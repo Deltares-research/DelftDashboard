@@ -1,0 +1,20 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Constants
+    module: models.sfincs.ddb_sfincs_physics_constants
+    element: sfincs.physics.constants.yml
+  - string: Roughness
+    module: models.sfincs.ddb_sfincs_physics_roughness
+    element: sfincs.physics.roughness.yml
+  - string: Advection
+    module: models.sfincs.ddb_sfincs_physics_advection
+    element: sfincs.physics.advection.yml
+  - string: Meteo
+    module: models.sfincs.ddb_sfincs_physics_meteo
+    element: sfincs.physics.meteo.yml

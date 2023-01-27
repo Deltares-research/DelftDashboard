@@ -1,0 +1,20 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 140
+  element:
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 110
+      width: 130
+      height: 20
+    text: Thin Dam File
+    variable: thdfile
+    showfilename: True
+    extension: "*.thd"
+    selectiontext: Select thin dam file
+    tooltipstring: Select thin dam file

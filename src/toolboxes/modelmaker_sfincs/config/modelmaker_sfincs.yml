@@ -1,0 +1,16 @@
+element:
+- style: panel
+  position:
+    x: 50
+    y: 50
+    width: 30
+    height: 30
+- style: edit
+  position:
+    x: 100
+    y: 85
+    width: 60
+    height: 20
+  text: Rho_a
+  variable_group: sfincs
+  variable: rhoa

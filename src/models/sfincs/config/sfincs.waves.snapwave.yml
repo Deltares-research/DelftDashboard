@@ -1,0 +1,16 @@
+element:
+- style: edit
+  position:
+    x: 100
+    y: 85
+    width: 60
+    height: 20
+  text: Advection Limiter
+  variable: advlim
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: advection
+      operator: gt
+      value: 0
