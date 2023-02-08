@@ -9,7 +9,7 @@ import os
 import importlib
 
 from ddb import ddb
-from guitools.gui import set_missing_element_values
+from guitools.gui import set_missing_element_values, read_gui_elements, find_element_by_id
 
 
 def build_gui_config():
@@ -20,7 +20,8 @@ def build_gui_config():
         # Read the GUI elements for this toolbox
         path = os.path.join(ddb.main_path, "toolboxes", toolbox_name, "config")
         file_name = toolbox_name + ".yml"
-        ddb.toolbox[toolbox_name].element = ddb.gui.read_gui_elements(path, file_name)
+#        ddb.toolbox[toolbox_name].element = ddb.gui.read_gui_elements(path, file_name)
+        ddb.toolbox[toolbox_name].element = read_gui_elements(path, file_name)
         variable_group = toolbox_name
         module = importlib.import_module("toolboxes." + toolbox_name + "." + toolbox_name)
         set_missing_element_values(ddb.toolbox[toolbox_name].element,
@@ -28,15 +29,14 @@ def build_gui_config():
                                    module,
                                    ddb.gui.variables,
                                    ddb.gui.getvar,
-                                   ddb.gui.setvar,
-                                   [])
+                                   ddb.gui.setvar)
 
     # Models
     for model_name in ddb.model:
         # Add the GUI elements (tab panel) for this model
         path = os.path.join(ddb.main_path, "models", model_name, "config")
         file_name = model_name + ".yml"
-        ddb.model[model_name].element = ddb.gui.read_gui_elements(path, file_name)[0]
+        ddb.model[model_name].element = read_gui_elements(path, file_name)[0]
 
     # The Delft Dashboard GUI is built up programmatically
     ddb.gui.config["window"] = {}
@@ -119,9 +119,14 @@ def build_gui_config():
     # Coordinate system
     menu = {}
     menu["text"] = "Coordinate System"
-    menu["module"] = "menu_coordinate_system"
+    menu["module"] = "ddb_coordinate_system"
     menu["menu"] = []
+    menu["menu"].append({"text": "WGS 84", "method": "wgs84", "separator": False})
+    menu["menu"].append({"text": "Select Other Geographic ...", "method": "other_geographic", "separator": True})
+    menu["menu"].append({"text": "Select UTM Zone ...", "method": "utm_zone", "separator": False})
+    menu["menu"].append({"text": "Select Other Projected ...", "method": "other_projected", "separator": False})
     ddb.gui.config["menu"].append(menu)
+
 
     # Help
     menu = {}
@@ -129,6 +134,7 @@ def build_gui_config():
     menu["module"] = "menu_help"
     menu["menu"] = []
     ddb.gui.config["menu"].append(menu)
+
 
 #    ddb.gui.config["element"].pop(1)
 #    ddb.gui.config["element"] = []

@@ -1,25 +1,15 @@
-//import mapboxgl from './assets/index.9e7ef0f8.js'; // or "const mapboxgl = require('mapbox-gl');"
-//console.log('main.js ...');
+let mapboxgl = mpbox.import_mapbox_gl()
 
-import mapboxgl from 'https://cdn.skypack.dev/mapbox-gl';
-//import deckGl from 'https://cdn.skypack.dev/deck.gl';
-//import mapboxMapboxGlDraw from 'https://cdn.skypack.dev/@mapbox/mapbox-gl-draw'
+import { draw, setDrawEvents } from '/js/draw.js';
 
 let mapReady;
 let mapMoved;
 let getMapExtent;
-let layerAdded;
 export let featureDrawn;
 export let featureSelected;
 export let featureModified;
-let layerName;
-let layerGroupName;
 export let jsonString;
-let idCounter = 0;
-let layerID = 'abc';
-export let featureId = '';
-let activeLayerId;
-let drawLayer = {};
+export let featureClicked;
 
 console.log('Adding MapBox map ...')
 
@@ -34,10 +24,6 @@ export const map = new mapboxgl.Map({
   projection: 'mercator' // display the map as a 3D globe
 });
 
-map.on('moveend', () => {
-    onMoveEnd();
-});
-
 map.scrollZoom.setWheelZoomRate(1 / 200);
 
 // Web Channel
@@ -47,6 +33,7 @@ new QWebChannel(qt.webChannelTransport, function (channel) {
     mapReady          = function() { MapBox.mapReady(jsonString)};
     mapMoved          = function() { MapBox.mapMoved(jsonString)};
     getMapExtent      = function() { MapBox.getMapExtent(jsonString)};
+    featureClicked    = function(featureId, featureProps) { MapBox.featureClicked(featureId, JSON.stringify(featureProps))};
     featureDrawn      = function(coordString, featureId, featureType) { MapBox.featureDrawn(coordString, featureId, featureType)};
     featureModified   = function(coordString, featureId, featureType) { MapBox.featureModified(coordString, featureId, featureType)};
     featureSelected   = function(featureId) { MapBox.featureSelected(featureId)};
@@ -54,7 +41,15 @@ new QWebChannel(qt.webChannelTransport, function (channel) {
 });
 
 map.on('load', () => {
-    mapLoaded();
+  console.log('Mapbox loaded !');
+  // Add dummy layer
+  addDummyLayer();
+  map.addControl(draw, 'top-left');
+  mapLoaded();
+});
+
+map.on('moveend', () => {
+    onMoveEnd();
 });
 
 function mapLoaded(evt) {
@@ -87,16 +82,32 @@ function onMoveEnd(evt) {
 
 
 export function removeLayer(id) {
-	// Remove layer
+  // Remove layer
+  var mapLayer = map.getLayer(id);
+  if(typeof mapLayer !== 'undefined') {
+    // Remove map layer & source.
+    map.removeLayer(id);
+  }
+  var mapSource = map.getSource(id);
+  if(typeof mapSource !== 'undefined') {
+    map.removeSource(id);
+  }
+  var legend = document.getElementById("legend" + id);
+  if (legend) {
+    legend.remove();
+  }
+}
+
+export function showLayer(id) {
+	// Show layer
 	var mapLayer = map.getLayer(id);
-	    if(typeof mapLayer !== 'undefined') {
-	      // Remove map layer & source.
-	      map.removeLayer(id).removeSource(id);
-    }
-    var legend = document.getElementById("legend" + id);
-    if (legend) {
-        legend.remove();
-    }
+	map.setLayoutProperty(id, 'visibility', 'visible');
+}
+
+export function hideLayer(id) {
+	// Show layer
+	var mapLayer = map.getLayer(id);
+	map.setLayoutProperty(id, 'visibility', 'none');
 }
 
 export function getExtent() {
@@ -127,4 +138,28 @@ export function jumpTo(lon, lat, zoom) {
 	// Called after moving map ended
 	// Get new map extents
 	map.jumpTo({center: [lon, lat], zoom: zoom});
+}
+
+export function flyTo(lon, lat, zoom) {
+	// Called after moving map ended
+	// Get new map extents
+	map.flyTo({center: [lon, lat], zoom: zoom});
+}
+
+function addDummyLayer() {
+  // Add a dummy layer (other layer will be added BEFORE this dummy layer)
+  var id = 'dummy_layer';
+  map.addSource(id, {
+    'type': 'geojson'
+  });
+  map.addLayer({
+    'id': 'dummy_layer',
+    'type': 'line',
+    'source': id,
+    'layout': {},
+    'paint': {
+      'line-color': '#000',
+      'line-width': 1
+    }
+  });
 }

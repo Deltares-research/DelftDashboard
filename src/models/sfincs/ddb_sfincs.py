@@ -8,9 +8,9 @@ import datetime
 
 from ddb_model import GenericModel
 from ddb import ddb
-#from ddb_gui import gui
 
-from cht.sfincs.sfincs import SFINCS
+#from cht.sfincs.sfincs import SFINCS
+from hydromt_sfincs import SfincsModel
 
 class Model(GenericModel):
     def __init__(self, name):
@@ -38,8 +38,10 @@ class Model(GenericModel):
 
         group = "sfincs"
 
-        for var_name in vars(self.domain.input):
-            ddb.gui.setvar(group, var_name, getattr(self.domain.input, var_name))
+#        for var_name in vars(self.domain.input):
+        for var_name in self.domain.config:
+            ddb.gui.setvar(group, var_name, self.domain.config[var_name])
+#                ddb.gui.setvar(group, var_name, getattr(self.domain.input, var_name))
 
         # # Loop through available input variables
         # gui.variables.add(group, "tstart",      self.domain.input.tstart,       minval=None,    maxval=None, errmsg="SFINCS start time must be greater than stop time")
@@ -79,12 +81,13 @@ class Model(GenericModel):
 
         group = "sfincs"
 
-        for var_name in vars(self.domain.input):
-            setattr(self.domain.input, var_name, ddb.gui.variables[group][var_name]["value"])
+        for var_name in self.domain.config:
+            self.domain.config[var_name] = ddb.gui.variables[group][var_name]["value"]
+#            setattr(self.domain.input, var_name, ddb.gui.variables[group][var_name]["value"])
 
     def initialize_domain(self):
 
-        self.domain = SFINCS()
+        self.domain = SfincsModel()
 
     def set_input_variable(self, gui_variable, value):
 

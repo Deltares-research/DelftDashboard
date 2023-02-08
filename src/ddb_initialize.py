@@ -92,5 +92,6 @@ def initialize():
     rgb = read_colormap('c:/work/checkouts/svn/OET/matlab/applications/DelftDashBoard/settings/colormaps/earth.txt')
     ddb.color_map_earth = ListedColormap(rgb)
 
+
     # Now build up GUI config
     build_gui_config()

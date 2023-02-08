@@ -20,7 +20,7 @@ export function addLayer(fileName, id, bounds, colorbar) {
         'paint': {
             'raster-resampling': 'nearest'
         }
-    });
+    }, 'dummy_layer');
 
     map.setPaintProperty(id,
       'raster-opacity',0.5
@@ -46,9 +46,6 @@ export function addLayer(fileName, id, bounds, colorbar) {
         legend.appendChild(document.createElement("br"));
     }
     document.body.appendChild(legend);
-
-//    layerAdded();
-
 }
 
 export function updateLayer(fileName, id, bounds, colorbar) {
@@ -87,7 +84,5 @@ export function updateLayer(fileName, id, bounds, colorbar) {
         legend.appendChild(document.createElement("br"));
     }
     document.body.appendChild(legend);
-
-
 }
 

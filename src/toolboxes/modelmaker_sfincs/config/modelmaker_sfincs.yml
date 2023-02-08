@@ -1,16 +1,29 @@
 element:
-- style: panel
+- style: tabpanel
   position:
-    x: 50
-    y: 50
-    width: 30
-    height: 30
-- style: edit
-  position:
-    x: 100
-    y: 85
-    width: 60
-    height: 20
-  text: Rho_a
-  variable_group: sfincs
-  variable: rhoa
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Domain
+    module: toolboxes.modelmaker_sfincs.domain
+    element: domain.yml
+  - string: Quadtree
+    module: toolboxes.modelmaker_sfincs.quadtree
+    element: quadtree.yml
+  - string: Bathymetry
+    module: toolboxes.modelmaker_sfincs.bathymetry
+    element: bathymetry.yml
+  - string: Roughness
+    module: toolboxes.modelmaker_sfincs.roughness
+    element: roughness.yml
+  - string: Mask Active Cells
+    module: toolboxes.modelmaker_sfincs.mask_active_cells
+    element: mask_active_cells.yml
+  - string: Mask Boundary Cells
+    module: toolboxes.modelmaker_sfincs.mask_boundary_cells
+    element: mask_boundary_cells.yml
+  - string: Sub Grid
+    module: toolboxes.modelmaker_sfincs.subgrid
+    element: subgrid.yml

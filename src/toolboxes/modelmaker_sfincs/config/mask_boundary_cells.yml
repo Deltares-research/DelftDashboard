@@ -1,0 +1,9 @@
+element:
+- style: pushbutton
+  text: Draw Boundary Polygon
+  position:
+    x: 120
+    y: 130
+    width: 120
+    height: 20
+  method: draw_boundary_polygon
