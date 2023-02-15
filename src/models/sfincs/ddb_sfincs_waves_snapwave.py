@@ -9,11 +9,10 @@ from ddb_models import models
 from ddb_gui import gui
 
 
-def select():
+def select(*args):
     gui.main_window.update_active_tab()
 
 
-def set_variables():
+def set_variables(*args):
     # All variables will be set
     models.model["sfincs"].set_model_variables()
-    gui.main_window.update_active_tab()

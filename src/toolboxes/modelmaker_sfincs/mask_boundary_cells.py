@@ -9,11 +9,11 @@ Created on Mon May 10 12:18:09 2021
 
 from ddb import ddb
 
-def select():
+def select(*args):
     # De-activate existing layers
     ddb.update_map()
     # Show the mask boundary layer
-    ddb.gui.map_widget["map"].layer["modelmaker_sfincs"].layer["mask_boundary"].set_mode("active")
+    ddb.map.layer["modelmaker_sfincs"].layer["mask_boundary"].set_mode("active")
 
-def draw_boundary_polygon():
+def draw_boundary_polygon(*args):
     ddb.toolbox["modelmaker_sfincs"].draw_boundary_polygon()

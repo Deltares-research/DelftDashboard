@@ -27,7 +27,7 @@ def utm_zone(option):
     lat = -80.0 + index*8.0 - 4.0
     zoom = 6
     ddb.crs = CRS("WGS 84 / UTM zone " + utm)
-    ddb.gui.map_widget["map"].fly_to(lon, lat, zoom)
+    ddb.map.fly_to(lon, lat, zoom)
 
 def other_projected(option):
     print("Other")

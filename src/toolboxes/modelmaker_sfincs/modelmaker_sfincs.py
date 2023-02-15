@@ -38,7 +38,7 @@ class Toolbox(GenericToolbox):
 
     def update_map(self, option):
         # Get layer
-        layer = ddb.gui.map_widget["map"].layer["modelmaker_sfincs"]
+        layer = ddb.map.layer["modelmaker_sfincs"]
         if option == "deactivate":
             # Make the layers invisible
             layer.set_mode("inactive")
@@ -66,7 +66,7 @@ class Toolbox(GenericToolbox):
 
     def add_layers(self):
         # Add Mapbox layers
-        layer = ddb.gui.map_widget["map"].add_layer("modelmaker_sfincs")
+        layer = ddb.map.add_layer("modelmaker_sfincs")
         # Grid outline
         layer.add_draw_layer("grid_outline",
                              create=self.grid_outline_created,
@@ -108,13 +108,11 @@ class Toolbox(GenericToolbox):
 #        layer.add_deck_geojson_layer("sfincs_grid")
 
     def draw_grid_outline(self):
-        mp = ddb.gui.map_widget["map"]
-        mp.layer["modelmaker_sfincs"].layer["grid_outline"].draw_rectangle()
+        ddb.map.layer["modelmaker_sfincs"].layer["grid_outline"].draw_rectangle()
 
     def grid_outline_created(self, gdf, feature_shape, feature_id):
         # Remove the old grid outline
-        mp = ddb.gui.map_widget["map"]
-        layer = mp.layer["modelmaker_sfincs"].layer["grid_outline"]
+        layer = ddb.map.layer["modelmaker_sfincs"].layer["grid_outline"]
         layer.delete_feature(self.grid_outline_id)
         self.grid_outline_id = feature_id
         self.x0       = round(gdf["x0"][0], 3)
@@ -124,7 +122,6 @@ class Toolbox(GenericToolbox):
         self.rotation = gdf["rotation"][0]*180/math.pi
         self.get_outline_geometry() # Compute nmax and mmax
         self.set_gui_variables()
-        ddb.gui.update_tab()
 
     def grid_outline_modified(self, gdf, feature_shape, feature_id):
         self.x0       = round(gdf["x0"][0], 3)
@@ -134,7 +131,6 @@ class Toolbox(GenericToolbox):
         self.rotation = round(gdf["rotation"][0] * 180 / math.pi, 1)
         self.get_outline_geometry()  # Compute nmax and mmax
         self.set_gui_variables()
-        ddb.gui.update_tab()
 
     def get_outline_geometry(self):
         self.nmax = np.floor(self.leny/self.dy).astype(int)
@@ -155,31 +151,31 @@ class Toolbox(GenericToolbox):
         grid_layer = layer.get("sfincs_grid")
         if grid_layer:
             grid_layer.delete()
-        layer.add_deck_geojson_layer("sfincs_grid", data=gdf)
+        layer.add_deck_geojson_layer("sfincs_grid", data=gdf, file_name="sfincs_grid.geojson")
 
     def draw_refinement_polygon(self):
-        ddb.gui.map_widget["map"].layer["modelmaker_sfincs"].layer["quadtree_refinement"].draw_polygon()
+        ddb.map.layer["modelmaker_sfincs"].layer["quadtree_refinement"].draw_polygon()
 
     def refinement_polygon_created(self, gdf, feature_shape, feature_id):
         pass
     def refinement_polygon_modified(self, gdf, feature_shape, feature_id):
         pass
     def draw_include_polygon(self):
-        ddb.gui.map_widget["map"].layer["modelmaker_sfincs"].layer["mask_include"].draw_polygon()
+        ddb.map.layer["modelmaker_sfincs"].layer["mask_include"].draw_polygon()
     def include_polygon_created(self, gdf, feature_shape, feature_id):
         pass
     def include_polygon_modified(self, gdf, feature_shape, feature_id):
         pass
 
     def draw_exclude_polygon(self):
-        ddb.gui.map_widget["map"].layer["modelmaker_sfincs"].layer["mask_exclude"].draw_polygon()
+        ddb.map.layer["modelmaker_sfincs"].layer["mask_exclude"].draw_polygon()
     def exclude_polygon_created(self, gdf, feature_shape, feature_id):
         pass
     def exclude_polygon_modified(self, gdf, feature_shape, feature_id):
         pass
 
     def draw_boundary_polygon(self):
-        ddb.gui.map_widget["map"].layer["modelmaker_sfincs"].layer["mask_boundary"].draw_polygon()
+        ddb.map.layer["modelmaker_sfincs"].layer["mask_boundary"].draw_polygon()
     def boundary_polygon_created(self, gdf, feature_shape, feature_id):
         pass
     def boundary_polygon_modified(self, gdf, feature_shape, feature_id):

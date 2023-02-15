@@ -25,6 +25,9 @@ class Model(GenericModel):
         self.initialize_domain()
         self.set_gui_variables()
 
+    def open(self):
+        pass
+
     def save(self):
         pass
 

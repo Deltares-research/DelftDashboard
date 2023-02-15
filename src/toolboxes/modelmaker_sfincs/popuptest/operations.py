@@ -10,7 +10,7 @@ def open():
     pass
 
 def map_ready():
-    mp = find_element_by_id(ddb.gui.popup_config["element"], "utm_map")["widget_group"]
+    mp = find_element_by_id(ddb.gui.popup_config["element"], "utm_map")["widget"]
     mp.jump_to(0.0, 0.0, 1)
     # Add UTM polygons
     lon = np.arange(-180.0, 180.0, 6.0)
@@ -28,7 +28,7 @@ def map_ready():
             utm_letter = letters[ilat]
             polygon = shapely.geometry.Polygon([[x, y], [x + 6.0, y], [x + 6.0, y + 8.0], [x, y + 8]])
             gdf_list.append({"utm_zone": utm_zone, "utm_letter": letters[ilat], "geometry": polygon})
-    gdf = gpd.GeoDataFrame(gdf_list)
+    gdf = gpd.GeoDataFrame(gdf_list, crs=4326)
     layer = mp.add_layer("utm")
     layer.add_geojson_layer("polygons",
                             data=gdf,

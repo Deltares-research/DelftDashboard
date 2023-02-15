@@ -7,6 +7,7 @@ element:
     height: 20
   text: X0
   variable: x0
+  method: edit
 - style: edit
   position:
     x: 160
@@ -15,6 +16,7 @@ element:
     height: 20
   text: Y0
   variable: y0
+  method: edit
 - style: edit
   position:
     x: 60

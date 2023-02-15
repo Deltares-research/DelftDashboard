@@ -7,5 +7,5 @@ Created on Mon May 10 12:18:09 2021
 
 from ddb import ddb
 
-def draw_layout():
+def draw_layout(*args):
     pass

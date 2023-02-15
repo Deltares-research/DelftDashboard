@@ -1,0 +1,98 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: edit
+    position:
+      x: 60
+      y: 110
+      width: 60
+      height: 20
+    text: X0
+    variable: x0
+    enable: False
+  - style: edit
+    position:
+      x: 160
+      y: 110
+      width: 60
+      height: 20
+    text: Y0
+    variable: y0
+    enable: False
+  - style: edit
+    position:
+      x: 60
+      y: 85
+      width: 60
+      height: 20
+    text: MMax
+    variable: mmax
+    enable: False
+  - style: edit
+    position:
+      x: 160
+      y: 85
+      width: 60
+      height: 20
+    text: NMax
+    variable: nmax
+    enable: False
+  - style: edit
+    position:
+      x: 60
+      y: 60
+      width: 60
+      height: 20
+    text: dX
+    variable: dx
+    enable: False
+  - style: edit
+    position:
+      x: 160
+      y: 60
+      width: 60
+      height: 20
+    text: dY
+    variable: dy
+    enable: False
+  - style: edit
+    position:
+      x: 60
+      y: 35
+      width: 60
+      height: 20
+    text: Rotation
+    variable: rotation
+    enable: False
+  - style: edit
+    position:
+      x: 60
+      y: 10
+      width: 60
+      height: 20
+    text: Latitude
+    variable: latitude
+    method: set_variables
+  - style: pushselectfile
+    position:
+      x: 260
+      y: 110
+      width: 130
+      height: 20
+    tooltipstring: Select depth file
+    text: Depth File
+    variable: depfile
+  - style: pushselectfile
+    position:
+      x: 260
+      y: 60
+      width: 130
+      height: 20
+    tooltipstring: Select mask file
+    text: Mask File
+    variable: mskfile

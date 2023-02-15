@@ -9,15 +9,15 @@ Created on Mon May 10 12:18:09 2021
 
 from ddb import ddb
 
-def select():
+def select(*args):
     # De-activate existing layers
     ddb.update_map()
     # Show the mask include and exclude layer
-    ddb.gui.map_widget["map"].layer["modelmaker_sfincs"].layer["mask_include"].set_mode("active")
-    ddb.gui.map_widget["map"].layer["modelmaker_sfincs"].layer["mask_exclude"].set_mode("active")
+    ddb.map.layer["modelmaker_sfincs"].layer["mask_include"].set_mode("active")
+    ddb.map.layer["modelmaker_sfincs"].layer["mask_exclude"].set_mode("active")
 
-def draw_include_polygon():
+def draw_include_polygon(*args):
     ddb.toolbox["modelmaker_sfincs"].draw_include_polygon()
 
-def draw_exclude_polygon():
+def draw_exclude_polygon(*args):
     ddb.toolbox["modelmaker_sfincs"].draw_exclude_polygon()

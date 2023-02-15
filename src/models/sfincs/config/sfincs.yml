@@ -5,13 +5,12 @@ element:
     x: 10
     y: 10
     width: -10
-    height: -30
+    height: -10
   variable_group: sfincs
   tab:
   - string: Toolbox
   - string: Domain
     module: models.sfincs.ddb_sfincs_domain
-    method: set_variables
     element: sfincs.domain.yml
   - string: Time Frame
     module: models.sfincs.ddb_sfincs_timeframe
@@ -35,3 +34,4 @@ element:
   - string: Output
     module: models.sfincs.ddb_sfincs_output
     element: sfincs.output.yml
+- style: mapbox

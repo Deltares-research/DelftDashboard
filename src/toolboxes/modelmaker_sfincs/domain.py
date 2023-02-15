@@ -9,13 +9,16 @@ Created on Mon May 10 12:18:09 2021
 
 from ddb import ddb
 
-def select():
+def select(*args):
     # De-activate existing layers
     ddb.update_map()
     # Show the grid outline layer
-    ddb.gui.map_widget["map"].layer["modelmaker_sfincs"].layer["grid_outline"].set_mode("active")
+    ddb.map.layer["modelmaker_sfincs"].layer["grid_outline"].set_mode("active")
 
-def draw_grid_outline():
+def edit(*args):
+    pass
+
+def draw_grid_outline(*args):
     ddb.toolbox["modelmaker_sfincs"].draw_grid_outline()
 
 def generate_grid():

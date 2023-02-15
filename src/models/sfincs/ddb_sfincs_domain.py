@@ -7,10 +7,9 @@ Created on Mon May 10 12:18:09 2021
 
 from ddb import ddb
 
-def select():
-#    ddb.gui.update_tab()
+def select(*args):
     pass
 
-def set_variables():
+def set_variables(*args):
     ddb.model["sfincs"].set_model_variables()
-    ddb.gui.update_tab()
+

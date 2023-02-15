@@ -43,8 +43,7 @@ class Toolbox(GenericToolbox):
             pass
 
     def draw_polygon(self):
-        mp = ddb.gui.map_widget["map"]
-        layer = mp.add_layer("drawing")
+        layer = ddb.map.add_layer("drawing")
         draw_layer = layer.add_draw_layer("polygon",
                                           create=self.polygon_created,
                                           modify=self.polygon_modified,
@@ -59,7 +58,7 @@ class Toolbox(GenericToolbox):
         self.polygon.append(Polygon(name, gdf))
         ddb.gui.setvar("drawing", "active_polygon", npol - 1)
         #        geom = gdf.to_crs(3857).buffer(5000.0).to_crs(4326)
-        #        ddb.gui.map_widget["map"].layer["drawing"].add_deck_geojson_layer("buffer01", data=geom)
+        #        ddb.map.layer["drawing"].add_deck_geojson_layer("buffer01", data=geom)
         self.update()
 
     def polygon_modified(self, gdf, feature_shape, feature_id):
@@ -81,19 +80,18 @@ class Toolbox(GenericToolbox):
         iac = ddb.gui.getvar("drawing", "active_polygon")
         # Activate on map
         feature_id = self.polygon[iac].gdf["id"][0]
-        ddb.gui.map_widget["map"].layer["drawing"].layer["polygon"].activate_feature(feature_id)
+        ddb.map.layer["drawing"].layer["polygon"].activate_feature(feature_id)
 
     def delete_polygon(self):
         if self.polygon:
             iac = ddb.gui.getvar("drawing", "active_polygon")
             feature_id = self.polygon[iac].gdf["id"][0]
-            ddb.gui.map_widget["map"].layer["drawing"].layer["polygon"].delete_feature(feature_id)
+            ddb.map.layer["drawing"].layer["polygon"].delete_feature(feature_id)
             self.polygon.pop(iac)
             self.update()
 
     def draw_rectangle(self):
-        mp = ddb.gui.map_widget["map"]
-        layer = mp.add_layer("drawing")
+        layer = ddb.map.add_layer("drawing")
         draw_layer = layer.add_draw_layer("rectangle",
                                           create=self.rectangle_created,
                                           modify=self.rectangle_modified,
@@ -128,19 +126,18 @@ class Toolbox(GenericToolbox):
         iac = ddb.gui.getvar("drawing", "active_rectangle")
         # Activate on map
         feature_id = self.rectangle[iac].gdf["id"][0]
-        ddb.gui.map_widget["map"].layer["drawing"].layer["rectangle"].activate_feature(feature_id)
+        ddb.map.layer["drawing"].layer["rectangle"].activate_feature(feature_id)
 
     def delete_rectangle(self):
         if self.rectangle:
             iac = ddb.gui.getvar("drawing", "active_rectangle")
             feature_id = self.rectangle[iac].gdf["id"][0]
-            ddb.gui.map_widget["map"].layer["drawing"].layer["rectangle"].delete_feature(feature_id)
+            ddb.map.layer["drawing"].layer["rectangle"].delete_feature(feature_id)
             self.rectangle.pop(iac)
             self.update()
 
     def draw_polyline(self):
-        mp = ddb.gui.map_widget["map"]
-        layer = mp.add_layer("drawing")
+        layer = ddb.map.add_layer("drawing")
         draw_layer = layer.add_draw_layer("polyline",
                                           create=self.polyline_created,
                                           modify=self.polyline_modified,
@@ -175,13 +172,13 @@ class Toolbox(GenericToolbox):
         iac = ddb.gui.getvar("drawing", "active_polyline")
         # Activate on map
         feature_id = self.polyline[iac].gdf["id"][0]
-        ddb.gui.map_widget["map"].layer["drawing"].layer["polyline"].activate_feature(feature_id)
+        ddb.map.layer["drawing"].layer["polyline"].activate_feature(feature_id)
 
     def delete_polyline(self):
         if self.polyline:
             iac = ddb.gui.getvar("drawing", "active_polyline")
             feature_id = self.polyline[iac].gdf["id"][0]
-            ddb.gui.map_widget["map"].layer["drawing"].layer["polyline"].delete_feature(feature_id)
+            ddb.map.layer["drawing"].layer["polyline"].delete_feature(feature_id)
             self.polyline.pop(iac)
             self.update()
 
@@ -203,7 +200,7 @@ class Toolbox(GenericToolbox):
         iac = min(iac, len(self.polyline) - 1)
         ddb.gui.setvar("drawing", "active_polyline", iac)
 
-        ddb.gui.update_tab()
+        ddb.gui.update()
 
     def update_polygon_names(self):
         names = []
@@ -231,36 +228,36 @@ class Toolbox(GenericToolbox):
 
 # Methods that are called from the GUI
 
-def draw_polygon():
+def draw_polygon(*args):
     ddb.toolbox["drawing"].draw_polygon()
 
 
-def select_polygon():
+def select_polygon(*args):
     ddb.toolbox["drawing"].select_polygon()
 
 
-def delete_polygon():
+def delete_polygon(*args):
     ddb.toolbox["drawing"].delete_polygon()
 
 
-def draw_rectangle():
+def draw_rectangle(*args):
     ddb.toolbox["drawing"].draw_rectangle()
 
 
-def select_rectangle():
+def select_rectangle(*args):
     ddb.toolbox["drawing"].select_rectangle()
 
 
-def delete_rectangle():
+def delete_rectangle(*args):
     ddb.toolbox["drawing"].delete_rectangle()
 
-def draw_polyline():
+def draw_polyline(*args):
     ddb.toolbox["drawing"].draw_polyline()
 
 
-def select_polyline():
+def select_polyline(*args):
     ddb.toolbox["drawing"].select_polyline()
 
 
-def delete_polyline():
+def delete_polyline(*args):
     ddb.toolbox["drawing"].delete_polyline()

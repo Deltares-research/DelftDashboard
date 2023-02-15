@@ -9,6 +9,7 @@ import os
 import yaml
 from matplotlib.colors import ListedColormap
 import importlib
+from pyproj import CRS
 
 from guitools.gui import GUI
 from cht.bathymetry.bathymetry_database import bathymetry_database
@@ -33,6 +34,9 @@ def initialize():
     ddb.config["height"]        = 600
     ddb.config["model"]         = []
     ddb.config["toolbox"]       = []
+    ddb.config["window_icon"]   = os.path.join(ddb.main_path, "settings", "images", "deltares_icon.png")
+#    ddb.config["splash_file"]   = os.path.join(ddb.main_path, "settings", "images", "DelftDashBoard.jpg")
+    ddb.config["splash_file"]   = None
 
     # Read ini file and override stuff in default config dict
     inifile = open("delftdashboard.ini", "r")
@@ -47,7 +51,35 @@ def initialize():
                   config_path=ddb.main_path,
                   server_path=ddb.server_path,
                   server_port=ddb.config["server_port"],
-                  stylesheet=ddb.config["stylesheet"])
+                  stylesheet=ddb.config["stylesheet"],
+                  splash_file=ddb.config["splash_file"])
+
+    ddb.gui.show_splash()
+
+
+    # Define some other variables
+    ddb.crs = CRS(4326)
+    ddb.auto_update_topography = True
+    ddb.background_topography  = "gebco22"
+    ddb.bathymetry_database_path = "c:\\work\\delftdashboard\\data\\bathymetry"
+    bathymetry_database.initialize(ddb.bathymetry_database_path)
+
+
+    # View
+    ddb.view = {}
+    ddb.view["projection"] = "mercator"
+    ddb.view["topography"] = {}
+    ddb.view["topography"]["visible"]  = True
+    ddb.view["topography"]["opacity"]  = 0.5
+    ddb.view["topography"]["quality"]  = "medium"
+    ddb.view["topography"]["colormap"] = "earth"
+    ddb.view["topography"]["interp_method"] = "nearest"
+    ddb.view["topography"]["interp_method"] = "linear"
+    ddb.view["layer_style"] = "streets"
+    ddb.view["terrain"] = {}
+    ddb.view["terrain"]["visible"] = False
+    ddb.view["terrain"]["exaggeration"] = 1.5
+    ddb.view["interp_method"] = "nearest"
 
     # Initialize toolboxes
     ddb.toolbox = {}
@@ -78,11 +110,6 @@ def initialize():
     ddb.active_model   = ddb.model[list(ddb.model)[0]]
     ddb.active_toolbox = ddb.toolbox[list(ddb.toolbox)[0]]
 
-    # Define some other variables
-    ddb.auto_update_topography = True
-    ddb.background_topography  = "gebco22"
-    ddb.bathymetry_database_path = "c:\\work\\delftdashboard\\data\\bathymetry"
-    bathymetry_database.initialize(ddb.bathymetry_database_path)
 
     # Read bathymetry database
 

@@ -7,17 +7,16 @@ Created on Mon May 10 12:18:09 2021
 
 from ddb import ddb
 
-def select():
-    ddb.gui.main_window.update_active_tab()
+def select(*args):
+    pass
 
 
-def set_variables():
+def set_variables(*args):
     # All variables will be set
     ddb.model["sfincs"].set_model_variables()
-    ddb.gui.update()
 
 
-def set_theta():
+def set_theta(*args):
     #    models.model["sfincs"].set_model_variables()
     #    # OR:
     ddb.model["sfincs"].domain.input.theta = ddb.gui.variables.var["sfincs"]["theta"]["value"]

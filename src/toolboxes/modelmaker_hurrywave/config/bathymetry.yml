@@ -1,0 +1,150 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 35
+    width: 200
+    height: 85
+  text: "Available Datasets"
+  text_position: "above"
+  method: select_bathymetry_dataset
+  variable: bathymetry_dataset_index
+  select: index
+  option_string:
+    variable: bathymetry_dataset_names
+- style: popupmenu
+  position:
+    x: 10
+    y: 10
+    width: 200
+    height: 20
+  method: select_bathymetry_source
+  variable: active_bathymetry_source
+  select: item
+  option_string:
+    variable: bathymetry_source_names
+  option_value:
+    variable: bathymetry_source_names
+- style: pushbutton
+  position:
+    x: 220
+    y: 100
+    width: 80
+    height: 20
+  text: "Use Dataset ->"
+  method: use_dataset
+- style: pushbutton
+  position:
+    x: 220
+    y: 75
+    width: 80
+    height: 20
+  text: "Info"
+  method: info
+  enable: False
+- style: listbox
+  position:
+    x: 310
+    y: 10
+    width: 200
+    height: 110
+  text: "Selected Datasets"
+  text_position: "above"
+  method: select_selected_bathymetry_dataset
+  variable: selected_bathymetry_dataset_index
+  select: index
+  option_string:
+    variable: selected_bathymetry_dataset_names
+- style: pushbutton
+  position:
+    x: 520
+    y: 100
+    width: 80
+    height: 20
+  text: "Remove"
+  method: remove_selected_bathymetry_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: pushbutton
+  position:
+    x: 520
+    y: 75
+    width: 80
+    height: 20
+  text: "Move Up"
+  method: move_up_selected_bathymetry_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: pushbutton
+  position:
+    x: 520
+    y: 50
+    width: 80
+    height: 20
+  text: "Move Down"
+  method: move_down_selected_bathymetry_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: edit
+  position:
+    x: 650
+    y: 100
+    width: 50
+    height: 20
+  text: "Zmax"
+  method: edit_zmax_bathymetry_dataset
+  variable: selected_bathymetry_dataset_zmax
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: edit
+  position:
+    x: 650
+    y: 75
+    width: 50
+    height: 20
+  text: "Zmin"
+  method: edit_zmin_bathymetry_dataset
+  variable: selected_bathymetry_dataset_zmin
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: pushbutton
+  position:
+    x: -10
+    y: 10
+    width: 120
+    height: 20
+  text: "Generate Bathymetry"
+  method: generate_bathymetry
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+  

@@ -9,7 +9,8 @@ import os
 import importlib
 
 from ddb import ddb
-from guitools.gui import set_missing_element_values, read_gui_elements, find_element_by_id
+from guitools.gui import set_missing_element_values, read_gui_elements
+from cht.bathymetry.bathymetry_database import bathymetry_database
 
 
 def build_gui_config():
@@ -27,9 +28,7 @@ def build_gui_config():
         set_missing_element_values(ddb.toolbox[toolbox_name].element,
                                    variable_group,
                                    module,
-                                   ddb.gui.variables,
-                                   ddb.gui.getvar,
-                                   ddb.gui.setvar)
+                                   ddb.gui)
 
     # Models
     for model_name in ddb.model:
@@ -43,6 +42,7 @@ def build_gui_config():
     ddb.gui.config["window"]["title"] = ddb.config["title"]
     ddb.gui.config["window"]["width"] = ddb.config["width"]
     ddb.gui.config["window"]["height"] = ddb.config["height"]
+    ddb.gui.config["window"]["icon"]  = ddb.config["window_icon"]
     ddb.gui.config["menu"] = []
     ddb.gui.config["toolbar"] = []
     ddb.gui.config["element"] = []
@@ -59,7 +59,7 @@ def build_gui_config():
     mpbox["position"]["x"] = 20
     mpbox["position"]["y"] = 190
     mpbox["position"]["width"] = -20
-    mpbox["position"]["height"] = -70
+    mpbox["position"]["height"] = -40
     mpbox["module"] = "ddb_map"
     ddb.gui.config["element"].append(mpbox)
 
@@ -102,11 +102,21 @@ def build_gui_config():
                              "checkable": True})
     ddb.gui.config["menu"].append(menu)
 
+
     # Topography
+    source_names, sources = bathymetry_database.sources()
+#    dataset_names, dataset_long_names, dataset_source_names = bathymetry_database.dataset_names()
     menu = {}
     menu["text"] = "Topography"
     menu["module"] = "menu_topography"
     menu["menu"] = []
+    for source in sources:
+        source_menu = {}
+        source_menu["text"] = source.name
+        source_menu["menu"] = []
+        for dataset in source.dataset:
+            source_menu["menu"].append({"id": "topography." + dataset.name, "text": dataset.name, "separator": False,  "checkable": True, "option": dataset.name, "method": "select_dataset"})
+        menu["menu"].append(source_menu)
     ddb.gui.config["menu"].append(menu)
 
     # View
@@ -114,6 +124,22 @@ def build_gui_config():
     menu["text"] = "View"
     menu["module"] = "menu_view"
     menu["menu"] = []
+    menu["menu"].append({"id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True})
+    menu["menu"].append({"id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True})
+    menu["menu"].append({"id": "view.topography",  "text": "Topography", "method": "topography", "separator": True,  "checkable": True})
+
+    # layer_style_menu = {}
+    # layer_style_menu["text"] = "Layer Style"
+    # layer_style_menu["menu"] = []
+    # layer_style_menu["menu"].append({"id": "view.layer_style.streets", "text": "Streets", "separator": False,  "checkable": True, "option": "streets-v12", "method": "layer_style"})
+    # layer_style_menu["menu"].append({"id": "view.layer_style.satellite", "text": "Satellite", "separator": False,  "checkable": True, "option": "satellite-v9", "method": "layer_style"})
+    # layer_style_menu["menu"].append({"id": "view.layer_style.satellite_streets", "text": "Satellite Streets", "separator": False,  "checkable": True, "option": "satellite-streets-v12", "method": "layer_style"})
+    # layer_style_menu["menu"].append({"id": "view.layer_style.dark", "text": "Dark", "separator": False,  "checkable": True, "option": "dark-v11", "method": "layer_style"})
+    # layer_style_menu["menu"].append({"id": "view.layer_style.light", "text": "Light", "separator": False,  "checkable": True, "option": "light-v11", "method": "layer_style"})
+    # menu["menu"].append(layer_style_menu)
+
+    menu["menu"].append({"id": "view.terrain",  "text": "3D Terrain", "method": "terrain", "separator": True,  "checkable": True})
+
     ddb.gui.config["menu"].append(menu)
 
     # Coordinate system

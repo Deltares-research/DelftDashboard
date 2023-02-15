@@ -14,6 +14,12 @@ class GenericModel:
         self.name      = "model"
         self.long_name = "Model"
 
+    def open(self):
+        pass
+
+    def add_layers(self):
+        pass
+
     def select(self):
 
         elements = ddb.gui.config["element"]
@@ -22,13 +28,15 @@ class GenericModel:
         for element in elements:
             if element["style"] == "tabpanel":
                 if element["id"] == self.name:
-                    element["widget"].setVisible(True)
-                    ddb.active_model_panel = element
+                    element["widget"].widgets[0].setVisible(True)
+                    element["visible"] = True
+#                    ddb.active_model_panel = element
         # And the others to invisible
         for element in elements:
             if element["style"] == "tabpanel":
                 if element["id"] != self.name:
-                    element["widget"].setVisible(False)
+                    element["widget"].widgets[0].setVisible(False)
+                    element["visible"] = False
 
         ddb.active_model = self
 

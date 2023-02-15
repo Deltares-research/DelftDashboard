@@ -1,0 +1,18 @@
+element:
+- style: tabpanel
+  id: hurrywave
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: -10
+  variable_group: hurrywave
+  tab:
+  - string: Toolbox
+  - string: Domain
+    module: models.hurrywave.ddb_hurrywave_domain
+    method: set_variables
+    element: hurrywave.domain.yml
+  - string: Time Frame
+    module: models.hurrywave.ddb_hurrywave_timeframe
+    element: hurrywave.timeframe.yml

@@ -7,7 +7,7 @@ Created on Mon May 10 12:18:09 2021
 
 from ddb import ddb
 
-def draw_domain():
+def draw_domain(*args):
     toolbox = ddb.toolbox["modelmaker_sfincs"]    
     pass
     

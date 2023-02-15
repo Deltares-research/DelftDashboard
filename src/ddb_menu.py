@@ -10,3 +10,9 @@ from ddb import ddb
 def new(id, option):
     print(id)
     print(option)
+
+def open(option):
+    ddb.active_model.open()
+
+def save(option):
+    ddb.active_model.save()
