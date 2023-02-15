@@ -9,7 +9,7 @@ import os
 import importlib
 
 from ddb import ddb
-from guitools.gui import set_missing_element_values, read_gui_elements
+from guitares.gui import set_missing_element_values, read_gui_elements
 from cht.bathymetry.bathymetry_database import bathymetry_database
 
 

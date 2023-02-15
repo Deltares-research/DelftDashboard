@@ -6,7 +6,7 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 from ddb import ddb
-from guitools.gui import add_elements
+from guitares.gui import add_elements
 
 class GenericToolbox:
     def __init__(self):

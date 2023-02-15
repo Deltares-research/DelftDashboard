@@ -8,7 +8,7 @@ import numpy as np
 
 from ddb import ddb
 from cht.bathymetry.bathymetry_database import bathymetry_database
-from guitools.gui import find_element_by_id
+from guitares.gui import find_element_by_id
 from cht.misc.geometry import RegularGrid
 from pyproj import CRS
 

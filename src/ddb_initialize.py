@@ -11,7 +11,7 @@ from matplotlib.colors import ListedColormap
 import importlib
 from pyproj import CRS
 
-from guitools.gui import GUI
+from guitares.gui import GUI
 from cht.bathymetry.bathymetry_database import bathymetry_database
 from colormap import read_colormap
 

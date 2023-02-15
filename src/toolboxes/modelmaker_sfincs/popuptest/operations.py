@@ -3,7 +3,7 @@ import geopandas as gpd
 import shapely
 
 from ddb import ddb
-from guitools.gui import find_element_by_id
+from guitares.gui import find_element_by_id
 
 
 def open():

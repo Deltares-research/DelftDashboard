@@ -6,7 +6,7 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 from ddb import ddb
-from guitools.gui import find_menu_item_by_id
+from guitares.gui import find_menu_item_by_id
 
 def globe(option):
     if ddb.view["projection"] == "globe":
