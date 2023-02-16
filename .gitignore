@@ -1,3 +1,5 @@
 __pycache__
 .idea
 /src/server
+/src/mapbox_token.mine.txt
+/src/mapbox_token.empty.txt
