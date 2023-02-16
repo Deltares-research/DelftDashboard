@@ -1,5 +1,6 @@
 element:
 - style: panel
+  title: Time Frame
   position:
     x: 10
     y: 10
@@ -9,7 +10,7 @@ element:
   - style: datetimeedit
     position:
       x: 80
-      y: 110
+      y: 130
       width: 110
       height: 20
     text: Reference Time
@@ -18,7 +19,7 @@ element:
   - style: datetimeedit
     position:
       x: 80
-      y: 85
+      y: 105
       width: 110
       height: 20
     text: Start Time
@@ -27,7 +28,7 @@ element:
   - style: datetimeedit
     position:
       x: 80
-      y: 60
+      y: 80
       width: 110
       height: 20
     text: Stop Time
@@ -36,7 +37,7 @@ element:
   - style: edit
     position:
       x: 80
-      y: 35
+      y: 55
       width: 110
       height: 20
     text: Spin-up Time (s)

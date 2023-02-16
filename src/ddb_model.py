@@ -13,6 +13,7 @@ class GenericModel:
     def __init__(self):
         self.name      = "model"
         self.long_name = "Model"
+        self.exe_path  = None
 
     def open(self):
         pass

@@ -16,14 +16,24 @@ def select(*args):
     ddb.map.layer["modelmaker_hurrywave"].layer["mask_include"].set_mode("active")
     ddb.map.layer["modelmaker_hurrywave"].layer["mask_exclude"].set_mode("active")
 
-def select_include_polygon(*args):
-    pass
 
 def draw_include_polygon(*args):
-    ddb.map.layer["modelmaker_hurrywave"].layer["mask_include"].draw_polygon()
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_include"].draw()
 
 def delete_include_polygon(*args):
-    pass
+    if len(ddb.toolbox["modelmaker_hurrywave"].include_polygon) == 0:
+        return
+    index = ddb.gui.getvar("modelmaker_hurrywave", "include_polygon_index")
+    # or: iac = args[0]
+    feature_id = ddb.toolbox["modelmaker_hurrywave"].include_polygon.loc[index, "id"]
+    # Delete from map
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_include"].delete_feature(feature_id)
+    # Delete from app
+    ddb.toolbox["modelmaker_hurrywave"].include_polygon = ddb.toolbox["modelmaker_hurrywave"].include_polygon.drop(index)
+    # If the last polygon was deleted, set index to last available polygon
+    if index > len(ddb.toolbox["modelmaker_hurrywave"].include_polygon) - 1:
+        ddb.gui.setvar("modelmaker_hurrywave", "include_polygon_index", len(ddb.toolbox["modelmaker_hurrywave"].include_polygon) - 1)
+    update()
 
 def load_include_polygon(*args):
     pass
@@ -31,26 +41,41 @@ def load_include_polygon(*args):
 def save_include_polygon(*args):
     pass
 
-def include_polygon_created(gdf, feature_shape, feature_id):
+def select_include_polygon(*args):
+    index = args[0]
+    feature_id = ddb.toolbox["modelmaker_hurrywave"].include_polygon.loc[index, "id"]
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_include"].activate_feature(feature_id)
+
+def include_polygon_created(gdf, index, id):
     ddb.toolbox["modelmaker_hurrywave"].include_polygon = gdf
     nrp = len(ddb.toolbox["modelmaker_hurrywave"].include_polygon)
     ddb.gui.setvar("modelmaker_hurrywave", "include_polygon_index", nrp - 1)
     update()
 
-def include_polygon_modified(gdf, feature_shape, feature_id):
-    pass
+def include_polygon_modified(gdf, index, id):
+    ddb.toolbox["modelmaker_hurrywave"].include_polygon = gdf
 
-def include_polygon_selected(gdf, feature_shape, feature_id):
-    pass
-
-def select_exclude_polygon(*args):
-    pass
+def include_polygon_selected(index):
+    ddb.gui.setvar("modelmaker_hurrywave", "include_polygon_index", index)
+    update()
 
 def draw_exclude_polygon(*args):
-    ddb.toolbox["modelmaker_hurrywave"].draw_exclude_polygon()
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_exclude"].draw()
 
 def delete_exclude_polygon(*args):
-    pass
+    if len(ddb.toolbox["modelmaker_hurrywave"].exclude_polygon) == 0:
+        return
+    index = ddb.gui.getvar("modelmaker_hurrywave", "exclude_polygon_index")
+    # or: iac = args[0]
+    feature_id = ddb.toolbox["modelmaker_hurrywave"].exclude_polygon.loc[index, "id"]
+    # Delete from map
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_exclude"].delete_feature(feature_id)
+    # Delete from app
+    ddb.toolbox["modelmaker_hurrywave"].exclude_polygon = ddb.toolbox["modelmaker_hurrywave"].exclude_polygon.drop(index)
+    # If the last polygon was deleted, set index to last available polygon
+    if index > len(ddb.toolbox["modelmaker_hurrywave"].exclude_polygon) - 1:
+        ddb.gui.setvar("modelmaker_hurrywave", "exclude_polygon_index", len(ddb.toolbox["modelmaker_hurrywave"].exclude_polygon) - 1)
+    update()
 
 def load_exclude_polygon(*args):
     pass
@@ -58,20 +83,25 @@ def load_exclude_polygon(*args):
 def save_exclude_polygon(*args):
     pass
 
-def exclude_polygon_created(gdf, feature_shape, feature_id):
+def select_exclude_polygon(*args):
+    index = args[0]
+    feature_id = ddb.toolbox["modelmaker_hurrywave"].exclude_polygon.loc[index, "id"]
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_exclude"].activate_feature(feature_id)
+
+def exclude_polygon_created(gdf, index, id):
     ddb.toolbox["modelmaker_hurrywave"].exclude_polygon = gdf
     nrp = len(ddb.toolbox["modelmaker_hurrywave"].exclude_polygon)
-    ddb.gui.setvar("modelmaker_hurrywave", "nr_exclude_polygon_index", nrp - 1)
+    ddb.gui.setvar("modelmaker_hurrywave", "exclude_polygon_index", nrp - 1)
     update()
 
-def exclude_polygon_modified(gdf, feature_shape, feature_id):
-    pass
+def exclude_polygon_modified(gdf, index, id):
+    ddb.toolbox["modelmaker_hurrywave"].exclude_polygon = gdf
 
-def exclude_polygon_selected(gdf, feature_shape, feature_id):
-    pass
+def exclude_polygon_selected(index):
+    ddb.gui.setvar("modelmaker_hurrywave", "exclude_polygon_index", index)
+    update()
 
 def update():
-
     nrp = len(ddb.toolbox["modelmaker_hurrywave"].include_polygon)
     incnames = []
     for ip in range(nrp):
@@ -87,24 +117,6 @@ def update():
     ddb.gui.setvar("modelmaker_hurrywave", "exclude_polygon_names", excnames)
 
     ddb.gui.update()
-
-
-    # group = "modelmaker_hurrywave"
-    # include_names = []
-    # nrp = len(ddb.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets)
-    # if nrd>0:
-    #     for dataset in ddb.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets:
-    #         selected_names.append(dataset["dataset"].name)
-    #     ddb.gui.setvar(group, "selected_bathymetry_dataset_names", selected_names)
-    #     index = ddb.gui.getvar(group, "selected_bathymetry_dataset_index")
-    #     if index > nrd - 1:
-    #         index = nrd - 1
-    #     dataset = ddb.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets[index]
-    #     ddb.gui.setvar(group, "selected_bathymetry_dataset_zmin", dataset["zmin"])
-    #     ddb.gui.setvar(group, "selected_bathymetry_dataset_zmax", dataset["zmax"])
-
-    pass
-
 
 def update_mask(*args):
     ddb.toolbox["modelmaker_hurrywave"].update_mask()

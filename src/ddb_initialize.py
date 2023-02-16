@@ -52,7 +52,8 @@ def initialize():
                   server_path=ddb.server_path,
                   server_port=ddb.config["server_port"],
                   stylesheet=ddb.config["stylesheet"],
-                  splash_file=ddb.config["splash_file"])
+                  splash_file=ddb.config["splash_file"],
+                  copy_mapbox_server_folder=True)
 
     ddb.gui.show_splash()
 
@@ -96,6 +97,8 @@ def initialize():
         # And initialize the domain for this model
         module = importlib.import_module("models." + model_name + "." + "ddb_" + model_name)
         ddb.model[model_name] = module.Model(model_name)
+        if "exe_path" in mdl:
+            ddb.model[model_name].domain.exe_path = mdl["exe_path"]
         # Loop through toolboxes to see which ones should be activated for which model
         ddb.model[model_name].toolbox = []
         for tlb in ddb.config["toolbox"]:

@@ -15,14 +15,23 @@ def select(*args):
     # Show the mask boundary layer
     ddb.map.layer["modelmaker_hurrywave"].layer["mask_boundary"].set_mode("active")
 
-def select_boundary_polygon(*args):
-    pass
-
 def draw_boundary_polygon(*args):
-    ddb.map.layer["modelmaker_hurrywave"].layer["mask_boundary"].draw_polygon()
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_boundary"].draw()
 
 def delete_boundary_polygon(*args):
-    pass
+    if len(ddb.toolbox["modelmaker_hurrywave"].boundary_polygon) == 0:
+        return
+    index = ddb.gui.getvar("modelmaker_hurrywave", "boundary_polygon_index")
+    # or: iac = args[0]
+    feature_id = ddb.toolbox["modelmaker_hurrywave"].boundary_polygon.loc[index, "id"]
+    # Delete from map
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_boundary"].delete_feature(feature_id)
+    # Delete from app
+    ddb.toolbox["modelmaker_hurrywave"].boundary_polygon = ddb.toolbox["modelmaker_hurrywave"].boundary_polygon.drop(index)
+    # If the last polygon was deleted, set index to last available polygon
+    if index > len(ddb.toolbox["modelmaker_hurrywave"].boundary_polygon) - 1:
+        ddb.gui.setvar("modelmaker_hurrywave", "boundary_polygon_index", len(ddb.toolbox["modelmaker_hurrywave"].boundary_polygon) - 1)
+    update()
 
 def load_boundary_polygon(*args):
     pass
@@ -30,45 +39,34 @@ def load_boundary_polygon(*args):
 def save_boundary_polygon(*args):
     pass
 
-def boundary_polygon_created(gdf, feature_shape, feature_id):
+def select_boundary_polygon(*args):
+    index = args[0]
+    feature_id = ddb.toolbox["modelmaker_hurrywave"].boundary_polygon.loc[index, "id"]
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_boundary"].activate_feature(feature_id)
+
+def boundary_polygon_created(gdf, index, id):
     ddb.toolbox["modelmaker_hurrywave"].boundary_polygon = gdf
     nrp = len(ddb.toolbox["modelmaker_hurrywave"].boundary_polygon)
-    ddb.gui.setvar("modelmaker_hurrywave", "nr_boundary_polygon_index", nrp - 1)
+    ddb.gui.setvar("modelmaker_hurrywave", "boundary_polygon_index", nrp - 1)
     update()
 
-def boundary_polygon_modified(gdf, feature_shape, feature_id):
-    pass
+def boundary_polygon_modified(gdf, index, id):
+    ddb.toolbox["modelmaker_hurrywave"].boundary_polygon = gdf
 
-def boundary_polygon_selected(gdf, feature_shape, feature_id):
-    pass
+def boundary_polygon_selected(index):
+    ddb.gui.setvar("modelmaker_hurrywave", "boundary_polygon_index", index)
+    update()
 
 
 def update():
-
     nrp = len(ddb.toolbox["modelmaker_hurrywave"].boundary_polygon)
-    names = []
+    incnames = []
     for ip in range(nrp):
-        names.append(str(ip + 1))
+        incnames.append(str(ip + 1))
     ddb.gui.setvar("modelmaker_hurrywave", "nr_boundary_polygons", nrp)
-    ddb.gui.setvar("modelmaker_hurrywave", "nr_boundary_polygon_names", names)
+    ddb.gui.setvar("modelmaker_hurrywave", "boundary_polygon_names", incnames)
 
-
-    # group = "modelmaker_hurrywave"
-    # boundary_names = []
-    # nrp = len(ddb.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets)
-    # if nrd>0:
-    #     for dataset in ddb.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets:
-    #         selected_names.append(dataset["dataset"].name)
-    #     ddb.gui.setvar(group, "selected_bathymetry_dataset_names", selected_names)
-    #     index = ddb.gui.getvar(group, "selected_bathymetry_dataset_index")
-    #     if index > nrd - 1:
-    #         index = nrd - 1
-    #     dataset = ddb.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets[index]
-    #     ddb.gui.setvar(group, "selected_bathymetry_dataset_zmin", dataset["zmin"])
-    #     ddb.gui.setvar(group, "selected_bathymetry_dataset_zmax", dataset["zmax"])
-
-    pass
-
+    ddb.gui.update()
 
 def update_mask(*args):
     ddb.toolbox["modelmaker_hurrywave"].update_mask()

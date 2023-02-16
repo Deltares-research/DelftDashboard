@@ -10,9 +10,26 @@ element:
   tab:
   - string: Toolbox
   - string: Domain
-    module: models.hurrywave.ddb_hurrywave_domain
+    module: models.hurrywave.domain
     method: set_variables
-    element: hurrywave.domain.yml
+    element: domain.yml
   - string: Time Frame
-    module: models.hurrywave.ddb_hurrywave_timeframe
-    element: hurrywave.timeframe.yml
+    module: models.hurrywave.timeframe
+    element: timeframe.yml
+  - string: Physics
+    element: physics.yml
+  - string: Numerics
+    module: models.hurrywave.numerics
+    element: numerics.yml
+  - string: Boundary Conditions
+    module: models.hurrywave.boundary_conditions
+    element: boundary_conditions.yml
+  - string: Meteo
+    module: models.hurrywave.meteo
+    element: meteo.yml
+  - string: Structures
+    module: models.hurrywave.structures
+    element: structures.yml
+  - string: Output
+    module: models.hurrywave.output
+    element: output.yml

@@ -57,7 +57,7 @@ def build_gui_config():
     mpbox["id"] = "map"
     mpbox["position"] = {}
     mpbox["position"]["x"] = 20
-    mpbox["position"]["y"] = 190
+    mpbox["position"]["y"] = 195
     mpbox["position"]["width"] = -20
     mpbox["position"]["height"] = -40
     mpbox["module"] = "ddb_map"

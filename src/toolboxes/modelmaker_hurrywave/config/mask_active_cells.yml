@@ -1,5 +1,6 @@
 element:
 - style: panel
+  title: Global
   position:
     x: 10
     y: 10
@@ -23,6 +24,7 @@ element:
     text: Zmin
     variable: global_zmin
 - style: panel
+  title: Include Polygons
   position:
     x: 110
     y: 10
@@ -56,6 +58,13 @@ element:
       width: 80
       height: 20
     method: delete_include_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_include_polygons
+        operator: gt
+        value: 0
   - style: pushbutton
     text: Load Polygon
     position:
@@ -72,6 +81,13 @@ element:
       width: 80
       height: 20
     method: save_include_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_include_polygons
+        operator: gt
+        value: 0
   - style: edit
     position:
       x: 215
@@ -89,6 +105,7 @@ element:
     text: Zmin
     variable: include_zmin
 - style: panel
+  title: Exclude Polygons
   position:
     x: 390
     y: 10
@@ -122,6 +139,13 @@ element:
       width: 80
       height: 20
     method: delete_exclude_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_exclude_polygons
+        operator: gt
+        value: 0
   - style: pushbutton
     text: Load Polygon
     position:
@@ -138,6 +162,13 @@ element:
       width: 80
       height: 20
     method: save_exclude_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_exclude_polygons
+        operator: gt
+        value: 0
   - style: edit
     position:
       x: 215

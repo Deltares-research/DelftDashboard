@@ -69,6 +69,7 @@ class Toolbox(GenericToolbox):
         layer = ddb.map.add_layer("modelmaker_sfincs")
         # Grid outline
         layer.add_draw_layer("grid_outline",
+                             shape="rectangle",
                              create=self.grid_outline_created,
                              modify=self.grid_outline_modified,
                              polygon_line_color="mediumblue",
@@ -76,6 +77,7 @@ class Toolbox(GenericToolbox):
 
         # Quadtree refinement polygons
         layer.add_draw_layer("quadtree_refinement",
+                             shape="polygon",
                              create=self.refinement_polygon_created,
                              modify=self.refinement_polygon_modified,
                              polygon_line_color="gold",
@@ -84,20 +86,22 @@ class Toolbox(GenericToolbox):
 
         # Mask active cells
         layer.add_draw_layer("mask_include",
+                             shape="polygon",
                              create=self.include_polygon_created,
                              modify=self.include_polygon_modified,
                              polygon_line_color="limegreen",
                              polygon_fill_color="limegreen",
                              polygon_fill_opacity=0.3)
         layer.add_draw_layer("mask_exclude",
+                             shape="polygon",
                              create=self.exclude_polygon_created,
                              modify=self.exclude_polygon_modified,
                              polygon_line_color="orangered",
                              polygon_fill_color="orangered",
                              polygon_fill_opacity=0.3)
-
         # Mask boundary cells
         layer.add_draw_layer("mask_boundary",
+                             shape="polygon",
                              create=self.boundary_polygon_created,
                              modify=self.boundary_polygon_modified,
                              polygon_line_color="deepskyblue",
@@ -108,7 +112,7 @@ class Toolbox(GenericToolbox):
 #        layer.add_deck_geojson_layer("sfincs_grid")
 
     def draw_grid_outline(self):
-        ddb.map.layer["modelmaker_sfincs"].layer["grid_outline"].draw_rectangle()
+        ddb.map.layer["modelmaker_sfincs"].layer["grid_outline"].draw()
 
     def grid_outline_created(self, gdf, feature_shape, feature_id):
         # Remove the old grid outline

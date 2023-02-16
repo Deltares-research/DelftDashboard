@@ -1,0 +1,101 @@
+element:
+- style: panel
+  title: Meteo Forcing
+  position:
+    x: 10
+    y: 10
+    width: 400
+    height: 160
+  element:
+  - style: popupmenu
+    position:
+      x: 80
+      y: 130
+      width: 150
+      height: 20
+    text: File Type
+    variable: wind_type
+    option_string:
+    - Uniform
+    - Spider web
+    - Rectangular
+    option_value:
+    - uniform
+    - spiderweb
+    - rectangular
+  - style: pushselectfile
+    position:
+      x: 20
+      y: 100
+      width: 130
+      height: 20
+    text: Wind File
+    variable: wndfile
+    showfilename: True
+    extension: "*.wnd"
+    selectiontext: Select wind file
+    tooltipstring: Select wind file
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: wind_type
+        operator: eq
+        value: uniform
+  - style: pushselectfile
+    position:
+      x: 20
+      y: 75
+      width: 130
+      height: 20
+    text: Spiderweb File
+    variable: spwfile
+    showfilename: True
+    extension: "*.spw"
+    selectiontext: Select spiderweb file
+    tooltipstring: Select spiderweb file
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: wind_type
+        operator: eq
+        value: spiderweb
+  - style: pushselectfile
+    position:
+      x: 20
+      y: 50
+      width: 130
+      height: 20
+    text: AMU File
+    variable: amufile
+    showfilename: True
+    extension: "*.amu"
+    selectiontext: Select AMU file
+    tooltipstring: Select AMU file
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: wind_type
+        operator: eq
+        value: rectangular
+  - style: pushselectfile
+    position:
+      x: 20
+      y: 25
+      width: 130
+      height: 20
+    text: AMV File
+    variable: amvfile
+    showfilename: True
+    extension: "*.amv"
+    selectiontext: Select AMV file
+    tooltipstring: Select AMV file
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: wind_type
+        operator: eq
+        value: rectangular

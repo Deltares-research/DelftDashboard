@@ -24,12 +24,27 @@ class Model(GenericModel):
         self.active_domain = 0
 
         self.initialize_domain()
+
+#        self.domain.exe_path = self.exe_path
+
         self.set_gui_variables()
 
     def add_layers(self):
         # Add main DDB layer
         layer = ddb.map.add_layer("hurrywave")
 
+        layer.add_geojson_layer("mask_include",
+                                file_name="hurrywave_mask_include.geojson",
+                                type="circle",
+                                circle_radius=3,
+                                fill_color="yellow",
+                                line_color="transparent")
+        layer.add_geojson_layer("mask_boundary",
+                                file_name="hurrywave_mask_boundary.geojson",
+                                type="circle",
+                                circle_radius=3,
+                                fill_color="red",
+                                line_color="transparent")
 
     def open(self):
         fname = QFileDialog.getOpenFileName(None, "Open file", "",
@@ -49,6 +64,8 @@ class Model(GenericModel):
     def save(self):
         # Write hurrywave.inp
         self.domain.input.write()
+        self.domain.write_batch_file()
+
 
     def load(self):
         self.domain.read()
@@ -90,11 +107,9 @@ class Model(GenericModel):
 
     def set_gui_variables(self):
         group = "hurrywave"
-
         # Input variables
         for var_name in vars(self.domain.input.variables):
             ddb.gui.setvar(group, var_name, getattr(self.domain.input.variables, var_name))
-
         ddb.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
         ddb.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
 

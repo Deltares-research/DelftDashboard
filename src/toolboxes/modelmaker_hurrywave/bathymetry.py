@@ -118,7 +118,4 @@ def update():
 
 
 def generate_bathymetry(*args):
-    grid = ddb.model["hurrywave"].domain.grid
-    bathymetry_list = ddb.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets
-    ddb.model["hurrywave"].domain.bathymetry.build(grid, bathymetry_list)
-    ddb.model["hurrywave"].domain.bathymetry.write()
+    ddb.toolbox["modelmaker_hurrywave"].generate_bathymetry()

@@ -94,6 +94,7 @@ def update():
     ddb.map.set_mouse_default()
     # Sets all layers to inactive
     for name, model in ddb.model.items():
-        model.plot()
+        pass
+#        model.plot()
     for name, toolbox in ddb.toolbox.items():
         toolbox.update_map("deactivate")

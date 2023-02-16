@@ -1,5 +1,6 @@
 element:
 - style: panel
+  title: Domain
   position:
     x: 10
     y: 10
@@ -9,7 +10,7 @@ element:
   - style: edit
     position:
       x: 60
-      y: 110
+      y: 130
       width: 60
       height: 20
     text: X0
@@ -18,7 +19,7 @@ element:
   - style: edit
     position:
       x: 160
-      y: 110
+      y: 130
       width: 60
       height: 20
     text: Y0
@@ -27,7 +28,7 @@ element:
   - style: edit
     position:
       x: 60
-      y: 85
+      y: 105
       width: 60
       height: 20
     text: MMax
@@ -36,7 +37,7 @@ element:
   - style: edit
     position:
       x: 160
-      y: 85
+      y: 105
       width: 60
       height: 20
     text: NMax
@@ -45,7 +46,7 @@ element:
   - style: edit
     position:
       x: 60
-      y: 60
+      y: 80
       width: 60
       height: 20
     text: dX
@@ -54,7 +55,7 @@ element:
   - style: edit
     position:
       x: 160
-      y: 60
+      y: 80
       width: 60
       height: 20
     text: dY
@@ -63,7 +64,7 @@ element:
   - style: edit
     position:
       x: 60
-      y: 35
+      y: 55
       width: 60
       height: 20
     text: Rotation

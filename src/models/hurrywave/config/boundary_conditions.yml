@@ -1,0 +1,243 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: 250
+    height: 160
+  element:
+  - style: pushbutton
+    position:
+      x: 10
+      y: 110
+      width: 130
+      height: 20
+    text: Draw Boundary Spline
+    method: draw_boundary_spline
+    tooltipstring: Draw boundary spline
+  - style: pushbutton
+    position:
+      x: 10
+      y: 85
+      width: 130
+      height: 20
+    text: Delete Boundary Spline
+    method: ddb_sfincs_boundary_conditions
+    tooltipstring: Delete boundary spline
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 60
+      width: 130
+      height: 20
+    text: Load Boundary Spline
+    variable: boundaryspline_filename
+    onchange: ddb_sfincs_boundary_conditions
+    showfilename: False
+    extension: "*.pol"
+    selectiontext: Select boundary spline file
+    tooltipstring: Select boundary spline file
+  - style: pushsavefile
+    position:
+      x: 10
+      y: 35
+      width: 130
+      height: 20
+    text: Save Boundary Spline
+    variable: boundaryspline_filename
+    onchange: ddb_sfincs_boundary_conditions
+    showfilename: False
+    extension: "*.pol"
+    selectiontext: Select boundary spline file
+    tooltipstring: Select boundary spline file
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: boundaryspline_length
+        operator: gt
+        value: 0
+  - style: edit
+    position:
+      x: 190
+      y: 110
+      width: 50
+      height: 20
+    text: Contour
+    variable: depthcontour_value
+  - style: pushbutton
+    position:
+      x: 190
+      y: 85
+      width: 50
+      height: 20
+    text: Update
+    method: ddb_sfincs_boundary_conditions
+    tooltipstring: Re-plot depth contour
+  - style: pushbutton
+    position:
+      x: 190
+      y: 60
+      width: 50
+      height: 20
+    text: Snap
+    method: ddb_sfincs_boundary_conditions
+    tooltipstring: Snap boundary spline to depth contour
+- style: panel
+  position:
+    x: 270
+    y: 10
+    width: 270
+    height: 160
+  element:
+  - style: pushbutton
+    position:
+      x: 280
+      y: 120
+      width: 100
+      height: 20
+    text: Create points
+    method: ddb_sfincs_boundary_conditions
+    tooltipstring: Create boundary points
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: boundaryspline_length
+        operator: gt
+        value: 0
+  - style: pushbutton
+    position:
+      x: 280
+      y: 95
+      width: 100
+      height: 20
+    text: Delete points
+    method: ddb_sfincs_boundary_conditions
+    tooltipstring: Delete boundary points
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: flowboundarypoints_length
+        operator: gt
+        value: 0
+  - style: edit
+    position:
+      x: 330
+      y: 70
+      width: 50
+      height: 20
+    text: Distance
+    variable: boundaryspline_flowdx
+    tooltipstring: Edit distance between boundary points
+  - style: pushbutton
+    position:
+      x: 400
+      y: 70
+      width: 50
+      height: 20
+    text: Snap
+    method: ddb_sfincs_boundary_conditions
+    tooltipstring: Snap boundary points to depth contour
+  - style: pushselectfile
+    position:
+      x: 400
+      y: 120
+      width: 130
+      height: 20
+    text: Load Boundary Points
+    variable: bndfile
+    onchange: ddb_sfincs_boundary_conditions
+    showfilename: False
+    extension: "*.bnd"
+    selectiontext: Select boundary points file
+    tooltipstring: Select boundary points file
+  - style: pushsavefile
+    position:
+      x: 400
+      y: 95
+      width: 130
+      height: 20
+    text: Save Boundary Points
+    variable: bndfile
+    onchange: ddb_sfincs_boundary_conditions
+    showfilename: False
+    extension: "*.bnd"
+    selectiontext: Select boundary points file
+    tooltipstring: Select boundary points file
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: flowboundarypoints_length
+        operator: gt
+        value: 0
+  - style: edit
+    position:
+      x: 480
+      y: 20
+      width: 50
+      height: 20
+    text: water level
+    variable: boundaryconditions_zs
+    tooltipstring: Edit water level
+  - style: pushbutton
+    position:
+      x: 280
+      y: 20
+      width: 120
+      height: 20
+    text: Generate Tides
+    method: ddb_sfincs_boundary_conditions
+    tooltipstring: Generate tidal boundary conditions
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: flowboundarypoints_length
+        operator: gt
+        value: 0
+- style: panel
+  position:
+    x: 550
+    y: 10
+    width: 220
+    height: 160
+  element:
+  - style: edit
+    position:
+      x: 890
+      y: 120
+      width: 150
+      height: 20
+    text: BZS file
+    variable: bzsfile
+    tooltipstring: Edit bzs file name
+  - style: edit
+    position:
+      x: 890
+      y: 95
+      width: 150
+      height: 20
+    text: BHS file
+    variable: bhsfile
+    tooltipstring: Edit bzs file name
+  - style: edit
+    position:
+      x: 890
+      y: 70
+      width: 150
+      height: 20
+    text: BTP file
+    variable: btpfile
+    tooltipstring: Edit bzs file name
+  - style: edit
+    position:
+      x: 890
+      y: 45
+      width: 150
+      height: 20
+    text: BWD file
+    variable: bwdfile
+    tooltipstring: Edit bzs file name

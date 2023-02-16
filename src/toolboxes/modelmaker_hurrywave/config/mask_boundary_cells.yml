@@ -1,5 +1,6 @@
 element:
 - style: panel
+  title: Boundary Polygons
   position:
     x: 10
     y: 10
@@ -33,6 +34,13 @@ element:
       width: 80
       height: 20
     method: delete_boundary_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_boundary_polygons
+        operator: gt
+        value: 0
   - style: pushbutton
     text: Load Polygon
     position:
@@ -49,6 +57,13 @@ element:
       width: 80
       height: 20
     method: save_boundary_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_boundary_polygons
+        operator: gt
+        value: 0
   - style: edit
     position:
       x: 215
