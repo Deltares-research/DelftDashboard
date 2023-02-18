@@ -5,7 +5,7 @@ conda activate delftdashboard
 conda install -c conda-forge hydromt
 
 pip install -e c:\work\checkouts\git\CoastalHazardsToolkit
-pip install -e c:\work\checkouts\git\GUITools
+pip install -e c:\work\checkouts\git\Guitares
 pip install -e c:\work\checkouts\git\hydromt_sfincs
 
 # To export this environment: 

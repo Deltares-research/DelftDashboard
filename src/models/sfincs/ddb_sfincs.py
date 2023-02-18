@@ -9,8 +9,8 @@ import datetime
 from ddb_model import GenericModel
 from ddb import ddb
 
-#from cht.sfincs.sfincs import SFINCS
-from hydromt_sfincs import SfincsModel
+from cht.sfincs.sfincs import SFINCS
+#from hydromt_sfincs import SfincsModel
 
 class Model(GenericModel):
     def __init__(self, name):
@@ -41,10 +41,10 @@ class Model(GenericModel):
 
         group = "sfincs"
 
-#        for var_name in vars(self.domain.input):
-        for var_name in self.domain.config:
-            ddb.gui.setvar(group, var_name, self.domain.config[var_name])
-#                ddb.gui.setvar(group, var_name, getattr(self.domain.input, var_name))
+        for var_name in vars(self.domain.input):
+#        for var_name in self.domain.config:
+#            ddb.gui.setvar(group, var_name, self.domain.config[var_name])
+            ddb.gui.setvar(group, var_name, getattr(self.domain.input, var_name))
 
         # # Loop through available input variables
         # gui.variables.add(group, "tstart",      self.domain.input.tstart,       minval=None,    maxval=None, errmsg="SFINCS start time must be greater than stop time")
@@ -90,7 +90,8 @@ class Model(GenericModel):
 
     def initialize_domain(self):
 
-        self.domain = SfincsModel()
+#        self.domain = SfincsModel()
+        self.domain = SFINCS()
 
     def set_input_variable(self, gui_variable, value):
 

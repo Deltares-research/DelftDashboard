@@ -29,14 +29,14 @@ class GenericModel:
         for element in elements:
             if element["style"] == "tabpanel":
                 if element["id"] == self.name:
-                    element["widget"].widgets[0].setVisible(True)
+                    element["widget"].setVisible(True)
                     element["visible"] = True
 #                    ddb.active_model_panel = element
         # And the others to invisible
         for element in elements:
             if element["style"] == "tabpanel":
                 if element["id"] != self.name:
-                    element["widget"].widgets[0].setVisible(False)
+                    element["widget"].setVisible(False)
                     element["visible"] = False
 
         ddb.active_model = self

@@ -70,30 +70,3 @@ element:
     text: Rotation
     variable: rotation
     enable: False
-  - style: edit
-    position:
-      x: 60
-      y: 10
-      width: 60
-      height: 20
-    text: Latitude
-    variable: latitude
-    method: set_variables
-  - style: pushselectfile
-    position:
-      x: 260
-      y: 110
-      width: 130
-      height: 20
-    tooltipstring: Select depth file
-    text: Depth File
-    variable: depfile
-  - style: pushselectfile
-    position:
-      x: 260
-      y: 60
-      width: 130
-      height: 20
-    tooltipstring: Select mask file
-    text: Mask File
-    variable: mskfile
