@@ -8,6 +8,7 @@ import importlib
 
 from ddb import ddb
 from ddb_toolbox import select_toolbox
+from guitares.gui import set_missing_menu_values
 
 class GenericModel:
     def __init__(self):
@@ -58,10 +59,22 @@ class GenericModel:
                 toolboxes_to_add.append(toolbox_name)
 
         # Clear toolbox menu
+        toolbox_menu = ddb.gui.config["menu"][2]
+        toolbox_menu["widget"].clear()
 
         # Add toolboxes_to_add
+        menu_to_add = []
         for toolbox_name in toolboxes_to_add:
-            pass
+            menu_to_add.append({"text": ddb.toolbox[toolbox_name].long_name,
+                                "module": "ddb_toolbox",
+                                "method": "select_toolbox",
+                                "id": toolbox_name,
+                                "option": toolbox_name,
+                                "checkable": True})
+        set_missing_menu_values(menu_to_add, "ddb_toolbox")
+        toolbox_menu["menu"] = menu_to_add
+        ddb.gui.menu.add_menu(menu_to_add, toolbox_menu["widget"])
+
 
         # Check if the current toolbox is available. If not, select a new toolbox.
         if ddb.active_toolbox.name in toolboxes_to_add:

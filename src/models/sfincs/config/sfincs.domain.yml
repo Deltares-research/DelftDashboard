@@ -87,6 +87,8 @@ element:
     tooltipstring: Select depth file
     text: Depth File
     variable: depfile
+    title: Depth File
+    filter: "SFINCS Depth File (*.dep)"
   - style: pushselectfile
     position:
       x: 260

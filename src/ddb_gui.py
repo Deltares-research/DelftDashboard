@@ -94,12 +94,12 @@ def build_gui_config():
     menu["text"] = "Toolbox"
     menu["module"] = "ddb_toolbox"
     menu["menu"] = []
-    for toolbox_name in ddb.toolbox:
-        menu["menu"].append({"text": ddb.toolbox[toolbox_name].long_name,
-                             "method": "select_toolbox",
-                             "id": toolbox_name,
-                             "option": toolbox_name,
-                             "checkable": True})
+    # for toolbox_name in ddb.toolbox:
+    #     menu["menu"].append({"text": ddb.toolbox[toolbox_name].long_name,
+    #                          "method": "select_toolbox",
+    #                          "id": toolbox_name,
+    #                          "option": toolbox_name,
+    #                          "checkable": True})
     ddb.gui.config["menu"].append(menu)
 
 
