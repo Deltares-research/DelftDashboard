@@ -6,7 +6,6 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 from ddb import ddb
-from guitares.gui import add_elements
 
 class GenericToolbox:
     def __init__(self):
@@ -14,35 +13,25 @@ class GenericToolbox:
 
     def select(self):
 
-        # Set this toolbox checked (and the other ones unchecked)
-        for menu in ddb.gui.config["menu"]:
-            if menu["text"] == "Toolbox":
-                for m in menu["menu"]:
-                    if m["id"] == self.name:
-                        m["widget"].setChecked(True)
-                    else:
-                        m["widget"].setChecked(False)
+        ddb.active_toolbox = self
+        ddb.gui.setvar("menu", "active_toolbox_name", ddb.active_toolbox.name)
 
-        #
-
-#        tab = ddb.active_model_panel["tab"][0]["widget"]
         # Get index of active model
-        model = ddb.active_model.name
-#        models = list(ddb.model)
-        index = list(ddb.model).index(model)
+        index = list(ddb.model).index(ddb.active_model.name)
 
         # Toolbox tab
-        tab = ddb.gui.config["element"][index]["tab"][0]
+        tab = ddb.gui.window.elements[index].tabs[0]
+        tab.widget.parent().parent().setTabText(0, ddb.active_toolbox.long_name)
 
         # First remove old toolbox elements from first tab
-        for child in tab["widget"].children():
-            child.setParent(None)
+        tab.elements = []
+        ddb.gui.window.elements[index].clear_tab(0)
 
         # Now add toolbox elements to first tab
-        tab["element"] = self.element
-        add_elements(self.element, tab["widget"], ddb.gui)
+        ddb.gui.window.add_elements_to_tree(tab.elements, self.element, tab, ddb.gui, ddb.gui.window)
+        ddb.gui.window.add_elements(tab.elements)
 
-        ddb.active_toolbox = self
+        ddb.gui.window.update()
 
     def add_layers(self):
         pass
@@ -50,8 +39,9 @@ class GenericToolbox:
 
 def select_toolbox(toolbox_name):
     # Called from menu, or from ddb_model->select
-    ddb.toolbox[toolbox_name].select()
-    # And go to this tab
-    ddb.gui.config["element"][0]["widget"].select_tab(0)
-    ddb.gui.update()
+    ddb.active_toolbox = ddb.toolbox[toolbox_name]
+    ddb.active_toolbox.select()
+    # # And go to this tab
+    # ddb.gui.window.elements[0].widget.select_tab(0)
+    # ddb.gui.update()
 

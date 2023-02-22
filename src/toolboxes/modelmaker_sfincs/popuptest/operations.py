@@ -3,14 +3,12 @@ import geopandas as gpd
 import shapely
 
 from ddb import ddb
-from guitares.gui import find_element_by_id
-
 
 def open():
     pass
 
 def map_ready():
-    mp = find_element_by_id(ddb.gui.popup_config["element"], "utm_map")["widget"]
+    mp = ddb.gui.popup_window.find_element_by_id(ddb.gui.popup_window.elements, "utm_map").widget
     mp.jump_to(0.0, 0.0, 1)
     # Add UTM polygons
     lon = np.arange(-180.0, 180.0, 6.0)

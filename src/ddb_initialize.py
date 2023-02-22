@@ -122,6 +122,11 @@ def initialize():
     rgb = read_colormap('c:/work/checkouts/svn/OET/matlab/applications/DelftDashBoard/settings/colormaps/earth.txt')
     ddb.color_map_earth = ListedColormap(rgb)
 
+    # GUI variables
+    ddb.gui.setvar("menu", "active_model_name", "")
+    ddb.gui.setvar("menu", "active_toolbox_name", "")
+    ddb.gui.setvar("menu", "active_topography_name", ddb.background_topography)
+
 
     # Now build up GUI config
     build_gui_config()

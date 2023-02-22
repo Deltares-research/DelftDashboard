@@ -6,16 +6,15 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 from ddb import ddb
-from guitares.gui import find_menu_item_by_id
 
 def globe(option):
     if ddb.view["projection"] == "globe":
         # Do nothing
         pass
     else:
-        item = find_menu_item_by_id(ddb.gui.config["menu"], "view.globe")
+        item = ddb.gui.find_menu_item_by_id(ddb.gui.config["menu"], "view.globe")
         item["widget"].setChecked(True)
-        item = find_menu_item_by_id(ddb.gui.config["menu"], "view.mercator")
+        item = ddb.gui.find_menu_item_by_id(ddb.gui.config["menu"], "view.mercator")
         item["widget"].setChecked(False)
         ddb.view["projection"] = "globe"
         ddb.map.set_projection("globe")

@@ -8,7 +8,7 @@ import numpy as np
 
 from ddb import ddb
 from cht.bathymetry.bathymetry_database import bathymetry_database
-from guitares.gui import find_element_by_id
+#from guitares.gui import find_element_by_id
 from cht.misc.geometry import RegularGrid
 from pyproj import CRS
 
@@ -18,8 +18,8 @@ def map_ready():
     print('Map is ready !')
 
     # Find map widget
-    element = find_element_by_id(ddb.gui.config["element"], "map")
-    ddb.map = element["widget"]
+    element = ddb.gui.window.find_element_by_id(ddb.gui.window.elements, "map")
+    ddb.map = element.widget
 
     # Add main DDB layer
     main_layer = ddb.map.add_layer("main")
@@ -63,11 +63,11 @@ def update_background():
         xl = [coords[0][0], coords[1][0]]
         yl = [coords[0][1], coords[1][1]]
         if ddb.view["topography"]["quality"] == "high":
-            npix = ddb.gui.window.width()
+            npix = ddb.gui.window.width
         elif ddb.view["topography"]["quality"] == "medium":
-            npix = int(ddb.gui.window.width()*0.5)
+            npix = int(ddb.gui.window.width*0.5)
         else:
-            npix = int(ddb.gui.window.width()*0.25)
+            npix = int(ddb.gui.window.width*0.25)
 
         dxy = (xl[1] - xl[0])/npix
         xv = np.arange(xl[0], xl[1], dxy)

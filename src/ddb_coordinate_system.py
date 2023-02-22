@@ -15,7 +15,7 @@ def other_geographic(option):
     print("Other")
 
 def utm_zone(option):
-    data = ddb.gui.popup("c:\\work\checkouts\\git\\DelftDashboard\\src\\toolboxes\\modelmaker_sfincs\\popuptest\\utm_zone.yml", None, modal=True)
+    data = ddb.gui.popup("c:\\work\checkouts\\git\\DelftDashboard\\src\\toolboxes\\modelmaker_sfincs\\popuptest\\utm_zone.yml", None)
     if not data:
         return
     letters = ['C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']

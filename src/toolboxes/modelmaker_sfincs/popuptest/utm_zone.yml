@@ -4,6 +4,7 @@ window:
   height: 400
   module: toolboxes.modelmaker_sfincs.popuptest.operations
   variable_group: popup_window
+  modal: True
   cancel: True
 element:
 - style: mapbox

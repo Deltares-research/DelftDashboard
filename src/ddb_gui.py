@@ -9,7 +9,6 @@ import os
 import importlib
 
 from ddb import ddb
-from guitares.gui import set_missing_element_values, read_gui_elements
 from cht.bathymetry.bathymetry_database import bathymetry_database
 
 
@@ -21,28 +20,26 @@ def build_gui_config():
         # Read the GUI elements for this toolbox
         path = os.path.join(ddb.main_path, "toolboxes", toolbox_name, "config")
         file_name = toolbox_name + ".yml"
-#        ddb.toolbox[toolbox_name].element = ddb.gui.read_gui_elements(path, file_name)
-        ddb.toolbox[toolbox_name].element = read_gui_elements(path, file_name)
-        variable_group = toolbox_name
-        module = importlib.import_module("toolboxes." + toolbox_name + "." + toolbox_name)
-        set_missing_element_values(ddb.toolbox[toolbox_name].element,
-                                   variable_group,
-                                   module,
-                                   ddb.gui)
+        ddb.toolbox[toolbox_name].element = ddb.gui.read_gui_elements(path, file_name)
+        for element in ddb.toolbox[toolbox_name].element:
+            element["module"]         = "toolboxes." + toolbox_name + "." + toolbox_name
+            element["variable_group"] = toolbox_name
 
     # Models
     for model_name in ddb.model:
         # Add the GUI elements (tab panel) for this model
         path = os.path.join(ddb.main_path, "models", model_name, "config")
         file_name = model_name + ".yml"
-        ddb.model[model_name].element = read_gui_elements(path, file_name)[0]
+        ddb.model[model_name].element = ddb.gui.read_gui_elements(path, file_name)[0]
+        ddb.model[model_name].element["variable_group"] = model_name
+        ddb.model[model_name].element["module"] = "models." + model_name + ".ddb_" + model_name
 
     # The Delft Dashboard GUI is built up programmatically
     ddb.gui.config["window"] = {}
-    ddb.gui.config["window"]["title"] = ddb.config["title"]
-    ddb.gui.config["window"]["width"] = ddb.config["width"]
+    ddb.gui.config["window"]["title"]  = ddb.config["title"]
+    ddb.gui.config["window"]["width"]  = ddb.config["width"]
     ddb.gui.config["window"]["height"] = ddb.config["height"]
-    ddb.gui.config["window"]["icon"]  = ddb.config["window_icon"]
+    ddb.gui.config["window"]["icon"]   = ddb.config["window_icon"]
     ddb.gui.config["menu"] = []
     ddb.gui.config["toolbar"] = []
     ddb.gui.config["element"] = []
@@ -82,11 +79,19 @@ def build_gui_config():
     menu["module"] = "ddb_model"
     menu["menu"] = []
     for model_name in ddb.model:
+        dependency = [{"action": "check",
+                       "checkfor": "all",
+                       "check": [{"variable": "active_model_name",
+                                  "operator": "eq",
+                                  "value": model_name}]
+                     }]
         menu["menu"].append({"text": ddb.model[model_name].long_name,
+                             "variable_group": "menu",
                              "method": "select_model",
                              "id": model_name,
                              "option": model_name,
-                             "checkable": True})
+                             "checkable": True,
+                             "dependency": dependency})
     ddb.gui.config["menu"].append(menu)
 
     # Toolbox
@@ -94,12 +99,7 @@ def build_gui_config():
     menu["text"] = "Toolbox"
     menu["module"] = "ddb_toolbox"
     menu["menu"] = []
-    # for toolbox_name in ddb.toolbox:
-    #     menu["menu"].append({"text": ddb.toolbox[toolbox_name].long_name,
-    #                          "method": "select_toolbox",
-    #                          "id": toolbox_name,
-    #                          "option": toolbox_name,
-    #                          "checkable": True})
+    menu["menu"].append({"text": "toolbox"})
     ddb.gui.config["menu"].append(menu)
 
 
@@ -115,7 +115,20 @@ def build_gui_config():
         source_menu["text"] = source.name
         source_menu["menu"] = []
         for dataset in source.dataset:
-            source_menu["menu"].append({"id": "topography." + dataset.name, "text": dataset.name, "separator": False,  "checkable": True, "option": dataset.name, "method": "select_dataset"})
+            dependency = [{"action": "check",
+                           "checkfor": "all",
+                           "check": [{"variable": "active_topography_name",
+                                      "operator": "eq",
+                                      "value": dataset.name}]
+                           }]
+            source_menu["menu"].append({"id": "topography." + dataset.name,
+                                        "variable_group": "menu",
+                                        "text": dataset.name,
+                                        "separator": False,
+                                        "checkable": True,
+                                        "option": dataset.name,
+                                        "method": "select_dataset",
+                                        "dependency": dependency})
         menu["menu"].append(source_menu)
     ddb.gui.config["menu"].append(menu)
 

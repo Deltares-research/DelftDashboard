@@ -8,7 +8,7 @@ import importlib
 
 from ddb import ddb
 from ddb_toolbox import select_toolbox
-from guitares.gui import set_missing_menu_values
+#from guitares.gui import set_missing_menu_values
 
 class GenericModel:
     def __init__(self):
@@ -24,33 +24,23 @@ class GenericModel:
 
     def select(self):
 
-        elements = ddb.gui.config["element"]
+        elements = ddb.gui.window.elements
 
-        # Set all tab panel for current model to visible
+        # Set tab panel for current model to visible
         for element in elements:
-            if element["style"] == "tabpanel":
-                if element["id"] == self.name:
-                    element["widget"].setVisible(True)
-                    element["visible"] = True
-#                    ddb.active_model_panel = element
+            if element.style == "tabpanel":
+                if element.id == self.name:
+                    element.widget.setVisible(True)
+                    element.visible = True
         # And the others to invisible
         for element in elements:
-            if element["style"] == "tabpanel":
-                if element["id"] != self.name:
-                    element["widget"].setVisible(False)
-                    element["visible"] = False
+            if element.style == "tabpanel":
+                if element.id != self.name:
+                    element.widget.setVisible(False)
+                    element.visible = False
 
         ddb.active_model = self
-
-        # Set this model checked in the menu (and the other ones unchecked)
-        for menu in ddb.gui.config["menu"]:
-            if menu["text"] == "Model":
-                for m in menu["menu"]:
-                    if m["id"] == self.name:
-                        m["widget"].setChecked(True)
-                    else:
-                        m["widget"].setChecked(False)
-
+        ddb.gui.setvar("menu", "active_model_name", ddb.active_model.name)
 
         # Check which toolboxes we can add and update the menu
         toolboxes_to_add = []
@@ -59,22 +49,29 @@ class GenericModel:
                 toolboxes_to_add.append(toolbox_name)
 
         # Clear toolbox menu
-        toolbox_menu = ddb.gui.config["menu"][2]
-        toolbox_menu["widget"].clear()
+        toolbox_menu = ddb.gui.window.menus[2]
+        toolbox_menu.widget.clear()
 
         # Add toolboxes_to_add
         menu_to_add = []
         for toolbox_name in toolboxes_to_add:
+            dependency = [{"action": "check",
+                           "checkfor": "all",
+                           "check": [{"variable": "active_toolbox_name",
+                                      "operator": "eq",
+                                      "value": toolbox_name}]
+                           }]
             menu_to_add.append({"text": ddb.toolbox[toolbox_name].long_name,
+                                "variable_group": "menu",
                                 "module": "ddb_toolbox",
                                 "method": "select_toolbox",
                                 "id": toolbox_name,
                                 "option": toolbox_name,
-                                "checkable": True})
-        set_missing_menu_values(menu_to_add, "ddb_toolbox")
-        toolbox_menu["menu"] = menu_to_add
-        ddb.gui.menu.add_menu(menu_to_add, toolbox_menu["widget"])
-
+                                "checkable": True,
+                                "dependency": dependency})
+        toolbox_menu.menus = []
+        ddb.gui.window.add_menu_to_tree(toolbox_menu.menus, menu_to_add, toolbox_menu)
+        ddb.gui.window.add_menus(toolbox_menu.menus, toolbox_menu, ddb.gui)
 
         # Check if the current toolbox is available. If not, select a new toolbox.
         if ddb.active_toolbox.name in toolboxes_to_add:
@@ -83,6 +80,8 @@ class GenericModel:
         else:
             # Select first toolbox from the list
             select_toolbox(toolboxes_to_add[0])
+
+        ddb.gui.window.update()
 
 def select_model(model_name):
     # Called from menu
