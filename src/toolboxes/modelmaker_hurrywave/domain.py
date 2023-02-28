@@ -28,12 +28,12 @@ def grid_outline_created(gdf, index, id):
         layer.delete_feature(ddb.toolbox["modelmaker_hurrywave"].grid_outline["id"][0])
     ddb.toolbox["modelmaker_hurrywave"].grid_outline = gdf
     update_geometry()
-    ddb.gui.update()
+    ddb.gui.window.update()
 
 def grid_outline_modified(gdf, index, id):
     ddb.toolbox["modelmaker_hurrywave"].grid_outline = gdf
     update_geometry()
-    ddb.gui.update()
+    ddb.gui.window.update()
 
 def generate_grid(*args):
     ddb.toolbox["modelmaker_hurrywave"].generate_grid()

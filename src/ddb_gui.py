@@ -46,6 +46,10 @@ def build_gui_config():
 
     # Add tab panels for models
     for model_name in ddb.model:
+        # First insert tabs for Layers and Toolbox
+        tab_panel = ddb.model[model_name].element
+        tab_panel["tab"].insert(0, {'string': 'Layers', 'element': [], "module": ""})
+        tab_panel["tab"].insert(0, {'string': 'Toolbox', 'element': [], "module": ""})
         ddb.gui.config["element"].append(ddb.model[model_name].element)
 
     # Now add MapBox element
@@ -132,26 +136,29 @@ def build_gui_config():
         menu["menu"].append(source_menu)
     ddb.gui.config["menu"].append(menu)
 
+    dependency = [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]
+
     # View
     menu = {}
     menu["text"] = "View"
     menu["module"] = "menu_view"
     menu["menu"] = []
-    menu["menu"].append({"id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True})
-    menu["menu"].append({"id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True})
-    menu["menu"].append({"id": "view.topography",  "text": "Topography", "method": "topography", "separator": True,  "checkable": True})
+    menu["menu"].append({"variable_group": "menu", "id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]})
+    menu["menu"].append({"variable_group": "menu", "id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "globe"}]}]})
+    menu["menu"].append({"variable_group": "menu", "id": "view.topography",  "text": "Topography", "method": "topography", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "show_topography", "operator": "eq", "value": True}]}]})
 
-    # layer_style_menu = {}
-    # layer_style_menu["text"] = "Layer Style"
-    # layer_style_menu["menu"] = []
-    # layer_style_menu["menu"].append({"id": "view.layer_style.streets", "text": "Streets", "separator": False,  "checkable": True, "option": "streets-v12", "method": "layer_style"})
-    # layer_style_menu["menu"].append({"id": "view.layer_style.satellite", "text": "Satellite", "separator": False,  "checkable": True, "option": "satellite-v9", "method": "layer_style"})
-    # layer_style_menu["menu"].append({"id": "view.layer_style.satellite_streets", "text": "Satellite Streets", "separator": False,  "checkable": True, "option": "satellite-streets-v12", "method": "layer_style"})
-    # layer_style_menu["menu"].append({"id": "view.layer_style.dark", "text": "Dark", "separator": False,  "checkable": True, "option": "dark-v11", "method": "layer_style"})
-    # layer_style_menu["menu"].append({"id": "view.layer_style.light", "text": "Light", "separator": False,  "checkable": True, "option": "light-v11", "method": "layer_style"})
-    # menu["menu"].append(layer_style_menu)
+    menu["menu"].append({"variable_group": "menu", "id": "view.terrain",  "text": "3D Terrain", "method": "terrain", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "show_terrain", "operator": "eq", "value": True}]}]})
 
-    menu["menu"].append({"id": "view.terrain",  "text": "3D Terrain", "method": "terrain", "separator": True,  "checkable": True})
+    layer_style_menu = {}
+    layer_style_menu["text"] = "Layer Style"
+    layer_style_menu["menu"] = []
+    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.streets", "text": "Streets", "separator": False,  "checkable": True, "option": "streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "streets-v12"}]}]})
+    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.satellite", "text": "Satellite", "separator": False,  "checkable": True, "option": "satellite-v9", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-v9"}]}]})
+    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.satellite_streets", "text": "Satellite Streets", "separator": False,  "checkable": True, "option": "satellite-streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-streets-v12"}]}]})
+    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.dark", "text": "Dark", "separator": False,  "checkable": True, "option": "dark-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "dark-v11"}]}]})
+    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.light", "text": "Light", "separator": False,  "checkable": True, "option": "light-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "light-v11"}]}]})
+    menu["menu"].append(layer_style_menu)
+
 
     ddb.gui.config["menu"].append(menu)
 

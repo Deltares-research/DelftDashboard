@@ -8,7 +8,6 @@ element:
     height: -10
   variable_group: hurrywave
   tab:
-  - string: Toolbox
   - string: Domain
     module: models.hurrywave.domain
     method: set_variables
@@ -27,6 +26,9 @@ element:
   - string: Meteo
     module: models.hurrywave.meteo
     element: meteo.yml
+  - string: Observation Points
+    module: models.hurrywave.observation_points
+    element: observation_points.yml
   - string: Structures
     module: models.hurrywave.structures
     element: structures.yml

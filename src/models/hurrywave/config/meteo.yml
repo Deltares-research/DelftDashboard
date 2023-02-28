@@ -4,21 +4,21 @@ element:
   position:
     x: 10
     y: 10
-    width: 400
+    width: -10
     height: 160
   element:
   - style: popupmenu
     position:
-      x: 80
-      y: 130
-      width: 150
+      x: 50
+      y: 125
+      width: 100
       height: 20
     text: File Type
     variable: wind_type
     option_string:
     - Uniform
     - Spider web
-    - Rectangular
+    - Regular Grid
     option_value:
     - uniform
     - spiderweb
@@ -26,14 +26,14 @@ element:
   - style: pushselectfile
     position:
       x: 20
-      y: 100
+      y: 95
       width: 130
       height: 20
     text: Wind File
     variable: wndfile
     showfilename: True
-    extension: "*.wnd"
-    selectiontext: Select wind file
+    filter: "Wind file (*.wnd)"
+    title: Select wind file
     tooltipstring: Select wind file
     dependency:
     - action: enable
@@ -45,14 +45,14 @@ element:
   - style: pushselectfile
     position:
       x: 20
-      y: 75
+      y: 70
       width: 130
       height: 20
     text: Spiderweb File
     variable: spwfile
     showfilename: True
-    extension: "*.spw"
-    selectiontext: Select spiderweb file
+    filter: "Spiderweb file (*.spw)"
+    title: Select spiderweb file
     tooltipstring: Select spiderweb file
     dependency:
     - action: enable
@@ -64,15 +64,16 @@ element:
   - style: pushselectfile
     position:
       x: 20
-      y: 50
+      y: 45
       width: 130
       height: 20
     text: AMU File
     variable: amufile
     showfilename: True
     extension: "*.amu"
-    selectiontext: Select AMU file
+    title: Select AMU file
     tooltipstring: Select AMU file
+    filter: "AMU file (*.amu)"
     dependency:
     - action: enable
       checkfor: all
@@ -83,14 +84,14 @@ element:
   - style: pushselectfile
     position:
       x: 20
-      y: 25
+      y: 20
       width: 130
       height: 20
     text: AMV File
     variable: amvfile
     showfilename: True
-    extension: "*.amv"
-    selectiontext: Select AMV file
+    filter: "AMV file (*.amv)"
+    title: Select AMV file
     tooltipstring: Select AMV file
     dependency:
     - action: enable

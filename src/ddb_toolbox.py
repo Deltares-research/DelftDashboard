@@ -24,11 +24,10 @@ class GenericToolbox:
         tab.widget.parent().parent().setTabText(0, ddb.active_toolbox.long_name)
 
         # First remove old toolbox elements from first tab
-        tab.elements = []
         ddb.gui.window.elements[index].clear_tab(0)
 
         # Now add toolbox elements to first tab
-        ddb.gui.window.add_elements_to_tree(tab.elements, self.element, tab, ddb.gui, ddb.gui.window)
+        ddb.gui.window.add_elements_to_tree(self.element, tab, ddb.gui.window)
         ddb.gui.window.add_elements(tab.elements)
 
         ddb.gui.window.update()

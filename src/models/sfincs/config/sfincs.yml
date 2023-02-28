@@ -8,7 +8,6 @@ element:
     height: -10
   variable_group: sfincs
   tab:
-  - string: Toolbox
   - string: Domain
     module: models.sfincs.ddb_sfincs_domain
     element: sfincs.domain.yml

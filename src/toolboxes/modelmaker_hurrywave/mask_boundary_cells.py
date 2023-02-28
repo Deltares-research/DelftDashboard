@@ -65,8 +65,7 @@ def update():
         incnames.append(str(ip + 1))
     ddb.gui.setvar("modelmaker_hurrywave", "nr_boundary_polygons", nrp)
     ddb.gui.setvar("modelmaker_hurrywave", "boundary_polygon_names", incnames)
-
-    ddb.gui.update()
+    ddb.gui.window.update()
 
 def update_mask(*args):
     ddb.toolbox["modelmaker_hurrywave"].update_mask()

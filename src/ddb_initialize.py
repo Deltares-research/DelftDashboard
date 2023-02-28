@@ -76,7 +76,7 @@ def initialize():
     ddb.view["topography"]["colormap"] = "earth"
     ddb.view["topography"]["interp_method"] = "nearest"
     ddb.view["topography"]["interp_method"] = "linear"
-    ddb.view["layer_style"] = "streets"
+    ddb.view["layer_style"] = "streets-v12"
     ddb.view["terrain"] = {}
     ddb.view["terrain"]["visible"] = False
     ddb.view["terrain"]["exaggeration"] = 1.5
@@ -126,6 +126,10 @@ def initialize():
     ddb.gui.setvar("menu", "active_model_name", "")
     ddb.gui.setvar("menu", "active_toolbox_name", "")
     ddb.gui.setvar("menu", "active_topography_name", ddb.background_topography)
+    ddb.gui.setvar("menu", "projection", "mercator")
+    ddb.gui.setvar("menu", "show_topography", True)
+    ddb.gui.setvar("menu", "show_terrain", False)
+    ddb.gui.setvar("menu", "layer_style", ddb.view["layer_style"])
 
 
     # Now build up GUI config

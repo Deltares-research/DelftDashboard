@@ -11,6 +11,7 @@ element:
     element: physics.constants.yml
   - string: Roughness
     module: models.hurrywave.physics_roughness
+    element: physics.roughness.yml
   - string: Meteo
     module: models.hurrywave.physics_meteo
     element: physics.meteo.yml

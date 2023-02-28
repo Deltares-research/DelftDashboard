@@ -173,6 +173,15 @@ class Toolbox(GenericToolbox):
         model.input.variables.mmax     = ddb.gui.getvar(group, "mmax")
         model.input.variables.rotation = ddb.gui.getvar(group, "rotation")
 
+        group = "hurrywave"
+        ddb.gui.setvar(group, "x0", model.input.variables.x0)
+        ddb.gui.setvar(group, "y0", model.input.variables.y0)
+        ddb.gui.setvar(group, "dx", model.input.variables.dx)
+        ddb.gui.setvar(group, "dy", model.input.variables.dy)
+        ddb.gui.setvar(group, "nmax", model.input.variables.nmax)
+        ddb.gui.setvar(group, "mmax", model.input.variables.mmax)
+        ddb.gui.setvar(group, "rotation", model.input.variables.rotation)
+
         model.grid.build()
 
         gdf = model.grid.to_gdf()

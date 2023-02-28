@@ -112,6 +112,7 @@ class Model(GenericModel):
             ddb.gui.setvar(group, var_name, getattr(self.domain.input.variables, var_name))
         ddb.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
         ddb.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
+        ddb.gui.setvar(group, "wind_type", "uniform")
 
     def set_model_variables(self):
         # Update all model input variables
