@@ -18,7 +18,7 @@ def map_ready():
     print('Map is ready !')
 
     # Find map widget
-    element = ddb.gui.window.find_element_by_id(ddb.gui.window.elements, "map")
+    element = ddb.gui.window.find_element_by_id("map")
     ddb.map = element.widget
 
     # Add main DDB layer
