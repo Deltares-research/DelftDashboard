@@ -3,3 +3,4 @@ __pycache__
 /src/server
 /src/mapbox_token.mine.txt
 /src/mapbox_token.txt
+/src/.vscode
