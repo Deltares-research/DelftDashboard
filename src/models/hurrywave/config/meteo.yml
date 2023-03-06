@@ -11,7 +11,7 @@ element:
     position:
       x: 50
       y: 125
-      width: 100
+      width: 150
       height: 20
     text: File Type
     variable: wind_type
@@ -19,10 +19,12 @@ element:
     - Uniform
     - Spider web
     - Regular Grid
+    - Regular Grid + Spider web
     option_value:
     - uniform
     - spiderweb
     - rectangular
+    - rectangular_and_spiderweb
   - style: pushselectfile
     position:
       x: 20
@@ -56,8 +58,11 @@ element:
     tooltipstring: Select spiderweb file
     dependency:
     - action: enable
-      checkfor: all
+      checkfor: any
       check:
+      - variable: wind_type
+        operator: eq
+        value: rectangular_and_spiderweb
       - variable: wind_type
         operator: eq
         value: spiderweb
@@ -76,11 +81,14 @@ element:
     filter: "AMU file (*.amu)"
     dependency:
     - action: enable
-      checkfor: all
+      checkfor: any
       check:
       - variable: wind_type
         operator: eq
         value: rectangular
+      - variable: wind_type
+        operator: eq
+        value: rectangular_and_spiderweb
   - style: pushselectfile
     position:
       x: 20
@@ -95,8 +103,11 @@ element:
     tooltipstring: Select AMV file
     dependency:
     - action: enable
-      checkfor: all
+      checkfor: any
       check:
       - variable: wind_type
         operator: eq
         value: rectangular
+      - variable: wind_type
+        operator: eq
+        value: rectangular_and_spiderweb

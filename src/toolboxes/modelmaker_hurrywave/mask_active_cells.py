@@ -116,7 +116,7 @@ def update():
     ddb.gui.setvar("modelmaker_hurrywave", "nr_exclude_polygons", nrp)
     ddb.gui.setvar("modelmaker_hurrywave", "exclude_polygon_names", excnames)
 
-    ddb.gui.update()
+    ddb.gui.window.update()
 
 def update_mask(*args):
     ddb.toolbox["modelmaker_hurrywave"].update_mask()
