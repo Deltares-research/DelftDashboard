@@ -9,20 +9,18 @@ import os
 import time
 import sched
 
-
-
-
 class DelftDashboard:
     def __init__(self):
         pass
 
     def initialize(self):
-        import ddb_initialize
-        ddb_initialize.initialize()
+        from operations import initialize
+        self.main_path = os.path.dirname(os.path.abspath(__file__))
+        initialize.initialize()
 
     def update_map(self):
-        import ddb_map
-        ddb_map.update()
+        from operations import map
+        map.update()
 
 
     def on_build(self):

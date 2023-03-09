@@ -5,7 +5,7 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 
-from ddb_toolbox import GenericToolbox
+from operations.toolbox import GenericToolbox
 from ddb import ddb
 
 
@@ -38,9 +38,19 @@ class Toolbox(GenericToolbox):
     def plot(self):
         pass
 
-    def update_map(self, option):
-        if option == "deactivate":
-            pass
+    # def update_map(self, option):
+    #     if option == "deactivate":
+    #         pass
+
+    def set_layer_mode(self, mode):
+        try:
+            if mode == "inactive":
+                ddb.map.layer["drawing"].set_mode("invisible")
+            if mode == "invisible":
+                ddb.map.layer["drawing"].set_mode("invisible")
+        except:
+            pass        
+
 
     def draw_polygon(self):
         layer = ddb.map.add_layer("drawing")

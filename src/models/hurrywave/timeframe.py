@@ -8,9 +8,10 @@ Created on Mon May 10 12:18:09 2021
 from ddb import ddb
 
 def select(*args):
-    pass
+    # De-activate existing layers
+    ddb.update_map()
 
 
 def set_variables(*args):
     # All variables will be set
-    ddb.model["hurrywave"].set_model_variables()
+    ddb.model["hurrywave"].set_input_variables()

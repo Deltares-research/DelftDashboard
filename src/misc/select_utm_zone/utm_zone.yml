@@ -2,7 +2,7 @@ window:
   title: Select UTM Zone ...
   width: 800
   height: 400
-  module: toolboxes.modelmaker_sfincs.popuptest.operations
+  module: misc.select_utm_zone.callbacks
   variable_group: popup_window
   modal: True
   cancel: True

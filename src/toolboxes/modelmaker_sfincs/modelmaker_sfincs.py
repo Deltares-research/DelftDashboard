@@ -11,7 +11,7 @@ import geopandas as gpd
 import shapely
 import json
 
-from ddb_toolbox import GenericToolbox
+from operations.toolbox import GenericToolbox
 from ddb import ddb
 
 class Toolbox(GenericToolbox):
@@ -36,12 +36,18 @@ class Toolbox(GenericToolbox):
 
         self.set_gui_variables()
 
-    def update_map(self, option):
-        # Get layer
-        layer = ddb.map.layer["modelmaker_sfincs"]
-        if option == "deactivate":
-            # Make the layers invisible
-            layer.set_mode("inactive")
+    def set_layer_mode(self, mode):
+        if mode == "inactive":
+            ddb.map.layer["modelmaker_sfincs"].set_mode("invisible")
+        elif mode == "invisible":
+            ddb.map.layer["modelmaker_sfincs"].set_mode("invisible")
+
+    # def update_map(self, option):
+    #     # Get layer
+    #     layer = ddb.map.layer["modelmaker_sfincs"]
+    #     if option == "deactivate":
+    #         # Make the layers invisible
+    #         layer.set_mode("inactive")
 
 
     def set_gui_variables(self):
@@ -68,7 +74,7 @@ class Toolbox(GenericToolbox):
         # Add Mapbox layers
         layer = ddb.map.add_layer("modelmaker_sfincs")
         # Grid outline
-        layer.add_draw_layer("grid_outline",
+        layer.add_layer("grid_outline", type="draw",
                              shape="rectangle",
                              create=self.grid_outline_created,
                              modify=self.grid_outline_modified,
@@ -76,7 +82,7 @@ class Toolbox(GenericToolbox):
                              polygon_fill_opacity=0.3)
 
         # Quadtree refinement polygons
-        layer.add_draw_layer("quadtree_refinement",
+        layer.add_layer("quadtree_refinement", type="draw",
                              shape="polygon",
                              create=self.refinement_polygon_created,
                              modify=self.refinement_polygon_modified,
@@ -85,14 +91,14 @@ class Toolbox(GenericToolbox):
                              polygon_fill_opacity=0.3)
 
         # Mask active cells
-        layer.add_draw_layer("mask_include",
+        layer.add_layer("mask_include", type="draw",
                              shape="polygon",
                              create=self.include_polygon_created,
                              modify=self.include_polygon_modified,
                              polygon_line_color="limegreen",
                              polygon_fill_color="limegreen",
                              polygon_fill_opacity=0.3)
-        layer.add_draw_layer("mask_exclude",
+        layer.add_layer("mask_exclude", type="draw",
                              shape="polygon",
                              create=self.exclude_polygon_created,
                              modify=self.exclude_polygon_modified,
@@ -100,7 +106,7 @@ class Toolbox(GenericToolbox):
                              polygon_fill_color="orangered",
                              polygon_fill_opacity=0.3)
         # Mask boundary cells
-        layer.add_draw_layer("mask_boundary",
+        layer.add_layer("mask_boundary", type="draw",
                              shape="polygon",
                              create=self.boundary_polygon_created,
                              modify=self.boundary_polygon_modified,

@@ -7,7 +7,7 @@ Created on Tue Jul  5 13:40:07 2022
 import importlib
 
 from ddb import ddb
-from ddb_toolbox import select_toolbox
+from operations.toolbox import select_toolbox
 #from guitares.gui import set_missing_menu_values
 
 class GenericModel:
@@ -63,8 +63,8 @@ class GenericModel:
                            }]
             menu_to_add.append({"text": ddb.toolbox[toolbox_name].long_name,
                                 "variable_group": "menu",
-                                "module": "ddb_toolbox",
-                                "method": "select_toolbox",
+                                "module": "menu.toolbox",
+                                "method": "select",
                                 "id": toolbox_name,
                                 "option": toolbox_name,
                                 "checkable": True,
@@ -85,4 +85,5 @@ class GenericModel:
 
 def select_model(model_name):
     # Called from menu
+    ddb.active_model = ddb.model[model_name]
     ddb.model[model_name].select()

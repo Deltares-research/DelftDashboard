@@ -11,7 +11,7 @@ import geopandas as gpd
 import shapely
 import json
 
-from ddb_toolbox import GenericToolbox
+from operations.toolbox import GenericToolbox
 from ddb import ddb
 from cht.bathymetry.bathymetry_database import bathymetry_database
 
@@ -80,12 +80,12 @@ class Toolbox(GenericToolbox):
         ddb.gui.setvar(group, "boundary_zmax",  99999.0)
         ddb.gui.setvar(group, "boundary_zmin", -99999.0)
 
-    def update_map(self, option):
-        # Get layer
-        layer = ddb.map.layer["modelmaker_hurrywave"]
-        if option == "deactivate":
-            # Make the layers invisible
-            layer.set_mode("inactive")
+    def set_layer_mode(self, mode):
+        if mode == "inactive":
+            # Make all layers invisible
+            ddb.map.layer["modelmaker_hurrywave"].set_mode("invisible")
+        if mode == "invisible":
+            ddb.map.layer["modelmaker_hurrywave"].set_mode("invisible")
 
 
     # def set_gui_variables(self):
@@ -117,7 +117,7 @@ class Toolbox(GenericToolbox):
         # Grid outline
         from .domain import grid_outline_created
         from .domain import grid_outline_modified
-        layer.add_draw_layer("grid_outline",
+        layer.add_layer("grid_outline", type="draw",
                              shape="rectangle",
                              create=grid_outline_created,
                              modify=grid_outline_modified,
@@ -129,7 +129,7 @@ class Toolbox(GenericToolbox):
         from .mask_active_cells import include_polygon_created
         from .mask_active_cells import include_polygon_modified
         from .mask_active_cells import include_polygon_selected
-        layer.add_draw_layer("mask_include",
+        layer.add_layer("mask_include", type="draw",
                              shape="polygon",
                              create=include_polygon_created,
                              modify=include_polygon_modified,
@@ -141,7 +141,7 @@ class Toolbox(GenericToolbox):
         from .mask_active_cells import exclude_polygon_created
         from .mask_active_cells import exclude_polygon_modified
         from .mask_active_cells import exclude_polygon_selected
-        layer.add_draw_layer("mask_exclude",
+        layer.add_layer("mask_exclude", type="draw",
                              shape="polygon",
                              create=exclude_polygon_created,
                              modify=exclude_polygon_modified,
@@ -153,7 +153,7 @@ class Toolbox(GenericToolbox):
         from .mask_boundary_cells import boundary_polygon_created
         from .mask_boundary_cells import boundary_polygon_modified
         from .mask_boundary_cells import boundary_polygon_selected
-        layer.add_draw_layer("mask_boundary",
+        layer.add_layer("mask_boundary", type="draw",
                              shape="polygon",
                              create=boundary_polygon_created,
                              modify=boundary_polygon_modified,
@@ -185,11 +185,12 @@ class Toolbox(GenericToolbox):
         model.grid.build()
 
         gdf = model.grid.to_gdf()
-        layer = ddb.map.layer["hurrywave"]
-        grid_layer = layer.get("grid")
-        if grid_layer:
-            grid_layer.delete()
-        layer.add_deck_geojson_layer("hurrywave_grid", data=gdf, file_name="hurrywave_grid.geojson")
+        layer = ddb.map.layer["hurrywave"].layer["grid"]
+        layer.set_data(gdf)
+        # grid_layer = layer.get("grid")
+        # if grid_layer:
+        #     grid_layer.delete()
+#        layer.add_deck_geojson_layer("hurrywave_grid", data=gdf, file_name="hurrywave_grid.geojson")
 
     def generate_bathymetry(self):
         bathymetry_list = ddb.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets

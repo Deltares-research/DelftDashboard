@@ -5,6 +5,8 @@ Created on Tue Jul  5 13:40:07 2022
 @author: ormondt
 """
 
+import os
+
 from ddb import ddb
 from pyproj import CRS
 
@@ -15,8 +17,8 @@ def other_geographic(option):
     print("Other")
 
 def utm_zone(option):
-    data = ddb.gui.popup("c:\\work\checkouts\\git\\DelftDashboard\\src\\toolboxes\\modelmaker_sfincs\\popuptest\\utm_zone.yml", None)
-    if not data:
+    okay, data = ddb.gui.popup(os.path.join(ddb.main_path, "misc", "select_utm_zone","utm_zone.yml"), None)
+    if not okay:
         return
     letters = ['C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
     utm = data["utm_zone"]

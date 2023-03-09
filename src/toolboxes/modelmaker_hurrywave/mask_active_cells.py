@@ -12,9 +12,13 @@ from ddb import ddb
 def select(*args):
     # De-activate existing layers
     ddb.update_map()
-    # Show the mask include and exclude layer
+    # Show the mask include and exclude polygons
     ddb.map.layer["modelmaker_hurrywave"].layer["mask_include"].set_mode("active")
     ddb.map.layer["modelmaker_hurrywave"].layer["mask_exclude"].set_mode("active")
+    # Show the grid and mask
+    ddb.map.layer["hurrywave"].layer["grid"].set_mode("active")
+    ddb.map.layer["hurrywave"].layer["mask_include"].set_mode("active")
+    ddb.map.layer["hurrywave"].layer["mask_boundary"].set_mode("active")
 
 
 def draw_include_polygon(*args):

@@ -50,8 +50,11 @@ class Model(GenericModel):
                         fill_color="red",
                         line_color="transparent")
 
+        # Move this to hurrywave.py
+        from .boundary_conditions import select_boundary_point_from_map
         layer.add_layer("boundary_points",
                         type="circle_selector",
+                        select=select_boundary_point_from_map,
                         line_color="white",
                         line_opacity=1.0,
                         fill_color="blue",

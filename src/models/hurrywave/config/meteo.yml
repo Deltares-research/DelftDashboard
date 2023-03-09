@@ -27,9 +27,9 @@ element:
     - rectangular_and_spiderweb
   - style: pushselectfile
     position:
-      x: 20
+      x: 50
       y: 95
-      width: 130
+      width: 150
       height: 20
     text: Wind File
     variable: wndfile
@@ -46,9 +46,9 @@ element:
         value: uniform
   - style: pushselectfile
     position:
-      x: 20
+      x: 50
       y: 70
-      width: 130
+      width: 150
       height: 20
     text: Spiderweb File
     variable: spwfile
@@ -68,9 +68,9 @@ element:
         value: spiderweb
   - style: pushselectfile
     position:
-      x: 20
+      x: 50
       y: 45
-      width: 130
+      width: 150
       height: 20
     text: AMU File
     variable: amufile
@@ -91,9 +91,9 @@ element:
         value: rectangular_and_spiderweb
   - style: pushselectfile
     position:
-      x: 20
+      x: 50
       y: 20
-      width: 130
+      width: 150
       height: 20
     text: AMV File
     variable: amvfile

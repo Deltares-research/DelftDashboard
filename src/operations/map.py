@@ -25,7 +25,7 @@ def map_ready():
     main_layer = ddb.map.add_layer("main")
 
     # Add background topography layer
-    ddb.background_topography_layer = main_layer.add_raster_layer("background_topography")
+    ddb.background_topography_layer = main_layer.add_layer("background_topography", type="raster")
 
     # Set update method for topography layer
     ddb.background_topography_layer.update = update_background
@@ -94,7 +94,12 @@ def update():
     ddb.map.set_mouse_default()
     # Sets all layers to inactive
     for name, model in ddb.model.items():
-        pass
-#        model.plot()
+        if model == ddb.active_model:
+            model.set_layer_mode("inactive")
+        else:
+            model.set_layer_mode("invisible")
     for name, toolbox in ddb.toolbox.items():
-        toolbox.update_map("deactivate")
+        if toolbox == ddb.active_toolbox:
+            toolbox.set_layer_mode("inactive")
+        else:
+            toolbox.set_layer_mode("invisible")

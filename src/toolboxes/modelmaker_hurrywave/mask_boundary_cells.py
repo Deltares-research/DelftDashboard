@@ -12,8 +12,12 @@ from ddb import ddb
 def select(*args):
     # De-activate existing layers
     ddb.update_map()
-    # Show the mask boundary layer
+    # Show the boundary polygons
     ddb.map.layer["modelmaker_hurrywave"].layer["mask_boundary"].set_mode("active")
+    # Show the grid and mask
+    ddb.map.layer["hurrywave"].layer["grid"].set_mode("active")
+    ddb.map.layer["hurrywave"].layer["mask_include"].set_mode("active")
+    ddb.map.layer["hurrywave"].layer["mask_boundary"].set_mode("active")
 
 def draw_boundary_polygon(*args):
     ddb.map.layer["modelmaker_hurrywave"].layer["mask_boundary"].draw()

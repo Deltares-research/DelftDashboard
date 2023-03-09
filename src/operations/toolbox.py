@@ -37,7 +37,7 @@ class GenericToolbox:
 
 
 def select_toolbox(toolbox_name):
-    # Called from menu, or from ddb_model->select
+    # Called from menu, or from model->select
     ddb.active_toolbox = ddb.toolbox[toolbox_name]
     ddb.active_toolbox.select()
     # # And go to this tab

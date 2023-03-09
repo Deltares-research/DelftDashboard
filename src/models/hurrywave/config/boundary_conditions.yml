@@ -1,17 +1,38 @@
 element:
-- style: panel
+- style: listbox
   position:
     x: 10
     y: 10
-    width: -10
-    height: 160
-  element:
-  - style: pushbutton
-    position:
-      x: 10
-      y: 110
-      width: 130
-      height: 20
-    text: Add Point
-    method: click_boundary_point
-    tooltip: Click boundary point
+    width: 80
+    height: 100
+  method: select_boundary_point_from_list
+  variable: active_boundary_point
+  select: index
+  option_string:
+    variable: boundary_point_names
+  tooltip: Select boundary point
+- style: pushbutton
+  text: Add Point
+  position:
+    x: 100
+    y: 90
+    width: 80
+    height: 20
+  method: add_boundary_point_on_map
+  tooltip: Add boundary point on map
+- style: pushbutton
+  text: Delete Point
+  position:
+    x: 100
+    y: 65
+    width: 80
+    height: 20
+  method: delete_point_from_list
+  tooltip: Delete boundary point from list
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_boundary_points
+      operator: gt
+      value: 0

@@ -16,7 +16,6 @@ element:
     tooltipstring: Edit map output interval (in seconds)
     text: Map output interval (s)
     textposition: left
-    variable_group: sfincs
     variable: dtmapout
     method: set_variables
   - style: edit
@@ -28,7 +27,6 @@ element:
     tooltipstring: Edit max output interval (in seconds)
     text: Max output interval (s)
     textposition: left
-    variable_group: sfincs
     variable: dtmaxout
     method: set_variables
   - style: edit
@@ -40,7 +38,6 @@ element:
     tooltipstring: Edit history output interval (in seconds)
     text: His output interval (s)
     textposition: left
-    variable_group: sfincs
     variable: dthisout
     method: set_variables
   - style: edit
@@ -49,25 +46,35 @@ element:
       y: 55
       width: 80
       height: 20
-    tooltipstring: Edit restart output interval (in seconds)
-    text: Restart output interval (s)
+    tooltipstring: Edit interval for 2d spectral output at points (in seconds)
+    text: Spectra output interval (s)
     textposition: left
-    variable_group: sfincs
-    variable: dtrstout
+    variable: dtsp2out
     method: set_variables
-  - style: popupmenu
+  - style: edit
     position:
       x: 120
       y: 30
       width: 80
       height: 20
-    text: Output Format
-    variable_group: sfincs
-    variable: outputformat
+    tooltipstring: Edit restart output interval (in seconds)
+    text: Restart output interval (s)
+    textposition: left
+    variable: dtrstout
     method: set_variables
-    option_string:
-    - NetCDF
-    - ASCII
-    option_value:
-    - net
-    - asc
+  # - style: popupmenu
+  #   position:
+  #     x: 120
+  #     y: 30
+  #     width: 80
+  #     height: 20
+  #   text: Output Format
+  #   variable_group: sfincs
+  #   variable: outputformat
+  #   method: set_variables
+  #   option_string:
+  #   - NetCDF
+  #   - ASCII
+  #   option_value:
+  #   - net
+  #   - asc

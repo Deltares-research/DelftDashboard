@@ -34,11 +34,11 @@ def topography(option):
 
 def layer_style(option):
     ddb.gui.setvar("menu", "layer_style", option)
-    if ddb.view["layer_style"] == option:
-        pass
-    else:
+    if ddb.view["layer_style"] != option:
         ddb.map.set_layer_style(option)
     ddb.view["layer_style"] = option
+    # # No redraw all layers
+    # ddb.map.redraw_layers()
     ddb.gui.window.update()
 
 def terrain(option):

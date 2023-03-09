@@ -32,7 +32,7 @@ def build_gui_config():
         file_name = model_name + ".yml"
         ddb.model[model_name].element = ddb.gui.read_gui_elements(path, file_name)[0]
         ddb.model[model_name].element["variable_group"] = model_name
-        ddb.model[model_name].element["module"] = "models." + model_name + ".ddb_" + model_name
+        ddb.model[model_name].element["module"] = "models." + model_name + "." + model_name
 
     # The Delft Dashboard GUI is built up programmatically
     ddb.gui.config["window"] = {}
@@ -61,7 +61,7 @@ def build_gui_config():
     mpbox["position"]["y"] = 195
     mpbox["position"]["width"] = -20
     mpbox["position"]["height"] = -40
-    mpbox["module"] = "ddb_map"
+    mpbox["module"] = "operations.map"
     ddb.gui.config["element"].append(mpbox)
 
     # Menu
@@ -69,7 +69,7 @@ def build_gui_config():
     # File
     menu = {}
     menu["text"] = "File"
-    menu["module"] = "ddb_menu"
+    menu["module"] = "menu.file"
     menu["menu"] = []
     menu["menu"].append({"text": "New", "method": "new", "separator": True})
     menu["menu"].append({"text": "Open", "method": "open"})
@@ -80,7 +80,7 @@ def build_gui_config():
     # Model
     menu = {}
     menu["text"] = "Model"
-    menu["module"] = "ddb_model"
+    menu["module"] = "menu.model"
     menu["menu"] = []
     for model_name in ddb.model:
         dependency = [{"action": "check",
@@ -91,7 +91,7 @@ def build_gui_config():
                      }]
         menu["menu"].append({"text": ddb.model[model_name].long_name,
                              "variable_group": "menu",
-                             "method": "select_model",
+                             "method": "select",
                              "id": model_name,
                              "option": model_name,
                              "checkable": True,
@@ -101,7 +101,7 @@ def build_gui_config():
     # Toolbox
     menu = {}
     menu["text"] = "Toolbox"
-    menu["module"] = "ddb_toolbox"
+    menu["module"] = "menu.toolbox"
     menu["menu"] = []
     menu["menu"].append({"text": "toolbox"})
     ddb.gui.config["menu"].append(menu)
@@ -112,7 +112,7 @@ def build_gui_config():
 #    dataset_names, dataset_long_names, dataset_source_names = bathymetry_database.dataset_names()
     menu = {}
     menu["text"] = "Topography"
-    menu["module"] = "menu_topography"
+    menu["module"] = "menu.topography"
     menu["menu"] = []
     for source in sources:
         source_menu = {}
@@ -141,7 +141,7 @@ def build_gui_config():
     # View
     menu = {}
     menu["text"] = "View"
-    menu["module"] = "menu_view"
+    menu["module"] = "menu.view"
     menu["menu"] = []
     menu["menu"].append({"variable_group": "menu", "id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]})
     menu["menu"].append({"variable_group": "menu", "id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "globe"}]}]})
@@ -165,7 +165,7 @@ def build_gui_config():
     # Coordinate system
     menu = {}
     menu["text"] = "Coordinate System"
-    menu["module"] = "ddb_coordinate_system"
+    menu["module"] = "menu.coordinate_system"
     menu["menu"] = []
     menu["menu"].append({"text": "WGS 84", "method": "wgs84", "separator": False})
     menu["menu"].append({"text": "Select Other Geographic ...", "method": "other_geographic", "separator": True})
@@ -177,7 +177,7 @@ def build_gui_config():
     # Help
     menu = {}
     menu["text"] = "Help"
-    menu["module"] = "menu_help"
+    menu["module"] = "menu.help"
     menu["menu"] = []
     ddb.gui.config["menu"].append(menu)
 

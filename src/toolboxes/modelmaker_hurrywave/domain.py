@@ -16,6 +16,7 @@ def select(*args):
     # De-activate existing layers
     ddb.update_map()
     # Show the grid outline layer
+    ddb.map.layer["hurrywave"].layer["grid"].set_mode("active")
     ddb.map.layer["modelmaker_hurrywave"].layer["grid_outline"].set_mode("active")
 
 def draw_grid_outline(*args):

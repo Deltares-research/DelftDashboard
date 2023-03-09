@@ -13,15 +13,15 @@ from pyproj import CRS
 
 from guitares.gui import GUI
 from cht.bathymetry.bathymetry_database import bathymetry_database
-from colormap import read_colormap
+from operations.colormap import read_colormap
 
 from ddb import ddb
-from ddb_gui import build_gui_config
+from operations.gui import build_gui_config
 
 def initialize():
 
-    ddb.main_path = os.path.dirname(os.path.abspath(__file__))
     ddb.server_path = os.path.join(ddb.main_path, "server")
+    ddb.config_path = os.path.join(ddb.main_path, "config")
 
     # Set default config
     ddb.config                  = {}
@@ -34,12 +34,13 @@ def initialize():
     ddb.config["height"]        = 600
     ddb.config["model"]         = []
     ddb.config["toolbox"]       = []
-    ddb.config["window_icon"]   = os.path.join(ddb.main_path, "settings", "images", "deltares_icon.png")
+    ddb.config["window_icon"]   = os.path.join(ddb.config_path, "images", "deltares_icon.png")
 #    ddb.config["splash_file"]   = os.path.join(ddb.main_path, "settings", "images", "DelftDashBoard.jpg")
     ddb.config["splash_file"]   = None
+    ddb.config["bathymetry_database"] = ""
 
     # Read ini file and override stuff in default config dict
-    inifile = open("delftdashboard.ini", "r")
+    inifile = open(os.path.join(ddb.config_path, "delftdashboard.ini"), "r")
     config = yaml.load(inifile, Loader=yaml.FullLoader)
     for key in config:
         ddb.config[key] = config[key]
@@ -48,7 +49,7 @@ def initialize():
     # Initialize GUI object
     ddb.gui = GUI(ddb,
                   framework=ddb.config["gui_framework"],
-                  config_path=ddb.main_path,
+                  config_path=ddb.config_path,
                   server_path=ddb.server_path,
                   server_port=ddb.config["server_port"],
                   stylesheet=ddb.config["stylesheet"],
@@ -62,7 +63,7 @@ def initialize():
     ddb.crs = CRS(4326)
     ddb.auto_update_topography = True
     ddb.background_topography  = "gebco22"
-    ddb.bathymetry_database_path = "c:\\work\\delftdashboard\\data\\bathymetry"
+    ddb.bathymetry_database_path = ddb.config["bathymetry_database"]
     bathymetry_database.initialize(ddb.bathymetry_database_path)
 
 
@@ -95,7 +96,7 @@ def initialize():
     for mdl in ddb.config["model"]:
         model_name = mdl["name"]
         # And initialize the domain for this model
-        module = importlib.import_module("models." + model_name + "." + "ddb_" + model_name)
+        module = importlib.import_module("models." + model_name + "." + model_name)
         ddb.model[model_name] = module.Model(model_name)
         if "exe_path" in mdl:
             ddb.model[model_name].domain.exe_path = mdl["exe_path"]
@@ -119,7 +120,7 @@ def initialize():
     # Read tide database
 
     # Read color maps
-    rgb = read_colormap('c:/work/checkouts/svn/OET/matlab/applications/DelftDashBoard/settings/colormaps/earth.txt')
+    rgb = read_colormap(os.path.join(ddb.config_path, "colormaps", "earth.txt"))
     ddb.color_map_earth = ListedColormap(rgb)
 
     # GUI variables

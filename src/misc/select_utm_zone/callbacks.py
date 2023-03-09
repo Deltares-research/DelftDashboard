@@ -28,12 +28,11 @@ def map_ready():
             gdf_list.append({"utm_zone": utm_zone, "utm_letter": letters[ilat], "geometry": polygon})
     gdf = gpd.GeoDataFrame(gdf_list, crs=4326)
     layer = mp.add_layer("utm")
-    layer.add_geojson_layer("polygons",
-                            data=gdf,
-                            file_name="utm_zones.geojson",
-                            select=select_utm_zone,
-                            type="polygon_selector",
-                            selection_type="single")
+    polygon_layer = layer.add_layer("polygons", type="polygon_selector",
+                    file_name="utm_zones.geojson",
+                    select=select_utm_zone,
+                    selection_type="single")
+    polygon_layer.set_data(gdf, 0)
 
 def map_moved(coords):
     pass

@@ -11,6 +11,7 @@ from cht.bathymetry.bathymetry_database import bathymetry_database
 def select(*args):
     # De-activate existing layers
     ddb.update_map()
+    ddb.map.layer["hurrywave"].layer["grid"].set_mode("active")
 
 def select_bathymetry_source(*args):
     source = args[0]
