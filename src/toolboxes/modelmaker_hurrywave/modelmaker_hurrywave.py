@@ -185,6 +185,7 @@ class Toolbox(GenericToolbox):
 
         model.grid.build()
 
+#        gdf = model.grid.to_gdf().to_crs(4326)
         gdf = model.grid.to_gdf()
         ddb.map.layer["hurrywave"].layer["grid"].set_data(gdf)
 
@@ -207,10 +208,6 @@ class Toolbox(GenericToolbox):
                    boundary_zmin=ddb.gui.getvar("modelmaker_hurrywave", "boundary_zmin"),
                    boundary_zmax=ddb.gui.getvar("modelmaker_hurrywave", "boundary_zmax")
                    )
-        gdf_include = mask.to_gdf(option="include")
-        layer = ddb.map.layer["hurrywave"].layer["mask_include"]
-        layer.set_data(gdf_include)
-        gdf_boundary = mask.to_gdf(option="boundary")
-        layer = ddb.map.layer["hurrywave"].layer["mask_boundary"]
-        layer.set_data(gdf_boundary)
+        ddb.map.layer["hurrywave"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
+        ddb.map.layer["hurrywave"].layer["mask_boundary"].set_data(mask.to_gdf(option="boundary"))
         ddb.model["hurrywave"].domain.mask.write()

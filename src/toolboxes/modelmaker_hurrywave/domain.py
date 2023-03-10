@@ -21,6 +21,7 @@ def select(*args):
 
 def draw_grid_outline(*args):
     # Clear grid outline layer
+    ddb.map.layer["modelmaker_hurrywave"].layer["grid_outline"].crs = ddb.crs
     ddb.map.layer["modelmaker_hurrywave"].layer["grid_outline"].draw()
 
 def grid_outline_created(gdf, index, id):

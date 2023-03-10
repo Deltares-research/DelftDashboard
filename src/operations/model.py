@@ -83,6 +83,9 @@ class GenericModel:
 
         ddb.gui.window.update()
 
+    def set_crs(self, crs):        
+        pass
+
 def select_model(model_name):
     # Called from menu
     ddb.active_model = ddb.model[model_name]

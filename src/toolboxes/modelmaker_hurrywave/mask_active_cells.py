@@ -22,6 +22,7 @@ def select(*args):
 
 
 def draw_include_polygon(*args):
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_include"].crs = ddb.crs
     ddb.map.layer["modelmaker_hurrywave"].layer["mask_include"].draw()
 
 def delete_include_polygon(*args):

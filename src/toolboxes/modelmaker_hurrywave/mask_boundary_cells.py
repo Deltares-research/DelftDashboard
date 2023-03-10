@@ -20,6 +20,7 @@ def select(*args):
     ddb.map.layer["hurrywave"].layer["mask_boundary"].set_mode("active")
 
 def draw_boundary_polygon(*args):
+    ddb.map.layer["modelmaker_hurrywave"].layer["mask_boundary"].crs = ddb.crs
     ddb.map.layer["modelmaker_hurrywave"].layer["mask_boundary"].draw()
 
 def delete_boundary_polygon(*args):

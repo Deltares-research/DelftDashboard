@@ -129,6 +129,9 @@ class Model(GenericModel):
     def load(self):
         self.domain.read()
 
+    def set_crs(self, crs):
+        self.domain.crs = crs
+
 #     def plot(self):
 
 #         # Called when a model has been loaded

@@ -27,7 +27,6 @@ def initialize():
     ddb.config                  = {}
     ddb.config["gui_framework"] = "pyqt5"
     ddb.config["server_port"]   = 3000
-#    ddb.config["stylesheet"]    = "Combinear.qss"
     ddb.config["stylesheet"]    = ""
     ddb.config["title"]         = "Delft Dashboard"
     ddb.config["width"]         = 800
@@ -35,8 +34,7 @@ def initialize():
     ddb.config["model"]         = []
     ddb.config["toolbox"]       = []
     ddb.config["window_icon"]   = os.path.join(ddb.config_path, "images", "deltares_icon.png")
-#    ddb.config["splash_file"]   = os.path.join(ddb.main_path, "settings", "images", "DelftDashBoard.jpg")
-    ddb.config["splash_file"]   = None
+    ddb.config["splash_file"]   = os.path.join(ddb.config_path, "images", "DelftDashBoard.jpg")
     ddb.config["bathymetry_database"] = ""
 
     # Read ini file and override stuff in default config dict
@@ -53,11 +51,9 @@ def initialize():
                   server_path=ddb.server_path,
                   server_port=ddb.config["server_port"],
                   stylesheet=ddb.config["stylesheet"],
+                  icon=ddb.config["window_icon"],
                   splash_file=ddb.config["splash_file"],
                   copy_mapbox_server_folder=True)
-
-    ddb.gui.show_splash()
-
 
     # Define some other variables
     ddb.crs = CRS(4326)
