@@ -1,45 +1,17 @@
 element:
 - style: panel
+  text: Wind
   position:
     x: 10
     y: 10
     width: 200
     height: 120
   element:
-  - style: text
-    position:
-      x: 10
-      y: 116
-    text: Breakpoint 1
-  - style: text
-    position:
-      x: 10
-      y: 96
-    text: Breakpoint 2
-  - style: text
-    position:
-      x: 10
-      y: 76
-    text: Breakpoint 3
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: cdnrb
-        operator: eq
-        value: 3
-  - style: table
-    position:
-      x: 580
-      y: 75
-    nrrows: 3
-    includenumbers: False
-    method: set_variables
   - style: popupmenu
     text: Number of breakpoints
     position:
-      x: 100
-      y: 100
+      x: 110
+      y: 90
       width: 30
       height: 20
     variable: cdnrb
@@ -51,6 +23,7 @@ element:
     - 2
     - 3
 - style: panel
+  title: Barometric Pressure
   position:
     x: 220
     y: 10
@@ -60,8 +33,8 @@ element:
   - style: checkbox
     position:
       x: 10
-      y: 95
-      width: 50
+      y: 90
+      width: 100
       height: 20
     text: Include pressure
     variable: baro
@@ -69,7 +42,7 @@ element:
     tooltipstring: Check to include barometric pressure gradients in flux computation
   - style: edit
     position:
-      x: 10
+      x: 110
       y: 70
       width: 50
       height: 20
@@ -80,7 +53,7 @@ element:
     textposition: right
   - style: edit
     position:
-      x: 100
+      x: 110
       y: 45
       width: 50
       height: 20
@@ -90,6 +63,7 @@ element:
     tooltipstring: Edit background air pressure
     textposition: right
 - style: panel
+  title: Rain
   position:
     x: 530
     y: 10

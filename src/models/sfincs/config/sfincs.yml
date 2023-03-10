@@ -9,28 +9,28 @@ element:
   variable_group: sfincs
   tab:
   - string: Domain
-    module: models.sfincs.ddb_sfincs_domain
-    element: sfincs.domain.yml
+    module: models.sfincs.domain
+    element: domain.yml
   - string: Time Frame
-    module: models.sfincs.ddb_sfincs_timeframe
-    element: sfincs.timeframe.yml
+    module: models.sfincs.timeframe
+    element: timeframe.yml
   - string: Physics
-    element: sfincs.physics.yml
+    element: physics.yml
   - string: Numerics
-    module: models.sfincs.ddb_sfincs_numerics
-    element: sfincs.numerics.yml
+    module: models.sfincs.numerics
+    element: numerics.yml
   - string: Boundary Conditions
-    module: models.sfincs.ddb_sfincs_boundary_conditions
-    element: sfincs.boundaryconditions.yml
+    module: models.sfincs.boundary_conditions
+    element: boundary_conditions.yml
   - string: Waves
-    element: sfincs.waves.yml
+    element: waves.yml
   - string: Meteo
-    module: models.sfincs.ddb_sfincs_meteo
-    element: sfincs.meteo.yml
+    module: models.sfincs.meteo
+    element: meteo.yml
   - string: Structures
-    module: models.sfincs.ddb_sfincs_structures
-    element: sfincs.structures.yml
+    module: models.sfincs.structures
+    element: structures.yml
   - string: Output
-    module: models.sfincs.ddb_sfincs_output
-    element: sfincs.output.yml
+    module: models.sfincs.output
+    element: output.yml
 - style: mapbox

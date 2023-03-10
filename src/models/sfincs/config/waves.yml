@@ -7,6 +7,6 @@ element:
     height: 160
   tab:
   - string: SnapWave
-    element: sfincs.waves.snapwave.yml
+    element: waves_snapwave.yml
   - string: Wave Makers
-    element: sfincs.waves.wavemakers.yml
+    element: waves_wavemakers.yml

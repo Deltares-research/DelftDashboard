@@ -106,22 +106,22 @@ class Model(GenericModel):
             setattr(self.domain.input.variables, var_name, ddb.gui.getvar("hurrywave", var_name))
 
     def open(self):
-        fname = QFileDialog.getOpenFileName(None, "Open file", "",
-                                            "HurryWave input file (hurrywave.inp)")
-        fname = fname[0]
+        # Open input file, and change working directory
+        fname = ddb.gui.open_file_name("Open file", "HurryWave input file (hurrywave.inp)")
         if fname:
             path = os.path.dirname(fname)
             self.domain.path = path
             self.domain.read()
             # Change working directory
-#            os.chdir(path)
+            os.chdir(path)
             # Change CRS
             ddb.crs = self.domain.crs
 
-            self.plot()
+#            self.plot()
 
     def save(self):
         # Write hurrywave.inp
+        self.domain.path = os.getcwd()
         self.domain.input.write()
         self.domain.write_batch_file()
 

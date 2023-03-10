@@ -89,13 +89,28 @@ class Model(GenericModel):
         ddb.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
         ddb.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
 
+        ddb.gui.setvar(group, "meteo_forcing_type", "uniform")
+
+        ddb.gui.setvar(group, "depthcontour_value", 0.0)
+        ddb.gui.setvar(group, "flowboundarypoints_length", 0)
+        ddb.gui.setvar(group, "boundaryspline_length", 0)
+        ddb.gui.setvar(group, "boundaryspline_filename", "")
+        ddb.gui.setvar(group, "boundaryspline_flowdx", 0.0)
+        ddb.gui.setvar(group, "boundaryconditions_zs", 0.0)
+        ddb.gui.setvar(group, "wind", True)
+        ddb.gui.setvar(group, "rain", True)
+
+
     def set_model_variables(self, varid=None, value=None):
+        # Copies gui variables to sfincs input
 
         group = "sfincs"
 
-        for var_name in self.domain.config:
-            self.domain.config[var_name] = ddb.gui.variables[group][var_name]["value"]
-#            setattr(self.domain.input, var_name, ddb.gui.variables[group][var_name]["value"])
+        for var_name in vars(self.domain.input):
+            setattr(self.domain.input, var_name, ddb.gui.variables[group][var_name]["value"])
+
+#        for var_name in self.domain.config:
+#            self.domain.config[var_name] = ddb.gui.variables[group][var_name]["value"]
 
     def initialize_domain(self):
 

@@ -7,7 +7,7 @@ element:
     height: 20
   text: X0
   variable: x0
-  method: edit
+  method: edit_origin
 - style: edit
   position:
     x: 160
@@ -16,7 +16,7 @@ element:
     height: 20
   text: Y0
   variable: y0
-  method: edit
+  method: edit_origin
 - style: edit
   position:
     x: 60
@@ -25,7 +25,7 @@ element:
     height: 20
   text: MMax
   variable: mmax
-  method: edit
+  method: edit_nmmax
 - style: edit
   position:
     x: 160
@@ -34,7 +34,7 @@ element:
     height: 20
   text: NMax
   variable: nmax
-  method: edit
+  method: edit_nmmax
 - style: edit
   position:
     x: 60
@@ -43,7 +43,7 @@ element:
     height: 20
   text: dX
   variable: dx
-  method: edit
+  method: edit_dxdy
 - style: edit
   position:
     x: 160
@@ -52,7 +52,7 @@ element:
     height: 20
   text: dY
   variable: dy
-  method: edit
+  method: edit_dxdy
 - style: edit
   position:
     x: 60
@@ -61,7 +61,7 @@ element:
     height: 20
   text: Rotation
   variable: rotation
-  method: edit
+  method: edit_rotation
 - style: pushbutton
   text: Draw Layout
   position:

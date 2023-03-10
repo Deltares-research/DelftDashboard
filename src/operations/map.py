@@ -62,12 +62,13 @@ def update_background():
         coords = ddb.map.map_extent
         xl = [coords[0][0], coords[1][0]]
         yl = [coords[0][1], coords[1][1]]
+        wdt = ddb.map.view.geometry().width()
         if ddb.view["topography"]["quality"] == "high":
-            npix = ddb.gui.window.width
+            npix = wdt
         elif ddb.view["topography"]["quality"] == "medium":
-            npix = int(ddb.gui.window.width*0.5)
+            npix = int(wdt*0.5)
         else:
-            npix = int(ddb.gui.window.width*0.25)
+            npix = int(wdt*0.25)
 
         dxy = (xl[1] - xl[0])/npix
         xv = np.arange(xl[0], xl[1], dxy)

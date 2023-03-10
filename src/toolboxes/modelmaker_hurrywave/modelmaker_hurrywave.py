@@ -161,6 +161,7 @@ class Toolbox(GenericToolbox):
                              polygon_line_color="deepskyblue",
                              polygon_fill_color="deepskyblue",
                              polygon_fill_opacity=0.3)
+
     def generate_grid(self):
         model = ddb.model["hurrywave"].domain
 
@@ -185,12 +186,7 @@ class Toolbox(GenericToolbox):
         model.grid.build()
 
         gdf = model.grid.to_gdf()
-        layer = ddb.map.layer["hurrywave"].layer["grid"]
-        layer.set_data(gdf)
-        # grid_layer = layer.get("grid")
-        # if grid_layer:
-        #     grid_layer.delete()
-#        layer.add_deck_geojson_layer("hurrywave_grid", data=gdf, file_name="hurrywave_grid.geojson")
+        ddb.map.layer["hurrywave"].layer["grid"].set_data(gdf)
 
     def generate_bathymetry(self):
         bathymetry_list = ddb.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets

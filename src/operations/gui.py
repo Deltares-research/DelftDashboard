@@ -74,6 +74,7 @@ def build_gui_config():
     menu["menu"].append({"text": "New", "method": "new", "separator": True})
     menu["menu"].append({"text": "Open", "method": "open"})
     menu["menu"].append({"text": "Save", "method": "save", "separator": True})
+    menu["menu"].append({"text": "Select Working Directory", "method": "select_working_directory", "separator": True})
     menu["menu"].append({"text": "Exit", "method": "exit"})
     ddb.gui.config["menu"].append(menu)
 
