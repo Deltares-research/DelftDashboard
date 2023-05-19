@@ -1,0 +1,24 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: pushbutton
+    text: Select Track
+    position:
+      x: 20
+      y: 130
+      width: 120
+      height: 20
+    method: select_track
+  - style: pushbutton
+    text: Build Spiderweb
+    position:
+      x: 20
+      y: 105
+      width: 120
+      height: 20
+    method: build_spiderweb

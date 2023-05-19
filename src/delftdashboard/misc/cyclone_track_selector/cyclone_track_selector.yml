@@ -1,0 +1,42 @@
+window:
+  title: Select Cyclone Track ...
+  width: 800
+  height: 500
+  module: misc.cyclone_track_selector.cyclone_track_selector
+  variable_group: cyclone_track_selector
+  modal: True
+  cancel: True
+element:
+- style: edit
+  variable: distance
+  method: edit_filter
+  text: Distance (km)
+  position:
+    x: 100
+    y: 70
+    width: 50
+    height: 20
+- style: edit
+  variable: year0
+  method: edit_filter
+  text: Year
+  position:
+    x: 100
+    y: 45
+    width: 50
+    height: 20
+- style: edit
+  variable: year1
+  method: edit_filter
+  position:
+    x: 160
+    y: 45
+    width: 50
+    height: 20
+- style: mapbox
+  id: track_selector_map
+  position:
+    x: 20
+    y: 100
+    width: -20
+    height: -20

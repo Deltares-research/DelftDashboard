@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+version = "0.1.0"
+name = "delftdashboard"
+authors = [
+    {name = "Maarten van Ormondt", email = "maarten.vanormondt@deltares-usa.us"},
+    {name = "Roel de Goede", email = "roel.degoede@deltares.nl"},
+    {name = "Kees Nederhoff", email = "kees.nederhoff@deltares-usa.us"},
+    {name = "Tim Leijnse", email = "tim.leijnse@deltares.nl"},
+    {name = "Panos Athanasiou", email = "panos.athanasiou@deltares.nl"},
+]
+requires-python = ">=3.10"
+dependencies = [
+    "geopandas >=0.8",
+    "numpy",
+    "pandas",
+    "pyproj",
+    "rasterio",
+    "shapely",
+    "scipy",
+    "xarray",
+    "wget",
+    "elementpath",
+    "geojson",
+    "Pillow",
+    "matplotlib",
+    "noaa-coops",
+    "metpy",
+    "siphon",
+    "netCDF4",
+    "mat73",
+    "tabulate",
+]

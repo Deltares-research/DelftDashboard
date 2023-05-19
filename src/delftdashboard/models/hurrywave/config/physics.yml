@@ -1,0 +1,17 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Constants
+    module: delftdashboard.models.hurrywave.physics_constants
+    element: physics_constants.yml
+  - string: Roughness
+    module: delftdashboard.models.hurrywave.physics_roughness
+    element: physics_roughness.yml
+  - string: Meteo
+    module: delftdashboard.models.hurrywave.physics_meteo
+    element: physics_meteo.yml

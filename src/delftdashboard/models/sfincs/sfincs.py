@@ -1,0 +1,124 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May 10 12:18:09 2021
+
+@author: ormondt
+"""
+import datetime
+
+from delftdashboard.operations.model import GenericModel
+from delftdashboard.app import app
+
+from cht.sfincs.sfincs import SFINCS
+
+#from hydromt_sfincs import SfincsModel
+
+class Model(GenericModel):
+    def __init__(self, name):
+        super().__init__()
+
+        self.name = name
+        self.long_name = "SFINCS"
+
+        print("Model " + self.name + " added!")
+        self.active_domain = 0
+
+        self.initialize_domain()
+        self.set_gui_variables()
+
+    def add_layers(self):
+        layer = app.map.add_layer("sfincs")
+
+    def set_layer_mode(self, mode):
+        if mode == "inactive":
+            app.map.layer["sfincs"].set_mode("invisible")
+        if mode == "invisible":
+            app.map.layer["sfincs"].set_mode("invisible")
+
+    def open(self):
+        pass
+
+    def save(self):
+        pass
+
+    def load(self):
+        pass
+
+    def plot(self):
+        pass
+
+    def set_gui_variables(self):
+
+        group = "sfincs"
+
+        for var_name in vars(self.domain.input):
+#        for var_name in self.domain.config:
+#            app.gui.setvar(group, var_name, self.domain.config[var_name])
+            app.gui.setvar(group, var_name, getattr(self.domain.input, var_name))
+
+        # # Loop through available input variables
+        # gui.variables.add(group, "tstart",      self.domain.input.tstart,       minval=None,    maxval=None, errmsg="SFINCS start time must be greater than stop time")
+        # gui.variables.add(group, "tstop",       self.domain.input.tstop,        minval=None,    maxval=None, errmsg="SFINCS start time must be greater than stop time")
+        # gui.variables.add(group, "theta",       self.domain.input.theta,        minval=0.0,     maxval=1.0)
+        # gui.variables.add(group, "huthresh",    self.domain.input.huthresh,     minval=0.0001,  maxval=0.5)
+        # gui.variables.add(group, "inputformat", self.domain.input.inputformat)
+        # gui.variables.add(group, "x0",          self.domain.input.x0)
+        # gui.variables.add(group, "y0",          self.domain.input.y0)
+        # gui.variables.add(group, "dx",          self.domain.input.dx)
+        # gui.variables.add(group, "dy",          self.domain.input.dy)
+        # gui.variables.add(group, "nmax",        self.domain.input.nmax)
+        # gui.variables.add(group, "mmax",        self.domain.input.mmax)
+        # gui.variables.add(group, "rotation",    self.domain.input.rotation)
+        # gui.variables.add(group, "latitude",    self.domain.input.latitude)
+        # gui.variables.add(group, "manning",     self.domain.input.manning)
+        # gui.variables.add(group, "manning_land",     self.domain.input.manning_land)
+        # gui.variables.add(group, "manning_sea",     self.domain.input.manning_sea)
+        # gui.variables.add(group, "rgh_lev_land",     self.domain.input.rgh_lev_land)
+        # gui.variables.add(group, "advection",     self.domain.input.advection)
+        # gui.variables.add(group, "advlim",     self.domain.input.advlim)
+
+        app.gui.setvar(group, "tref", datetime.datetime(2000, 1, 1))
+        app.gui.setvar(group, "tstart", datetime.datetime(2000, 1, 1))
+        app.gui.setvar(group, "tstop", datetime.datetime(2000, 1, 3))
+
+        app.gui.setvar(group, "roughness_type", "landsea")
+
+        # Now set some extra variables needed for SFINCS GUI
+        app.gui.setvar(group, "input_options_text", ["Binary", "ASCII"])
+        app.gui.setvar(group, "input_options_values", ["bin", "asc"])
+
+        app.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
+        app.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
+
+        app.gui.setvar(group, "meteo_forcing_type", "uniform")
+
+        app.gui.setvar(group, "depthcontour_value", 0.0)
+        app.gui.setvar(group, "flowboundarypoints_length", 0)
+        app.gui.setvar(group, "boundaryspline_length", 0)
+        app.gui.setvar(group, "boundaryspline_filename", "")
+        app.gui.setvar(group, "boundaryspline_flowdx", 0.0)
+        app.gui.setvar(group, "boundaryconditions_zs", 0.0)
+        app.gui.setvar(group, "wind", True)
+        app.gui.setvar(group, "rain", True)
+
+
+    def set_model_variables(self, varid=None, value=None):
+        # Copies gui variables to sfincs input
+
+        group = "sfincs"
+
+        for var_name in vars(self.domain.input):
+            setattr(self.domain.input, var_name, app.gui.variables[group][var_name]["value"])
+
+#        for var_name in self.domain.config:
+#            self.domain.config[var_name] = app.gui.variables[group][var_name]["value"]
+
+    def initialize_domain(self):
+
+#        self.domain = SfincsModel()
+        self.domain = SFINCS()
+
+    def set_input_variable(self, gui_variable, value):
+
+        pass
+

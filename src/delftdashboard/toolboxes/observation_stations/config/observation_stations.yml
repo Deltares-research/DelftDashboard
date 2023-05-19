@@ -1,0 +1,38 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 300
+      height: 130
+    text: Stations
+    text_position: above
+    method: select_station
+    variable: active_station_index
+    select: index
+    option_string:
+      variable: station_names
+  - style: pushbutton
+    position:
+      x: 320
+      y: 120
+      width: 100
+      height: 20
+    text: Add to Model
+    method: add_stations_to_model
+  - style: radiobuttongroup
+    position:
+      x: 320
+      y: 75
+      width: 100
+    variable: naming_option
+    option_string: ["Name", "ID"]
+    option_value: ["name", "id"]
+    method: select_naming_option
