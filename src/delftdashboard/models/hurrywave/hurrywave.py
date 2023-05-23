@@ -32,9 +32,10 @@ class Model(GenericModel):
         # Add main DDB layer
         layer = app.map.add_layer("hurrywave")
 
-        layer.add_layer("grid", type="deck_geojson",
-                        file_name="hurrywave_grid.geojson",
-                        line_color="black")
+        # layer.add_layer("grid", type="deck_geojson",
+        #                 file_name="hurrywave_grid.geojson",
+        #                 line_color="black")
+        layer.add_layer("grid", type="image")
 
         layer.add_layer("mask_include",
                         type="circle",
