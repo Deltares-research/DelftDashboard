@@ -13,6 +13,6 @@ def select(*args):
     map.update()
 
 
-def set_variables(*args):
+def set_model_variables(*args):
     # All variables will be set
     app.model["hurrywave"].set_input_variables()

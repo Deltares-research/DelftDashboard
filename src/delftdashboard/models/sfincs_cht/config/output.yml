@@ -1,0 +1,69 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 140
+  element:
+  - style: edit
+    position:
+      x: 120
+      y: 110
+      width: 80
+      height: 20
+    tooltipstring: Edit map output interval (in seconds)
+    text: Map output interval (s)
+    textposition: left
+    variable: dtmapout
+    method: set_model_variables
+  - style: edit
+    position:
+      x: 120
+      y: 85
+      width: 80
+      height: 20
+    tooltipstring: Edit max output interval (in seconds)
+    text: Max output interval (s)
+    textposition: left
+    variable: dtmaxout
+    method: set_model_variables
+  - style: edit
+    position:
+      x: 120
+      y: 60
+      width: 80
+      height: 20
+    tooltipstring: Edit history output interval (in seconds)
+    text: His output interval (s)
+    textposition: left
+    variable: dthisout
+    method: set_model_variables
+  - style: edit
+    position:
+      x: 120
+      y: 35
+      width: 80
+      height: 20
+    tooltipstring: Edit restart output interval (in seconds)
+    text: Restart output interval (s)
+    textposition: left
+    variable: dtrstout
+    method: set_model_variables
+  - style: popupmenu
+    position:
+      x: 120
+      y: 10
+      width: 80
+      height: 20
+    text: Output Format
+    variable: outputformat
+    method: set_model_variables
+    option_string:
+    - NetCDF
+    - Binary
+    - ASCII
+    option_value:
+    - net
+    - bin
+    - asc

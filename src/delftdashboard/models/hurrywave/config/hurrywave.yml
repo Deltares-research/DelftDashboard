@@ -10,7 +10,7 @@ element:
   tab:
   - string: Domain
     module: delftdashboard.models.hurrywave.domain
-    method: set_variables
+    method: set_model_variables
     element: domain.yml
   - string: Time Frame
     module: delftdashboard.models.hurrywave.timeframe
@@ -27,7 +27,6 @@ element:
     module: delftdashboard.models.hurrywave.meteo
     element: meteo.yml
   - string: Observation Points
-    module: delftdashboard.models.hurrywave.observation_points
     element: observation_points.yml
   - string: Structures
     module: delftdashboard.models.hurrywave.structures

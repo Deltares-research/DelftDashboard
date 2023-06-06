@@ -1,0 +1,63 @@
+element:
+- style: panel
+  title: Boundary Conditions
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 80
+      height: 140
+    method: select_boundary_point_from_list
+    variable: active_boundary_point
+    select: index
+    option_string:
+      variable: boundary_point_names
+    tooltip: Select boundary point
+  - style: pushbutton
+    text: Add Point
+    position:
+      x: 100
+      y: 130
+      width: 80
+      height: 20
+    method: add_boundary_point_on_map
+    tooltip: Add boundary point on map
+  - style: pushbutton
+    text: Delete Point
+    position:
+      x: 100
+      y: 105
+      width: 80
+      height: 20
+    method: delete_point_from_list
+    tooltip: Delete boundary point from list
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_boundary_points
+        operator: gt
+        value: 0
+  - style: pushbutton
+    text: Create Boundary Points
+    position:
+      x: 300
+      y: 130
+      width: 110
+      height: 20
+    method: create_boundary_points
+  - style: edit
+    text: Distance (m)
+    text_position: right  
+    position:
+      x: 300
+      y: 105
+      width: 50
+      height: 20
+    variable: boundary_dx  

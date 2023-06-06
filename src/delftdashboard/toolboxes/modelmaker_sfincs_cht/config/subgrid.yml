@@ -1,0 +1,72 @@
+element:
+- style: edit
+  text: Nr Bins
+  variable: subgrid_nr_bins
+  position:
+    x: 80
+    y: 110
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Number of vertical bins in sub-grid tables
+- style: edit
+  text: Nr Pixels per Cell
+  variable: subgrid_nr_pixels
+  position:
+    x: 80
+    y: 85
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Number of sub-grid pixels per coarse cell
+- style: edit
+  text: Max dZ/dV
+  variable: subgrid_max_dzdv
+  position:
+    x: 80
+    y: 60
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Max dZ/dV
+- style: edit
+  text: Manning (max)
+  variable: subgrid_manning_max
+  position:
+    x: 260
+    y: 110
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Maximum Manning's n below cut-off level
+- style: edit
+  text: Manning Cut-off Level (m)
+  variable: subgrid_manning_z_cutoff
+  position:
+    x: 260
+    y: 85
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Cut-off level (m) for maximizing Manning's n value
+- style: edit
+  text: Zmin (m)
+  variable: subgrid_zmin
+  position:
+    x: 260
+    y: 60
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Minimum bed level used in subgrid table (used to limit extreme depths)
+- style: pushbutton
+  text: Generate
+  position:
+    x: 260
+    y: 10
+    width: 60
+    height: 20
+  method: generate_subgrid
+  tooltip: Generate sub-grid tables
+
+

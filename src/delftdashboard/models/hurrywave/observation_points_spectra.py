@@ -55,10 +55,8 @@ def update():
 def add_observation_point_on_map(*args):
     app.map.click_point(point_clicked)
 
-def point_clicked(coords):
+def point_clicked(x, y):
     # Point clicked on map. Add observation point.
-    x = coords["lng"]
-    y = coords["lat"]
     name, okay = app.gui.window.dialog_string("Edit name for new observation point")
     if not okay:
         # Cancel was clicked

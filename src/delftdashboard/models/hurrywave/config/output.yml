@@ -17,7 +17,7 @@ element:
     text: Map output interval (s)
     textposition: left
     variable: dtmapout
-    method: set_variables
+    method: set_model_variables
   - style: edit
     position:
       x: 120
@@ -28,7 +28,7 @@ element:
     text: Max output interval (s)
     textposition: left
     variable: dtmaxout
-    method: set_variables
+    method: set_model_variables
   - style: edit
     position:
       x: 120
@@ -39,7 +39,7 @@ element:
     text: His output interval (s)
     textposition: left
     variable: dthisout
-    method: set_variables
+    method: set_model_variables
   - style: edit
     position:
       x: 120
@@ -50,7 +50,7 @@ element:
     text: Spectra output interval (s)
     textposition: left
     variable: dtsp2out
-    method: set_variables
+    method: set_model_variables
   - style: edit
     position:
       x: 120
@@ -61,7 +61,7 @@ element:
     text: Restart output interval (s)
     textposition: left
     variable: dtrstout
-    method: set_variables
+    method: set_model_variables
   # - style: popupmenu
   #   position:
   #     x: 120
@@ -71,7 +71,7 @@ element:
   #   text: Output Format
   #   variable_group: sfincs
   #   variable: outputformat
-  #   method: set_variables
+  #   method: set_model_variables
   #   option_string:
   #   - NetCDF
   #   - ASCII

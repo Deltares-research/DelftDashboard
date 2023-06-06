@@ -1,0 +1,82 @@
+element:
+- style: panel
+  text: Wind
+  position:
+    x: 10
+    y: 10
+    width: 200
+    height: 120
+  element:
+  - style: popupmenu
+    text: Number of breakpoints
+    position:
+      x: 110
+      y: 90
+      width: 30
+      height: 20
+    variable: cdnrb
+    method: set_model_variables
+    option_string:
+    - '2'
+    - '3'
+    option_value:
+    - 2
+    - 3
+- style: panel
+  title: Barometric Pressure
+  position:
+    x: 220
+    y: 10
+    width: 300
+    height: 120
+  element:
+  - style: checkbox
+    position:
+      x: 10
+      y: 90
+      width: 100
+      height: 20
+    text: Include pressure
+    variable: baro
+    method: set_model_variables
+    tooltipstring: Check to include barometric pressure gradients in flux computation
+  - style: edit
+    position:
+      x: 110
+      y: 70
+      width: 50
+      height: 20
+    text: Pressure Correction (Pa)
+    variable: pavbnd
+    method: set_model_variables
+    tooltipstring: Edit background pressure for inverse barometer correction at the boundaries
+    textposition: right
+  - style: edit
+    position:
+      x: 110
+      y: 45
+      width: 50
+      height: 20
+    text: Ambient Pressure (Pa)
+    variable: gapres
+    method: set_model_variables
+    tooltipstring: Edit background air pressure
+    textposition: right
+- style: panel
+  title: Rain
+  position:
+    x: 530
+    y: 10
+    width: 180
+    height: 120
+  element:
+  - style: edit
+    position:
+      x: 120
+      y: 90
+      width: 50
+      height: 20
+    text: Infiltration Rate (mm/h)
+    variable: qinf
+    tooltipstring: Edit infiltration rate
+    textposition: right

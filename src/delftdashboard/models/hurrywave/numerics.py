@@ -12,5 +12,5 @@ def select(*args):
     # De-activate existing layers
     map.update()
 
-def set_variables(*args):
+def set_model_variables(*args):
     app.model["hurrywave"].set_input_variables()
