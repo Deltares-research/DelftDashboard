@@ -1,0 +1,92 @@
+element:
+- style: panel
+  title: Constant values
+  position:
+    x: 10
+    y: 10
+    width: 120
+    height: 120
+  element:
+  - style: edit
+    position:
+      x: 65
+      y: 90
+      width: 45
+      height: 20
+    text: Manning land
+    variable: manning_land
+  - style: edit
+    position:
+      x: 65
+      y: 65
+      width: 45
+      height: 20
+    text: Manning sea
+    variable: manning_sea
+  - style: edit
+    position:
+      x: 65
+      y: 40
+      width: 45
+      height: 20
+    text: Land level
+    variable: rgh_lev_land  
+- style: panel
+  title: Spatially varying
+  position:
+    x: 140
+    y: 10
+    width: 220
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 200
+      height: 20
+    select: item
+    method: select_manning_dataset
+    variable: roughness_dataset_names
+    option_string:
+      variable: roughness_dataset_names
+    option_value:
+      variable: selected_manning_dataset_index
+  - style: pushbutton
+    text: Load mapping table
+    position:
+      x: 10
+      y: 40
+      width: 200
+      height: 20
+    method: select_mapping_file  
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: selected_manning_dataset_index
+        operator: gt
+        value: 0
+  - style: edit
+    position:
+      x: 10
+      y: 10
+      width: 200
+      height: 20
+    variable: roughness_mapping_name
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: selected_manning_dataset_index
+        operator: gt
+        value: 0
+
+- style: pushbutton
+  position:
+    x: -10
+    y: 10
+    width: 120
+    height: 20
+  text: "Generate Manning"
+  method: generate_manning

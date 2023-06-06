@@ -1,0 +1,8 @@
+element:
+- style: panel
+  title: Observation Points
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160

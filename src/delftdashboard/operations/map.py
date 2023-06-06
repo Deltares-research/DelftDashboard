@@ -12,6 +12,10 @@ from delftdashboard.app import app
 from cht.bathymetry.bathymetry_database import bathymetry_database
 from cht.misc.geometry import RegularGrid
 
+import geopandas as gpd
+from shapely.geometry import box
+import xarray as xr
+
 def map_ready(*args):
 
     # This method is called when the map has been loaded
@@ -79,13 +83,61 @@ def update_background():
         dataset = bathymetry_database.get_dataset(app.background_topography)
         dataset_list = [{"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}]
 
-        try:
-            z = bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(4326), dataset_list,
-                                                           method=app.view["topography"]["interp_method"])
-            app.background_topography_layer.set_data(x=xv, y=yv, z=z, colormap=app.color_map_earth, decimals=0)
-        except:
-            print("Error loading background topo ...")
-            traceback.print_exc()
+        # NOTE : we first check if hydromt data is initiated, if not we use the ddb data
+        if app.config["data_libs"] is not None:
+            # we then check if the background topography is in the hydromt data catalog
+            if app.background_topography in app.data_catalog.keys:
+                try:
+                    # convert active window to geodataframe
+                    bbox = box(min(xv), min(yv), max(xv), max(yv))
+                    gdf = gpd.GeoDataFrame(geometry=[bbox], crs=CRS(4326))
+
+                    # initilize empty xarray
+                    da_dep = xr.DataArray(
+                        np.float32(np.full([len(yv), len(xv)], np.nan)),
+                        coords={"y": yv, "x": xv},
+                        dims=["y", "x"],
+                    )
+                    da_dep.raster.set_crs(4326)
+
+                    # get data from hydromt data catalog and reproject to active window
+                    da = app.data_catalog.get_rasterdataset(
+                        app.background_topography,
+                        geom=gdf,
+                        buffer=5,
+                        zoom_level=(dxy, "degree"),
+                    )
+                    da = da.raster.reproject_like(da_dep, method="bilinear").load()
+                    da.raster.set_nodata(np.nan)
+
+                    # set data to background topography layer
+                    app.background_topography_layer.set_data(
+                        x=xv,
+                        y=yv,
+                        z=da.values,
+                        colormap=app.color_map_earth,
+                        decimals=0,
+                    )
+                except:
+                    print("Error loading hydromt background topo ...")
+            elif app.config["bathymetry_database"] is not None:
+                try:
+                    dataset = bathymetry_database.get_dataset(app.background_topography)
+                    dataset_list = [
+                        {"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}
+                    ]
+                    z = bathymetry_database.get_bathymetry_on_grid(
+                        xv,
+                        yv,
+                        CRS(4326),
+                        dataset_list,
+                        method=app.view["topography"]["interp_method"],
+                    )
+                    app.background_topography_layer.set_data(
+                        x=xv, y=yv, z=z, colormap=app.color_map_earth, decimals=0
+                    )
+                except:
+                    print("Error loading ddb background topo ...")
 
         # try:
         #     x, y, z = bathymetry_database.get_data(app.background_topography,
