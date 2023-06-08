@@ -1,0 +1,44 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: datetimeedit
+    position:
+      x: 80
+      y: 130
+      width: 110
+      height: 20
+    text: Reference Time
+    variable: tref
+    method: set_model_variables
+  - style: datetimeedit
+    position:
+      x: 80
+      y: 105
+      width: 110
+      height: 20
+    text: Start Time
+    variable: tstart
+    method: set_model_variables
+  - style: datetimeedit
+    position:
+      x: 80
+      y: 80
+      width: 110
+      height: 20
+    text: Stop Time
+    variable: tstop
+    method: set_model_variables
+  - style: edit
+    position:
+      x: 80
+      y: 55
+      width: 110
+      height: 20
+    text: Spin-up Time (s)
+    variable: tspinup
+    method: set_model_variables

@@ -1,0 +1,38 @@
+element:
+- style: tabpanel
+  id: sfincs_cht
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: -10
+  variable_group: sfincs_cht
+  tab:
+  - string: Domain
+    module: delftdashboard.models.sfincs_cht.domain
+    element: domain.yml
+  - string: Time Frame
+    module: delftdashboard.models.sfincs_cht.timeframe
+    element: timeframe.yml
+  - string: Physics
+    element: physics.yml
+  - string: Numerics
+    module: delftdashboard.models.sfincs_cht.numerics
+    element: numerics.yml
+  - string: Boundary Conditions
+    module: delftdashboard.models.sfincs_cht.boundary_conditions
+    element: boundary_conditions.yml
+  - string: Waves
+    element: waves.yml
+  - string: Meteo
+    module: delftdashboard.models.sfincs_cht.meteo
+    element: meteo.yml
+  - string: Observation Points
+    module: delftdashboard.models.sfincs_cht.observation_points
+    element: observation_points.yml
+  - string: Structures
+    module: delftdashboard.models.sfincs_cht.structures
+    element: structures.yml
+  - string: Output
+    module: delftdashboard.models.sfincs_cht.output
+    element: output.yml

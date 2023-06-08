@@ -15,7 +15,7 @@ element:
       height: 20
     text: Reference Time
     variable: tref
-    method: set_variables
+    method: set_model_variables
   - style: datetimeedit
     position:
       x: 80
@@ -24,7 +24,7 @@ element:
       height: 20
     text: Start Time
     variable: tstart
-    method: set_variables
+    method: set_model_variables
   - style: datetimeedit
     position:
       x: 80
@@ -33,7 +33,7 @@ element:
       height: 20
     text: Stop Time
     variable: tstop
-    method: set_variables
+    method: set_model_variables
   - style: edit
     position:
       x: 80
@@ -42,4 +42,4 @@ element:
       height: 20
     text: Spin-up Time (s)
     variable: tspinup
-    method: set_variables
+    method: set_model_variables

@@ -7,7 +7,7 @@ element:
     height: 20
   text: Wind Drag
   variable: winddrag
-  method: set_variables
+  method: set_model_variables
   option_string:
   - Zijlema (2012)
   - Wu (1982)
@@ -22,7 +22,7 @@ element:
     height: 20
   text: Cd Cap
   variable: cdcap
-  method: set_variables
+  method: set_model_variables
   dependency:
   - action: visible
     checkfor: all

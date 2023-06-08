@@ -1,0 +1,14 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: SnapWave
+    element: waves_snapwave.yml
+    module: delftdashboard.models.sfincs_cht.waves_snapwave
+  - string: Wave Makers
+    element: waves_wave_makers.yml
+    module: delftdashboard.models.sfincs_cht.waves_wave_makers

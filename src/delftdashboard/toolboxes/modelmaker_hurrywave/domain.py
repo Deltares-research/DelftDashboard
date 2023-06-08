@@ -119,3 +119,6 @@ def write_setup_yaml(*args):
 
 def build_model(*args):
     app.toolbox["modelmaker_hurrywave"].build_model()
+
+def info(*args):
+    pass

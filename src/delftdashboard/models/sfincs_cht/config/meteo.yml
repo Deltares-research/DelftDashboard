@@ -1,0 +1,235 @@
+element:
+- style: panel
+  text: Forcing
+  position:
+    x: 10
+    y: 10
+    width: 170
+    height: 160
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 130
+      width: 150
+      height: 20
+    variable: meteo_forcing_type
+    option_string:
+    - Uniform
+    - Spider web
+    - Regular Grid
+    - Regular Grid + Spider web
+    option_value:
+    - uniform
+    - spiderweb
+    - rectangular
+    - rectangular_and_spiderweb
+  - style: checkbox
+    position:
+      x: 10
+      y: 100
+      width: 100
+      height: 20
+    text: Wind
+    variable: wind
+    method: set_model_variables
+  - style: checkbox
+    position:
+      x: 10
+      y: 75
+      width: 100
+      height: 20
+    text: Barometric Pressure
+    variable: baro
+    method: set_model_variables
+  - style: checkbox
+    position:
+      x: 10
+      y: 50
+      width: 100
+      height: 20
+    text: Rain
+    variable: rain
+    method: set_model_variables
+- style: panel
+  text: Wind
+  position:
+    x: 190
+    y: 10
+    width: 120
+    height: 160
+  element:
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 130
+      width: 100
+      height: 20
+    text: Wind File
+    variable: wndfile
+    showfilename: True
+    filter: "Wind file (*.wnd)"
+    title: Select wind file
+    tooltipstring: Select wind file
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: meteo_forcing_type
+        operator: eq
+        value: uniform
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 95
+      width: 100
+      height: 20
+    text: AMU File
+    variable: amufile
+    showfilename: True
+    extension: "*.amu"
+    title: Select AMU file
+    tooltipstring: Select AMU file
+    filter: "AMU file (*.amu)"
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: meteo_forcing_type
+        operator: eq
+        value: rectangular
+      - variable: meteo_forcing_type
+        operator: eq
+        value: rectangular_and_spiderweb
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 70
+      width: 100
+      height: 20
+    text: AMV File
+    variable: amvfile
+    showfilename: True
+    filter: "AMV file (*.amv)"
+    title: Select AMV file
+    tooltipstring: Select AMV file
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: meteo_forcing_type
+        operator: eq
+        value: rectangular
+      - variable: meteo_forcing_type
+        operator: eq
+        value: rectangular_and_spiderweb
+- style: panel
+  text: Barometric Pressure
+  position:
+    x: 320
+    y: 10
+    width: 120
+    height: 160
+  element:
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 130
+      width: 100
+      height: 20
+    text: AMP File
+    variable: ampfile
+    showfilename: True
+    extension: "*.amp"
+    title: Select AMP file
+    tooltipstring: Select AMP file
+    filter: "AMP file (*.amp)"
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: meteo_forcing_type
+        operator: eq
+        value: rectangular
+      - variable: meteo_forcing_type
+        operator: eq
+        value: rectangular_and_spiderweb
+- style: panel
+  text: Rain
+  position:
+    x: 450
+    y: 10
+    width: 120
+    height: 160
+  element:
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 130
+      width: 100
+      height: 20
+    text: Precip File
+    variable: precipfile
+    showfilename: True
+    extension: "*.prc"
+    selectiontext: Select precipitation file
+    tooltipstring: Select precipitation file
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: meteo_forcing_type
+        operator: eq
+        value: uniform
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 95
+      width: 100
+      height: 20
+    text: AMPR File
+    variable: amprfile
+    showfilename: True
+    extension: "*.ampr"
+    selectiontext: Select AMPR file
+    tooltipstring: Select AMPR file
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: meteo_forcing_type
+        operator: eq
+        value: rectangular
+      - variable: meteo_forcing_type
+        operator: eq
+        value: rectangular_and_spiderweb
+- style: panel
+  text: Spiderweb
+  position:
+    x: 580
+    y: 10
+    width: 120
+    height: 160
+  element:
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 130
+      width: 100
+      height: 20
+    text: Spiderweb File
+    variable: spwfile
+    showfilename: True
+    extension: "*.spw"
+    selectiontext: Select spiderweb file
+    tooltipstring: Select spiderweb file
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: meteo_forcing_type
+        operator: eq
+        value: spiderweb
+      - variable: meteo_forcing_type
+        operator: eq
+        value: rectangular_and_spiderweb

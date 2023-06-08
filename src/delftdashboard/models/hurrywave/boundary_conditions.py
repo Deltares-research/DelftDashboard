@@ -24,10 +24,8 @@ def write():
 def add_boundary_point_on_map(*args):
     app.map.click_point(point_clicked)
 
-def point_clicked(coords):
+def point_clicked(x, y):
     # Point clicked on map. Add boundary point.
-    x = coords["lng"]
-    y = coords["lat"]
     hs = app.gui.getvar("hurrywave", "boundary_hm0")
     tp = app.gui.getvar("hurrywave", "boundary_tp")
     wd = app.gui.getvar("hurrywave", "boundary_wd")

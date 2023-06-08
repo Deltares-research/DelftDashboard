@@ -2,7 +2,7 @@ window:
   title: Select UTM Zone ...
   width: 800
   height: 400
-  module: misc.select_utm_zone.callbacks
+  module: delftdashboard.misc.select_utm_zone.callbacks
   variable_group: popup_window
   modal: True
   cancel: True
