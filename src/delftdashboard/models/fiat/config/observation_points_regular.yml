@@ -1,0 +1,63 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 300
+    height: 120
+  method: select_observation_point_from_list
+  variable: active_observation_point_regular
+  select: index
+  option_string:
+    variable: observation_point_names_regular
+  tooltip: Select observation point
+- style: pushbutton
+  text: Add Point
+  position:
+    x: 320
+    y: 110
+    width: 80
+    height: 20
+  method: add_observation_point_on_map
+  tooltip: Add observation point on map
+- style: pushbutton
+  text: Delete Point
+  position:
+    x: 320
+    y: 85
+    width: 80
+    height: 20
+  method: delete_point_from_list
+  tooltip: Delete observation point from list
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_observation_points_regular
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: Load
+  position:
+    x: 320
+    y: 60
+    width: 80
+    height: 20
+  method: load
+  tooltip: Load observation points from file
+- style: pushbutton
+  text: Save
+  position:
+    x: 320
+    y: 35
+    width: 80
+    height: 20
+  method: save
+  tooltip: Save observation points to file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_observation_points_regular
+      operator: gt
+      value: 0

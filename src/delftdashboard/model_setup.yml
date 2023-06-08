@@ -1,0 +1,18 @@
+coordinates:
+  x0: 0.0
+  y0: 0.0
+  dx: 0.1
+  dy: 0.1
+  nmax: 0
+  mmax: 0
+  rotation: 0.0
+  crs: WGS 84
+mask:
+  zmin: -99999.0
+  zmax: -2.0
+  include_polygon: []
+  exclude_polygon: []
+  open_boundary_polygon: []
+bathymetry:
+  dataset:
+  - {}

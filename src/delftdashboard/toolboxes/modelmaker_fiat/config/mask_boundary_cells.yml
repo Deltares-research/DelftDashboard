@@ -1,0 +1,91 @@
+element:
+- style: panel
+  title: Boundary Polygons
+  position:
+    x: 10
+    y: 10
+    width: 270
+    height: 120
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 80
+      height: 100
+    method: select_boundary_polygon
+    variable: boundary_polygon_index
+    select: index
+    option_string:
+      variable: boundary_polygon_names
+  - style: pushbutton
+    text: Draw Polygon
+    position:
+      x: 100
+      y: 90
+      width: 80
+      height: 20
+    method: draw_boundary_polygon
+  - style: pushbutton
+    text: Delete Polygon
+    position:
+      x: 100
+      y: 65
+      width: 80
+      height: 20
+    method: delete_boundary_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_boundary_polygons
+        operator: gt
+        value: 0
+  - style: pushbutton
+    text: Load Polygon
+    position:
+      x: 100
+      y: 40
+      width: 80
+      height: 20
+    method: load_boundary_polygon
+  - style: pushbutton
+    text: Save Polygon
+    position:
+      x: 100
+      y: 15
+      width: 80
+      height: 20
+    method: save_boundary_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_boundary_polygons
+        operator: gt
+        value: 0
+  - style: edit
+    position:
+      x: 215
+      y: 90
+      width: 45
+      height: 20
+    text: Zmax
+    variable: boundary_zmax
+  - style: edit
+    position:
+      x: 215
+      y: 65
+      width: 45
+      height: 20
+    text: Zmin
+    variable: boundary_zmin
+- style: pushbutton
+  text: Update Mask
+  position:
+    x: 290
+    y: 100
+    width: 80
+    height: 20
+  method: update_mask
+

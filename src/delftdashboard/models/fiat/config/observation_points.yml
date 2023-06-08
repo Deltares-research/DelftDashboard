@@ -1,0 +1,14 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Regular
+    module: delftdashboard.models.hurrywave.observation_points_regular
+    element: observation_points_regular.yml
+  - string: Spectra
+    module: delftdashboard.models.hurrywave.observation_points_spectra
+    element: observation_points_spectra.yml
