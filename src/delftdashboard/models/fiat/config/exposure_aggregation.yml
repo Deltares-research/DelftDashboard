@@ -1,38 +1,8 @@
 element:
-- style: popupmenu
-  position:
-    x: 50
-    y: 100
-    width: 160
-    height: 20
-  text: Source
-  variable: wind_type
-  option_string:
-  - Census Tracts
-  - Census Blocks
-  - Basin
-  - Sub-basin
-  option_value:
-  - Census Tracts
-  - Census Blocks
-  - Basin
-  - Sub-basin
-- style: pushselectfile
-  position:
-    x: 40
-    y: 30
-    width: 150
-    height: 20
-  text: Aggregation File Input
-  variable: wndfile
-  showfilename: True
-  filter: "Aggregation file (*.shp)"
-  title: Select aggregation file
-  tooltipstring: Select aggregation file
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: wind_type
-      operator: eq
-      value: uniform
+- style: panel
+  text: TBD
+  position:    
+    x: 10
+    y: 10
+    width: 200
+    height: 120

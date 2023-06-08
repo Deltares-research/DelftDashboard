@@ -1,7 +1,31 @@
 element:
+- style: panel
+  title: Global
+  position:
+    x: 10
+    y: 10
+    width: 90
+    height: 120
+  element:
+  - style: edit
+    position:
+      x: 35
+      y: 90
+      width: 45
+      height: 20
+    text: Zmax
+    variable: global_zmax
+  - style: edit
+    position:
+      x: 35
+      y: 65
+      width: 45
+      height: 20
+    text: Zmin
+    variable: global_zmin
 - style: popupmenu
   position:
-    x: 50
+    x: 250
     y: 100
     width: 160
     height: 20
@@ -15,7 +39,7 @@ element:
   - Open Street Maps (OSM)
 - style: pushselectfile
   position:
-    x: 40
+    x: 240
     y: 30
     width: 150
     height: 20
