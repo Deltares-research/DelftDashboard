@@ -16,7 +16,7 @@ class Model(GenericModel):
         super().__init__()
 
         self.name = name
-        self.long_name = "FIAT"
+        self.long_name = "fiat"
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -30,28 +30,28 @@ class Model(GenericModel):
 
     def add_layers(self):
         # Add main DDB layer
-        layer = app.map.add_layer("hurrywave")
+        layer = app.map.add_layer("fiat")
 
         # layer.add_layer("grid", type="deck_geojson",
-        #                 file_name="hurrywave_grid.geojson",
+        #                 file_name="fiat_grid.geojson",
         #                 line_color="black")
         layer.add_layer("grid", type="image")
 
         layer.add_layer("mask_include",
                         type="circle",
-                        file_name="hurrywave_mask_include.geojson",
+                        file_name="fiat_mask_include.geojson",
                         circle_radius=3,
                         fill_color="yellow",
                         line_color="transparent")
 
         layer.add_layer("mask_boundary",
                         type="circle",
-                        file_name="hurrywave_mask_boundary.geojson",
+                        file_name="fiat_mask_boundary.geojson",
                         circle_radius=3,
                         fill_color="red",
                         line_color="transparent")
 
-        # Move this to hurrywave.py
+        # Move this to fiat.py
         from .boundary_conditions import select_boundary_point_from_map
         layer.add_layer("boundary_points",
                         type="circle_selector",
@@ -99,21 +99,21 @@ class Model(GenericModel):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Grid is made visible
-            app.map.layer["hurrywave"].layer["grid"].set_mode("inactive")
+            app.map.layer["fiat"].layer["grid"].set_mode("inactive")
             # Mask is made invisible
-            app.map.layer["hurrywave"].layer["mask_include"].set_mode("invisible")
-            app.map.layer["hurrywave"].layer["mask_boundary"].set_mode("invisible")
+            app.map.layer["fiat"].layer["mask_include"].set_mode("invisible")
+            app.map.layer["fiat"].layer["mask_boundary"].set_mode("invisible")
             # Boundary points are made grey
-            app.map.layer["hurrywave"].layer["boundary_points"].set_mode("inactive")
+            app.map.layer["fiat"].layer["boundary_points"].set_mode("inactive")
             # Observation points are made grey
-            app.map.layer["hurrywave"].layer["observation_points_regular"].set_mode("inactive")
-            app.map.layer["hurrywave"].layer["observation_points_spectra"].set_mode("inactive")
+            app.map.layer["fiat"].layer["observation_points_regular"].set_mode("inactive")
+            app.map.layer["fiat"].layer["observation_points_spectra"].set_mode("inactive")
         elif mode == "invisible":
             # Everything set to invisible
-            app.map.layer["hurrywave"].set_mode("invisible")
+            app.map.layer["fiat"].set_mode("invisible")
 
     def set_gui_variables(self):
-        group = "hurrywave"
+        group = "fiat"
         # Input variables
         for var_name in vars(self.domain.input.variables):
             app.gui.setvar(group, var_name, getattr(self.domain.input.variables, var_name))
@@ -140,14 +140,14 @@ class Model(GenericModel):
     def set_input_variables(self):
         # Update all model input variables
         for var_name in vars(self.domain.input.variables):
-            setattr(self.domain.input.variables, var_name, app.gui.getvar("hurrywave", var_name))
+            setattr(self.domain.input.variables, var_name, app.gui.getvar("fiat", var_name))
 
     def open(self):
         # Open input file, and change working directory
-        fname = app.gui.window.dialog_open_file("Open file", filter="HurryWave input file (hurrywave.inp)")
+        fname = app.gui.window.dialog_open_file("Open file", filter="fiat input file (fiat.inp)")
         fname = fname[0]
         if fname:
-            dlg = app.gui.window.dialog_wait("Loading HurryWave model ...")
+            dlg = app.gui.window.dialog_wait("Loading fiat model ...")
             path = os.path.dirname(fname)
             self.domain.path = path
             self.domain.read()
@@ -160,7 +160,7 @@ class Model(GenericModel):
             dlg.close()
 
     def save(self):
-        # Write hurrywave.inp
+        # Write fiat.inp
         self.domain.path = os.getcwd()
         self.domain.input.write()
         self.domain.write_batch_file()
@@ -175,23 +175,23 @@ class Model(GenericModel):
     def plot(self):
         # Grid
         gdf = self.domain.grid.to_gdf()
-        app.map.layer["hurrywave"].layer["grid"].set_data(gdf)
+        app.map.layer["fiat"].layer["grid"].set_data(gdf)
         # Mask
-        app.map.layer["hurrywave"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
-        app.map.layer["hurrywave"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
+        app.map.layer["fiat"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
+        app.map.layer["fiat"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
         # Boundary points
         gdf = self.domain.boundary_conditions.gdf
-        app.map.layer["hurrywave"].layer["boundary_points"].set_data(gdf, 0)
+        app.map.layer["fiat"].layer["boundary_points"].set_data(gdf, 0)
         # Observation points
         gdf = self.domain.observation_points_regular.gdf
-        app.map.layer["hurrywave"].layer["observation_points_regular"].set_data(gdf, 0)
+        app.map.layer["fiat"].layer["observation_points_regular"].set_data(gdf, 0)
         gdf = self.domain.observation_points_sp2.gdf
-        app.map.layer["hurrywave"].layer["observation_points_spectra"].set_data(gdf, 0)
+        app.map.layer["fiat"].layer["observation_points_spectra"].set_data(gdf, 0)
 
     def add_stations(self, gdf_stations_to_add, naming_option="id"):
         self.domain.observation_points_regular.add_points(gdf_stations_to_add, name=naming_option)
         gdf = self.domain.observation_points_regular.gdf
-        app.map.layer["hurrywave"].layer["observation_points_regular"].set_data(gdf, 0)
+        app.map.layer["fiat"].layer["observation_points_regular"].set_data(gdf, 0)
         if not self.domain.input.variables.obsfile:
-            self.domain.input.variables.obsfile = "hurrywave.obs"
+            self.domain.input.variables.obsfile = "fiat.obs"
         self.domain.observation_points_regular.write()

@@ -1,6 +1,6 @@
 element:
 - style: tabpanel
-  id: modelmaker_hurrywave
+  id: modelmaker_fiat
   position:
     x: 10
     y: 10
@@ -8,17 +8,17 @@ element:
     height: 160
   tab:
   - string: Domain
-    module: toolboxes.modelmaker_hurrywave.domain
+    module: toolboxes.modelmaker_fiat.domain
     element: domain.yml    
   - string: Bathymetry
-    module: toolboxes.modelmaker_hurrywave.bathymetry
+    module: toolboxes.modelmaker_fiat.bathymetry
     element: bathymetry.yml
   - string: Mask Active Cells
-    module: toolboxes.modelmaker_hurrywave.mask_active_cells
+    module: toolboxes.modelmaker_fiat.mask_active_cells
     element: mask_active_cells.yml
   - string: Mask Boundary Cells
-    module: toolboxes.modelmaker_hurrywave.mask_boundary_cells
+    module: toolboxes.modelmaker_fiat.mask_boundary_cells
     element: mask_boundary_cells.yml
   - string: Boundary Points
-    module: toolboxes.modelmaker_hurrywave.boundary_points
+    module: toolboxes.modelmaker_fiat.boundary_points
     element: boundary_points.yml

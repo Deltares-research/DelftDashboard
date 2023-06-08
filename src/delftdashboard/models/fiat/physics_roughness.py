@@ -13,4 +13,4 @@ def select(*args):
     map.update()
 
 def set_variables(*args):
-    app.model["hurrywave"].set_input_variables()
+    app.model["fiat"].set_input_variables()

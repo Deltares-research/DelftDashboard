@@ -12,9 +12,9 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the grid and mask
-    app.map.layer["hurrywave"].layer["grid"].set_mode("active")
-    app.map.layer["hurrywave"].layer["mask_include"].set_mode("active")
-    app.map.layer["hurrywave"].layer["mask_boundary"].set_mode("active")
+    app.map.layer["fiat"].layer["grid"].set_mode("active")
+    app.map.layer["fiat"].layer["mask_include"].set_mode("active")
+    app.map.layer["fiat"].layer["mask_boundary"].set_mode("active")
 
 def set_variables(*args):
-    app.model["hurrywave"].set_input_variables()
+    app.model["fiat"].set_input_variables()

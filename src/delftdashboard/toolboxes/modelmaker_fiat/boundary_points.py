@@ -11,7 +11,7 @@ from delftdashboard.operations import map
 def select(*args):
     # De-activate existing layers
     map.update()
-    app.map.layer["hurrywave"].layer["grid"].set_mode("active")
+    app.map.layer["fiat"].layer["grid"].set_mode("active")
 
 def create_boundary_points(*args):
-    app.toolbox["modelmaker_hurrywave"].create_boundary_points()
+    app.toolbox["modelmaker_fiat"].create_boundary_points()

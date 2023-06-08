@@ -15,4 +15,4 @@ def select(*args):
 
 def set_variables(*args):
     # All variables will be set
-    app.model["hurrywave"].set_input_variables()
+    app.model["fiat"].set_input_variables()

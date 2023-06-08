@@ -1,0 +1,20 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Asset Locations
+    module: models.fiat.exposure_locations
+    element: exposure_locations.yml
+  - string: Footprints
+    module: models.fiat.exposure_footprints
+    element: exposure_footprints.yml
+  - string: Aggregation
+    module: models.fiat.exposure_aggregation
+    element: exposure_aggregation.yml
+  - string: Occupancy
+    module: models.fiat.exposure_occupancy
+    element: exposure_occupancy.yml

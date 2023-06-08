@@ -1,0 +1,8 @@
+element:
+- style: panel
+  text: TBD
+  position:    
+    x: 10
+    y: 10
+    width: 200
+    height: 120

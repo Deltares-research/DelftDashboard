@@ -8,30 +8,15 @@ element:
     height: -10
   variable_group: fiat
   tab:
-  - string: Domain
-    module: delftdashboard.models.hurrywave.domain
-    method: set_variables
-    element: domain.yml
-  - string: Time Frame
-    module: delftdashboard.models.hurrywave.timeframe
-    element: timeframe.yml
-  - string: Physics
-    element: physics.yml
-  - string: Numerics
-    module: delftdashboard.models.hurrywave.numerics
-    element: numerics.yml
-  - string: Boundary Conditions
-    module: delftdashboard.models.hurrywave.boundary_conditions
-    element: boundary_conditions.yml
-  - string: Meteo
-    module: delftdashboard.models.hurrywave.meteo
-    element: meteo.yml
-  - string: Observation Points
-    module: delftdashboard.models.hurrywave.observation_points
-    element: observation_points.yml
-  - string: Structures
-    module: delftdashboard.models.hurrywave.structures
-    element: structures.yml
-  - string: Output
-    module: delftdashboard.models.hurrywave.output
-    element: output.yml
+  - string: Exposure
+    module: models.fiat.exposure
+    element: exposure.yml
+  - string: Vulnerability
+    module: models.fiat.vulnerability
+    element: vulnerability.yml
+  - string: Hazard
+    module: models.fiat.hazard
+    element: hazard.yml
+  - string: SVI
+    module: models.fiat.svi
+    element: svi.yml
