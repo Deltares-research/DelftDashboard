@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-GUI methods for modelmaker_sfincs_hmt -> domain
-
-Created on Mon May 10 12:18:09 2021
-
-@author: Maarten van Ormondt
-"""
 import numpy as np
 import math
 
@@ -19,11 +11,14 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["grid"].set_mode("active")
     app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].set_mode("active")
 
+def select_method(*args):
+    app.gui.setvar("modelmaker_sfincs_hmt", "setup_grid_methods_index", args[0])
 
 def draw_grid_outline(*args):
     # Clear grid outline layer
     app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].crs = app.crs
     app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].draw()
+    app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
 
 
 def grid_outline_created(gdf, index, id):

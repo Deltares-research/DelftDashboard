@@ -20,26 +20,37 @@ class Toolbox(GenericToolbox):
         self.long_name = "Model Maker"
 
         # Set variables
-
         # Grid outline
         self.grid_outline = gpd.GeoDataFrame()
 
         # Bathymetry
         self.selected_bathymetry_datasets = []
 
+        # River bathymetry 
+        # self.selected_river_datasets = []
+
         # Manning's n
         self.selected_manning_datasets = []
 
-        # Include polygons
-        self.include_polygon = gpd.GeoDataFrame()
-        # Exclude polygons
-        self.exclude_polygon = gpd.GeoDataFrame()
-        # Boundary polygons
-        self.wlev_polygon = gpd.GeoDataFrame()
-        self.outflow_polygon = gpd.GeoDataFrame()
+        # Mask active polygons
+        self.mask_polygon = gpd.GeoDataFrame() # initial mask area
+        self.mask_include_polygon = gpd.GeoDataFrame() # explicit include polygons
+        self.mask_exclude_polygon = gpd.GeoDataFrame() # explicit exclude polygons
+
+        # Mask boundary polygons
+        self.wlev_include_polygon = gpd.GeoDataFrame()
+        self.wlev_exclude_polygon = gpd.GeoDataFrame()
+        self.outflow_include_polygon = gpd.GeoDataFrame()
+        self.outflow_exclude_polygon = gpd.GeoDataFrame()
 
         # Set GUI variable
         group = "modelmaker_sfincs_hmt"
+
+        #Model extent determination
+        app.gui.setvar(group, "grid_outline", 0)
+        app.gui.setvar(group, "setup_grid_methods", ["Draw bounding box", "Draw Polygon", "Load Polygon"])
+        app.gui.setvar(group, "setup_grid_methods_index", 0)
+
         # Domain
         app.gui.setvar(group, "x0", 0.0)
         app.gui.setvar(group, "y0", 0.0)
@@ -72,9 +83,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "bathymetry_dataset_index", 0)
         app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
         app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_offset", 0)
+        app.gui.setvar(group, "selected_bathymetry_dataset_zmin", None)
+        app.gui.setvar(group, "selected_bathymetry_dataset_zmax", None)
+        app.gui.setvar(group, "selected_bathymetry_dataset_offset", None)
         app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
 
         # Roughness
@@ -95,32 +106,38 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "selected_manning_dataset_index", 0)
     
         # Mask active
+        app.gui.setvar(group, "mask_polygon_names", [])
+        app.gui.setvar(group, "mask_polygon_index", 0)
         app.gui.setvar(group, "mask_active_zmax", 10.0)
         app.gui.setvar(group, "mask_active_zmin", -10.0)
         app.gui.setvar(group, "mask_active_drop_area", 0.0)
         app.gui.setvar(group, "mask_active_fill_area", 10.0)
+        app.gui.setvar(group, "nr_mask_polygons", 0)
         app.gui.setvar(group, "mask_active_reset", False)
-        app.gui.setvar(group, "include_polygon_names", [])
-        app.gui.setvar(group, "include_polygon_index", 0)
+        app.gui.setvar(group, "mask_include_polygon_names", [])
+        app.gui.setvar(group, "mask_include_polygon_index", 0)
         app.gui.setvar(group, "nr_include_polygons", 0)
-        app.gui.setvar(group, "include_zmax", 99999.0)
-        app.gui.setvar(group, "include_zmin", -99999.0)
-        app.gui.setvar(group, "exclude_polygon_names", [])
-        app.gui.setvar(group, "exclude_polygon_index", 0)
+        app.gui.setvar(group, "mask_exclude_polygon_names", [])
+        app.gui.setvar(group, "mask_exclude_polygon_index", 0)
         app.gui.setvar(group, "nr_exclude_polygons", 0)
-        app.gui.setvar(group, "exclude_zmax", 99999.0)
-        app.gui.setvar(group, "exclude_zmin", -99999.0)
 
         # Mask bounds
-        app.gui.setvar(group, "wlev_polygon_names", [])
-        app.gui.setvar(group, "wlev_polygon_index", 0)
-        app.gui.setvar(group, "nr_wlev_polygons", 0)
+        app.gui.setvar(group, "wlev_include_polygon_names", [])
+        app.gui.setvar(group, "wlev_include_polygon_index", 0)
+        app.gui.setvar(group, "nr_wlev_include_polygons", 0)
+        app.gui.setvar(group, "wlev_exclude_polygon_names", [])
+        app.gui.setvar(group, "wlev_exclude_polygon_index", 0)
+        app.gui.setvar(group, "nr_wlev_exclude_polygons", 0)
         app.gui.setvar(group, "wlev_zmax", -2.0)
         app.gui.setvar(group, "wlev_zmin", -99999.0)
         app.gui.setvar(group, "wlev_reset", False)
-        app.gui.setvar(group, "outflow_polygon_names", [])
-        app.gui.setvar(group, "outflow_polygon_index", 0)
-        app.gui.setvar(group, "nr_outflow_polygons", 0)
+
+        app.gui.setvar(group, "outflow_include_polygon_names", [])
+        app.gui.setvar(group, "outflow_include_polygon_index", 0)
+        app.gui.setvar(group, "nr_outflow_include_polygons", 0)
+        app.gui.setvar(group, "outflow_exclude_polygon_names", [])
+        app.gui.setvar(group, "outflow_exclude_polygon_index", 0)
+        app.gui.setvar(group, "nr_outflow_exclude_polygons", 0)        
         app.gui.setvar(group, "outflow_zmax", 99999.0)
         app.gui.setvar(group, "outflow_zmin", 2.0)
         app.gui.setvar(group, "outflow_reset", False)
@@ -246,8 +263,14 @@ class Toolbox(GenericToolbox):
 
         #NOTE this only works for regular grids (quadtee also not implemented)
         gdf = model.reggrid.to_vector_lines()
- 
+
         app.map.layer["sfincs_hmt"].layer["grid"].set_data(gdf)
+
+        # app.map.layer["sfincs_hmt"].layer["grid"].set_data(model.grid, 
+        #                                                   xlim=[app.gui.getvar(group, "x0"),
+        #                                                         app.gui.getvar(group, "x0")],                                                                
+        #                                                   ylim=[app.gui.getvar(group, "y0"),
+        #                                                          app.gui.getvar(group, "y0")])
 
         dlg.close()
 
@@ -265,8 +288,9 @@ class Toolbox(GenericToolbox):
 
     def update_mask_active(self):
         mask = app.model["sfincs_hmt"].domain.create_mask_active(
-            gdf_include=app.toolbox["modelmaker_sfincs_hmt"].include_polygon,
-            gdf_exclude=app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon,
+            mask=app.toolbox["modelmaker_sfincs_hmt"].mask_polygon,
+            include_mask=app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon,
+            exclude_mask=app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon,
             zmin=app.gui.getvar("modelmaker_sfincs_hmt", "mask_active_zmin"),
             zmax=app.gui.getvar("modelmaker_sfincs_hmt", "mask_active_zmax"),
             drop_area=app.gui.getvar("modelmaker_sfincs_hmt", "mask_active_drop_area"),
@@ -282,7 +306,8 @@ class Toolbox(GenericToolbox):
 
         mask_wlev = app.model["sfincs_hmt"].domain.create_mask_bounds(
             btype = "waterlevel",
-            gdf_include=app.toolbox["modelmaker_sfincs_hmt"].wlev_polygon if app.gui.getvar("modelmaker_sfincs_hmt", "nr_wlev_polygons") > 0 else None,
+            include_mask=app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon if app.gui.getvar("modelmaker_sfincs_hmt", "nr_wlev_include_polygons") > 0 else None,
+            exclude_mask=app.toolbox["modelmaker_sfincs_hmt"].wlev_exclude_polygon if app.gui.getvar("modelmaker_sfincs_hmt", "nr_wlev_exclude_polygons") > 0 else None,
             zmin=app.gui.getvar("modelmaker_sfincs_hmt", "wlev_zmin"),
             zmax=app.gui.getvar("modelmaker_sfincs_hmt", "wlev_zmax"),
             reset_bounds = app.gui.getvar("modelmaker_sfincs_hmt", "wlev_reset"),
@@ -294,7 +319,7 @@ class Toolbox(GenericToolbox):
 
         mask_outflow = app.model["sfincs_hmt"].domain.create_mask_bounds(
             btype = "outflow",
-            gdf_include=app.toolbox["modelmaker_sfincs_hmt"].outflow_polygon if app.gui.getvar("modelmaker_sfincs_hmt", "nr_outflow_polygons") > 0 else None,
+            gdf_include=app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon if app.gui.getvar("modelmaker_sfincs_hmt", "nr_outflow_polygons") > 0 else None,
             zmin=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_zmin"),
             zmax=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_zmax"),
             reset_bounds = app.gui.getvar("modelmaker_sfincs_hmt", "outflow_reset"),

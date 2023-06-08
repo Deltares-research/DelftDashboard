@@ -57,7 +57,7 @@ element:
     variable: include_polygon_index
     select: index
     option_string:
-      variable: include_polygon_names
+      variable: mask_include_polygon_names
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -138,7 +138,7 @@ element:
     variable: exclude_polygon_index
     select: index
     option_string:
-      variable: exclude_polygon_names
+      variable: mask_exclude_polygon_names
   - style: pushbutton
     text: Draw Polygon
     position:

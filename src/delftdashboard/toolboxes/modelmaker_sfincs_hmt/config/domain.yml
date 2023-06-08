@@ -1,80 +1,153 @@
 element:
-- style: edit
+- style: panel
+  title: Model extent
   position:
-    x: 60
-    y: 110
-    width: 60
-    height: 20
-  text: X0
-  variable: x0
-  method: edit_origin
-- style: edit
-  position:
-    x: 160
-    y: 110
-    width: 60
-    height: 20
-  text: Y0
-  variable: y0
-  method: edit_origin
-- style: edit
-  position:
-    x: 60
-    y: 85
-    width: 60
-    height: 20
-  text: MMax
-  variable: mmax
-  method: edit_nmmax
-- style: edit
-  position:
-    x: 160
-    y: 85
-    width: 60
-    height: 20
-  text: NMax
-  variable: nmax
-  method: edit_nmmax
-- style: edit
-  position:
-    x: 60
-    y: 60
-    width: 60
-    height: 20
-  text: dX
-  variable: dx
-  method: edit_dxdy
-- style: edit
-  position:
-    x: 160
-    y: 60
-    width: 60
-    height: 20
-  text: dY
-  variable: dy
-  method: edit_dxdy
-- style: edit
-  position:
-    x: 60
-    y: 35
-    width: 60
-    height: 20
-  text: Rotation
-  variable: rotation
-  method: edit_rotation
-- style: pushbutton
-  text: Draw Layout
-  position:
-    x: 230
-    y: 110
+    x: 10
+    y: 10
     width: 120
-    height: 20
-  method: draw_grid_outline
-- style: pushbutton
-  text: Generate Grid
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 100
+      height: 20
+    text: Select method
+    tooltip: Select method to determine model extent
+    select: index
+    method: select_method
+    variable: setup_grid_methods_index
+    option_string:
+      variable: setup_grid_methods
+  - style: pushbutton
+    text: Draw bbox
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    method: draw_grid_outline
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: setup_grid_methods_index
+        operator: eq
+        value: 0 
+  - style: pushbutton
+    text: Draw region
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    method: draw_grid_outline
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: setup_grid_methods_index
+        operator: eq
+        value: 1
+  - style: pushbutton
+    text: Load region
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    method: draw_grid_outline
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: setup_grid_methods_index
+        operator: eq
+        value: 2   
+  - style: pushbutton
+    text: Generate Grid
+    position:
+      x: 10
+      y: 15
+      width: 100
+      height: 20
+    method: generate_grid
+    dependency:
+      - action: enable
+        checkfor: all
+        check:
+        - variable: grid_outline
+          operator: eq
+          value: 1     
+- style: panel
+  title: Grid parameters
   position:
-    x: 230
-    y: 85
-    width: 120
-    height: 20
-  method: generate_grid
+    x: 140
+    y: 10
+    width: 230
+    height: 120
+  element:
+  - style: edit
+    position:
+      x: 60
+      y: 90
+      width: 60
+      height: 20
+    text: X0
+    variable: x0
+    method: edit_origin
+  - style: edit
+    position:
+      x: 160
+      y: 90
+      width: 60
+      height: 20
+    text: Y0
+    variable: y0
+    method: edit_origin
+  - style: edit
+    position:
+      x: 60
+      y: 60
+      width: 60
+      height: 20
+    text: MMax
+    variable: mmax
+    method: edit_nmmax
+  - style: edit
+    position:
+      x: 160
+      y: 60
+      width: 60
+      height: 20
+    text: NMax
+    variable: nmax
+    method: edit_nmmax
+  - style: edit
+    position:
+      x: 60
+      y: 35
+      width: 60
+      height: 20
+    text: dX
+    variable: dx
+    method: edit_dxdy
+  - style: edit
+    position:
+      x: 160
+      y: 35
+      width: 60
+      height: 20
+    text: dY
+    variable: dy
+    method: edit_dxdy
+  - style: edit
+    position:
+      x: 60
+      y: 10
+      width: 60
+      height: 20
+    text: Rotation
+    variable: rotation
+    method: edit_rotation
