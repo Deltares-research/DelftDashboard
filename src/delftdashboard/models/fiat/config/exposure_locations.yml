@@ -17,7 +17,7 @@ element:
 - style: panel
   title: Area of interest
   position:
-    x: 190
+    x: 170
     y: 10
     width: 120
     height: 120
@@ -42,25 +42,83 @@ element:
     filter: "Shapefile (*.shp)"
     title: Select shapefile
     tooltipstring: Select shapefile
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: wind_type
-        operator: eq
-        value: uniform
   - style: checkbox
     position:
       x: 10
-      y: 15
+      y: 5
       width: 100
       height: 20
-    text: Display area of interest
+    text: Display area
+    variable: rain
+    method: set_variables
+- style: panel
+  title: Asset locations
+  position:
+    x: 300
+    y: 10
+    width: 170
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 85
+      width: 150
+      height: 20
+    text: ""
+    variable: roughness_type
+    method: set_variables
+    option_string:
+    - National Structure Inventory (NSI)
+    - Upload data
+    option_value:
+    - nsi
+    - file
+  - style: pushbutton
+    position:
+      x: 10
+      y: 60
+      width: 100
+      height: 20
+    text: Create asset location
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: roughness_type
+        operator: eq
+        value: nsi
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 60
+      width: 100
+      height: 20
+    text: Upload asset location
+    variable: wndfile
+    showfilename: True
+    filter: "Shapefile (*.shp)"
+    title: Select asset location shapefile
+    tooltipstring: Select asset location shapefile
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: roughness_type
+        operator: eq
+        value: file
+  - style: checkbox
+    position:
+      x: 10
+      y: 5
+      width: 100
+      height: 20
+    text: Display assets
     variable: rain
     method: set_variables
 - style: popupmenu
   position:
-    x: 400
+    x: 700
     y: 100
     width: 160
     height: 20
