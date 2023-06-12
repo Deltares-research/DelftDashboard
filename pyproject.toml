@@ -33,4 +33,6 @@ dependencies = [
     "netCDF4",
     "mat73",
     "tabulate",
+    "xugrid",
+    "datashader"
 ]
