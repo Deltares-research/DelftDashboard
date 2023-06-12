@@ -179,14 +179,7 @@ class Toolbox(GenericToolbox):
 
         model.grid.build()
 
-        # gdf = model.grid.to_gdf()
-        # app.map.layer["hurrywave"].layer["grid"].set_data(gdf)
-
-        app.map.layer["hurrywave"].layer["grid"].set_data(model.grid, 
-                                                          xlim=[app.gui.getvar(group, "x0"),
-                                                                app.gui.getvar(group, "x0")],                                                                
-                                                          ylim=[app.gui.getvar(group, "y0"),
-                                                                 app.gui.getvar(group, "y0")])
+        app.map.layer["hurrywave"].layer["grid"].set_data(model.grid)
 
         dlg.close()
 

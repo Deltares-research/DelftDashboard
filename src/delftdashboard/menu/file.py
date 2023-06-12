@@ -39,7 +39,7 @@ def save(option):
     app.active_model.save()
 
 def select_working_directory(option):
-    path = app.gui.select_path(os.getcwd())
+    path = app.gui.window.select_path(os.getcwd())
     if path:
         os.chdir(path)
 

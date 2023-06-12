@@ -127,3 +127,6 @@ def update():
 
 def update_mask(*args):
     app.toolbox["modelmaker_sfincs_cht"].update_mask()
+
+def cut_inactive_cells(*args):
+    app.toolbox["modelmaker_sfincs_cht"].cut_inactive_cells()
