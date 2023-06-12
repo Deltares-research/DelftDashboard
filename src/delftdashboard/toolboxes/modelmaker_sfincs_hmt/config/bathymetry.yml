@@ -163,6 +163,11 @@ element:
     method: advanced_merge_options_bathymetry_dataset
     dependency:
     - action: enable
+      checkfor: all
+      check:
+      - variable: nr_selected_bathymetry_datasets
+        operator: gt
+        value: 10
 - style: panel
   title: Merge all
   tooltip: "Merge all datasets. \n Note that you have to specify at least one dataset

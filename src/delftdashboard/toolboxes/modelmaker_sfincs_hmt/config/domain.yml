@@ -101,7 +101,7 @@ element:
           operator: eq
           value: 1     
 - style: panel
-  text: "Grid parameters"
+  title: "Grid parameters"
   position:
     x: 140
     y: 10
@@ -129,7 +129,7 @@ element:
   - style: edit
     position:
       x: 60
-      y: 60
+      y: 65
       width: 60
       height: 20
     text: MMax
@@ -138,7 +138,7 @@ element:
   - style: edit
     position:
       x: 160
-      y: 60
+      y: 65
       width: 60
       height: 20
     text: NMax
@@ -147,7 +147,7 @@ element:
   - style: edit
     position:
       x: 60
-      y: 35
+      y: 40
       width: 60
       height: 20
     text: dX
@@ -156,7 +156,7 @@ element:
   - style: edit
     position:
       x: 160
-      y: 35
+      y: 40
       width: 60
       height: 20
     text: dY
@@ -165,7 +165,7 @@ element:
   - style: edit
     position:
       x: 60
-      y: 10
+      y: 15
       width: 60
       height: 20
     text: Rotation

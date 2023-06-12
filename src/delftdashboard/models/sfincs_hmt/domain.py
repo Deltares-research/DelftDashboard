@@ -9,5 +9,6 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["mask_include"].set_mode("active")
     app.map.layer["sfincs_hmt"].layer["mask_boundary"].set_mode("active")
 
+
 def set_variables(*args):
     app.model[""].set_model_variables()

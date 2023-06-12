@@ -1,4 +1,3 @@
-
 from delftdashboard.app import app
 
 

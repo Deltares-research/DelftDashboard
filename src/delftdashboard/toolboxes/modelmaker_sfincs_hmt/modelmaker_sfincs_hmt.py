@@ -9,8 +9,9 @@ from delftdashboard.app import app
 
 from cht.bathymetry.bathymetry_database import bathymetry_database
 
-from hydromt.config import configread,configwrite
+from hydromt.config import configread, configwrite
 from hydromt_sfincs.utils import mask2gdf
+
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):
@@ -27,16 +28,16 @@ class Toolbox(GenericToolbox):
         # Bathymetry
         self.selected_bathymetry_datasets = []
 
-        # River bathymetry 
+        # River bathymetry
         # self.selected_river_datasets = []
 
         # Manning's n
         self.selected_manning_datasets = []
 
         # Mask active polygons
-        self.mask_polygon = gpd.GeoDataFrame() # initial mask area
-        self.mask_include_polygon = gpd.GeoDataFrame() # explicit include polygons
-        self.mask_exclude_polygon = gpd.GeoDataFrame() # explicit exclude polygons
+        self.mask_polygon = gpd.GeoDataFrame()  # initial mask area
+        self.mask_include_polygon = gpd.GeoDataFrame()  # explicit include polygons
+        self.mask_exclude_polygon = gpd.GeoDataFrame()  # explicit exclude polygons
 
         # Mask boundary polygons
         self.wlev_include_polygon = gpd.GeoDataFrame()
@@ -47,9 +48,13 @@ class Toolbox(GenericToolbox):
         # Set GUI variable
         group = "modelmaker_sfincs_hmt"
 
-        #Model extent determination
+        # Model extent determination
         app.gui.setvar(group, "grid_outline", 0)
-        app.gui.setvar(group, "setup_grid_methods", ["Draw Bounding Box", "Draw Area of Interest", "Load Area of Interest"])
+        app.gui.setvar(
+            group,
+            "setup_grid_methods",
+            ["Draw Bounding Box", "Draw Area of Interest", "Load Area of Interest"],
+        )
         app.gui.setvar(group, "setup_grid_methods_index", 0)
 
         # Domain
@@ -64,7 +69,7 @@ class Toolbox(GenericToolbox):
         # Bathymetry
         source_names = []
         # if app.config["bathymetry_database"] is not None:
-            # source_names, sources = bathymetry_database.sources()
+        # source_names, sources = bathymetry_database.sources()
         if app.config["data_libs"] is not None:
             source_names.append("hydromt")
 
@@ -73,7 +78,7 @@ class Toolbox(GenericToolbox):
 
         dataset_names = []
         # if app.config["bathymetry_database"] is not None:
-            # dataset_names = bathymetry_database.dataset_names(source=source_names[0])[0]
+        # dataset_names = bathymetry_database.dataset_names(source=source_names[0])[0]
         if app.config["data_libs"] is not None:
             for key in app.data_catalog.keys:
                 if app.data_catalog[key].driver == "raster":
@@ -84,9 +89,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "bathymetry_dataset_index", 0)
         app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
         app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmin", None)
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmax", None)
-        app.gui.setvar(group, "selected_bathymetry_dataset_offset", None)
+        app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
+        app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
+        app.gui.setvar(group, "selected_bathymetry_dataset_offset", 0)
         app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
         app.gui.setvar(group, "bathymetry_dataset_buffer_cells", 0)
         app.gui.setvar(group, "bathymetry_dataset_interp_method", "linear")
@@ -95,22 +100,49 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "manning_land", 0.06)
         app.gui.setvar(group, "manning_sea", 0.02)
         app.gui.setvar(group, "rgh_lev_land", 0.0)
-        landuse_names = ["Use constants"]
+
+        roughness_methods = [
+            "Constant values",
+            "Landuse dataset",
+            "Manning dataset",
+            "Manning shapes",
+        ]
+        app.gui.setvar(group, "roughness_methods", roughness_methods)
+        app.gui.setvar(group, "roughness_methods_index", 0)
+
+        manning_dataset_names = []
+        lulc_dataset_names = []
         if app.config["data_libs"] is not None:
             for key in app.data_catalog.keys:
                 if app.data_catalog[key].driver == "raster":
                     if app.data_catalog[key].meta["category"] == "landuse":
-                        landuse_names.append(key)
+                        lulc_dataset_names.append(key)
+                    elif app.data_catalog[key].meta["category"] == "roughness":
+                        manning_dataset_names.append(key)
 
-        app.gui.setvar(group, "roughness_dataset_names", landuse_names)
-        app.gui.setvar(group, "roughness_dataset_index", 0)
-        app.gui.setvar(group, "roughness_reclass_table", "")
-        # app.gui.setvar(group, "selected_manning_dataset_names", [])
-        # app.gui.setvar(group, "selected_manning_dataset_index", 0)
-    
+        app.gui.setvar(group, "lulc_dataset_names", lulc_dataset_names)
+        app.gui.setvar(group, "lulc_dataset_index", 0)
+        app.gui.setvar(group, "lulc_reclass_table", "")
+        app.gui.setvar(group, "manning_dataset_names", manning_dataset_names)
+        app.gui.setvar(group, "manning_dataset_index", 0)
+        app.gui.setvar(group, "manning_polygon_names", [])
+        app.gui.setvar(group, "manning_polygon_values", [])
+        app.gui.setvar(group, "manning_polygon_index", 0)
+        app.gui.setvar(group, "nr_manning_polygons", 0)
+        app.gui.setvar(group, "selected_manning_dataset_names", [])
+        app.gui.setvar(group, "selected_manning_dataset_index", 0)
+        app.gui.setvar(group, "nr_selected_manning_datasets", 0)
+
         # Mask active
-        app.gui.setvar(group, "mask_polygon_names", [])
-        app.gui.setvar(group, "mask_polygon_index", 0)
+        mask_polygon_methods = [
+            "Load Polygon",
+            "Draw Polygon",
+            "Delete Polygon",
+            "Save Polygon",
+        ]
+
+        app.gui.setvar(group, "mask_polygon_methods", mask_polygon_methods)
+        app.gui.setvar(group, "mask_polygon_methods_index", 0)
         app.gui.setvar(group, "mask_active_zmax", 10.0)
         app.gui.setvar(group, "mask_active_zmin", -10.0)
         app.gui.setvar(group, "mask_active_drop_area", 0.0)
@@ -140,7 +172,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "nr_outflow_include_polygons", 0)
         app.gui.setvar(group, "outflow_exclude_polygon_names", [])
         app.gui.setvar(group, "outflow_exclude_polygon_index", 0)
-        app.gui.setvar(group, "nr_outflow_exclude_polygons", 0)        
+        app.gui.setvar(group, "nr_outflow_exclude_polygons", 0)
         app.gui.setvar(group, "outflow_zmax", 99999.0)
         app.gui.setvar(group, "outflow_zmin", 2.0)
         app.gui.setvar(group, "outflow_reset", False)
@@ -185,6 +217,21 @@ class Toolbox(GenericToolbox):
         )
 
         ### Mask
+        # Region
+        from .mask_active_cells import mask_polygon_created
+        from .mask_active_cells import mask_polygon_modified
+
+        layer.add_layer(
+            "mask_polygon",
+            type="draw",
+            shape="polygon",
+            create=mask_polygon_created,
+            modify=mask_polygon_modified,
+            polygon_line_color="grey",
+            polygon_fill_color="grey",
+            polygon_fill_opacity=0.3,
+        )
+
         # Include
         from .mask_active_cells import include_polygon_created
         from .mask_active_cells import include_polygon_modified
@@ -252,6 +299,7 @@ class Toolbox(GenericToolbox):
 
     def generate_grid(self):
         import time
+
         tic = time.perf_counter()
         dlg = app.gui.window.dialog_wait("Generating grid ...")
 
@@ -278,16 +326,15 @@ class Toolbox(GenericToolbox):
 
         model.update_grid_from_config()
 
-        #NOTE this only works for regular grids (quadtee also not implemented)
+        # NOTE this only works for regular grids (quadtee also not implemented)
         gdf = model.reggrid.to_vector_lines()
         app.map.layer["sfincs_hmt"].layer["grid"].set_data(gdf)
 
         dlg.close()
         toc = time.perf_counter()
         print(f"Done in {toc - tic:0.4f} seconds")
-        
-    def generate_bathymetry(self):
 
+    def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
 
         datasets_dep = app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets
@@ -298,7 +345,7 @@ class Toolbox(GenericToolbox):
     def generate_manning(self):
         datasets_rgh = app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets
 
-        #NOTE setup methods parse the dataset-names to xarray datasets
+        # NOTE setup methods parse the dataset-names to xarray datasets
         app.model["sfincs_hmt"].domain.setup_manning_roughness(datasets_rgh)
 
     def update_mask_active(self):
@@ -316,16 +363,18 @@ class Toolbox(GenericToolbox):
         if gdf is not None:
             app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
 
-
     def update_mask_bounds(self):
-
         mask_wlev = app.model["sfincs_hmt"].domain.create_mask_bounds(
-            btype = "waterlevel",
-            include_mask=app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon if app.gui.getvar("modelmaker_sfincs_hmt", "nr_wlev_include_polygons") > 0 else None,
-            exclude_mask=app.toolbox["modelmaker_sfincs_hmt"].wlev_exclude_polygon if app.gui.getvar("modelmaker_sfincs_hmt", "nr_wlev_exclude_polygons") > 0 else None,
+            btype="waterlevel",
+            include_mask=app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon
+            if app.gui.getvar("modelmaker_sfincs_hmt", "nr_wlev_include_polygons") > 0
+            else None,
+            exclude_mask=app.toolbox["modelmaker_sfincs_hmt"].wlev_exclude_polygon
+            if app.gui.getvar("modelmaker_sfincs_hmt", "nr_wlev_exclude_polygons") > 0
+            else None,
             zmin=app.gui.getvar("modelmaker_sfincs_hmt", "wlev_zmin"),
             zmax=app.gui.getvar("modelmaker_sfincs_hmt", "wlev_zmax"),
-            reset_bounds = app.gui.getvar("modelmaker_sfincs_hmt", "wlev_reset"),
+            reset_bounds=app.gui.getvar("modelmaker_sfincs_hmt", "wlev_reset"),
         )
 
         gdf_wlev = mask2gdf(mask_wlev, option="wlev")
@@ -333,31 +382,38 @@ class Toolbox(GenericToolbox):
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_data(gdf_wlev)
 
         mask_outflow = app.model["sfincs_hmt"].domain.create_mask_bounds(
-            btype = "outflow",
-            gdf_include=app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon if app.gui.getvar("modelmaker_sfincs_hmt", "nr_outflow_polygons") > 0 else None,
+            btype="outflow",
+            gdf_include=app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon
+            if app.gui.getvar("modelmaker_sfincs_hmt", "nr_outflow_polygons") > 0
+            else None,
             zmin=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_zmin"),
             zmax=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_zmax"),
-            reset_bounds = app.gui.getvar("modelmaker_sfincs_hmt", "outflow_reset"),
+            reset_bounds=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_reset"),
         )
 
         gdf_outflow = mask2gdf(mask_outflow, option="outflow")
         if gdf_wlev is not None:
-            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_data(gdf_outflow)
-        
+            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_data(
+                gdf_outflow
+            )
 
     def reset_mask_bounds(self):
         if app.gui.getvar("modelmaker_sfincs_hmt", "wlev_reset"):
-            mask = app.model["sfincs_hmt"].domain.create_mask_bounds(reset_bounds = True, btype="waterlevel")
+            mask = app.model["sfincs_hmt"].domain.create_mask_bounds(
+                reset_bounds=True, btype="waterlevel"
+            )
             # remove old waterlevel mask data
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].clear()
-            
+
             # possibly mask active has ben changed so, recalculate it
             gdf = mask2gdf(mask, option="active")
             if gdf is not None:
                 app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
-        
+
         if app.gui.getvar("modelmaker_sfincs_hmt", "outflow_reset"):
-            mask = app.model["sfincs_hmt"].domain.create_mask_bounds(reset_bounds = True, btype="outflow")
+            mask = app.model["sfincs_hmt"].domain.create_mask_bounds(
+                reset_bounds=True, btype="outflow"
+            )
             # remove old outflow mask data
             app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].clear()
 
@@ -365,4 +421,3 @@ class Toolbox(GenericToolbox):
             gdf = mask2gdf(mask, option="active")
             if gdf is not None:
                 app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
-        

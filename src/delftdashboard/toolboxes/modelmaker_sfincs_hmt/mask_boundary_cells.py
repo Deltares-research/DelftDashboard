@@ -23,6 +23,7 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("active")
     app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode("active")
 
+
 def draw_wlev_polygon(*args):
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].crs = app.crs
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].draw()
@@ -35,9 +36,7 @@ def delete_wlev_polygon(*args):
     # or: iac = args[0]
     feature_id = app.toolbox["modelmaker_sfincs_hmt"].wlev_polygon.loc[index, "id"]
     # Delete from map
-    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].delete_feature(
-        feature_id
-    )
+    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].delete_feature(feature_id)
     # Delete from app
     app.toolbox["modelmaker_sfincs_hmt"].wlev_polygon = app.toolbox[
         "modelmaker_sfincs_hmt"
@@ -83,8 +82,10 @@ def wlev_polygon_selected(index):
     app.gui.setvar("modelmaker_sfincs_hmt", "wlev_polygon_index", index)
     update()
 
+
 def tick_box_wlev(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "wlev_reset", args[0])
+
 
 def draw_outflow_polygon(*args):
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_outflow"].crs = app.crs
@@ -146,11 +147,13 @@ def outflow_polygon_selected(index):
     app.gui.setvar("modelmaker_sfincs_hmt", "outflow_polygon_index", index)
     update()
 
+
 def tick_box_outflow(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "outflow_reset", args[0])
 
+
 def update():
-    #loop through wlev polygons
+    # loop through wlev polygons
     nrp = len(app.toolbox["modelmaker_sfincs_hmt"].wlev_polygon)
     incnames = []
     for ip in range(nrp):
@@ -158,7 +161,7 @@ def update():
     app.gui.setvar("modelmaker_sfincs_hmt", "nr_wlev_polygons", nrp)
     app.gui.setvar("modelmaker_sfincs_hmt", "wlev_polygon_names", incnames)
 
-    #loop through outflow polygons
+    # loop through outflow polygons
     nrp = len(app.toolbox["modelmaker_sfincs_hmt"].outflow_polygon)
     incnames = []
     for ip in range(nrp):
@@ -172,5 +175,6 @@ def update():
 def update_mask_bounds(*args):
     app.toolbox["modelmaker_sfincs_hmt"].update_mask_bounds()
 
+
 def reset_mask_bounds(*args):
-    app.toolbox["modelmaker_sfincs_hmt"].reset_mask_bounds()    
+    app.toolbox["modelmaker_sfincs_hmt"].reset_mask_bounds()

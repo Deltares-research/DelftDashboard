@@ -1,4 +1,3 @@
-
 from delftdashboard.operations.model import GenericModel
 from delftdashboard.app import app
 import os
@@ -23,12 +22,14 @@ class Model(GenericModel):
 
     def initialize_domain(self):
         root = os.getcwd()
-        self.domain = SfincsModel(data_libs=app.config["data_libs"], root=root, mode="w+")
+        self.domain = SfincsModel(
+            data_libs=app.config["data_libs"], root=root, mode="w+"
+        )
 
     def add_layers(self):
         # Add main app layer
         layer = app.map.add_layer("sfincs_hmt")
-        
+
         layer.add_layer(
             "grid",
             type="deck_geojson",
@@ -99,7 +100,9 @@ class Model(GenericModel):
             app.map.layer["sfincs_hmt"].layer["grid"].set_mode("invisible")
             app.map.layer["sfincs_hmt"].layer["mask_active"].set_mode("invisible")
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("invisible")
-            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode("invisible")
+            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode(
+                "invisible"
+            )
 
             # Boundary points are made grey
             app.map.layer["sfincs_hmt"].layer["boundary_points"].set_mode("inactive")
@@ -146,9 +149,7 @@ class Model(GenericModel):
 
     def open(self):
         # Open input file, and change working directory
-        fname = app.gui.open_file_name(
-            "Open file", "SFINCS input file (sfincs.inp)"
-        )
+        fname = app.gui.open_file_name("Open file", "SFINCS input file (sfincs.inp)")
         if fname:
             path = os.path.dirname(fname)
             self.domain.set_root(root=path, mode="r")
@@ -157,7 +158,6 @@ class Model(GenericModel):
             os.chdir(path)
             # Change CRS
             app.crs = self.domain.crs
-
 
     def save(self):
         # Save sfincs input
@@ -168,7 +168,8 @@ class Model(GenericModel):
         )
         if mode == "r":
             fname = app.gui.select_path(
-                "Select model directory", "Select the directory where you want to store your model",
+                "Select model directory",
+                "Select the directory where you want to store your model",
             )
             self.domain.set_root(root=fname, mode="w+")
 
