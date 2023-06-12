@@ -20,7 +20,8 @@ class Toolbox(GenericToolbox):
         self.long_name = "Model Maker"
 
         # Set variables
-        # Grid outline
+        # Area of interest and grid outline
+        self.area_of_interest = gpd.GeoDataFrame()
         self.grid_outline = gpd.GeoDataFrame()
 
         # Bathymetry
@@ -48,7 +49,7 @@ class Toolbox(GenericToolbox):
 
         #Model extent determination
         app.gui.setvar(group, "grid_outline", 0)
-        app.gui.setvar(group, "setup_grid_methods", ["Draw bounding box", "Draw Polygon", "Load Polygon"])
+        app.gui.setvar(group, "setup_grid_methods", ["Draw Bounding Box", "Draw Area of Interest", "Load Area of Interest"])
         app.gui.setvar(group, "setup_grid_methods_index", 0)
 
         # Domain
@@ -87,6 +88,8 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", None)
         app.gui.setvar(group, "selected_bathymetry_dataset_offset", None)
         app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
+        app.gui.setvar(group, "bathymetry_dataset_buffer_cells", 0)
+        app.gui.setvar(group, "bathymetry_dataset_interp_method", "linear")
 
         # Roughness
         app.gui.setvar(group, "manning_land", 0.06)
@@ -101,9 +104,9 @@ class Toolbox(GenericToolbox):
 
         app.gui.setvar(group, "roughness_dataset_names", landuse_names)
         app.gui.setvar(group, "roughness_dataset_index", 0)
-        app.gui.setvar(group, "roughness_mapping_name", "")
-        app.gui.setvar(group, "selected_manning_dataset_names", [])
-        app.gui.setvar(group, "selected_manning_dataset_index", 0)
+        app.gui.setvar(group, "roughness_reclass_table", "")
+        # app.gui.setvar(group, "selected_manning_dataset_names", [])
+        # app.gui.setvar(group, "selected_manning_dataset_index", 0)
     
         # Mask active
         app.gui.setvar(group, "mask_polygon_names", [])
@@ -152,6 +155,20 @@ class Toolbox(GenericToolbox):
     def add_layers(self):
         # Add Mapbox layers
         layer = app.map.add_layer("modelmaker_sfincs_hmt")
+
+        # Area of interest
+        from .domain import aio_created
+        from .domain import aio_modified
+
+        layer.add_layer(
+            "area_of_interest",
+            type="draw",
+            shape="polygon",
+            create=aio_created,
+            modify=aio_modified,
+            polygon_line_color="grey",
+            polygon_fill_opacity=0.3,
+        )
 
         # Grid outline
         from .domain import grid_outline_created
@@ -234,7 +251,8 @@ class Toolbox(GenericToolbox):
         )
 
     def generate_grid(self):
-
+        import time
+        tic = time.perf_counter()
         dlg = app.gui.window.dialog_wait("Generating grid ...")
 
         model = app.model["sfincs_hmt"].domain
@@ -249,7 +267,6 @@ class Toolbox(GenericToolbox):
         model.set_config("rotation", app.gui.getvar(group, "rotation"))
         model.set_config("epsg", app.crs.to_epsg())
 
-        # NOTE: why is this needed?
         group = "sfincs_hmt"
         app.gui.setvar(group, "x0", model.config.get("x0"))
         app.gui.setvar(group, "y0", model.config.get("y0"))
@@ -263,23 +280,21 @@ class Toolbox(GenericToolbox):
 
         #NOTE this only works for regular grids (quadtee also not implemented)
         gdf = model.reggrid.to_vector_lines()
-
         app.map.layer["sfincs_hmt"].layer["grid"].set_data(gdf)
 
-        # app.map.layer["sfincs_hmt"].layer["grid"].set_data(model.grid, 
-        #                                                   xlim=[app.gui.getvar(group, "x0"),
-        #                                                         app.gui.getvar(group, "x0")],                                                                
-        #                                                   ylim=[app.gui.getvar(group, "y0"),
-        #                                                          app.gui.getvar(group, "y0")])
+        dlg.close()
+        toc = time.perf_counter()
+        print(f"Done in {toc - tic:0.4f} seconds")
+        
+    def generate_bathymetry(self):
+
+        dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
+
+        datasets_dep = app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets
+        app.model["sfincs_hmt"].domain.setup_dep(datasets_dep)
 
         dlg.close()
 
-    def generate_bathymetry(self):
-        datasets_dep = app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets
-
-        #NOTE setup methods parse the dataset-names to xarray datasets
-        app.model["sfincs_hmt"].domain.setup_dep(datasets_dep)
-        # app.model["sfincs_hmt"].domain.write_grid(data_vars=["dep"])
     def generate_manning(self):
         datasets_rgh = app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets
 

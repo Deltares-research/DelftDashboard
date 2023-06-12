@@ -1,6 +1,8 @@
 element:
 - style: panel
   title: Constant values
+  tooltip: Constant values for the Manning coefficient. Note that these values are
+    also used where no spatially varying Manning roughness is provided.
   position:
     x: 10
     y: 10
@@ -14,6 +16,7 @@ element:
       width: 45
       height: 20
     text: Manning land
+    tooltip: Constant manning roughness values for land
     variable: manning_land
   - style: edit
     position:
@@ -22,6 +25,7 @@ element:
       width: 45
       height: 20
     text: Manning sea
+    tooltip: Constant manning roughness values for sea
     variable: manning_sea
   - style: edit
     position:
@@ -30,6 +34,8 @@ element:
       width: 45
       height: 20
     text: Land level
+    tooltip: "Elevation to distinguish land from sea. \n Values below this level are
+      considered sea and values above are considered land."
     variable: rgh_lev_land  
 - style: panel
   title: Spatially varying
@@ -45,26 +51,27 @@ element:
       y: 90
       width: 200
       height: 20
-    select: item
+    select: index
+    tooltip: "Select a method to define to Manning roughness values in your model domain"
     method: select_manning_dataset
-    variable: roughness_dataset_names
+    variable: roughness_dataset_index
     option_string:
       variable: roughness_dataset_names
-    option_value:
-      variable: selected_manning_dataset_index
   - style: pushbutton
-    text: Load mapping table
+    text: Load reclass table
+    tooltip: "Load a reclass table to map landuse/landcover to Manning roughness values on the model grid. \n 
+    Note that default tables are used if not specified."
     position:
       x: 10
       y: 40
       width: 200
       height: 20
-    method: select_mapping_file  
+    method: select_reclass_table
     dependency:
     - action: enable
       checkfor: all
       check:
-      - variable: selected_manning_dataset_index
+      - variable: roughness_dataset_index
         operator: gt
         value: 0
   - style: edit
@@ -73,12 +80,12 @@ element:
       y: 10
       width: 200
       height: 20
-    variable: roughness_mapping_name
+    variable: roughness_reclass_table
     dependency:
     - action: enable
       checkfor: all
       check:
-      - variable: selected_manning_dataset_index
+      - variable: roughness_dataset_index
         operator: gt
         value: 0
 

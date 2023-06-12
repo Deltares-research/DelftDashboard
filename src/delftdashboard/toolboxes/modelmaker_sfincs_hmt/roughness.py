@@ -15,22 +15,24 @@ def select(*args):
 
 
 def select_manning_dataset(*args):
-    landuse_names = app.gui.getvar("modelmaker_sfincs_hmt", "roughness_dataset_names")
-    app.gui.setvar("modelmaker_sfincs_hmt", "selected_manning_dataset_index", args[0])
-    app.gui.setvar("modelmaker_sfincs_hmt", "selected_manning_dataset_names", [landuse_names[args[0]]])
+    group = "modelmaker_sfincs_hmt"
+    landuse_names = app.gui.getvar(group, "roughness_dataset_names")
+    index = app.gui.getvar(group, "roughness_dataset_index")
+    name = landuse_names[index]
 
-    if landuse_names[args[0]] != "Use constants":
-        dataset = {"lulc_fn": landuse_names[args[0]]}
+    if name != "Use constants":
+        dataset = {"lulc": landuse_names[index]}
         # for now we only support 1 dataset from the GUI
-        app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets = [dataset]  
-        app.gui.setvar("modelmaker_sfincs_hmt", "roughness_mapping_name", f"{landuse_names[args[0]]}_mapping.csv")
+        app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets = [dataset] 
+        app.gui.setvar("modelmaker_sfincs_hmt", "roughness_reclass_table", f"{landuse_names[index]}_mapping.csv")
 
-def select_mapping_file(*args):
+def select_reclass_table(*args):
     fname = app.gui.open_file_name(
-        "Select mapping file to convert landuse to mannings' n", ".csv",
+        "Select mapping file to convert landuse/ladncover to Mannings' n", ".csv",
     )
     if fname:
-        app.gui.setvar("modelmaker_sfincs_hmt", "roughness_mapping_name", fname)  
+        app.gui.setvar("modelmaker_sfincs_hmt", "roughness_reclass_table", fname)  
+        app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets[0].update({"reclass_table": fname})
 
 def generate_manning(*args):
     app.toolbox["modelmaker_sfincs_hmt"].generate_manning()

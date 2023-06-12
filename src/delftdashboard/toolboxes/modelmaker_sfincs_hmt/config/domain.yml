@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: Model extent
+  title: "Model extent"
   position:
     x: 10
     y: 10
@@ -21,13 +21,14 @@ element:
     option_string:
       variable: setup_grid_methods
   - style: pushbutton
-    text: Draw bbox
+    text: Draw Bounding Box
+    tooltip: Draw a bounding box around the area of interest
     position:
       x: 10
       y: 65
       width: 100
       height: 20
-    method: draw_grid_outline
+    method: draw_bbox
     dependency:
     - action: visible
       checkfor: any
@@ -36,13 +37,14 @@ element:
         operator: eq
         value: 0 
   - style: pushbutton
-    text: Draw region
+    text: Draw Area of Interest
+    tooltip: Draw a polygon describing the area of interest
     position:
       x: 10
       y: 65
       width: 100
       height: 20
-    method: draw_grid_outline
+    method: draw_aio
     dependency:
     - action: visible
       checkfor: any
@@ -51,13 +53,14 @@ element:
         operator: eq
         value: 1
   - style: pushbutton
-    text: Load region
+    text: Load Area of Interest
+    tooltip: Load a polygon describing the area of interest
     position:
       x: 10
       y: 65
       width: 100
       height: 20
-    method: draw_grid_outline
+    method: load_aio
     dependency:
     - action: visible
       checkfor: any
@@ -66,7 +69,24 @@ element:
         operator: eq
         value: 2   
   - style: pushbutton
+    text: Fly to site
+    tooltip: Move the map to the area of interest
+    position:
+      x: 10
+      y: 40
+      width: 100
+      height: 20
+    method: fly_to_site
+    dependency:
+      - action: enable
+        checkfor: all
+        check:
+        - variable: grid_outline
+          operator: eq
+          value: 1             
+  - style: pushbutton
     text: Generate Grid
+    tooltip: Generate a grid within the area of interest
     position:
       x: 10
       y: 15
@@ -81,7 +101,7 @@ element:
           operator: eq
           value: 1     
 - style: panel
-  title: Grid parameters
+  text: "Grid parameters"
   position:
     x: 140
     y: 10

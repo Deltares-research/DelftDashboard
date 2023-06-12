@@ -28,7 +28,7 @@ class Model(GenericModel):
     def add_layers(self):
         # Add main app layer
         layer = app.map.add_layer("sfincs_hmt")
-
+        
         layer.add_layer(
             "grid",
             type="deck_geojson",

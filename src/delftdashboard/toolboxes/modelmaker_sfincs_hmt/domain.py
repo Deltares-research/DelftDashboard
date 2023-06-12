@@ -4,22 +4,70 @@ import math
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+from hydromt_sfincs import utils
+
 def select(*args):
     # De-activate existing layers
     map.update()
     # Show the grid outline layer
     app.map.layer["sfincs_hmt"].layer["grid"].set_mode("active")
     app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].set_mode("active")
+    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].set_mode("active")
 
 def select_method(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "setup_grid_methods_index", args[0])
 
-def draw_grid_outline(*args):
+def draw_bbox(*args):
     # Clear grid outline layer
     app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].crs = app.crs
     app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].draw()
     app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
 
+    # Remove the area of interest
+    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].clear()
+
+def draw_aio(*args):
+    # Clear grid outline layer
+    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].crs = app.crs
+    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].draw()
+    app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
+
+def load_aio(*args):
+    fname = app.gui.window.dialog_open_file("Select polygon file", filter="*.pol *.shp *.geojson")
+    if fname[0]:
+        # for .pol files we assume that they are in the coordinate system of the current map
+        if str(fname[0]).endswith(".pol"):
+            gdf = utils.polygon2gdf(
+                feats=utils.read_geoms(fn=fname[0]), crs=app.crs
+            )
+        else:
+            gdf = app.model["sfincs_hmt"].domain.data_catalog.get_geodataframe(fname[0])
+
+        gdf = gdf.to_crs(4326)
+
+        # get the center of the polygon
+        x0 = gdf.geometry.centroid.x[0]
+        y0 = gdf.geometry.centroid.y[0]
+
+        # Fly to the site
+        app.map.fly_to(x0, y0, 7)
+
+        # Add the polygon to the map
+        layer = app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"]
+        layer.clear()
+        layer.add_feature(gdf)
+        app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
+        
+        aio_created(gdf,0,0)
+        
+def fly_to_site(*args):
+    gdf = app.toolbox["modelmaker_sfincs_hmt"].grid_outline
+    # get the center of the polygon
+    x0 = gdf.geometry.centroid.x[0]
+    y0 = gdf.geometry.centroid.y[0]
+
+    # Fly to the site
+    app.map.fly_to(x0, y0, 7)
 
 def grid_outline_created(gdf, index, id):
     if len(gdf) > 1:
@@ -35,6 +83,49 @@ def grid_outline_created(gdf, index, id):
 def grid_outline_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_hmt"].grid_outline = gdf
     update_geometry()
+    app.gui.window.update()
+
+
+def aio_created(gdf, index, id):
+    if len(gdf) > 1:
+        # Remove the old area of interest
+        id0 = gdf["id"][0]
+        app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].delete_feature(id0)
+        gdf = gdf.drop([0]).reset_index()
+    app.toolbox["modelmaker_sfincs_hmt"].area_of_interest = gdf
+
+    # Get grid resolution
+    dx = app.gui.getvar("modelmaker_sfincs_hmt", "dx")
+    dy = app.gui.getvar("modelmaker_sfincs_hmt", "dy")
+    res = np.mean([dx,dy])
+
+    # Create grid outline
+    x0, y0, mmax, nmax, rot = utils.rotated_grid(gdf.unary_union, res, dec_origin=6)
+    app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0,3))
+    app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0,3))
+    app.gui.setvar("modelmaker_sfincs_hmt", "mmax", mmax)
+    app.gui.setvar("modelmaker_sfincs_hmt", "nmax", nmax)
+    app.gui.setvar("modelmaker_sfincs_hmt", "rotation", round(rot,3))
+    redraw_rectangle()
+    app.gui.window.update()
+    
+
+def aio_modified(gdf, index, id):
+    app.toolbox["modelmaker_sfincs_hmt"].area_of_interest = gdf
+
+    # Get grid resolution
+    dx = app.gui.getvar("modelmaker_sfincs_hmt", "dx")
+    dy = app.gui.getvar("modelmaker_sfincs_hmt", "dy")
+    res = np.mean([dx,dy])
+
+    # Create grid outline
+    x0, y0, mmax, nmax, rot = utils.rotated_grid(gdf.unary_union, res, dec_origin=6)
+    app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0,3))
+    app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0,3))
+    app.gui.setvar("modelmaker_sfincs_hmt", "mmax", mmax)
+    app.gui.setvar("modelmaker_sfincs_hmt", "nmax", nmax)
+    app.gui.setvar("modelmaker_sfincs_hmt", "rotation", round(rot,3))
+    redraw_rectangle()
     app.gui.window.update()
 
 
@@ -100,6 +191,9 @@ def redraw_rectangle():
         app.toolbox["modelmaker_sfincs_hmt"].leny,
         app.gui.getvar(group, "rotation"),
     )
+    if app.toolbox["modelmaker_sfincs_hmt"].grid_outline.empty:
+        gdf = app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].get_gdf()
+        app.toolbox["modelmaker_sfincs_hmt"].grid_outline = gdf
 
 def read_setup_yaml(*args):
     fname = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
