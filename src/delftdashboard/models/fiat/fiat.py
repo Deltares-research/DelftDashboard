@@ -56,7 +56,11 @@ class Model(GenericModel):
         app.gui.setvar(group, "output_options_text", ["NetCDF", "GeoPackage", "CSV"])
         app.gui.setvar(group, "output_options_values", ["NetCDF", "GeoPackage", "CSV"])
         app.gui.setvar(group, "show_area_geometry", False)
-        app.gui.setvar(group, "asset_locations_string", ["National Structure Inventory (NSI)", "Upload data"])
+        app.gui.setvar(
+            group,
+            "asset_locations_string",
+            ["National Structure Inventory (NSI)", "Upload data"],
+        )
         app.gui.setvar(group, "asset_locations_value", ["nsi", "file"])
         app.gui.setvar(group, "asset_locations", None)
         app.gui.setvar(group, "damages_source_string", ["Hazus", "Create"])
@@ -66,6 +70,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_extraction_method", False)
         app.gui.setvar(group, "extraction_method", "Centroid")
         app.gui.setvar(group, "show_secondary_classification", False)
+        app.gui.setvar(group, "create_curves", False)
 
     def set_input_variables(self):
         # Update all model input variables
