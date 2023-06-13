@@ -87,35 +87,9 @@ def initialize():
 
     # Initialize toolboxes
     initialize_toolboxes()
-    # app.toolbox = {}
-    # for tlb in app.config["toolbox"]:
-    #     toolbox_name = tlb["name"]
-    #     # And initialize this toolbox
-    #     print("Adding toolbox : " + toolbox_name)
-    #     module = importlib.import_module("delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name)
-    #     app.toolbox[toolbox_name] = module.Toolbox(toolbox_name)
-    #     app.toolbox[toolbox_name].module = module
 
     # Initialize models
     initialize_models()
-    # app.model = {}
-    # for mdl in app.config["model"]:
-    #     model_name = mdl["name"]
-    #     # And initialize the domain for this model
-    #     print("Adding model   : " + model_name)
-    #     module = importlib.import_module("delftdashboard.models." + model_name + "." + model_name)
-    #     app.model[model_name] = module.Model(model_name)
-    #     if "exe_path" in mdl:
-    #         app.model[model_name].domain.exe_path = mdl["exe_path"]
-    #     # Loop through toolboxes to see which ones should be activated for which model
-    #     app.model[model_name].toolbox = []
-    #     for tlb in app.config["toolbox"]:
-    #         okay = True
-    #         if "for_model" in tlb:
-    #             if model_name not in tlb["for_model"]:
-    #                 okay = False
-    #         if okay:
-    #             app.model[model_name].toolbox.append(tlb["name"])
 
     # Set active toolbox and model
     app.active_model = app.model[list(app.model)[0]]

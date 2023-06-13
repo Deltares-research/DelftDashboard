@@ -122,4 +122,8 @@ def update():
 
 
 def reset_cursor():
-    app.map.set_mouse_default()
+    try:
+        assert app.map
+        app.map.set_mouse_default()
+    except AttributeError:
+        pass

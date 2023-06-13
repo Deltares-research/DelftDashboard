@@ -9,16 +9,4 @@ element:
   tab:
   - string: Domain
     module: toolboxes.modelmaker_fiat.domain
-    element: domain.yml    
-  - string: Bathymetry
-    module: toolboxes.modelmaker_fiat.bathymetry
-    element: bathymetry.yml
-  - string: Mask Active Cells
-    module: toolboxes.modelmaker_fiat.mask_active_cells
-    element: mask_active_cells.yml
-  - string: Mask Boundary Cells
-    module: toolboxes.modelmaker_fiat.mask_boundary_cells
-    element: mask_boundary_cells.yml
-  - string: Boundary Points
-    module: toolboxes.modelmaker_fiat.boundary_points
-    element: boundary_points.yml
+    element: domain.yml

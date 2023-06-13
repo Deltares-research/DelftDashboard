@@ -57,63 +57,6 @@ class Model(GenericModel):
             line_color="transparent",
         )
 
-        # Move this to fiat.py
-        from .boundary_conditions import select_boundary_point_from_map
-
-        layer.add_layer(
-            "boundary_points",
-            type="circle_selector",
-            select=select_boundary_point_from_map,
-            hover_property="name",
-            line_color="white",
-            line_opacity=1.0,
-            fill_color="blue",
-            fill_opacity=1.0,
-            circle_radius=4,
-            circle_radius_selected=5,
-            line_color_selected="white",
-            fill_color_selected="red",
-            circle_radius_inactive=4,
-            line_color_inactive="white",
-            fill_color_inactive="lightgrey",
-        )
-
-        from .observation_points_regular import (
-            select_observation_point_from_map_regular,
-        )
-
-        layer.add_layer(
-            "observation_points_regular",
-            type="circle_selector",
-            select=select_observation_point_from_map_regular,
-            line_color="white",
-            line_opacity=1.0,
-            fill_color="blue",
-            fill_opacity=1.0,
-            circle_radius=3,
-            circle_radius_selected=4,
-            line_color_selected="white",
-            fill_color_selected="red",
-        )
-
-        from .observation_points_spectra import (
-            select_observation_point_from_map_spectra,
-        )
-
-        layer.add_layer(
-            "observation_points_spectra",
-            type="circle_selector",
-            select=select_observation_point_from_map_spectra,
-            line_color="white",
-            line_opacity=1.0,
-            fill_color="orange",
-            fill_opacity=1.0,
-            circle_radius=3,
-            circle_radius_selected=4,
-            line_color_selected="white",
-            fill_color_selected="red",
-        )
-
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Grid is made visible
@@ -141,27 +84,14 @@ class Model(GenericModel):
             app.gui.setvar(
                 group, var_name, getattr(self.domain.input.variables, var_name)
             )
-        app.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
-        app.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
-        app.gui.setvar(group, "wind_type", "uniform")
-        app.gui.setvar(group, "boundary_point_names", [])
-        app.gui.setvar(group, "nr_boundary_points", 0)
-        app.gui.setvar(group, "active_boundary_point", 0)
-        app.gui.setvar(
-            group, "boundary_forcing", self.domain.boundary_conditions.forcing
-        )
-        app.gui.setvar(group, "boundary_hm0", 1.0)
-        app.gui.setvar(group, "boundary_tp", 6.0)
-        app.gui.setvar(group, "boundary_wd", 0.0)
-        app.gui.setvar(group, "boundary_ds", 30.0)
-
-        app.gui.setvar(group, "observation_point_names_regular", [])
-        app.gui.setvar(group, "nr_observation_points_regular", 0)
-        app.gui.setvar(group, "active_observation_point_regular", 0)
-
-        app.gui.setvar(group, "observation_point_names_spectra", [])
-        app.gui.setvar(group, "nr_observation_points_spectra", 0)
-        app.gui.setvar(group, "active_observation_point_spectra", 0)
+        app.gui.setvar(group, "output_options_text", ["NetCDF", "GeoPackage", "CSV"])
+        app.gui.setvar(group, "output_options_values", ["NetCDF", "GeoPackage", "CSV"])
+        app.gui.setvar(group, "show_area_geometry", False)
+        app.gui.setvar(group, "asset_locations", "Not yet set")
+        app.gui.setvar(group, "show_asset_locations", False)
+        app.gui.setvar(group, "show_extraction_method", False)
+        app.gui.setvar(group, "extraction_method", "Centroid")
+        app.gui.setvar(group, "show_secondary_classification", False)
 
     def set_input_variables(self):
         # Update all model input variables
@@ -173,7 +103,7 @@ class Model(GenericModel):
     def open(self):
         # Open input file, and change working directory
         fname = app.gui.window.dialog_open_file(
-            "Open file", filter="fiat input file (fiat.inp)"
+            "Open file", filter="fiat input file;;ini files (*.ini)"
         )
         fname = fname[0]
         if fname:
@@ -205,31 +135,6 @@ class Model(GenericModel):
         # Grid
         gdf = self.domain.grid.to_gdf()
         app.map.layer["fiat"].layer["grid"].set_data(gdf)
-        # Mask
-        app.map.layer["fiat"].layer["mask_include"].set_data(
-            self.domain.grid.mask_to_gdf(option="include")
-        )
-        app.map.layer["fiat"].layer["mask_boundary"].set_data(
-            self.domain.grid.mask_to_gdf(option="boundary")
-        )
-        # Boundary points
-        gdf = self.domain.boundary_conditions.gdf
-        app.map.layer["fiat"].layer["boundary_points"].set_data(gdf, 0)
-        # Observation points
-        gdf = self.domain.observation_points_regular.gdf
-        app.map.layer["fiat"].layer["observation_points_regular"].set_data(gdf, 0)
-        gdf = self.domain.observation_points_sp2.gdf
-        app.map.layer["fiat"].layer["observation_points_spectra"].set_data(gdf, 0)
-
-    def add_stations(self, gdf_stations_to_add, naming_option="id"):
-        self.domain.observation_points_regular.add_points(
-            gdf_stations_to_add, name=naming_option
-        )
-        gdf = self.domain.observation_points_regular.gdf
-        app.map.layer["fiat"].layer["observation_points_regular"].set_data(gdf, 0)
-        if not self.domain.input.variables.obsfile:
-            self.domain.input.variables.obsfile = "fiat.obs"
-        self.domain.observation_points_regular.write()
 
     def set_classification_field(self):
         # get window config yaml path
