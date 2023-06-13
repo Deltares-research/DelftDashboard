@@ -29,14 +29,12 @@ element:
       width: 130
       height: 20
     text: ""
-    variable: asset_locations
-    method: set_asset_locations
+    variable: damages_source
+    method: set_damages_source
     option_string:
-    - Hazus
-    - Create
+      variable: damages_source_string
     option_value:
-    - hazus
-    - create
+      variable: damages_source_value
   - style: pushbutton
     position:
       x: 10
@@ -48,7 +46,7 @@ element:
     - action: visible
       checkfor: all
       check:
-      - variable: asset_locations
+      - variable: damages_source
         operator: eq
         value: hazus
   - style: pushbutton
@@ -62,7 +60,7 @@ element:
     - action: visible
       checkfor: all
       check:
-      - variable: asset_locations
+      - variable: damages_source
         operator: eq
         value: create
 - style: panel
