@@ -8,9 +8,15 @@ Created on Mon May 10 12:18:09 2021
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+
 def select(*args):
     # De-activate existing layers
     map.update()
 
+
 def set_variables(*args):
     app.model["fiat"].set_input_variables()
+
+
+def set_classification_field(*args):
+    app.model["fiat"].set_classification_field()
