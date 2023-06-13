@@ -289,7 +289,7 @@ class Toolbox(GenericToolbox):
         mmax     = app.gui.getvar(group, "mmax")
         rotation = app.gui.getvar(group, "rotation")
         model.input.variables.qtrfile = "sfincs.nc"
-        app.gui.setvar(group, "qtrfile", model.input.variables.qtrfile)
+        app.gui.setvar("sfincs_cht", "qtrfile", model.input.variables.qtrfile)
 
         if len(self.refinement_polygon) == 0:
             refpol = None
