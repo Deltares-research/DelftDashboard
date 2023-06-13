@@ -34,45 +34,14 @@ class Model(GenericModel):
         # Add main DDB layer
         layer = app.map.add_layer("fiat")
 
-        # layer.add_layer("grid", type="deck_geojson",
-        #                 file_name="fiat_grid.geojson",
-        #                 line_color="black")
-        layer.add_layer("grid", type="image")
-
         layer.add_layer(
-            "mask_include",
-            type="circle",
-            file_name="fiat_mask_include.geojson",
-            circle_radius=3,
-            fill_color="yellow",
-            line_color="transparent",
-        )
-
-        layer.add_layer(
-            "mask_boundary",
-            type="circle",
-            file_name="fiat_mask_boundary.geojson",
-            circle_radius=3,
-            fill_color="red",
-            line_color="transparent",
+            "domain",
         )
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Grid is made visible
             app.map.layer["fiat"].layer["grid"].set_mode("inactive")
-            # Mask is made invisible
-            app.map.layer["fiat"].layer["mask_include"].set_mode("invisible")
-            app.map.layer["fiat"].layer["mask_boundary"].set_mode("invisible")
-            # Boundary points are made grey
-            app.map.layer["fiat"].layer["boundary_points"].set_mode("inactive")
-            # Observation points are made grey
-            app.map.layer["fiat"].layer["observation_points_regular"].set_mode(
-                "inactive"
-            )
-            app.map.layer["fiat"].layer["observation_points_spectra"].set_mode(
-                "inactive"
-            )
         elif mode == "invisible":
             # Everything set to invisible
             app.map.layer["fiat"].set_mode("invisible")

@@ -83,56 +83,6 @@ class Toolbox(GenericToolbox):
             rotate=True,
         )
 
-        ### Mask
-        # Include
-        from .mask_active_cells import include_polygon_created
-        from .mask_active_cells import include_polygon_modified
-        from .mask_active_cells import include_polygon_selected
-
-        layer.add_layer(
-            "mask_include",
-            type="draw",
-            shape="polygon",
-            create=include_polygon_created,
-            modify=include_polygon_modified,
-            select=include_polygon_selected,
-            polygon_line_color="limegreen",
-            polygon_fill_color="limegreen",
-            polygon_fill_opacity=0.3,
-        )
-        # Exclude
-        from .mask_active_cells import exclude_polygon_created
-        from .mask_active_cells import exclude_polygon_modified
-        from .mask_active_cells import exclude_polygon_selected
-
-        layer.add_layer(
-            "mask_exclude",
-            type="draw",
-            shape="polygon",
-            create=exclude_polygon_created,
-            modify=exclude_polygon_modified,
-            select=exclude_polygon_selected,
-            polygon_line_color="orangered",
-            polygon_fill_color="orangered",
-            polygon_fill_opacity=0.3,
-        )
-        # Boundary
-        from .mask_boundary_cells import boundary_polygon_created
-        from .mask_boundary_cells import boundary_polygon_modified
-        from .mask_boundary_cells import boundary_polygon_selected
-
-        layer.add_layer(
-            "mask_boundary",
-            type="draw",
-            shape="polygon",
-            create=boundary_polygon_created,
-            modify=boundary_polygon_modified,
-            select=boundary_polygon_selected,
-            polygon_line_color="deepskyblue",
-            polygon_fill_color="deepskyblue",
-            polygon_fill_opacity=0.3,
-        )
-
     def generate_grid(self):
         dlg = app.gui.window.dialog_wait("Generating grid ...")
 
