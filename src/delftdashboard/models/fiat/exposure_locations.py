@@ -16,3 +16,7 @@ def select(*args):
 
 def set_variables(*args):
     app.model["fiat"].set_input_variables()
+
+
+def set_asset_locations(*args):
+    print("Set asset locations")

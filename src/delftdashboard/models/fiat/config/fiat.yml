@@ -9,14 +9,10 @@ element:
   variable_group: fiat
   tab:
   - string: Exposure
-    module: models.fiat.exposure
     element: exposure.yml
   - string: Vulnerability
-    module: models.fiat.vulnerability
     element: vulnerability.yml
   - string: Hazard
-    module: models.fiat.hazard
     element: hazard.yml
   - string: SVI
-    module: models.fiat.svi
     element: svi.yml
