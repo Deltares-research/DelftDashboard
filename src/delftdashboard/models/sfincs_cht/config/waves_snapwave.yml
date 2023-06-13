@@ -1,0 +1,126 @@
+element:
+- style: checkbox
+  position:
+    x: 10
+    y: 110
+    width: 60
+    height: 20
+  text: SnapWave
+  variable: snapwave
+  method: set_model_variables
+- style: pushbutton
+  position:
+    x: 10
+    y: 80
+    width: 100
+    height: 20
+  text: Draw Boundary Enclosure
+  method: draw_boundary_enclosure
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: snapwave
+      operator: eq
+      value: True
+- style: checkbox
+  position:
+    x: 10
+    y: 10
+    width: 60
+    height: 20
+  text: IG Waves
+  variable: snapwave_igwaves
+  method: set_model_variables
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: snapwave
+      operator: eq
+      value: True
+- style: edit
+  position:
+    x: 150
+    y: 110
+    width: 60
+    height: 20
+  text: Time Step (s)
+  variable: dtwave
+  method: set_model_variables
+  tooltip: Time step for updating wave field
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: snapwave
+      operator: eq
+      value: True
+- style: edit
+  position:
+    x: 150
+    y: 85
+    width: 60
+    height: 20
+  text: dTheta (deg)
+  variable: snapwave_dtheta
+  method: set_model_variables
+  tooltip: Directional resolution in degrees
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: snapwave
+      operator: eq
+      value: True
+- style: edit
+  position:
+    x: 150
+    y: 60
+    width: 60
+    height: 20
+  text: Nr Sweeps (-)
+  variable: snapwave_nrsweeps
+  method: set_model_variables
+  tooltip: Maximum number of sweeps
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: snapwave
+      operator: eq
+      value: True
+- style: edit
+  position:
+    x: 150
+    y: 35
+    width: 60
+    height: 20
+  text: Crit (-)
+  variable: snapwave_crit
+  method: set_model_variables
+  tooltip: Maximum number of sweeps
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: snapwave
+      operator: eq
+      value: True
+- style: edit
+  position:
+    x: 150
+    y: 10
+    width: 60
+    height: 20
+  text: Hmin (m)
+  variable: snapwave_hmin
+  method: set_model_variables
+  tooltip: Minimum depth
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: snapwave
+      operator: eq
+      value: True

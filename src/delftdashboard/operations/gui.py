@@ -109,35 +109,77 @@ def build_gui_config():
 
 
     # Topography
-    source_names, sources = bathymetry_database.sources()
-#    dataset_names, dataset_long_names, dataset_source_names = bathymetry_database.dataset_names()
     menu = {}
     menu["text"] = "Topography"
-    menu["module"] = "delftdashboard.menu.topography"
+    menu["module"] = "menu.topography"
     menu["menu"] = []
-    for source in sources:
+    if app.config["bathymetry_database"] is not None:
+        source_names, sources = bathymetry_database.sources()
+        for source in sources:
+            source_menu = {}
+            source_menu["text"] = source.name
+            source_menu["menu"] = []
+            for dataset in source.dataset:
+                dependency = [
+                    {
+                        "action": "check",
+                        "checkfor": "all",
+                        "check": [
+                            {
+                                "variable": "active_topography_name",
+                                "operator": "eq",
+                                "value": dataset.name,
+                            }
+                        ],
+                    }
+                ]
+                source_menu["menu"].append(
+                    {
+                        "id": "topography." + dataset.name,
+                        "variable_group": "menu",
+                        "text": dataset.name,
+                        "separator": False,
+                        "checkable": True,
+                        "option": dataset.name,
+                        "method": "select_dataset",
+                        "dependency": dependency,
+                    }
+                )
+            menu["menu"].append(source_menu)
+
+    # also add hydromt datasets
+    if app.config["data_libs"] is not None:
         source_menu = {}
-        source_menu["text"] = source.name
+        source_menu["text"] = "hydromt"
         source_menu["menu"] = []
-        for dataset in source.dataset:
-            dependency = [{"action": "check",
-                           "checkfor": "all",
-                           "check": [{"variable": "active_topography_name",
-                                      "operator": "eq",
-                                      "value": dataset.name}]
-                           }]
-            source_menu["menu"].append({"id": "topography." + dataset.name,
-                                        "variable_group": "menu",
-                                        "text": dataset.name,
-                                        "separator": False,
-                                        "checkable": True,
-                                        "option": dataset.name,
-                                        "method": "select_dataset",
-                                        "dependency": dependency})
+        for key in app.data_catalog.keys:
+            if app.data_catalog[key].driver == "raster":
+                if app.data_catalog[key].meta["category"] == "topography":
+                    dependency = [
+                        {   
+                            "action": "check",
+                            "checkfor": "all",
+                            "check": [{ "variable": "active_topography_name",
+                                        "operator": "eq",
+                                        "value": key}],
+                        }
+                    ]
+                    source_menu["menu"].append(
+                        {
+                            "id": "topography." + key,
+                            "variable_group": "menu",
+                            "text": key,
+                            "separator": False,
+                            "checkable": True,
+                            "option": key,
+                            "method": "select_dataset",
+                            "dependency": dependency,
+                        }
+                    )
         menu["menu"].append(source_menu)
+
     app.gui.config["menu"].append(menu)
 
-    dependency = [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]
 
     # View
     menu = {}

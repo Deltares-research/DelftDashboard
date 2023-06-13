@@ -1,0 +1,48 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 140
+  element:
+  - style: edit
+    position:
+      x: 100
+      y: 110
+      width: 50
+      height: 20
+    text: Alpha (-)
+    variable: alpha
+    method: set_model_variables
+    tooltipstring: Edit Courant coefficient alpha
+  - style: edit
+    position:
+      x: 100
+      y: 85
+      width: 50
+      height: 20
+    text: Theta (-)
+    variable: theta
+    method: set_model_variables
+    tooltipstring: Edit smoothing coefficient theta
+  - style: edit
+    position:
+      x: 100
+      y: 60
+      width: 50
+      height: 20
+    text: Threshold Depth (m)
+    variable: huthresh
+    method: set_model_variables
+    tooltipstring: Edit threshold depth
+  - style: edit
+    position:
+      x: 100
+      y: 35
+      width: 50
+      height: 20
+    text: Stop Depth (m)
+    variable: stopdepth
+    method: set_model_variables
+    tooltipstring: Edit stop depth (simulation will stop when this depth is exceeded)

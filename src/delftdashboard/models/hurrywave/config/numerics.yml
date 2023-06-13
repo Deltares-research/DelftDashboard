@@ -15,7 +15,7 @@ element:
       height: 20
     text: Freq Min (Hz)
     variable: freqmin
-    method: set_variables
+    method: set_model_variables
     tooltipstring: Edit lowest frequency (Hz)
   - style: edit
     position:
@@ -25,7 +25,7 @@ element:
       height: 20
     text: Freq Max (Hz)
     variable: freqmax
-    method: set_variables
+    method: set_model_variables
     tooltipstring: Edit highest frequency (Hz)
   - style: edit
     position:
@@ -35,7 +35,7 @@ element:
       height: 20
     text: Frequency Bins
     variable: nsigma
-    method: set_variables
+    method: set_model_variables
     tooltipstring: Edit number of frequency bins
   - style: edit
     position:
@@ -45,7 +45,7 @@ element:
       height: 20
     text: Directional Bins
     variable: ntheta
-    method: set_variables
+    method: set_model_variables
     tooltipstring: Edit number of frequency bins
 - style: panel
   title: Limiters
@@ -63,7 +63,7 @@ element:
       height: 20
     text: Dmx1 (-)
     variable: dmx1
-    method: set_variables
+    method: set_model_variables
     tooltipstring: Edit DMX1
   - style: edit
     position:
@@ -73,5 +73,5 @@ element:
       height: 20
     text: Dmx2 (-)
     variable: dmx2
-    method: set_variables
+    method: set_model_variables
     tooltipstring: Edit DMX1

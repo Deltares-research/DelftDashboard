@@ -1,0 +1,173 @@
+element:
+- style: panel
+  title: "Model extent"
+  position:
+    x: 10
+    y: 10
+    width: 120
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 100
+      height: 20
+    text: Select method
+    tooltip: Select method to determine model extent
+    select: index
+    method: select_method
+    variable: setup_grid_methods_index
+    option_string:
+      variable: setup_grid_methods
+  - style: pushbutton
+    text: Draw Bounding Box
+    tooltip: Draw a bounding box around the area of interest
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    method: draw_bbox
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: setup_grid_methods_index
+        operator: eq
+        value: 0 
+  - style: pushbutton
+    text: Draw Area of Interest
+    tooltip: Draw a polygon describing the area of interest
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    method: draw_aio
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: setup_grid_methods_index
+        operator: eq
+        value: 1
+  - style: pushbutton
+    text: Load Area of Interest
+    tooltip: Load a polygon describing the area of interest
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    method: load_aio
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: setup_grid_methods_index
+        operator: eq
+        value: 2   
+  - style: pushbutton
+    text: Fly to site
+    tooltip: Move the map to the area of interest
+    position:
+      x: 10
+      y: 40
+      width: 100
+      height: 20
+    method: fly_to_site
+    dependency:
+      - action: enable
+        checkfor: all
+        check:
+        - variable: grid_outline
+          operator: eq
+          value: 1             
+  - style: pushbutton
+    text: Generate Grid
+    tooltip: Generate a grid within the area of interest
+    position:
+      x: 10
+      y: 15
+      width: 100
+      height: 20
+    method: generate_grid
+    dependency:
+      - action: enable
+        checkfor: all
+        check:
+        - variable: grid_outline
+          operator: eq
+          value: 1     
+- style: panel
+  title: "Grid parameters"
+  position:
+    x: 140
+    y: 10
+    width: 230
+    height: 120
+  element:
+  - style: edit
+    position:
+      x: 60
+      y: 90
+      width: 60
+      height: 20
+    text: X0
+    variable: x0
+    method: edit_origin
+  - style: edit
+    position:
+      x: 160
+      y: 90
+      width: 60
+      height: 20
+    text: Y0
+    variable: y0
+    method: edit_origin
+  - style: edit
+    position:
+      x: 60
+      y: 65
+      width: 60
+      height: 20
+    text: MMax
+    variable: mmax
+    method: edit_nmmax
+  - style: edit
+    position:
+      x: 160
+      y: 65
+      width: 60
+      height: 20
+    text: NMax
+    variable: nmax
+    method: edit_nmmax
+  - style: edit
+    position:
+      x: 60
+      y: 40
+      width: 60
+      height: 20
+    text: dX
+    variable: dx
+    method: edit_dxdy
+  - style: edit
+    position:
+      x: 160
+      y: 40
+      width: 60
+      height: 20
+    text: dY
+    variable: dy
+    method: edit_dxdy
+  - style: edit
+    position:
+      x: 60
+      y: 15
+      width: 60
+      height: 20
+    text: Rotation
+    variable: rotation
+    method: edit_rotation

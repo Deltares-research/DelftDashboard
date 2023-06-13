@@ -1,0 +1,20 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Constants
+    module: delftdashboard.models.sfincs_cht.physics_constants
+    element: physics_constants.yml
+  - string: Roughness
+    module: delftdashboard.models.sfincs_cht.physics_roughness
+    element: physics_roughness.yml
+  - string: Advection
+    module: delftdashboard.models.sfincs_cht.physics_advection
+    element: physics_advection.yml
+  - string: Meteo
+    module: delftdashboard.models.sfincs_cht.physics_meteo
+    element: physics_meteo.yml

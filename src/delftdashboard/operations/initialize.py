@@ -17,6 +17,7 @@ from .colormap import read_colormap
 from .gui import build_gui_config
 
 from delftdashboard.app import app
+from hydromt import DataCatalog
 
 
 def initialize():
@@ -37,7 +38,8 @@ def initialize():
     app.config["splash_file"] = os.path.join(
         app.config_path, "images", "DelftDashBoard.jpg"
     )
-    app.config["bathymetry_database"] = ""
+    app.config["bathymetry_database"] = None
+    app.config["data_libs"] = None
 
     # Read ini file and override stuff in default config dict
     inifile = open(os.path.join(app.config_path, "delftdashboard.ini"), "r")
@@ -45,6 +47,11 @@ def initialize():
     for key in config:
         app.config[key] = config[key]
     inifile.close()
+
+    assert (
+        app.config["bathymetry_database"] is not None
+        or app.config["data_libs"] is not None
+    ), "Bathymetry database or data_libs not defined in delftdashboard.ini"
 
     # Initialize GUI object
     app.gui = GUI(
@@ -65,9 +72,13 @@ def initialize():
     # Define some other variables
     app.crs = CRS(4326)
     app.auto_update_topography = True
-    app.background_topography = "gebco22"
-    app.bathymetry_database_path = app.config["bathymetry_database"]
-    bathymetry_database.initialize(app.bathymetry_database_path)
+    app.background_topography  = "gebco22"
+    if app.config["bathymetry_database"] is not None:
+        app.bathymetry_database_path = app.config["bathymetry_database"]
+        bathymetry_database.initialize(app.bathymetry_database_path)
+    # NOTE initialize HydroMT data catalog
+    if app.config["data_libs"] is not None:
+        app.data_catalog = DataCatalog(data_libs=app.config["data_libs"])
 
     # View
     app.view = {}

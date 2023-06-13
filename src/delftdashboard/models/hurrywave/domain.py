@@ -16,5 +16,5 @@ def select(*args):
     app.map.layer["hurrywave"].layer["mask_include"].set_mode("active")
     app.map.layer["hurrywave"].layer["mask_boundary"].set_mode("active")
 
-def set_variables(*args):
+def set_model_variables(*args):
     app.model["hurrywave"].set_input_variables()

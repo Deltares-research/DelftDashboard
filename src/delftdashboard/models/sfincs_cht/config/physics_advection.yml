@@ -1,0 +1,32 @@
+element:
+- style: popupmenu
+  text: Advection
+  position:
+    x: 100
+    y: 110
+    width: 60
+    height: 20
+  variable: advection
+  method: set_model_variables
+  option_string:
+  - "off"
+  - "on"
+  option_value:
+  - 0
+  - 1
+- style: edit
+  position:
+    x: 100
+    y: 85
+    width: 60
+    height: 20
+  text: Advection Limiter
+  variable: advlim
+  method: set_model_variables
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: advection
+      operator: eq
+      value: 1

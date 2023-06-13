@@ -1,0 +1,63 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 80
+    height: 120
+  method: select_from_list
+  variable: active_wave_maker
+  select: index
+  option_string:
+    variable: wave_maker_names
+  tooltip: Select wave maker line
+- style: pushbutton
+  text: Add Polyline
+  position:
+    x: 100
+    y: 110
+    width: 80
+    height: 20
+  method: add_on_map
+  tooltip: Add wave maker on map
+- style: pushbutton
+  text: Delete Polyline
+  position:
+    x: 100
+    y: 85
+    width: 80
+    height: 20
+  method: delete_from_list
+  tooltip: Delete wave maker from list
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_wave_makers
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: Load
+  position:
+    x: 100
+    y: 60
+    width: 80
+    height: 20
+  method: load
+  tooltip: Load wave makers from file
+- style: pushbutton
+  text: Save
+  position:
+    x: 100
+    y: 35
+    width: 80
+    height: 20
+  method: save
+  tooltip: Save wave maker to file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_wave_makers
+      operator: gt
+      value: 0

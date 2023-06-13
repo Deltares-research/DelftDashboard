@@ -29,6 +29,7 @@ def utm_zone(option):
     lat = -80.0 + index*8.0 - 4.0
     zoom = 6
     app.crs = CRS("WGS 84 / UTM zone " + utm)
+    app.map.crs = app.crs
     # Also change the model crs
     for model in app.model:
         app.model[model].set_crs(app.crs)
