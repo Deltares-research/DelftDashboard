@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
-
-@author: ormondt
-"""
-
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
@@ -67,11 +60,11 @@ def add_selected_manning_dataset(*args):
 
 
 def remove_selected_manning_dataset(*args):
-    if len(app.toolbox["modelmaker_sfincs_hmt"].selected_manning_dataset) == 0:
+    if len(app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets) == 0:
         return
     group = "modelmaker_sfincs_hmt"
     index = app.gui.getvar(group, "selected_manning_dataset_index")
-    app.toolbox["modelmaker_sfincs_hmt"].selected_manning_dataset.pop(index)
+    app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets.pop(index)
     update()
 
 
@@ -98,7 +91,7 @@ def select_lulc_dataset(*args):
 def select_reclass_table(*args):
     fname = app.gui.window.dialog_open_file(
         "Select mapping file to convert landuse/ladncover to Mannings' n",
-        filter=".csv",
+        filter="*.csv",
     )
     if fname:
         app.gui.setvar("modelmaker_sfincs_hmt", "lulc_reclass_table", fname)

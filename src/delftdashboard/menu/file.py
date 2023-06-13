@@ -20,10 +20,13 @@ def new(option):
     for model in app.model.keys():
         if model in app.map.layer:
             app.map.layer[model].delete()
+
     # Initialize toolboxes
     initialize_toolboxes()
+
     # Initialize models
     initialize_models()
+
     # Add layers
     for toolbox in app.toolbox:
         app.toolbox[toolbox].add_layers()
@@ -39,7 +42,7 @@ def save(option):
     app.active_model.save()
 
 def select_working_directory(option):
-    path = app.gui.select_path(os.getcwd())
+    path = app.gui.window.dialog_select_path("Select working directory", path=os.getcwd())
     if path:
         os.chdir(path)
 

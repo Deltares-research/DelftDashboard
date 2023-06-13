@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: "Initialize mask"
+  title: "Global mask parameters"
   position:
     x: 10
     y: 10
@@ -10,82 +10,96 @@ element:
   - style: text
     position:
       x: 10
-      y: 100
+      y: 95
       width: 180
       height: 20
     text: "Initialize the active mask with a polygon."
   - style: popupmenu
     position:
       x: 10
-      y: 80
+      y: 75
       width: 85
       height: 20
     select: index
     tooltip: "Initialize the active mask with a polygon"
-    method: select_mask_polygon_method
-    variable: mask_polygon_methods_index
+    method: select_mask_init_polygon_method
+    variable: mask_init_polygon_methods_index
     option_string:
-      variable: mask_polygon_methods
+      variable: mask_init_polygon_methods
   - style: pushbutton
     text: Load Polygon
     position:
       x: 105
-      y: 80
+      y: 75
       width: 85
       height: 20
-    method: load_mask_polygon
+    method: load_mask_init_polygon
     dependency:
     - action: visible
       checkfor: any
       check:
-      - variable: mask_polygon_methods_index
+      - variable: mask_init_polygon_methods_index
         operator: eq
         value: 0
   - style: pushbutton
     text: Draw Polygon
     position:
       x: 105
-      y: 80
+      y: 75
       width: 85
       height: 20
-    method: draw_mask_polygon
+    method: draw_mask_init_polygon
     dependency:
     - action: visible
       checkfor: any
       check:
-      - variable: mask_polygon_methods_index
+      - variable: mask_init_polygon_methods_index
         operator: eq
         value: 1
   - style: pushbutton
     text: Delete Polygon
     position:
       x: 105
-      y: 80
+      y: 75
       width: 85
       height: 20
-    method: delete_mask_polygon
+    method: delete_mask_init_polygon
     dependency:
     - action: visible
       checkfor: any
       check:
-      - variable: mask_polygon_methods_index
+      - variable: mask_init_polygon_methods_index
         operator: eq
         value: 2
   - style: pushbutton
     text: Save Polygon
     position:
       x: 105
-      y: 80
+      y: 75
       width: 85
       height: 20
-    method: save_mask_polygon
+    method: save_mask_init_polygon
     dependency:
     - action: visible
       checkfor: any
       check:
-      - variable: mask_polygon_methods_index
+      - variable: mask_init_polygon_methods_index
         operator: eq
         value: 3
+  - style: text
+    position:
+      x: 10
+      y: 55
+      width: 180
+      height: 20
+    text: "Active mask is initialized based on Zmax and Zmin"
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: nr_mask_init_polygons
+        operator: eq
+        value: 0          
   - style: text
     position:
       x: 10
@@ -97,7 +111,7 @@ element:
     - action: visible
       checkfor: any
       check:
-      - variable: nr_mask_polygons
+      - variable: nr_mask_init_polygons
         operator: ge
         value: 1   
   - style: edit
@@ -150,7 +164,8 @@ element:
     variable: mask_include_polygon_index
     select: index
     option_string:
-      variable: mask_include_polygon_names  
+      variable: mask_include_polygon_names
+    tooltip: "Areas within these polygons are explicitly included in the active mask"
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -171,7 +186,7 @@ element:
     - action: enable
       checkfor: all
       check:
-      - variable: nr_include_polygons
+      - variable: nr_mask_include_polygons
         operator: gt
         value: 0
   - style: pushbutton
@@ -194,25 +209,9 @@ element:
     - action: enable
       checkfor: all
       check:
-      - variable: nr_include_polygons
+      - variable: nr_mask_include_polygons
         operator: gt
         value: 0
-  # - style: edit
-  #   position:
-  #     x: 215
-  #     y: 90
-  #     width: 45
-  #     height: 20
-  #   text: Zmax
-  #   variable: include_zmax
-  # - style: edit
-  #   position:
-  #     x: 215
-  #     y: 65
-  #     width: 45
-  #     height: 20
-  #   text: Zmin
-  #   variable: include_zmin
 - style: panel
   title: Exclude Polygons
   position:
@@ -232,6 +231,7 @@ element:
     select: index
     option_string:
       variable: mask_exclude_polygon_names
+    tooltip: "Areas within these polygons are explicitly excluded in the active mask. \nNote: exclude polygons overrule the include polygons."
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -252,7 +252,7 @@ element:
     - action: enable
       checkfor: all
       check:
-      - variable: nr_exclude_polygons
+      - variable: nr_mask_exclude_polygons
         operator: gt
         value: 0
   - style: pushbutton
@@ -275,34 +275,18 @@ element:
     - action: enable
       checkfor: all
       check:
-      - variable: nr_exclude_polygons
+      - variable: nr_mask_exclude_polygons
         operator: gt
         value: 0
-  # - style: edit
-  #   position:
-  #     x: 215
-  #     y: 90
-  #     width: 45
-  #     height: 20
-  #   text: Zmax
-  #   variable: exclude_zmax
-  # - style: edit
-  #   position:
-  #     x: 215
-  #     y: 65
-  #     width: 45
-  #     height: 20
-  #   text: Zmin
-  #   variable: exclude_zmin
-- style: checkbox
-  position:
-    x: -10
-    y: 35
-    width: 80
-    height: 20
-  text: Reset Mask
-  method: tick_box
-  variable: mask_active_reset       
+# - style: checkbox
+#   position:
+#     x: -10
+#     y: 35
+#     width: 80
+#     height: 20
+#   text: Reset Mask
+#   method: tick_box
+#   variable: mask_active_reset       
 - style: pushbutton
   text: Update Mask
   position:

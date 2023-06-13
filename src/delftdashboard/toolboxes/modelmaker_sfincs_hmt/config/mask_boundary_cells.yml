@@ -14,10 +14,10 @@ element:
       width: 80
       height: 100
     method: select_wlev_polygon
-    variable: wlev_polygon_index
+    variable: wlev_include_polygon_index
     select: index
     option_string:
-      variable: wlev_polygon_names
+      variable: wlev_include_polygon_names
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -38,7 +38,7 @@ element:
     - action: enable
       checkfor: all
       check:
-      - variable: nr_wlev_polygons
+      - variable: nr_wlev_include_polygons
         operator: gt
         value: 0
   - style: pushbutton
@@ -61,7 +61,7 @@ element:
     - action: enable
       checkfor: all
       check:
-      - variable: nr_wlev_polygons
+      - variable: nr_wlev_include_polygons
         operator: gt
         value: 0
   - style: edit
@@ -104,10 +104,10 @@ element:
       width: 80
       height: 100
     method: select_outflow_polygon
-    variable: outflow_polygon_index
+    variable: outflow_include_polygon_index
     select: index
     option_string:
-      variable: outflow_polygon_names
+      variable: outflow_include_polygon_names
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -128,7 +128,7 @@ element:
     - action: enable
       checkfor: all
       check:
-      - variable: nr_outflow_polygons
+      - variable: nr_outflow_include_polygons
         operator: gt
         value: 0
   - style: pushbutton
@@ -151,7 +151,7 @@ element:
     - action: enable
       checkfor: all
       check:
-      - variable: nr_outflow_polygons
+      - variable: nr_outflow_include_polygons
         operator: gt
         value: 0
   - style: edit
@@ -182,16 +182,16 @@ element:
 - style: pushbutton
   text: Reset Bounds
   position:
-    x: 570
-    y: 100
+    x: -10
+    y: 35
     width: 80
     height: 20
   method: reset_mask_bounds 
 - style: pushbutton
   text: Update Bounds
   position:
-    x: 570
-    y: 70
+    x: -10
+    y: 10
     width: 80
     height: 20
   method: update_mask_bounds

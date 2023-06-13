@@ -65,30 +65,31 @@ element:
       y: 80
       width: 220
       height: 30
-    text: "Define constant values for Manning's roughness.\nNote that these
-      values are also used where no \nspatially varying Manning roughness is provided."
+    text: "Define constant values for Mannings' n roughness. Note that 
+          \nthese values are also used for areas where no spatially varying 
+          \nManning roughness is provided."
   - style: edit
     position:
-      x: 35
-      y: 35
+      x: -10
+      y: 60
       width: 45
       height: 20
-    text: Land
+    text: Manning land
     tooltip: Constant manning roughness values for land
     variable: manning_land
   - style: edit
     position:
-      x: 35
-      y: 10
+      x: -10
+      y: 35
       width: 45
       height: 20
-    text: Sea
+    text: Manning sea
     tooltip: Constant manning roughness values for sea
     variable: manning_sea
   - style: edit
     position:
-      x: 140
-      y: 35
+      x: -10
+      y: 10
       width: 45
       height: 20
     text: Land level
@@ -116,8 +117,8 @@ element:
       y: 90
       width: 220
       height: 20
-    text: "Choose a landuse/landcover dataset. Manning's n\n
-     values are computed based on the reclass table."      
+    text: "Choose a landuse/landcover dataset. Manning's n values 
+          \nare computed based on the reclass table."      
   - style: popupmenu
     position:
       x: 10
@@ -195,13 +196,12 @@ element:
     - variable: roughness_methods_index
       operator: eq
       value: 3
-       
 - style: listbox
   position:
     x: -95
     y: 35
     width: 180
-    height: 83
+    height: 85
   text: "Selected methods"
   text_position: "above"
   tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
