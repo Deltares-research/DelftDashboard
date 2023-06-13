@@ -12,10 +12,10 @@ from delftdashboard.app import app
 from cht.bathymetry.bathymetry_database import bathymetry_database
 from cht.misc.geometry import RegularGrid
 
-def map_ready(*args):
 
+def map_ready(*args):
     # This method is called when the map has been loaded
-    print('Map is ready !')
+    print("Map is ready !")
 
     # Find map widget
     element = app.gui.window.find_element_by_id("map")
@@ -25,7 +25,9 @@ def map_ready(*args):
     main_layer = app.map.add_layer("main")
 
     # Add background topography layer
-    app.background_topography_layer = main_layer.add_layer("background_topography", type="raster")
+    app.background_topography_layer = main_layer.add_layer(
+        "background_topography", type="raster"
+    )
 
     # Set update method for topography layer
     app.background_topography_layer.update = update_background
@@ -47,6 +49,7 @@ def map_ready(*args):
 
     app.gui.close_splash()
 
+
 def map_moved(coords, widget):
     # This method is called whenever the location of the map changes
     # Layers are already automatically updated in MapBox
@@ -54,7 +57,6 @@ def map_moved(coords, widget):
 
 
 def update_background():
-
     # Function that is called whenever the map has moved
 
     if not app.map.map_extent:
@@ -69,20 +71,27 @@ def update_background():
         if app.view["topography"]["quality"] == "high":
             npix = wdt
         elif app.view["topography"]["quality"] == "medium":
-            npix = int(wdt*0.5)
+            npix = int(wdt * 0.5)
         else:
-            npix = int(wdt*0.25)
+            npix = int(wdt * 0.25)
 
-        dxy = (xl[1] - xl[0])/npix
+        dxy = (xl[1] - xl[0]) / npix
         xv = np.arange(xl[0], xl[1], dxy)
         yv = np.arange(yl[0], yl[1], dxy)
         dataset = bathymetry_database.get_dataset(app.background_topography)
         dataset_list = [{"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}]
 
         try:
-            z = bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(4326), dataset_list,
-                                                           method=app.view["topography"]["interp_method"])
-            app.background_topography_layer.set_data(x=xv, y=yv, z=z, colormap=app.color_map_earth, decimals=0)
+            z = bathymetry_database.get_bathymetry_on_grid(
+                xv,
+                yv,
+                CRS(4326),
+                dataset_list,
+                method=app.view["topography"]["interp_method"],
+            )
+            app.background_topography_layer.set_data(
+                x=xv, y=yv, z=z, colormap=app.color_map_earth, decimals=0
+            )
         except:
             print("Error loading background topo ...")
             traceback.print_exc()
@@ -95,6 +104,7 @@ def update_background():
         #     app.background_topography_layer.set_data(x=x, y=y, z=z, colormap=app.color_map_earth, decimals=0)
         # except:
         #     print("Error loading background topo ...")
+
 
 def update():
     reset_cursor()
@@ -109,6 +119,7 @@ def update():
             toolbox.set_layer_mode("inactive")
         else:
             toolbox.set_layer_mode("invisible")
+
 
 def reset_cursor():
     app.map.set_mouse_default()
