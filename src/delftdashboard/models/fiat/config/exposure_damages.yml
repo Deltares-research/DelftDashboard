@@ -147,8 +147,8 @@ element:
     variable: damage_unit
     method: set_damage_unit
     option_string:
-    - "\u20AC/m2"
-    - "$/ft2"
+    - "\u20AC/m\u00B2"
+    - "$/ft\u00B2"
     option_value:
     - eurometer
     - dollarfoot
