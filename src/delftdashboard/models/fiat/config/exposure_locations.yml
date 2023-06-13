@@ -69,11 +69,9 @@ element:
     variable: asset_locations
     method: set_asset_locations
     option_string:
-    - National Structure Inventory (NSI)
-    - Upload data
+      variable: asset_locations_string
     option_value:
-    - nsi
-    - file
+      variable: asset_locations_value
   - style: pushbutton
     position:
       x: 10

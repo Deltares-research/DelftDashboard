@@ -87,7 +87,13 @@ class Model(GenericModel):
         app.gui.setvar(group, "output_options_text", ["NetCDF", "GeoPackage", "CSV"])
         app.gui.setvar(group, "output_options_values", ["NetCDF", "GeoPackage", "CSV"])
         app.gui.setvar(group, "show_area_geometry", False)
-        app.gui.setvar(group, "asset_locations", "Not yet set")
+        app.gui.setvar(
+            group,
+            "asset_locations_string",
+            ["National Structure Inventory (NSI)", "Upload data"],
+        )
+        app.gui.setvar(group, "asset_locations_value", ["NSI", "Upload data"])
+        app.gui.setvar(group, "asset_locations", None)
         app.gui.setvar(group, "show_asset_locations", False)
         app.gui.setvar(group, "show_extraction_method", False)
         app.gui.setvar(group, "extraction_method", "Centroid")
