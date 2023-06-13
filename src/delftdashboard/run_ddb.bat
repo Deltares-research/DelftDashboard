@@ -1,6 +1,6 @@
 @echo OFF
 set CONDAPATH=c:\work\miniconda3
-set DDBPATH=c:\work\checkouts\git\DelftDashboard\src\delftdashboard
+set DDBPATH=c:\Users\rodrigue\GitHub\DelftDashboard\src\delftdashboard
 set ENVNAME=delftdashboard
 
 rem The following command activates the base environment.

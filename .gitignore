@@ -2,6 +2,9 @@ __pycache__
 .idea
 /src/delftdashboard/server
 mapbox_token.mine.txt
-mapbox_token.txt
 .vscode
 mapbox_token.txt
+/src/delftdashboard.egg-info/SOURCES.txt
+/src/delftdashboard.egg-info/dependency_links.txt
+/src/delftdashboard.egg-info/requires.txt
+/src/delftdashboard.egg-info/top_level.txt

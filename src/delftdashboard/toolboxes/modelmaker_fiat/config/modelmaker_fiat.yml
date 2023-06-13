@@ -1,0 +1,12 @@
+element:
+- style: tabpanel
+  id: modelmaker_fiat
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Domain
+    module: toolboxes.modelmaker_fiat.domain
+    element: domain.yml

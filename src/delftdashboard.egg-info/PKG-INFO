@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: delftdashboard
+Version: 0.1.0
+Author-email: Maarten van Ormondt <maarten.vanormondt@deltares-usa.us>, Roel de Goede <roel.degoede@deltares.nl>, Kees Nederhoff <kees.nederhoff@deltares-usa.us>, Tim Leijnse <tim.leijnse@deltares.nl>, Panos Athanasiou <panos.athanasiou@deltares.nl>
+Requires-Python: >=3.10
+License-File: LICENSE

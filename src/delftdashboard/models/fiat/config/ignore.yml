@@ -1,0 +1,15 @@
+element:
+- style: popupmenu
+  position:
+    x: 700
+    y: 100
+    width: 160
+    height: 20
+  text: Source
+  variable: wind_type
+  option_string:
+  - National Structure Inventory (NSI)
+  - Open Street Maps (OSM)
+  option_value:
+  - National Structure Inventory (NSI)
+  - Open Street Maps (OSM)
