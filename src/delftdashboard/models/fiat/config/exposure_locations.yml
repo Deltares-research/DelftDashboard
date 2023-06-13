@@ -39,9 +39,9 @@ element:
     text: Upload geometry
     variable: area_geometry
     showfilename: True
-    filter: "Shapefile (*.shp)"
-    title: Select shapefile
-    tooltipstring: Select shapefile
+    filter: "Geometry (*.shp *.gpkg *.geojson)"
+    title: Select geometry
+    tooltipstring: Select geometry
   - style: checkbox
     position:
       x: 10
@@ -95,9 +95,9 @@ element:
     text: Upload asset location
     variable: asset_locations
     showfilename: True
-    filter: "Shapefile (*.shp)"
-    title: Select asset location shapefile
-    tooltipstring: Select asset location shapefile
+    filter: "Geometry (*.shp *.gpkg *.geojson)"
+    title: Select geometry
+    tooltipstring: Select geometry
     dependency:
     - action: visible
       checkfor: all
@@ -178,9 +178,9 @@ element:
       text: Upload
       variable: extraction_method
       showfilename: True
-      filter: "Shapefile (*.shp)"
-      title: Select shapefile
-      tooltipstring: Select shapefile
+      filter: "Geometry (*.shp *.gpkg *.geojson)"
+      title: Select geometry
+      tooltipstring: Select geometry
   - style: checkbox
     position:
       x: 10
