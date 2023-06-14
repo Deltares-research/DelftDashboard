@@ -31,9 +31,9 @@ element:
     text: Upload classification
     variable: area_classification
     showfilename: True
-    filter: "Shapefile (*.shp)"
-    title: Select shapefile
-    tooltipstring: Select shapefile
+    filter: "Geometry (*.shp *.gpkg *.geojson)"
+    title: Select geometry
+    tooltipstring: Select geometry
   - style: popupmenu
     position:
       x: 10
