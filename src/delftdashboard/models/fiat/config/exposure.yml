@@ -1,0 +1,23 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Asset Locations
+    module: models.fiat.exposure_locations
+    element: exposure_locations.yml
+  - string: Classification
+    module: models.fiat.exposure_classification
+    element: exposure_classification.yml
+  - string: Damage values
+    module: models.fiat.exposure_damages
+    element: exposure_damages.yml
+  - string: Elevation
+    module: models.fiat.exposure_elevation
+    element: exposure_elevation.yml
+  - string: Aggregation
+    module: models.fiat.exposure_aggregation
+    element: exposure_aggregation.yml

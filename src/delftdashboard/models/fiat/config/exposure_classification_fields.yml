@@ -1,0 +1,22 @@
+window:
+  title: Projection
+  width: 300
+  height: 100
+  variable_group: projection
+  modal: True
+  cancel: True
+element:
+- style: panel
+  position:
+    x: 10
+    y: 400
+    width: 580
+    height: 80
+  title: Description
+- style: panel
+  position:
+    x: 10
+    y: 210
+    width: 580
+    height: 170
+  title: Physical

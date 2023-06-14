@@ -1,0 +1,213 @@
+element:
+- style: panel
+  title: Info
+  position:
+    x: 10
+    y: 10
+    width: 150
+    height: 120
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 10
+      width: 130
+      height: 100
+    text: "Best\ndescription\never"
+- style: panel
+  title: Classification source
+  position:
+    x: 170
+    y: 10
+    width: 150
+    height: 120
+  element:
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 90
+      width: 130
+      height: 20
+    text: Upload classification
+    variable: area_classification
+    showfilename: True
+    filter: "Shapefile (*.shp)"
+    title: Select shapefile
+    tooltipstring: Select shapefile
+  - style: popupmenu
+    position:
+      x: 10
+      y: 60
+      width: 130
+      height: 20
+    text: ""
+    variable: object_type
+    method: set_object_type
+    option_string:
+    - Primary object type
+    - Secondary object type
+    option_value:
+    - pot
+    - sot
+  - style: popupmenu
+    position:
+      x: 10
+      y: 35
+      width: 130
+      height: 20
+    text: ""
+    variable: field_name
+    method: set_field_name
+    option_string:
+    - "*Field 1 from file*"
+    - "*Field 2 from file*"
+    - "*Field 3 from file*"
+    - "*Field 4 from file*"
+    option_value:
+    - field1
+    - field2
+    - field3
+    - field4
+  - style: pushbutton
+    position:
+      x: 10
+      y: 5
+      width: 130
+      height: 20
+    text: Add
+    variable: classification_field
+    method: set_classification_field
+- style: listbox
+  position:
+    x: 335
+    y: 30
+    width: 150
+    height: 85
+  text: "Primary Classification"
+  text_position: "above"
+  method: select_selected_bathymetry_dataset
+  variable: selected_bathymetry_dataset_index
+  select: index
+  option_string:
+    variable: selected_bathymetry_dataset_names
+- style: pushbutton
+  position:
+    x: 490
+    y: 95
+    width: 20
+    height: 20
+  text: "\u25B2"
+  method: move_up_selected_bathymetry_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: pushbutton
+  position:
+    x: 490
+    y: 75
+    width: 20
+    height: 20
+  text: "\u25BC"
+  method: move_down_selected_bathymetry_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: pushbutton
+  position:
+    x: 490
+    y: 45
+    width: 20
+    height: 20
+  text: "\u2716"
+  method: remove_selected_bathymetry_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: checkbox
+  position:
+    x: 335
+    y: 10
+    width: 150
+    height: 20
+  text: Display primary classification
+  variable: show_primary_classification
+  method: display_primary_classification
+- style: listbox
+  position:
+    x: 525
+    y: 30
+    width: 150
+    height: 85
+  text: "Secondary Classification"
+  text_position: "above"
+  method: select_selected_bathymetry_dataset
+  variable: selected_bathymetry_dataset_index
+  select: index
+  option_string:
+    variable: selected_bathymetry_dataset_names
+- style: pushbutton
+  position:
+    x: 680
+    y: 95
+    width: 20
+    height: 20
+  text: "\u25B2"
+  method: move_up_selected_bathymetry_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: pushbutton
+  position:
+    x: 680
+    y: 75
+    width: 20
+    height: 20
+  text: "\u25BC"
+  method: move_down_selected_bathymetry_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: pushbutton
+  position:
+    x: 680
+    y: 45
+    width: 20
+    height: 20
+  text: "\u2716"
+  method: remove_selected_bathymetry_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: checkbox
+  position:
+    x: 525
+    y: 10
+    width: 150
+    height: 20
+  text: Display secondary classification
+  variable: show_secondary_classification
+  method: display_secondary_classification
