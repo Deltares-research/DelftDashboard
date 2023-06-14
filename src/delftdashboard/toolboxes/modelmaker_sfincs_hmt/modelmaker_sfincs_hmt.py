@@ -66,8 +66,8 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "dx", 0.1)
             app.gui.setvar(group, "dy", 0.1)
         else:
-            app.gui.setvar(group, "dx", 200)
-            app.gui.setvar(group, "dy", 200)
+            app.gui.setvar(group, "dx", 500)
+            app.gui.setvar(group, "dy", 500)
         app.gui.setvar(group, "rotation", 0.0)
 
         # Bathymetry
@@ -133,7 +133,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "manning_polygon_values", [])
         app.gui.setvar(group, "manning_polygon_index", 0)
         app.gui.setvar(group, "nr_manning_polygons", 0)
-        app.gui.setvar(group, "selected_manning_dataset_names", [])
+        app.gui.setvar(group, "selected_manning_dataset_names", ["Constant values"])
         app.gui.setvar(group, "selected_manning_dataset_index", 0)
         app.gui.setvar(group, "nr_selected_manning_datasets", 0)
 
@@ -379,14 +379,6 @@ class Toolbox(GenericToolbox):
         manning_sea = app.gui.getvar("modelmaker_sfincs_hmt", "manning_sea")
         rgh_lev_land = app.gui.getvar("modelmaker_sfincs_hmt", "rgh_lev_land")
 
-        for dataset in datasets_rgh:
-            if "name" in dataset:
-                # pop dataset from datasets_rgh
-                constant_values = datasets_rgh.pop(datasets_rgh.index(dataset))
-                manning_land = constant_values["manning_land"]
-                manning_sea = constant_values["manning_sea"]
-                rgh_lev_land = constant_values["rgh_lev_land"]
-
         # NOTE setup methods parse the dataset-names to xarray datasets
         app.model["sfincs_hmt"].domain.setup_manning_roughness(
             datasets_rgh=datasets_rgh,
@@ -476,6 +468,8 @@ class Toolbox(GenericToolbox):
                 app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
 
     def generate_subgrid(self):
+        dlg = app.gui.window.dialog_wait("Generating subgrid ...")
+
         datasets_dep = app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets
         datasets_rgh = app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets
 
@@ -506,3 +500,10 @@ class Toolbox(GenericToolbox):
                 "modelmaker_sfincs_hmt", "extrapolate_values"
             ),
         )
+
+        dlg.close()
+
+        dlg = app.gui.window.dialog_wait("Writing SFINCS model ...")
+        app.model["sfincs_hmt"].save()
+        dlg.close()
+

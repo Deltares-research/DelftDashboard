@@ -188,8 +188,17 @@ class Model(GenericModel):
     def load(self):
         self.domain.read()
 
-    def set_crs(self, crs):
-        self.domain.set_crs(crs)
+            
+    def set_crs(self):
+        crs = app.crs
+        if self.domain.crs != crs:
+            self.domain.set_crs(crs)
+            # self.plot()
+
+    def set_working_directory(self):
+        root = os.getcwd()
+        if self.domain.root != root:
+            self.domain.set_root(root=root, mode="w+")
 
     def plot(self):
         pass

@@ -15,27 +15,15 @@ def select_roughness_method(*args):
 def add_selected_manning_dataset(*args):
     group = "modelmaker_sfincs_hmt"
     index = app.gui.getvar(group, "roughness_methods_index")
-    if index == 0:
-        manning_sea = app.gui.getvar(group, "manning_sea")
-        manning_land = app.gui.getvar(group, "manning_land")
-        rgh_lev_land = app.gui.getvar(group, "rgh_lev_land")
-        if "Constant values" not in app.gui.getvar(
-            group, "selected_manning_dataset_names"
-        ):
-            dataset = {
-                "name": "Constant values",
-                "manning_sea": manning_sea,
-                "manning_land": manning_land,
-                "rgh_lev_land": rgh_lev_land,
-            }
-            app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets.append(
-                dataset
-            )
-    elif index == 1:
-        reclass_table = app.gui.getvar(group, "lulc_reclass_table")
+
+    if index == 1:
         lulc = app.gui.getvar(group, "lulc_dataset_names")[
             app.gui.getvar(group, "lulc_dataset_index")
         ]
+        reclass_table = app.gui.getvar(group, "lulc_reclass_table")
+        # if reclass_table is the default value, set to None
+        if reclass_table == f"{lulc}_mapping.csv":
+            reclass_table = None
         if lulc not in app.gui.getvar(group, "selected_manning_dataset_names"):
             dataset = {"lulc": lulc, "reclass_table": reclass_table}
             app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets.append(
@@ -93,20 +81,24 @@ def select_reclass_table(*args):
         "Select mapping file to convert landuse/ladncover to Mannings' n",
         filter="*.csv",
     )
-    if fname:
-        app.gui.setvar("modelmaker_sfincs_hmt", "lulc_reclass_table", fname)
-        app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets[0].update(
-            {"reclass_table": fname}
-        )
+    if fname[0]:
+        app.gui.setvar("modelmaker_sfincs_hmt", "lulc_reclass_table", fname[0])
 
 
 def move_up_selected_manning_dataset(*args):
-    if len(app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets) < 2:
-        return
     group = "modelmaker_sfincs_hmt"
     index = app.gui.getvar(group, "selected_manning_dataset_index")
+
+    # if there is only one dataset, do nothing
+    if len(app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets) < 2:
+        return
+    # if the index is the first one, do nothing
     if index == 0:
         return
+    # if "Constant values", do nothing
+    if app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets[index] == "Constant values":
+        return
+
     i0 = index
     i1 = index - 1
     (
@@ -121,12 +113,18 @@ def move_up_selected_manning_dataset(*args):
 
 
 def move_down_selected_manning_dataset(*args):
-    if len(app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets) < 2:
-        return
     group = "modelmaker_sfincs_hmt"
     index = app.gui.getvar(group, "selected_manning_dataset_index")
+    # if there is only one dataset, do nothing
+    if len(app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets) < 2:
+        return
+    # if the index is the last one, do nothing
     if index == len(app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets) - 1:
         return
+    # if "Constant values" is below, do nothing
+    if app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets[index+1] == "Constant values":
+        return
+    
     i0 = index
     i1 = index + 1
     (
@@ -150,15 +148,16 @@ def update():
                 selected_names.append(dataset["lulc"])
             elif "manning" in dataset:
                 selected_names.append(dataset["manning"])
-            elif "name" in dataset:
-                selected_names.append(dataset["name"])
+        # also add "Constant values" to the list
+        selected_names.append("Constant values")
         app.gui.setvar(group, "selected_manning_dataset_names", selected_names)
         index = app.gui.getvar(group, "selected_manning_dataset_index")
         if index > nrd - 1:
             index = nrd - 1
         dataset = app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets[index]
+
     else:
-        app.gui.setvar(group, "selected_manning_dataset_names", [])
+        app.gui.setvar(group, "selected_manning_dataset_names", ["Constant values"])
         app.gui.setvar(group, "selected_manning_dataset_index", 0)
 
     app.gui.setvar(group, "nr_selected_manning_datasets", nrd)

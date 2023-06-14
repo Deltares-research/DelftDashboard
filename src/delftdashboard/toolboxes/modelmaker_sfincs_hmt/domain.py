@@ -48,33 +48,30 @@ def load_aio(*args):
         else:
             gdf = app.model["sfincs_hmt"].domain.data_catalog.get_geodataframe(fname[0])
 
-        gdf = gdf.to_crs(app.crs)
-
         # get the center of the polygon
-        x0 = gdf.geometry.centroid.x[0]
-        y0 = gdf.geometry.centroid.y[0]
+        lon = gdf.to_crs(4326).geometry.centroid.x[0]
+        lat = gdf.to_crs(4326).geometry.centroid.y[0]
 
         # Fly to the site
-        app.map.fly_to(x0, y0, 7)
+        app.map.fly_to(lon, lat, 7)
 
         # Add the polygon to the map
         layer = app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"]
         layer.set_data(gdf)
-        # layer.clear()
-        # layer.add_feature(gdf.to_crs(4326))
+
         app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
 
-        aio_created(gdf, 0, 0)
+        aio_created(gdf.to_crs(app.crs), 0, 0)
 
 
 def fly_to_site(*args):
     gdf = app.toolbox["modelmaker_sfincs_hmt"].grid_outline
     # get the center of the polygon
-    x0 = gdf.geometry.centroid.x[0]
-    y0 = gdf.geometry.centroid.y[0]
+    lon = gdf.to_crs(4326).geometry.centroid.x[0]
+    lat = gdf.to_crs(4326).geometry.centroid.y[0]
 
     # Fly to the site
-    app.map.fly_to(x0, y0, 7)
+    app.map.fly_to(lon, lat, 7)
 
 
 def grid_outline_created(gdf, index, id):
@@ -110,9 +107,14 @@ def aio_created(gdf, index, id):
     res = np.mean([dx, dy])
 
     # Create grid outline
-    x0, y0, mmax, nmax, rot = utils.rotated_grid(gdf.unary_union, res, dec_origin=6)
-    app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0, 3))
-    app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0, 3))
+    if app.crs.is_geographic:
+        precision = 6
+    else:
+        precision = 3
+
+    x0, y0, mmax, nmax, rot = utils.rotated_grid(gdf.unary_union, res, dec_origin=precision)
+    app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0, precision))
+    app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0, precision))
     app.gui.setvar("modelmaker_sfincs_hmt", "mmax", mmax)
     app.gui.setvar("modelmaker_sfincs_hmt", "nmax", nmax)
     app.gui.setvar("modelmaker_sfincs_hmt", "rotation", round(rot, 3))
@@ -129,9 +131,14 @@ def aio_modified(gdf, index, id):
     res = np.mean([dx, dy])
 
     # Create grid outline
-    x0, y0, mmax, nmax, rot = utils.rotated_grid(gdf.unary_union, res, dec_origin=6)
-    app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0, 3))
-    app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0, 3))
+    if app.crs.is_geographic:
+        precision = 6
+    else:
+        precision = 3
+
+    x0, y0, mmax, nmax, rot = utils.rotated_grid(gdf.unary_union, res, dec_origin=precision)
+    app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0, precision))
+    app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0, precision))
     app.gui.setvar("modelmaker_sfincs_hmt", "mmax", mmax)
     app.gui.setvar("modelmaker_sfincs_hmt", "nmax", nmax)
     app.gui.setvar("modelmaker_sfincs_hmt", "rotation", round(rot, 3))
@@ -146,8 +153,14 @@ def generate_grid(*args):
 def update_geometry():
     gdf = app.toolbox["modelmaker_sfincs_hmt"].grid_outline
     group = "modelmaker_sfincs_hmt"
-    app.gui.setvar(group, "x0", round(gdf["x0"][0], 3))
-    app.gui.setvar(group, "y0", round(gdf["y0"][0], 3))
+    
+    if app.crs.is_geographic:
+        precision = 6
+    else:
+        precision = 3
+    
+    app.gui.setvar(group, "x0", round(gdf["x0"][0], precision))
+    app.gui.setvar(group, "y0", round(gdf["y0"][0], precision))
     lenx = gdf["dx"][0]
     leny = gdf["dy"][0]
     app.toolbox["modelmaker_sfincs_hmt"].lenx = lenx

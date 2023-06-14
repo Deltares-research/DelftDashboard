@@ -28,6 +28,13 @@ element:
     text: Add method
     tooltip: "Add selected method to the list of selected Manning's n datasets"
     method: add_selected_manning_dataset
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: roughness_methods_index
+        operator: ge
+        value: 1
   - style: pushbutton
     position:
       x: 10
@@ -43,7 +50,10 @@ element:
       check:
       - variable: nr_selected_manning_datasets
         operator: gt
-        value: 0      
+        value: 0
+      - variable: roughness_methods_index
+        operator: ge
+        value: 1
 - style: panel
   title: Constant values
   position:
@@ -249,10 +259,3 @@ element:
     height: 20
   text: "Generate Manning"
   method: generate_manning
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_manning_datasets
-      operator: gt
-      value: 0
