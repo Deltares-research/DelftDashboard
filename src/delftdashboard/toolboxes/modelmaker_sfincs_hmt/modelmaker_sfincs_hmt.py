@@ -191,7 +191,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "write_man_tif", True)
         app.gui.setvar(group, "extrapolate_values", False)
 
-        subgrid_buffer_cells = app.gui.getvar(group, "nr_subgrid_pixels") * app.gui.getvar(group, "bathymetry_dataset_buffer_cells")
+        subgrid_buffer_cells = app.gui.getvar(
+            group, "nr_subgrid_pixels"
+        ) * app.gui.getvar(group, "bathymetry_dataset_buffer_cells")
         app.gui.setvar(group, "subgrid_buffer_cells", subgrid_buffer_cells)
 
     def set_layer_mode(self, mode):
@@ -355,9 +357,15 @@ class Toolbox(GenericToolbox):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
 
         datasets_dep = app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets
-        app.model["sfincs_hmt"].domain.setup_dep(datasets_dep=datasets_dep,
-                                                 buffer_cells=app.gui.getvar("modelmaker_sfincs_hmt", "bathymetry_dataset_buffer_cells"),
-                                                 interp_method=app.gui.getvar("modelmaker_sfincs_hmt", "bathymetry_dataset_interp_method"))
+        app.model["sfincs_hmt"].domain.setup_dep(
+            datasets_dep=datasets_dep,
+            buffer_cells=app.gui.getvar(
+                "modelmaker_sfincs_hmt", "bathymetry_dataset_buffer_cells"
+            ),
+            interp_method=app.gui.getvar(
+                "modelmaker_sfincs_hmt", "bathymetry_dataset_interp_method"
+            ),
+        )
 
         dlg.close()
 
@@ -375,22 +383,23 @@ class Toolbox(GenericToolbox):
             if "name" in dataset:
                 # pop dataset from datasets_rgh
                 constant_values = datasets_rgh.pop(datasets_rgh.index(dataset))
-                manning_land  = constant_values["manning_land"]
-                manning_sea   = constant_values["manning_sea"]
-                rgh_lev_land  = constant_values["rgh_lev_land"]
-
+                manning_land = constant_values["manning_land"]
+                manning_sea = constant_values["manning_sea"]
+                rgh_lev_land = constant_values["rgh_lev_land"]
 
         # NOTE setup methods parse the dataset-names to xarray datasets
-        app.model["sfincs_hmt"].domain.setup_manning_roughness(datasets_rgh=datasets_rgh,
-                                                                manning_land=manning_land,
-                                                                manning_sea=manning_sea, 
-                                                                rgh_lev_land=rgh_lev_land)
+        app.model["sfincs_hmt"].domain.setup_manning_roughness(
+            datasets_rgh=datasets_rgh,
+            manning_land=manning_land,
+            manning_sea=manning_sea,
+            rgh_lev_land=rgh_lev_land,
+        )
         dlg.close()
 
     def update_mask_active(self):
         app.model["sfincs_hmt"].domain.setup_mask_active(
-            mask=app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon 
-            if not app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon.empty 
+            mask=app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon
+            if not app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon.empty
             else None,
             include_mask=app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon,
             exclude_mask=app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon,
@@ -401,8 +410,8 @@ class Toolbox(GenericToolbox):
             reset_mask=app.gui.getvar("modelmaker_sfincs_hmt", "mask_active_reset"),
         )
 
-        mask = app.model["sfincs_hmt"].domain.mask   
-        
+        mask = app.model["sfincs_hmt"].domain.mask
+
         gdf = mask2gdf(mask, option="active")
         if gdf is not None:
             app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
@@ -421,15 +430,16 @@ class Toolbox(GenericToolbox):
         app.model["sfincs_hmt"].domain.setup_mask_bounds(
             btype="outflow",
             include_mask=app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon
-            if app.gui.getvar("modelmaker_sfincs_hmt", "nr_outflow_include_polygons") > 0
+            if app.gui.getvar("modelmaker_sfincs_hmt", "nr_outflow_include_polygons")
+            > 0
             else None,
             zmin=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_zmin"),
             zmax=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_zmax"),
             reset_bounds=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_reset"),
         )
 
-        mask = app.model["sfincs_hmt"].domain.mask    
-    
+        mask = app.model["sfincs_hmt"].domain.mask
+
         gdf_wlev = mask2gdf(mask, option="wlev")
         if gdf_wlev is not None:
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_data(gdf_wlev)
@@ -466,7 +476,6 @@ class Toolbox(GenericToolbox):
                 app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
 
     def generate_subgrid(self):
-
         datasets_dep = app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets
         datasets_rgh = app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets
 
@@ -481,13 +490,19 @@ class Toolbox(GenericToolbox):
             manning_land=manning_land,
             manning_sea=manning_sea,
             rgh_lev_land=rgh_lev_land,
-            buffer_cells=app.gui.getvar("modelmaker_sfincs_hmt", "subgrid_buffer_cells"),
-            nr_subgrid_pixels=app.gui.getvar("modelmaker_sfincs_hmt", "nr_subgrid_pixels"),
+            buffer_cells=app.gui.getvar(
+                "modelmaker_sfincs_hmt", "subgrid_buffer_cells"
+            ),
+            nr_subgrid_pixels=app.gui.getvar(
+                "modelmaker_sfincs_hmt", "nr_subgrid_pixels"
+            ),
             nbins=app.gui.getvar("modelmaker_sfincs_hmt", "nbins"),
             max_gradient=app.gui.getvar("modelmaker_sfincs_hmt", "max_gradient"),
             nrmax=app.gui.getvar("modelmaker_sfincs_hmt", "nrmax"),
             z_minimum=app.gui.getvar("modelmaker_sfincs_hmt", "z_minimum"),
             write_dep_tif=app.gui.getvar("modelmaker_sfincs_hmt", "write_dep_tif"),
             write_man_tif=app.gui.getvar("modelmaker_sfincs_hmt", "write_man_tif"),
-            extrapolate_values=app.gui.getvar("modelmaker_sfincs_hmt", "extrapolate_values"),
+            extrapolate_values=app.gui.getvar(
+                "modelmaker_sfincs_hmt", "extrapolate_values"
+            ),
         )
