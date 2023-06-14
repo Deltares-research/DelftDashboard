@@ -112,7 +112,9 @@ def aio_created(gdf, index, id):
     else:
         precision = 3
 
-    x0, y0, mmax, nmax, rot = utils.rotated_grid(gdf.unary_union, res, dec_origin=precision)
+    x0, y0, mmax, nmax, rot = utils.rotated_grid(
+        gdf.unary_union, res, dec_origin=precision
+    )
     app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0, precision))
     app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0, precision))
     app.gui.setvar("modelmaker_sfincs_hmt", "mmax", mmax)
@@ -136,7 +138,9 @@ def aio_modified(gdf, index, id):
     else:
         precision = 3
 
-    x0, y0, mmax, nmax, rot = utils.rotated_grid(gdf.unary_union, res, dec_origin=precision)
+    x0, y0, mmax, nmax, rot = utils.rotated_grid(
+        gdf.unary_union, res, dec_origin=precision
+    )
     app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0, precision))
     app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0, precision))
     app.gui.setvar("modelmaker_sfincs_hmt", "mmax", mmax)
@@ -153,12 +157,12 @@ def generate_grid(*args):
 def update_geometry():
     gdf = app.toolbox["modelmaker_sfincs_hmt"].grid_outline
     group = "modelmaker_sfincs_hmt"
-    
+
     if app.crs.is_geographic:
         precision = 6
     else:
         precision = 3
-    
+
     app.gui.setvar(group, "x0", round(gdf["x0"][0], precision))
     app.gui.setvar(group, "y0", round(gdf["y0"][0], precision))
     lenx = gdf["dx"][0]
@@ -222,15 +226,12 @@ def redraw_rectangle():
 def read_setup_yaml(*args):
     fname = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
     if fname[0]:
-        app.toolbox["modelmaker_hurrywave"].read_setup_yaml(fname[0])
+        app.toolbox["modelmaker_sfincs_hmt"].read_setup_yaml(fname[0])
 
 
 def write_setup_yaml(*args):
-    app.toolbox["modelmaker_hurrywave"].write_setup_yaml()
-    app.toolbox["modelmaker_hurrywave"].write_include_polygon()
-    app.toolbox["modelmaker_hurrywave"].write_exclude_polygon()
-    app.toolbox["modelmaker_hurrywave"].write_boundary_polygon()
+    app.toolbox["modelmaker_sfincs_hmt"].write_setup_yaml()
 
 
-def build_model(*args):
-    app.toolbox["modelmaker_hurrywave"].build_model()
+def build(*args):
+    app.toolbox["modelmaker_sfincs_hmt"].build()

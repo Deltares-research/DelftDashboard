@@ -47,7 +47,11 @@ def select_working_directory(option):
         os.chdir(path)
 
         for model in app.model:
-            app.model[model].set_working_directory()
+            try:
+                app.model[model].select_working_directory()
+            except:
+                print("No method select_working_directory for model: ", model)
+                pass
 
 def exit(option):
     app.gui.quit()

@@ -21,7 +21,7 @@ class Model(GenericModel):
     def initialize_domain(self):
         root = os.getcwd()
         self.domain = SfincsModel(
-            data_libs=app.config["data_libs"], 
+            data_libs=app.config["data_libs"],
             root=root,
             mode="w+",
         )
@@ -149,7 +149,9 @@ class Model(GenericModel):
 
     def open(self):
         # Open input file, and change working directory
-        fname = app.gui.window.dialog_open_file("Open SFINCS input file", filter="*.inp")
+        fname = app.gui.window.dialog_open_file(
+            "Open SFINCS input file", filter="*.inp"
+        )
         if fname:
             root = os.path.dirname(fname)
             self.domain.set_root(root=root, mode="r")
@@ -168,18 +170,20 @@ class Model(GenericModel):
             if self.domain._write and self.domain._read
             else ("w" if self.domain._write else "r")
         )
-        
+
         if mode == "r":
-            q = app.gui.window.dialog_yes_no("Do you want to overwrite the existing model?")
+            q = app.gui.window.dialog_yes_no(
+                "Do you want to overwrite the existing model?"
+            )
             if q.Yes:
                 self.domain.set_root(root=fname, mode="w+")
             else:
                 fname = app.gui.window.dialog_select_path(
                     "Select the directory where you want to store your model",
-                    path=os.getcwd()
+                    path=os.getcwd(),
                 )
                 self.domain.set_root(root=fname, mode="w+")
-                
+
         # Write sfincs model
         self.domain.write()
 
@@ -188,14 +192,13 @@ class Model(GenericModel):
     def load(self):
         self.domain.read()
 
-            
     def set_crs(self):
         crs = app.crs
         if self.domain.crs != crs:
             self.domain.set_crs(crs)
             # self.plot()
 
-    def set_working_directory(self):
+    def select_working_directory(self):
         root = os.getcwd()
         if self.domain.root != root:
             self.domain.set_root(root=root, mode="w+")

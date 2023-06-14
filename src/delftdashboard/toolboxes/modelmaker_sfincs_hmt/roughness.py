@@ -96,7 +96,10 @@ def move_up_selected_manning_dataset(*args):
     if index == 0:
         return
     # if "Constant values", do nothing
-    if app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets[index] == "Constant values":
+    if (
+        app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets[index]
+        == "Constant values"
+    ):
         return
 
     i0 = index
@@ -122,9 +125,12 @@ def move_down_selected_manning_dataset(*args):
     if index == len(app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets) - 1:
         return
     # if "Constant values" is below, do nothing
-    if app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets[index+1] == "Constant values":
+    if (
+        app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets[index + 1]
+        == "Constant values"
+    ):
         return
-    
+
     i0 = index
     i1 = index + 1
     (

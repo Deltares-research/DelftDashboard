@@ -171,3 +171,27 @@ element:
     text: Rotation
     variable: rotation
     method: edit_rotation
+- style: pushbutton
+  text: Read Set-up File
+  position:
+    x: -10
+    y: 60
+    width: 120
+    height: 20
+  method: read_setup_yaml
+- style: pushbutton
+  text: Write Set-up File
+  position:
+    x: -10
+    y: 35
+    width: 120
+    height: 20
+  method: write_setup_yaml
+- style: pushbutton
+  text: Build Model
+  position:
+    x: -10
+    y: 10
+    width: 120
+    height: 20
+  method: build
