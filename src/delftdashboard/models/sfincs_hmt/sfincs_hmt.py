@@ -10,7 +10,7 @@ class Model(GenericModel):
         super().__init__()
 
         self.name = name
-        self.long_name = "HydroMT SFINCS"
+        self.long_name = "SFINCS (HydroMT)"
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
