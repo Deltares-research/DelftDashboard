@@ -169,13 +169,14 @@ class Model(GenericModel):
     def load(self):
         self.domain.read()
 
-    def set_crs(self, crs):
-        self.domain.crs = crs
+    def set_crs(self):
+        self.domain.crs = app.crs
+        self.domain.clear_spatial_attributes()
+        self.plot()
 
     def plot(self):
         # Grid
-        gdf = self.domain.grid.to_gdf()
-        app.map.layer["hurrywave"].layer["grid"].set_data(gdf)
+        app.map.layer["hurrywave"].layer["grid"].set_data(self.domain.grid)
         # Mask
         app.map.layer["hurrywave"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
         app.map.layer["hurrywave"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))

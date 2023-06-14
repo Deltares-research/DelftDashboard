@@ -40,6 +40,8 @@ class GenericToolbox:
     def add_layers(self):
         pass
 
+    def set_crs(self):
+        pass
 
 def select_toolbox(toolbox_name):
     # Called from menu, or from model->select
