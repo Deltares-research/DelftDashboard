@@ -48,7 +48,7 @@ def load_aio(*args):
         else:
             gdf = app.model["sfincs_hmt"].domain.data_catalog.get_geodataframe(fname[0])
 
-        gdf = gdf.to_crs(4326)
+        gdf = gdf.to_crs(app.crs)
 
         # get the center of the polygon
         x0 = gdf.geometry.centroid.x[0]
@@ -59,8 +59,9 @@ def load_aio(*args):
 
         # Add the polygon to the map
         layer = app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"]
-        layer.clear()
-        layer.add_feature(gdf)
+        layer.set_data(gdf)
+        # layer.clear()
+        # layer.add_feature(gdf.to_crs(4326))
         app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
 
         aio_created(gdf, 0, 0)
@@ -200,9 +201,9 @@ def redraw_rectangle():
         app.toolbox["modelmaker_sfincs_hmt"].leny,
         app.gui.getvar(group, "rotation"),
     )
-    if app.toolbox["modelmaker_sfincs_hmt"].grid_outline.empty:
-        gdf = app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].get_gdf()
-        app.toolbox["modelmaker_sfincs_hmt"].grid_outline = gdf
+    # if app.toolbox["modelmaker_sfincs_hmt"].grid_outline.empty:
+    gdf = app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].get_gdf()
+    app.toolbox["modelmaker_sfincs_hmt"].grid_outline = gdf
 
 
 def read_setup_yaml(*args):

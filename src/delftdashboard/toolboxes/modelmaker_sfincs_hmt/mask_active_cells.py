@@ -200,7 +200,7 @@ def tick_box(*args):
 
 
 def update():
-    nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_polygon)
+    nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon)
     incnames = []
     for ip in range(nrp):
         incnames.append(str(ip + 1))

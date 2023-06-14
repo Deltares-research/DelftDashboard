@@ -62,8 +62,12 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "y0", 0.0)
         app.gui.setvar(group, "nmax", 10)
         app.gui.setvar(group, "mmax", 10)
-        app.gui.setvar(group, "dx", 0.1)
-        app.gui.setvar(group, "dy", 0.1)
+        if app.crs.is_geographic:
+            app.gui.setvar(group, "dx", 0.1)
+            app.gui.setvar(group, "dy", 0.1)
+        else:
+            app.gui.setvar(group, "dx", 200)
+            app.gui.setvar(group, "dy", 200)
         app.gui.setvar(group, "rotation", 0.0)
 
         # Bathymetry

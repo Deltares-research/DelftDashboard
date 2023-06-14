@@ -2,8 +2,6 @@ from delftdashboard.operations.model import GenericModel
 from delftdashboard.app import app
 import os
 
-# from cht.sfincs.sfincs import SFINCS
-
 from hydromt_sfincs import SfincsModel
 
 
@@ -23,7 +21,9 @@ class Model(GenericModel):
     def initialize_domain(self):
         root = os.getcwd()
         self.domain = SfincsModel(
-            data_libs=app.config["data_libs"], root=root, mode="w+"
+            data_libs=app.config["data_libs"], 
+            root=root,
+            mode="w+",
         )
 
     def add_layers(self):
@@ -149,13 +149,15 @@ class Model(GenericModel):
 
     def open(self):
         # Open input file, and change working directory
-        fname = app.gui.open_file_name("Open file", "SFINCS input file (sfincs.inp)")
+        fname = app.gui.window.dialog_open_file("Open SFINCS input file", filter="*.inp")
         if fname:
-            path = os.path.dirname(fname)
-            self.domain.set_root(root=path, mode="r")
+            root = os.path.dirname(fname)
+            self.domain.set_root(root=root, mode="r")
             self.domain.read()
+
             # Change working directory
-            os.chdir(path)
+            os.chdir(root)
+
             # Change CRS
             app.crs = self.domain.crs
 
@@ -166,13 +168,18 @@ class Model(GenericModel):
             if self.domain._write and self.domain._read
             else ("w" if self.domain._write else "r")
         )
+        
         if mode == "r":
-            fname = app.gui.select_path(
-                "Select model directory",
-                "Select the directory where you want to store your model",
-            )
-            self.domain.set_root(root=fname, mode="w+")
-
+            q = app.gui.window.dialog_yes_no("Do you want to overwrite the existing model?")
+            if q.Yes:
+                self.domain.set_root(root=fname, mode="w+")
+            else:
+                fname = app.gui.window.dialog_select_path(
+                    "Select the directory where you want to store your model",
+                    path=os.getcwd()
+                )
+                self.domain.set_root(root=fname, mode="w+")
+                
         # Write sfincs model
         self.domain.write()
 
