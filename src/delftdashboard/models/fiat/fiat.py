@@ -35,13 +35,13 @@ class Model(GenericModel):
         layer = app.map.add_layer("fiat")
 
         layer.add_layer(
-            "domain",
+            "area_of_interest",
         )
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Grid is made visible
-            app.map.layer["fiat"].layer["grid"].set_mode("inactive")
+            app.map.layer["fiat"].layer["area_of_interest"].set_mode("inactive")
         elif mode == "invisible":
             # Everything set to invisible
             app.map.layer["fiat"].set_mode("invisible")

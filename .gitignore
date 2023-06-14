@@ -8,3 +8,7 @@ mapbox_token.txt
 /src/delftdashboard.egg-info/dependency_links.txt
 /src/delftdashboard.egg-info/requires.txt
 /src/delftdashboard.egg-info/top_level.txt
+/src/delftdashboard/env/ddb_fiat
+/data
+/hydromt.log
+/src/delftdashboard/config/data_catalog_USA.yml
