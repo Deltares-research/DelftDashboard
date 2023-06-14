@@ -86,18 +86,15 @@ element:
       - variable: asset_locations
         operator: eq
         value: nsi
-  - style: pushselectfile
+  - style: pushbutton
     position:
       x: 10
       y: 65
       width: 100
       height: 20
     text: Upload asset location
-    variable: asset_locations
-    showfilename: True
-    filter: "Geometry (*.shp *.gpkg *.geojson)"
-    title: Select geometry
-    tooltipstring: Select geometry
+    variable: asset_locations_field
+    method: set_asset_locations_field
     dependency:
     - action: visible
       checkfor: all

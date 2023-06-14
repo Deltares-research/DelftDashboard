@@ -65,11 +65,18 @@ class Model(GenericModel):
         app.gui.setvar(group, "curve_join_type_string", ["Primary object type", "Secondary object type"])
         app.gui.setvar(group, "curve_join_type_value", ["primary", "secondary"])
         app.gui.setvar(group, "curve_join_type", None)
+        app.gui.setvar(group, "fiat_fields_string", ["Object ID", "Object Name", "Primary Object Type", "Secondary Object Type"])
+        app.gui.setvar(group, "fiat_fields_value", ["objectid", "objectname", "primaryobject", "secondaryobject"])
+        app.gui.setvar(group, "fiat_field_name_1", None)
+        app.gui.setvar(group, "fiat_field_name_2", None)
+        app.gui.setvar(group, "fiat_field_name_3", None)
+        app.gui.setvar(group, "fiat_field_name_4", None)
         app.gui.setvar(group, "show_asset_locations", False)
         app.gui.setvar(group, "show_extraction_method", False)
         app.gui.setvar(group, "extraction_method", "Centroid")
         app.gui.setvar(group, "show_secondary_classification", False)
         app.gui.setvar(group, "create_curves", False)
+        app.gui.setvar(group, "asset_location_file", "*asset location file path*")
 
     def set_input_variables(self):
         # Update all model input variables
@@ -125,7 +132,22 @@ class Model(GenericModel):
             / "config"
             / "exposure_classification_fields.yml"
         )
-
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, None)
+        if not okay:
+            return
+        
+    def set_asset_locations_field(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "exposure_asset_locations_fields.yml"
+        )
         # Create pop-up and only continue if user presses ok
         okay, data = app.gui.popup(pop_win_config_path, None)
         if not okay:
