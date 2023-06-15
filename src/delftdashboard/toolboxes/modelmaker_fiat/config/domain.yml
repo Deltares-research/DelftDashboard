@@ -30,7 +30,7 @@ element:
       y: 65
       width: 100
       height: 20
-    method: draw_aio
+    method: draw_polygon
     dependency:
     - action: visible
       checkfor: any

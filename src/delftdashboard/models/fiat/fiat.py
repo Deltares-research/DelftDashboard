@@ -23,25 +23,16 @@ class Model(GenericModel):
         print("Model " + self.name + " added!")
         self.active_domain = 0
 
-        self.initialize_domain()
-
         self.set_gui_variables()
-
-    def initialize_domain(self):
-        self.domain = HurryWave()
 
     def add_layers(self):
         # Add main DDB layer
         layer = app.map.add_layer("fiat")
 
-        layer.add_layer(
-            "area_of_interest",
-        )
-
     def set_layer_mode(self, mode):
         if mode == "inactive":
-            # Grid is made visible
-            app.map.layer["fiat"].layer["area_of_interest"].set_mode("inactive")
+            # Everything made visible
+            app.map.layer["fiat"].set_mode("inactive")
         elif mode == "invisible":
             # Everything set to invisible
             app.map.layer["fiat"].set_mode("invisible")
@@ -49,23 +40,38 @@ class Model(GenericModel):
     def set_gui_variables(self):
         group = "fiat"
         # Input variables
-        for var_name in vars(self.domain.input.variables):
-            app.gui.setvar(
-                group, var_name, getattr(self.domain.input.variables, var_name)
-            )
-        app.gui.setvar(group, "output_options_text", ["NetCDF", "GeoPackage", "CSV"])
-        app.gui.setvar(group, "output_options_values", ["NetCDF", "GeoPackage", "CSV"])
-        app.gui.setvar(group, "asset_locations_string", ["National Structure Inventory (NSI)", "Upload data"])
+        app.gui.setvar(
+            group,
+            "asset_locations_string",
+            ["National Structure Inventory (NSI)", "Upload data"],
+        )
         app.gui.setvar(group, "asset_locations_value", ["nsi", "file"])
         app.gui.setvar(group, "asset_locations", "nsi")
         app.gui.setvar(group, "damages_source_string", ["Hazus", "Create"])
         app.gui.setvar(group, "damages_source_value", ["hazus", "create"])
         app.gui.setvar(group, "damages_source", None)
-        app.gui.setvar(group, "curve_join_type_string", ["Primary object type", "Secondary object type"])
+        app.gui.setvar(
+            group,
+            "curve_join_type_string",
+            ["Primary object type", "Secondary object type"],
+        )
         app.gui.setvar(group, "curve_join_type_value", ["primary", "secondary"])
         app.gui.setvar(group, "curve_join_type", None)
-        app.gui.setvar(group, "fiat_fields_string", ["Object ID", "Object Name", "Primary Object Type", "Secondary Object Type"])
-        app.gui.setvar(group, "fiat_fields_value", ["objectid", "objectname", "primaryobject", "secondaryobject"])
+        app.gui.setvar(
+            group,
+            "fiat_fields_string",
+            [
+                "Object ID",
+                "Object Name",
+                "Primary Object Type",
+                "Secondary Object Type",
+            ],
+        )
+        app.gui.setvar(
+            group,
+            "fiat_fields_value",
+            ["objectid", "objectname", "primaryobject", "secondaryobject"],
+        )
         app.gui.setvar(group, "fiat_field_name_1", None)
         app.gui.setvar(group, "fiat_field_name_2", None)
         app.gui.setvar(group, "fiat_field_name_3", None)
@@ -142,7 +148,7 @@ class Model(GenericModel):
         # Grid
         gdf = self.domain.grid.to_gdf()
         app.map.layer["fiat"].layer["grid"].set_data(gdf)
-        
+
     def set_asset_locations_field(self):
         # get window config yaml path
         pop_win_config_path = str(

@@ -39,7 +39,8 @@ def initialize():
         app.config_path, "images", "DelftDashBoard.jpg"
     )
     app.config["bathymetry_database"] = None
-    app.config["data_libs"] = None
+    app.config["data_libs_sfincs"] = None
+    app.config["working_directory"] = os.getcwd()
 
     # Read ini file and override stuff in default config dict
     inifile = open(os.path.join(app.config_path, "delftdashboard.ini"), "r")
@@ -50,8 +51,8 @@ def initialize():
 
     assert (
         app.config["bathymetry_database"] is not None
-        or app.config["data_libs"] is not None
-    ), "Bathymetry database or data_libs not defined in delftdashboard.ini"
+        or app.config["data_libs_sfincs"] is not None
+    ), "Bathymetry database or data_libs_sfincs not defined in delftdashboard.ini"
 
     # Initialize GUI object
     app.gui = GUI(
@@ -72,13 +73,13 @@ def initialize():
     # Define some other variables
     app.crs = CRS(4326)
     app.auto_update_topography = True
-    app.background_topography  = "gebco22"
+    app.background_topography = "gebco22"
     if app.config["bathymetry_database"] is not None:
         app.bathymetry_database_path = app.config["bathymetry_database"]
         bathymetry_database.initialize(app.bathymetry_database_path)
     # NOTE initialize HydroMT data catalog
-    if app.config["data_libs"] is not None:
-        app.data_catalog = DataCatalog(data_libs=app.config["data_libs"])
+    if app.config["data_libs_sfincs"] is not None:
+        app.data_catalog = DataCatalog(data_libs=app.config["data_libs_sfincs"])
 
     # View
     app.view = {}

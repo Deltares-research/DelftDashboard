@@ -23,7 +23,7 @@ class Model(GenericModel):
     def initialize_domain(self):
         root = os.getcwd()
         self.domain = SfincsModel(
-            data_libs=app.config["data_libs"], root=root, mode="w+"
+            data_libs=app.config["data_libs_sfincs"], root=root, mode="w+"
         )
 
     def add_layers(self):

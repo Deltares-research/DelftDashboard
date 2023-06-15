@@ -12,3 +12,4 @@ mapbox_token.txt
 /data
 /hydromt.log
 /src/delftdashboard/config/data_catalog_USA.yml
+temp_database
