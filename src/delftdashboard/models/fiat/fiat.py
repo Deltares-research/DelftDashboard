@@ -40,7 +40,6 @@ class Model(GenericModel):
     def set_gui_variables(self):
         group = "fiat"
         # Input variables
-        app.gui.setvar(group, "show_area_geometry", False)
         app.gui.setvar(
             group,
             "asset_locations_string",
@@ -94,8 +93,15 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_secondary_classification", False)
         app.gui.setvar(group, "create_curves", False)
         app.gui.setvar(group, "asset_location_file", "*asset location file path*")
-        app.gui.setvar(group, "area_geometry", None)
         app.gui.setvar(group, "control_enable", 0)
+        app.gui.setvar(group, "area_classification", None)
+        app.gui.setvar(group, "object_type_string", ["Primary object type", "Secondary object type"])
+        app.gui.setvar(group, "object_type_value", ["pot", "sot"])
+        app.gui.setvar(group, "object_type", None)
+        app.gui.setvar(group, "classification_file_field_name_string", ["*Field 1 from file*", "*Field 2 from file*", "*Field 3 from file*", "*Field 4 from file*"])
+        app.gui.setvar(group, "classification_file_field_name_value", ["field1", "field2", "field3", "field4"])
+        app.gui.setvar(group, "classification_file_field_name", None)
+        app.gui.setvar(group, "classification_field", None)
 
     def set_input_variables(self):
         # Update all model input variables
@@ -139,22 +145,6 @@ class Model(GenericModel):
         # Grid
         gdf = self.domain.grid.to_gdf()
         app.map.layer["fiat"].layer["grid"].set_data(gdf)
-
-    def set_classification_field(self):
-        # get window config yaml path
-        pop_win_config_path = str(
-            Path(
-                app.gui.config_path
-            ).parent  # TODO: replace with a variables config_path for the fiat model
-            / "models"
-            / self.name
-            / "config"
-            / "exposure_classification_fields.yml"
-        )
-        # Create pop-up and only continue if user presses ok
-        okay, data = app.gui.popup(pop_win_config_path, None)
-        if not okay:
-            return
 
     def set_asset_locations_field(self):
         # get window config yaml path
