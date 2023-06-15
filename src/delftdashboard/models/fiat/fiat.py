@@ -55,7 +55,6 @@ class Model(GenericModel):
             )
         app.gui.setvar(group, "output_options_text", ["NetCDF", "GeoPackage", "CSV"])
         app.gui.setvar(group, "output_options_values", ["NetCDF", "GeoPackage", "CSV"])
-        app.gui.setvar(group, "show_area_geometry", False)
         app.gui.setvar(group, "asset_locations_string", ["National Structure Inventory (NSI)", "Upload data"])
         app.gui.setvar(group, "asset_locations_value", ["nsi", "file"])
         app.gui.setvar(group, "asset_locations", None)
@@ -88,7 +87,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_secondary_classification", False)
         app.gui.setvar(group, "create_curves", False)
         app.gui.setvar(group, "asset_location_file", "*asset location file path*")
-        app.gui.setvar(group, "area_geometry", None)
         app.gui.setvar(group, "control_enable", 0)
 
     def set_input_variables(self):

@@ -25,16 +25,8 @@ def set_asset_locations_field(*args):
     app.model["fiat"].set_asset_locations_field()
 
 
-def display_area_geometry(*args):
-    print("Display area")
-
-
 def create_nsi_assets(*args):
     print("Create NSI assets")
-
-
-def draw_area_interest(*args):
-    print("Draw area of interest")
 
 
 def display_asset_locations(*args):
