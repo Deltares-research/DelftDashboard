@@ -20,6 +20,7 @@ def set_variables(*args):
 
 def set_asset_locations(*args):
     print("Set asset locations")
-    
+
+
 def set_asset_locations_field(*args):
     app.model["fiat"].set_asset_locations_field()

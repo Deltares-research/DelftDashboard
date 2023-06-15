@@ -5,18 +5,11 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 
-import math
-import numpy as np
 import geopandas as gpd
-import shapely
-import json
 from pyproj import CRS
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
-
-from cht.misc.misc_tools import dict2yaml
-from cht.misc.misc_tools import yaml2dict
 
 
 class Toolbox(GenericToolbox):
@@ -60,12 +53,37 @@ class Toolbox(GenericToolbox):
         layer = app.map.add_layer("modelmaker_fiat")
 
         layer.add_layer(
-            "area_of_interest",
+            "area_of_interest_bbox",
             type="draw",
             shape="rectangle",
-            # create=grid_outline_created,
-            # modify=grid_outline_modified,
-            polygon_line_color="mediumblue",
+            polygon_line_color="mediumorange",
+            polygon_fill_opacity=0.3,
+            rotate=True,
+        )
+
+        layer.add_layer(
+            "area_of_interest_polygon",
+            type="draw",
+            shape="polygon",
+            polygon_line_color="mediumorange",
+            polygon_fill_opacity=0.3,
+            rotate=True,
+        )
+
+        layer.add_layer(
+            "area_of_interest_from_file",
+            type="draw",
+            shape="polygon",
+            polygon_line_color="mediumorange",
+            polygon_fill_opacity=0.3,
+            rotate=True,
+        )
+
+        layer.add_layer(
+            "area_of_interest_from_sfincs",
+            type="draw",
+            shape="rectangle",
+            polygon_line_color="mediumorange",
             polygon_fill_opacity=0.3,
             rotate=True,
         )
@@ -119,50 +137,10 @@ class Toolbox(GenericToolbox):
 
         app.toolbox["modelmaker_fiat"].write_boundary_polygon()
 
-    def read_include_polygon(self):
-        self.include_polygon = gpd.read_file(self.include_file_name)
-        self.update_polygons()
-
-    def read_exclude_polygon(self):
-        self.exclude_polygon = gpd.read_file(self.exclude_file_name)
-        self.update_polygons()
-
-    def read_boundary_polygon(self):
-        self.boundary_polygon = gpd.read_file(self.boundary_file_name)
-        self.update_polygons()
-
-    def write_include_polygon(self):
-        if len(self.include_polygon) == 0:
-            return
-        gdf = gpd.GeoDataFrame(geometry=self.include_polygon["geometry"])
-        gdf.to_file(self.include_file_name, driver="GeoJSON")
-
-    def write_exclude_polygon(self):
-        if len(self.exclude_polygon) == 0:
-            return
-        gdf = gpd.GeoDataFrame(geometry=self.exclude_polygon["geometry"])
-        gdf.to_file(self.exclude_file_name, driver="GeoJSON")
-
-    def write_boundary_polygon(self):
-        if len(self.boundary_polygon) == 0:
-            return
-        gdf = gpd.GeoDataFrame(geometry=self.boundary_polygon["geometry"])
-        gdf.to_file(self.boundary_file_name, driver="GeoJSON")
-
     def plot_include_polygon(self):
         layer = app.map.layer["modelmaker_fiat"].layer["mask_include"]
         layer.clear()
         layer.add_feature(self.include_polygon)
-
-    def plot_exclude_polygon(self):
-        layer = app.map.layer["modelmaker_fiat"].layer["mask_exclude"]
-        layer.clear()
-        layer.add_feature(self.exclude_polygon)
-
-    def plot_boundary_polygon(self):
-        layer = app.map.layer["modelmaker_fiat"].layer["mask_boundary"]
-        layer.clear()
-        layer.add_feature(self.boundary_polygon)
 
     def read_setup_yaml(self, file_name):
         pass

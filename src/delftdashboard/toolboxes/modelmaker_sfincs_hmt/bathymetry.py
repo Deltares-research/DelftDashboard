@@ -17,7 +17,7 @@ def select_bathymetry_source(*args):
     # if app.config["bathymetry_database"] is not None:
     # source_names, sources = bathymetry_database.sources()
     # dataset_names = bathymetry_database.dataset_names(source=source_names[source])[0]
-    if app.config["data_libs"] is not None:
+    if app.config["data_libs_sfincs"] is not None:
         source_names.append("HydroMT")
 
         dataset_names = []

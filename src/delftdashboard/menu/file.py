@@ -8,6 +8,7 @@ import os
 from delftdashboard.app import app
 from delftdashboard.operations.initialize import initialize_toolboxes, initialize_models
 
+
 def new(option):
     # Reset everything
     # Remove layers
@@ -32,19 +33,26 @@ def new(option):
         app.toolbox[toolbox].add_layers()
     for model in app.model:
         app.model[model].add_layers()
-    app.active_model   = app.model[list(app.model)[0]]
+    app.active_model = app.model[list(app.model)[0]]
     app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
+
 
 def open(option):
     app.active_model.open()
 
+
 def save(option):
     app.active_model.save()
 
+
 def select_working_directory(option):
-    path = app.gui.window.dialog_select_path("Select working directory", path=os.getcwd())
+    path = app.gui.window.dialog_select_path(
+        "Select working directory", path=os.getcwd()
+    )
     if path:
         os.chdir(path)
+        app.gui.config["working_directory"] = path
+
 
 def exit(option):
     app.gui.quit()
