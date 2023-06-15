@@ -18,5 +18,5 @@ def set_variables(*args):
     app.model["fiat"].set_input_variables()
 
 
-def set_classification_field(*args):
-    app.model["fiat"].set_classification_field()
+def add_classification_field(*args):
+    print("Add classification field")

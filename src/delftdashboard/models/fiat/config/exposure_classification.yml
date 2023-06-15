@@ -42,13 +42,10 @@ element:
       height: 20
     text: ""
     variable: object_type
-    method: set_object_type
     option_string:
-    - Primary object type
-    - Secondary object type
+      variable: object_type_string
     option_value:
-    - pot
-    - sot
+      variable: object_type_value
   - style: popupmenu
     position:
       x: 10
@@ -56,18 +53,11 @@ element:
       width: 130
       height: 20
     text: ""
-    variable: field_name
-    method: set_field_name
+    variable: classification_file_field_name
     option_string:
-    - "*Field 1 from file*"
-    - "*Field 2 from file*"
-    - "*Field 3 from file*"
-    - "*Field 4 from file*"
+      variable: classification_file_field_name_string
     option_value:
-    - field1
-    - field2
-    - field3
-    - field4
+      variable: classification_file_field_name_value
   - style: pushbutton
     position:
       x: 10
@@ -76,7 +66,7 @@ element:
       height: 20
     text: Add
     variable: classification_field
-    method: set_classification_field
+    method: add_classification_field
 - style: listbox
   position:
     x: 335
