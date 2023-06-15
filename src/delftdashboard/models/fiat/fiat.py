@@ -10,7 +10,7 @@ from pathlib import Path
 
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
-from cht.hurrywave.hurrywave import HurryWave
+from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 
 
 class Model(GenericModel):
@@ -76,8 +76,14 @@ class Model(GenericModel):
         app.gui.setvar(group, "fiat_field_name_2", None)
         app.gui.setvar(group, "fiat_field_name_3", None)
         app.gui.setvar(group, "fiat_field_name_4", None)
-        app.gui.setvar(group, "data_fields_string", ["data field 1", "data field 2", "data field 3"])
-        app.gui.setvar(group, "data_fields_value", ["data_field_1", "data_field_2", "data_field_3"])
+        app.gui.setvar(
+            group,
+            "data_fields_string",
+            ["data field 1", "data field 2", "data field 3"],
+        )
+        app.gui.setvar(
+            group, "data_fields_value", ["data_field_1", "data_field_2", "data_field_3"]
+        )
         app.gui.setvar(group, "data_field_name_1", None)
         app.gui.setvar(group, "data_field_name_2", None)
         app.gui.setvar(group, "data_field_name_3", None)
@@ -87,7 +93,9 @@ class Model(GenericModel):
         app.gui.setvar(group, "extraction_method_string", ["Area", "Centroid"])
         app.gui.setvar(group, "extraction_method_value", ["area", "centroid"])
         app.gui.setvar(group, "extraction_method", "centroid")
-        app.gui.setvar(group, "extraction_method_exception_string", ["Area", "Centroid"])
+        app.gui.setvar(
+            group, "extraction_method_exception_string", ["Area", "Centroid"]
+        )
         app.gui.setvar(group, "extraction_method_exception_value", ["area", "centroid"])
         app.gui.setvar(group, "extraction_method_exception", None)
         app.gui.setvar(group, "show_secondary_classification", False)
@@ -95,11 +103,28 @@ class Model(GenericModel):
         app.gui.setvar(group, "asset_location_file", "*asset location file path*")
         app.gui.setvar(group, "control_enable", 0)
         app.gui.setvar(group, "area_classification", None)
-        app.gui.setvar(group, "object_type_string", ["Primary object type", "Secondary object type"])
+        app.gui.setvar(
+            group,
+            "object_type_string",
+            ["Primary object type", "Secondary object type"],
+        )
         app.gui.setvar(group, "object_type_value", ["pot", "sot"])
         app.gui.setvar(group, "object_type", None)
-        app.gui.setvar(group, "classification_file_field_name_string", ["*Field 1 from file*", "*Field 2 from file*", "*Field 3 from file*", "*Field 4 from file*"])
-        app.gui.setvar(group, "classification_file_field_name_value", ["field1", "field2", "field3", "field4"])
+        app.gui.setvar(
+            group,
+            "classification_file_field_name_string",
+            [
+                "*Field 1 from file*",
+                "*Field 2 from file*",
+                "*Field 3 from file*",
+                "*Field 4 from file*",
+            ],
+        )
+        app.gui.setvar(
+            group,
+            "classification_file_field_name_value",
+            ["field1", "field2", "field3", "field4"],
+        )
         app.gui.setvar(group, "classification_file_field_name", None)
         app.gui.setvar(group, "classification_field", None)
 
@@ -161,3 +186,13 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, None)
         if not okay:
             return
+
+    def create_nsi_assets(self):
+        # Set the ini file to the correct variables for creating a FIAT model from NSI
+        # data
+        hydro_vm = HydroMtViewModel(
+            app.config["working_directory"], app.config["data_libs_fiat"][0]
+        )
+        hydro_vm.exposure_vm.set_asset_locations_source(
+            input_source="NSI",
+        )

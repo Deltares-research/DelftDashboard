@@ -1,6 +1,6 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
-from hydromt_fiat.api.view_model import HydroMtViewModel
+from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 import geopandas as gpd
 
 
