@@ -29,7 +29,7 @@ element:
       y: 90
       width: 100
       height: 20
-    method: draw_area
+    method: draw_area_interest
   - style: pushselectfile
     position:
       x: 10
@@ -67,7 +67,6 @@ element:
       height: 20
     text: ""
     variable: asset_locations
-    method: set_asset_locations
     option_string:
       variable: asset_locations_string
     option_value:
@@ -79,6 +78,7 @@ element:
       width: 100
       height: 20
     text: Create asset location
+    method: create_nsi_assets
     dependency:
     - action: visible
       checkfor: all
@@ -127,13 +127,10 @@ element:
       height: 20
     text: Default
     variable: extraction_method
-    method: set_variables
     option_string:
-    - Area
-    - Centroid
+      variable: extraction_method_string
     option_value:
-    - area
-    - centroid
+      variable: extraction_method_value
   - style: panel
     title: Exceptions
     position:
@@ -149,14 +146,11 @@ element:
         width: 70
         height: 18
       text: ""
-      variable: extraction_method
-      method: edit_variables
+      variable: extraction_method_exception
       option_string:
-      - Centroid
-      - Area
+        variable: extraction_method_exception_string
       option_value:
-      - exceptioncentroid
-      - exceptionarea
+        variable: extraction_method_exception_value
     - style: pushbutton
       position:
         x: 10
@@ -164,8 +158,8 @@ element:
         width: 50
         height: 18
       text: Draw
-      variable: extraction_method
-      method: edit_variables
+      variable: extraction_method_exception_draw
+      method: draw_extraction_method_exception
     - style: pushselectfile
       position:
         x: 70
@@ -173,7 +167,7 @@ element:
         width: 50
         height: 18
       text: Upload
-      variable: extraction_method
+      variable: extraction_method_exception_file
       showfilename: True
       filter: "Geometry (*.shp *.gpkg *.geojson)"
       title: Select geometry
