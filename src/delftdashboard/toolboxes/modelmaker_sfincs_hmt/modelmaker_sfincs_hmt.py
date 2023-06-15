@@ -525,7 +525,7 @@ class Toolbox(GenericToolbox):
     def write_setup_yaml(self):
         dlg = app.gui.window.dialog_wait("Writing setup.yaml ...")
 
-        self.setup_dict = process_dict(self.setup_dict)
+        _parse_setup_dict(self.setup_dict)
         configwrite(config_fn="sfincs_build.yaml", cfdict=self.setup_dict)
 
         dlg.close()
@@ -537,18 +537,25 @@ class Toolbox(GenericToolbox):
 
 
 ## Helper functions
-def process_dict(dictionary):
+def _parse_setup_dict(dictionary):
+    keys_to_remove = []
     for key, value in dictionary.items():
-        if isinstance(value, gpd.GeoDataFrame):
-            # Generate a unique filename based on the key
-            filename = key + ".geojson"
-            # Write the GeoDataFrame to a GeoJSON file
-            value.to_file(filename, driver="GeoJSON")
-            # Replace the entry with the filename
-            dictionary[key] = filename
+        if isinstance(value, dict):
+            _parse_setup_dict(value)
+        elif isinstance(value, gpd.GeoDataFrame):
+            # Drop the GeoDataFrame from the dict if empty
+            if value.empty:
+                keys_to_remove.append(key)
+            else:
+                # Generate a unique filename based on the key
+                filename = key + ".geojson"
+                # Write the GeoDataFrame to a GeoJSON file
+                value.to_file(filename, driver="GeoJSON")
+                # Replace the entry with the filename
+                dictionary[key] = filename
+        elif value is None:
+            keys_to_remove.append(key)
 
-        elif type(value) == np.float64:
-            dictionary[key] = float(value)
+    for key in keys_to_remove:
+        dictionary.pop(key)
 
-        elif type(value) == np.int32:
-            dictionary[key] = int(value)

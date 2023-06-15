@@ -21,11 +21,11 @@ def add_selected_manning_dataset(*args):
             app.gui.getvar(group, "lulc_dataset_index")
         ]
         reclass_table = app.gui.getvar(group, "lulc_reclass_table")
-        # if reclass_table is the default value, set to None
-        if reclass_table == f"{lulc}_mapping.csv":
-            reclass_table = None
         if lulc not in app.gui.getvar(group, "selected_manning_dataset_names"):
             dataset = {"lulc": lulc, "reclass_table": reclass_table}
+            # if reclass_table is the default value, set to None
+            if reclass_table == f"{lulc}_mapping.csv":
+                dataset.pop("reclass_table")
             app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets.append(
                 dataset
             )
