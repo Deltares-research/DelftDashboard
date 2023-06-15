@@ -29,58 +29,54 @@ element:
   - action: enable
     checkfor: all
     check:
-    - variable: a
+    - variable: control_enable
       operator: eq
       value: 999
 - style: panel
   position:
-    x: 40
+    x: 30
     y: 260
-    width: 110
+    width: 120
     height: 20
   element:
   - style: text
     position:
       x: 10
       y: 0
-      width: 90
+      width: 100
       height: 18
-    text: "Selected data field name"
+    text: <b>Selected data field name</b>
 - style: panel
   position:
     x: 150
     y: 260
-    width: 110
+    width: 120
     height: 20
   element:
   - style: text
     position:
       x: 10
       y: 0
-      width: 90
+      width: 100
       height: 18
-    text: "Delft-FIAT field name"
+    text: <b>Delft-FIAT field name</b>
 - style: popupmenu
   position:
-    x: 60
+    x: 30
     y: 235
-    width: 90
+    width: 120
     height: 18
   text: ""
   variable: data_field_name_1
   option_string:
-  - data field 1
-  - data field 2
-  - data field 3
+    variable: data_fields_string
   option_value:
-  - data_field_1
-  - data_field_2
-  - data_field_3
+    variable: data_fields_value
 - style: popupmenu
   position:
     x: 150
     y: 235
-    width: 90
+    width: 120
     height: 18
   text: ""
   variable: fiat_field_name_1
@@ -90,25 +86,21 @@ element:
     variable: fiat_fields_value
 - style: popupmenu
   position:
-    x: 60
+    x: 30
     y: 210
-    width: 90
+    width: 120
     height: 18
   text: ""
   variable: data_field_name_2
   option_string:
-  - data field 1
-  - data field 2
-  - data field 3
+    variable: data_fields_string
   option_value:
-  - data_field_1
-  - data_field_2
-  - data_field_3
+    variable: data_fields_value
 - style: popupmenu
   position:
     x: 150
     y: 210
-    width: 90
+    width: 120
     height: 18
   text: ""
   variable: fiat_field_name_2
@@ -118,25 +110,21 @@ element:
     variable: fiat_fields_value
 - style: popupmenu
   position:
-    x: 60
+    x: 30
     y: 185
-    width: 90
+    width: 120
     height: 18
   text: ""
   variable: data_field_name_3
   option_string:
-  - data field 1
-  - data field 2
-  - data field 3
+    variable: data_fields_string
   option_value:
-  - data_field_1
-  - data_field_2
-  - data_field_3
+    variable: data_fields_value
 - style: popupmenu
   position:
     x: 150
     y: 185
-    width: 90
+    width: 120
     height: 18
   text: ""
   variable: fiat_field_name_3
@@ -146,25 +134,21 @@ element:
     variable: fiat_fields_value
 - style: popupmenu
   position:
-    x: 60
+    x: 30
     y: 160
-    width: 90
+    width: 120
     height: 18
   text: ""
   variable: data_field_name_4
   option_string:
-  - data field 1
-  - data field 2
-  - data field 3
+    variable: data_fields_string
   option_value:
-  - data_field_1
-  - data_field_2
-  - data_field_3
+    variable: data_fields_value
 - style: popupmenu
   position:
     x: 150
     y: 160
-    width: 90
+    width: 120
     height: 18
   text: ""
   variable: fiat_field_name_4

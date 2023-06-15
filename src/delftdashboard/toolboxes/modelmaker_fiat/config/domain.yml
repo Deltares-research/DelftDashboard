@@ -118,3 +118,43 @@ element:
         - variable: area_of_interest
           operator: eq
           value: 1
+- style: panel
+  title: "CRS"
+  position:
+    x: 140
+    y: 10
+    width: 215
+    height: 120
+  element:
+  - style: edit
+    position:
+      x: 65
+      y: 90
+      width: 70
+      height: 20
+    text: Scenario name
+    tooltip: Select a name for this scenario
+    variable: selected_scenario
+  - style: pushbutton
+    text: Set name
+    position:
+      x: 145
+      y: 90
+      width: 60
+      height: 20
+  - style: edit
+    position:
+      x: 65
+      y: 65
+      width: 70
+      height: 20
+    text: Select CRS
+    tooltip: Select coordinate reference system
+    variable: selected_crs
+  - style: pushbutton
+    text: Set CRS
+    position:
+      x: 145
+      y: 65
+      width: 60
+      height: 20

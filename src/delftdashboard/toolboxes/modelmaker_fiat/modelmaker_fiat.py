@@ -34,6 +34,8 @@ class Toolbox(GenericToolbox):
             ["Draw Polygon", "Draw Bounding Box", "Use SFINCS Domain", "Load File"],
         )
         app.gui.setvar(group, "area_of_interest", 0)
+        app.gui.setvar(group, "selected_crs", "EPSG:4326")
+        app.gui.setvar(group, "selected_scenario", "MyScenario")
 
         # Area of Interest
         self.area_of_interest = gpd.GeoDataFrame()
