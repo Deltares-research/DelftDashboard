@@ -16,3 +16,5 @@ element:
     element: hazard.yml
   - string: SVI
     element: svi.yml
+  - string: Output
+    element: output.yml

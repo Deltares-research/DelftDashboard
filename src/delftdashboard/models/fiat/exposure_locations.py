@@ -26,6 +26,18 @@ def set_asset_locations_field(*args):
     app.model["fiat"].set_asset_locations_field()
 
 
-def create_nsi_assets(*args):
-    app.model["fiat"].create_nsi_assets()
-    # add variable to show in the gui that the assets are created
+def activate_create_nsi_assets(*args):
+    print("Create NSI assets")
+    app.gui.setvar("fiat", "create_nsi_assets", True)
+
+
+def display_asset_locations(*args):
+    print("Display assets")
+
+
+def display_extraction_method(*args):
+    print("Display extraction method")
+
+
+def draw_extraction_method_exception(*args):
+    print("Draw extraction method")

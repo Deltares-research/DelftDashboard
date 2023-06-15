@@ -13,7 +13,7 @@ element:
       y: 10
       width: 130
       height: 100
-    text: "Best\ndescription\never"
+    text: "After selecting your area of interest, \nin this tab you can specify the \nlocation of the assets to evaluate by \nimporting them from existing \ndatasets or uploading your own, \nas well as choosing their flood \nextraction method"
 - style: panel
   title: Asset locations
   position:
@@ -40,8 +40,9 @@ element:
       y: 65
       width: 100
       height: 20
-    text: Create asset locations
-    method: create_nsi_assets
+    text: Create asset location
+    method: activate_create_nsi_assets
+    variable: create_nsi_assets
     dependency:
     - action: visible
       checkfor: all
@@ -49,6 +50,27 @@ element:
       - variable: asset_locations
         operator: eq
         value: nsi
+  - style: panel
+    position:
+      x: 10
+      y: 35
+      width: 100
+      height: 20
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: create_nsi_assets
+        operator: eq
+        value: True
+    element:
+    - style: text
+      position:
+        x: 10
+        y: 0
+        width: 80
+        height: 18
+      text: <i>NSI assets created</i>
   - style: pushbutton
     position:
       x: 10
