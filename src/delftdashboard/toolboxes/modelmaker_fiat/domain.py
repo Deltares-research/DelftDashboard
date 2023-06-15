@@ -36,6 +36,9 @@ def draw_bbox(*args):
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_bbox"].crs = app.crs
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_bbox"].draw()
     app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
+    app.gui.setvar(
+        "modelmaker_fiat", "active_area_of_interest", "area_of_interest_bbox"
+    )
 
 
 def draw_polygon(*args):
@@ -45,6 +48,9 @@ def draw_polygon(*args):
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_polygon"].crs = app.crs
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_polygon"].draw()
     app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
+    app.gui.setvar(
+        "modelmaker_fiat", "active_area_of_interest", "area_of_interest_polygon"
+    )
 
 
 def load_aoi_file(*args):
@@ -67,10 +73,13 @@ def load_aoi_file(*args):
         layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
         layer.add_feature(gdf)
         app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
+        app.gui.setvar(
+            "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file"
+        )
 
 
 def load_sfincs_domain(*args):
-    # clear_aoi_layers()
+    clear_aoi_layers()
 
     group = "sfincs_hmt"
     lenx = app.gui.getvar(group, "dx") * app.gui.getvar(group, "mmax")
@@ -87,16 +96,20 @@ def load_sfincs_domain(*args):
         app.gui.getvar(group, "rotation"),
     )
     app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
+    app.gui.setvar(
+        "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_sfincs"
+    )
 
 
 def fly_to_site(*args):
-    gdf = app.toolbox["modelmaker_fiat"].area_of_interest
-    # get the center of the polygon
-    x0 = gdf.geometry.centroid.x[0]
-    y0 = gdf.geometry.centroid.y[0]
+    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+    gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
+
+    # get the aoi bounds
+    bounds = gdf.geometry.bounds
 
     # Fly to the site
-    app.map.fly_to(x0, y0, 7)
+    app.map.fit_bounds(bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0])
 
 
 def read_setup_yaml(*args):
@@ -117,12 +130,14 @@ def build_model(*args):
 
 
 def generate_aoi(*args):
-    gdf = app.map.layer["modelmaker_fiat"].layer["area_of_interest_bbox"].get_gdf()
+    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+    if active_layer:
+        gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
 
-    hydro_vm = HydroMtViewModel(
-        app.config["working_directory"], app.config["data_libs_fiat"][0]
-    )
-    gdf.to_file(HydroMtViewModel.database.drive / "aoi_bbox.geojson", driver="GeoJSON")
-    hydro_vm.exposure_vm.create_interest_area(
-        filepath=str(HydroMtViewModel.database.drive / "aoi_bbox.geojson")
-    )
+        hydro_vm = HydroMtViewModel(
+            app.config["working_directory"], app.config["data_libs_fiat"][0]
+        )
+        gdf.to_file(HydroMtViewModel.database.drive / "aoi.geojson", driver="GeoJSON")
+        hydro_vm.exposure_vm.create_interest_area(
+            filepath=str(HydroMtViewModel.database.drive / "aoi.geojson")
+        )

@@ -17,7 +17,7 @@ class Toolbox(GenericToolbox):
         super().__init__()
 
         self.name = name
-        self.long_name = "Model Maker"
+        self.long_name = "Domain"
 
         # Set GUI variable
         group = "modelmaker_fiat"
@@ -33,6 +33,7 @@ class Toolbox(GenericToolbox):
             "setup_aoi_method_value",
             ["Draw Polygon", "Draw Bounding Box", "Use SFINCS Domain", "Load File"],
         )
+        app.gui.setvar(group, "active_area_of_interest", "")
         app.gui.setvar(group, "area_of_interest", 0)
         app.gui.setvar(group, "selected_crs", "EPSG:4326")
         app.gui.setvar(group, "selected_scenario", "MyScenario")
@@ -58,7 +59,8 @@ class Toolbox(GenericToolbox):
             "area_of_interest_bbox",
             type="draw",
             shape="rectangle",
-            polygon_line_color="mediumorange",
+            polygon_line_color="orange",
+            polygon_fill_color="#fcc203",
             polygon_fill_opacity=0.3,
             rotate=True,
         )
@@ -67,7 +69,8 @@ class Toolbox(GenericToolbox):
             "area_of_interest_polygon",
             type="draw",
             shape="polygon",
-            polygon_line_color="mediumorange",
+            polygon_line_color="orange",
+            polygon_fill_color="#fcc203",
             polygon_fill_opacity=0.3,
             rotate=True,
         )
@@ -76,7 +79,8 @@ class Toolbox(GenericToolbox):
             "area_of_interest_from_file",
             type="draw",
             shape="polygon",
-            polygon_line_color="mediumorange",
+            polygon_line_color="orange",
+            polygon_fill_color="#fcc203",
             polygon_fill_opacity=0.3,
             rotate=True,
         )
@@ -85,7 +89,8 @@ class Toolbox(GenericToolbox):
             "area_of_interest_from_sfincs",
             type="draw",
             shape="rectangle",
-            polygon_line_color="mediumorange",
+            polygon_line_color="orange",
+            polygon_fill_color="#fcc203",
             polygon_fill_opacity=0.3,
             rotate=True,
         )
