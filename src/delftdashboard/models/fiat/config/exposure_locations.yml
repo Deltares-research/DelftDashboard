@@ -42,7 +42,7 @@ element:
       height: 20
     text: Create asset location
     method: activate_create_nsi_assets
-    variable: create_nsi_assets
+    variable: created_assets
     dependency:
     - action: visible
       checkfor: all
@@ -60,9 +60,9 @@ element:
     - action: visible
       checkfor: all
       check:
-      - variable: create_nsi_assets
-        operator: eq
-        value: True
+      - variable: created_assets
+        operator: nq
+        value: 0
     element:
     - style: text
       position:
@@ -70,7 +70,7 @@ element:
         y: 0
         width: 80
         height: 18
-      text: <i>NSI assets created</i>
+      variable: text_feedback_create_asset_locations
   - style: pushbutton
     position:
       x: 10

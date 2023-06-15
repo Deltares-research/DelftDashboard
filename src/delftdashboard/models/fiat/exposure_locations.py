@@ -27,8 +27,10 @@ def set_asset_locations_field(*args):
 
 
 def activate_create_nsi_assets(*args):
-    print("Create NSI assets")
-    app.gui.setvar("fiat", "create_nsi_assets", True)
+    app.gui.setvar("fiat", "created_assets", "nsi")
+    app.gui.setvar(
+        "fiat", "text_feedback_create_asset_locations", "Assets created from NSI"
+    )
 
 
 def display_asset_locations(*args):
