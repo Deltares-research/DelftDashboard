@@ -25,8 +25,9 @@ def set_asset_locations_field(*args):
     app.model["fiat"].set_asset_locations_field()
 
 
-def create_nsi_assets(*args):
+def activate_create_nsi_assets(*args):
     print("Create NSI assets")
+    app.gui.setvar("fiat", "create_nsi_assets", True)
 
 
 def display_asset_locations(*args):
