@@ -13,7 +13,7 @@ element:
       y: 10
       width: 130
       height: 100
-    text: "Best\ndescription\never"
+    text: "Here you can indicate the maximum \npotential damages of the different \nasset value characteristics, as well as \nassociate them to the object \ntype of your choice."
 - style: panel
   title: Damages source
   position:
