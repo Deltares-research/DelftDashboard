@@ -9,7 +9,8 @@ def select(*args):
     map.update()
     # Show the grid outline layer
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
-    app.map.layer["modelmaker_fiat"].layer[active_layer].set_mode("active")
+    if active_layer:
+        app.map.layer["modelmaker_fiat"].layer[active_layer].set_mode("active")
 
 
 def select_method(*args):

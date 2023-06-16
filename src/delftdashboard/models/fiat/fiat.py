@@ -65,7 +65,7 @@ class Model(GenericModel):
             ["Primary object type", "Secondary object type"],
         )
         app.gui.setvar(group, "curve_join_type_value", ["primary", "secondary"])
-        app.gui.setvar(group, "curve_join_type", None)
+        app.gui.setvar(group, "curve_join_type", "Secondary object type")
         app.gui.setvar(
             group,
             "fiat_fields_string",

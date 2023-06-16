@@ -58,13 +58,12 @@ def activate_create_nsi_assets(*args):
 
 
 def display_asset_locations(*args):
-    toggle = app.gui.getvar("fiat", "show_asset_locations")
-    if toggle:
-        app.gui.setvar("fiat", "show_asset_locations", False)
-        app.map.layer["fiat"].layer["exposure_points"].set_mode("inactive")
+    """Show/hide buildings layer"""
+    app.gui.setvar("fiat", "show_asset_locations", args[0])
+    if args[0]:
+        app.map.layer["fiat"].layer["exposure_points"].show()
     else:
-        app.gui.setvar("fiat", "show_asset_locations", True)
-        app.map.layer["fiat"].layer["exposure_points"].set_mode("active")
+        app.map.layer["fiat"].layer["exposure_points"].hide()
 
 
 def display_extraction_method(*args):
