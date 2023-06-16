@@ -30,3 +30,7 @@ def display_primary_classification(*args):
 
 def display_secondary_classification(*args):
     print("Display secondary classification fields")
+
+
+def create_model_setup(*args):
+    print("Create model setup")
