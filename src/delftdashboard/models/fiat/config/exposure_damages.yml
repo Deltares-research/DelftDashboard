@@ -185,7 +185,7 @@ element:
   variable: damage values
   select: index
   option_string:
-    variable: selected_damage_values
+    variable: created_vulnerability_curves
 - style: pushbutton
   position:
     x: 700

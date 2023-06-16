@@ -147,7 +147,11 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "selected_primary_classification_value",
-            ["residential", "commercial", "industrial",],
+            [
+                "residential",
+                "commercial",
+                "industrial",
+            ],
         )
         app.gui.setvar(group, "selected_primary_classification_value", 0)
         app.gui.setvar(
@@ -192,6 +196,7 @@ class Model(GenericModel):
             ["hazus", "jrc", "manual"],
         )
         app.gui.setvar(group, "vulnerability_source_input", "hazus")
+        app.gui.setvar(group, "created_vulnerability_curves", [""])
         app.gui.setvar(
             group,
             "curve_classification_string",
@@ -207,7 +212,7 @@ class Model(GenericModel):
             ["curve_class_1", "curve_class_2", "curve_class_3"],
         )
         app.gui.setvar(group, "curve_classification_value", 0)
-        
+
     def set_input_variables(self):
         # Update all model input variables
         for var_name in vars(self.domain.input.variables):
