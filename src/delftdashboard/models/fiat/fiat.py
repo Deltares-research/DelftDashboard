@@ -147,7 +147,11 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "selected_primary_classification_value",
-            ["residential", "commercial", "industrial",],
+            [
+                "residential",
+                "commercial",
+                "industrial",
+            ],
         )
         app.gui.setvar(group, "selected_primary_classification_value", 0)
         app.gui.setvar(
@@ -175,6 +179,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "created_nsi_assets", None)
         app.gui.setvar(group, "text_feedback_create_asset_locations", "")
         app.gui.setvar(group, "scenario_folder", "")
+        app.gui.setvar(group, "created_vulnerability_curves", [""])
 
     def set_input_variables(self):
         # Update all model input variables

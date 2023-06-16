@@ -35,15 +35,36 @@ def activate_create_nsi_assets(*args):
         app.config["working_directory"], app.config["data_libs_fiat"][0]
     )
     crs = app.gui.getvar("fiat", "selected_crs")
-    gdf = hydro_vm.exposure_vm.set_asset_locations_source(input_source="NSI", crs=crs)
+    (
+        gdf,
+        unique_primary_types,
+        unique_secondary_types,
+    ) = hydro_vm.exposure_vm.set_asset_locations_source(input_source="NSI", crs=crs)
+    gdf.set_crs(crs, inplace=True)
 
+    app.map.layer["fiat"].layer["exposure_points"].crs = crs
     app.map.layer["fiat"].layer["exposure_points"].set_data(
         gdf, hover_property="Object ID"
     )
 
+    app.gui.setvar(
+        "fiat", "selected_primary_classification_string", unique_primary_types
+    )
+    app.gui.setvar(
+        "fiat", "selected_secondary_classification_string", unique_secondary_types
+    )
+
+    app.gui.setvar("fiat", "show_asset_locations", True)
+
 
 def display_asset_locations(*args):
-    print("Display assets")
+    toggle = app.gui.getvar("fiat", "show_asset_locations")
+    if toggle:
+        app.gui.setvar("fiat", "show_asset_locations", False)
+        app.map.layer["fiat"].layer["exposure_points"].set_mode("inactive")
+    else:
+        app.gui.setvar("fiat", "show_asset_locations", True)
+        app.map.layer["fiat"].layer["exposure_points"].set_mode("active")
 
 
 def display_extraction_method(*args):
