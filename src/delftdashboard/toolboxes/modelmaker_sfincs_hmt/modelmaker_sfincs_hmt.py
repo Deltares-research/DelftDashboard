@@ -118,6 +118,8 @@ class Toolbox(GenericToolbox):
 
         manning_dataset_names = []
         lulc_dataset_names = []
+        cn_dataset_names = []
+        qinf_dataset_names = []
         if app.config["data_libs"] is not None:
             for key in app.data_catalog.keys:
                 if app.data_catalog[key].driver == "raster":
@@ -125,6 +127,10 @@ class Toolbox(GenericToolbox):
                         lulc_dataset_names.append(key)
                     elif app.data_catalog[key].meta["category"] == "roughness":
                         manning_dataset_names.append(key)
+                    elif app.data_catalog[key].meta["category"] == "soil":
+                        cn_dataset_names.append(key)
+                    elif app.data_catalog[key].meta["category"] == "infiltration":
+                        qinf_dataset_names.append(key)
 
         app.gui.setvar(group, "lulc_dataset_names", lulc_dataset_names)
         app.gui.setvar(group, "lulc_dataset_index", 0)
@@ -138,6 +144,16 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "selected_manning_dataset_names", ["Constant values"])
         app.gui.setvar(group, "selected_manning_dataset_index", 0)
         app.gui.setvar(group, "nr_selected_manning_datasets", 0)
+
+        infiltration_methods = ["Constant value", "CN dataset", "Qinf dataset"]
+        app.gui.setvar(group, "infiltration_methods", infiltration_methods)
+        app.gui.setvar(group, "infiltration_methods_index", 0)
+
+        app.gui.setvar(group, "cn_dataset_names", cn_dataset_names)
+        app.gui.setvar(group, "cn_dataset_index", 0)
+        app.gui.setvar(group, "cn_antecedent_moisture", "avg")
+        app.gui.setvar(group, "qinf_dataset_names", qinf_dataset_names)
+        app.gui.setvar(group, "qinf_dataset_index", 0)        
 
         # Mask active
         mask_polygon_methods = [
@@ -345,6 +361,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "nmax", model.config.get("nmax"))
         app.gui.setvar(group, "mmax", model.config.get("mmax"))
         app.gui.setvar(group, "rotation", model.config.get("rotation"))
+        app.gui.setvar(group, "epsg", model.config.get("epsg"))
 
         # NOTE this only works for regular grids (quadtee also not implemented)
         gdf = model.reggrid.to_vector_lines()
@@ -519,16 +536,47 @@ class Toolbox(GenericToolbox):
         app.model["sfincs_hmt"].save()
         dlg.close()
 
+    def generate_infiltration(self):
+        model = app.model["sfincs_hmt"].domain
+        index = app.gui.getvar("modelmaker_sfincs_hmt", "infiltration_methods_index")
+
+        dlg = app.gui.window.dialog_wait("Generating infiltration ...")
+
+        if index == 0: # constant infiltration
+            # drop other methods
+            model.config.pop("scsfile", None)
+            model.config.pop("qinffile", None)
+        elif index == 1:
+            # drop other methods
+            model.config.pop("qinffile", None)
+            model.config["qinf"] = 0.0
+
+            # generate CN infiltration
+            model.setup_cn_infiltration(
+                cn = app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_names")[app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_index")],
+                antecedent_moisture = app.gui.getvar("modelmaker_sfincs_hmt", "cn_antecedent_moisture"),
+            )
+        elif index == 2:
+            # drop other methods
+            model.config.pop("scsfile", None)
+            model.config["qinf"] = 0.0
+
+            # generate Qinf infiltration
+            model.setup_constant_infiltration(
+                qinf = app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_names")[app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_index")],
+            ) 
+        dlg.close()
+
     def read_setup_yaml(self):
-        pass
+        fname = app.gui.window.dialog_open_file(
+            "Select SFINCS setup yaml-file", filter="*.yml *.yaml"
+        )
+        if fname[0]:
+            self.setup_dict = configread(config_fn=fname[0])
 
     def write_setup_yaml(self):
-        dlg = app.gui.window.dialog_wait("Writing setup.yaml ...")
-
         _parse_setup_dict(self.setup_dict)
         configwrite(config_fn="sfincs_build.yaml", cfdict=self.setup_dict)
-
-        dlg.close()
 
     def build(self):
         model = app.model["sfincs_hmt"].domain

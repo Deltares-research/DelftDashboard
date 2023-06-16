@@ -6,15 +6,17 @@ element:
     y: 110
     width: 60
     height: 20
-  variable_group: sfincs
+  variable_group: sfincs_hmt
   variable: advection
   method: set_variables
   option_string:
   - "off"
-  - "on"
+  - "1D"
+  - "2D"
   option_value:
   - 0
   - 1
+  - 2
 - style: edit
   position:
     x: 100
@@ -29,5 +31,5 @@ element:
     checkfor: all
     check:
     - variable: advection
-      operator: eq
+      operator: ge
       value: 1

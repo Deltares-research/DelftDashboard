@@ -48,7 +48,10 @@ def update_crs():
     app.map.crs = app.crs
     # Also change the model crs
     for model in app.model:
-        app.model[model].set_crs()
+        try:
+            app.model[model].set_crs()
+        except:
+            print("No method set_crs for model: ", model)
     # Also change the toolbox crs
     for toolbox in app.toolbox:
         app.toolbox[toolbox].set_crs()

@@ -1,0 +1,8 @@
+element:
+- style: panel
+  title: Cross Sections
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 120

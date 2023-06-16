@@ -1,0 +1,148 @@
+element:
+- style: panel
+  title: Select method
+  position:
+    x: 10
+    y: 10
+    width: 120
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 100
+      height: 20
+    select: index
+    tooltip: "Select a method to define the infiltration in your model domain"
+    method: select_infiltration_method
+    variable: infiltration_methods_index
+    option_string:
+      variable: infiltration_methods
+- style: panel
+  title: Constant values
+  position:
+    x: 140
+    y: 10
+    width: 240
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: infiltration_methods_index
+      operator: eq
+      value: 0
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 80
+      width: 220
+      height: 30
+    text: "Define constant and uniform infiltraiton rate. Note that
+    \ninfiltration is only applied when rainfall is used"
+  - style: edit
+    position:
+      x: -10
+      y: 60
+      width: 45
+      height: 20
+    text: Infiltration rate (mm/hr)
+    tooltip: Constant infiltration rate in mm/hr
+    variable_group: sfincs_hmt
+    variable: qinf
+- style: panel
+  title: Curve numbers dataset
+  position:
+    x: 140
+    y: 10
+    width: 240
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: infiltration_methods_index
+      operator: eq
+      value: 1
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 90
+      width: 220
+      height: 20
+    text: "Choose a curve number dataset."      
+  - style: popupmenu
+    position:
+      x: 10
+      y: 70
+      width: 220
+      height: 20
+    select: index
+    tooltip: "Select a curve_number dataset"
+    variable: cn_dataset_index
+    option_string:
+      variable: cn_dataset_names
+  - style: text
+    position:
+      x: 10
+      y: 35
+      width: 220
+      height: 20
+    text: "Define antececent moisture condition."            
+  - style: popupmenu
+    position:
+      x: 10
+      y: 15
+      width: 220
+      height: 20
+    select: item
+    tooltip: "Define antecedent moisture"
+    variable: cn_antecedent_moisture
+    option_string: ["Dry", "Average", "Wet"]
+    option_value: ["dry", "avg", "wet"]
+- style: panel
+  title: Infiltration dataset
+  position:
+    x: 140
+    y: 10
+    width: 240
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: infiltration_methods_index
+      operator: eq
+      value: 2  
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 90
+      width: 220
+      height: 20
+    text: "Choose a spatially varying infiltration dataset."  
+  - style: popupmenu
+    position:
+      x: 10
+      y: 70
+      width: 220
+      height: 20
+    select: index
+    tooltip: "Select a spatially varying infiltration dataset (mm/hr)"
+    variable: qinf_dataset_index
+    option_string:
+      variable: qinf_dataset_names
+- style: pushbutton
+  position:
+    x: -10
+    y: 10
+    width: 120
+    height: 20
+  text: "Add infiltration"
+  tooltip: "Add infiltration to the model domain
+  \nNote that this will overwrite any infiltration already defined in the model domain"
+  method: generate_infiltration

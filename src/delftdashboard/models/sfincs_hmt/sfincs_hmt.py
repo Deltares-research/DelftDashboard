@@ -65,7 +65,7 @@ class Model(GenericModel):
         )
 
         # Move this to hurrywave.py
-        from .boundary_conditions import select_boundary_point_from_map
+        from .boundary_conditions_wlev import select_boundary_point_from_map
 
         layer.add_layer(
             "boundary_points",
@@ -94,6 +94,20 @@ class Model(GenericModel):
             fill_color_selected="red",
         )
 
+
+        layer.add_layer(
+            "cross_sections",
+            type="line_selector",
+            line_color="white",
+            line_opacity=1.0,
+            fill_color="blue",
+            fill_opacity=1.0,
+            circle_radius=3,
+            circle_radius_selected=4,
+            line_color_selected="white",
+            fill_color_selected="red",
+        )
+
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Mask is made invisible
@@ -108,6 +122,7 @@ class Model(GenericModel):
             app.map.layer["sfincs_hmt"].layer["boundary_points"].set_mode("inactive")
             # Observation points are made grey
             app.map.layer["sfincs_hmt"].layer["observation_points"].set_mode("inactive")
+            app.map.layer["sfincs_hmt"].layer["cross_sections"].set_mode("inactive")
         if mode == "invisible":
             app.map.layer["sfincs_hmt"].set_mode("invisible")
 
@@ -116,7 +131,10 @@ class Model(GenericModel):
         group = "sfincs_hmt"
 
         for var_name in self.domain.config:
-            app.gui.setvar(group, var_name, self.domain.config.get(var_name))
+            try:
+                app.gui.setvar(group, var_name, self.domain.config.get(var_name))
+            except:
+                print("No GUI variable " + var_name)
 
         app.gui.setvar(group, "roughness_type", "landsea")
 
@@ -129,6 +147,21 @@ class Model(GenericModel):
 
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
 
+        # Boundary conditions
+        bc_wlev_methods = ["Click points", "Generate along boundary", "Load from file"]
+        app.gui.setvar(group, "bc_wlev_methods", bc_wlev_methods)
+        app.gui.setvar(group, "bc_wlev_methods_index", 0)
+        app.gui.setvar(group, "bc_dist_along_msk", 5e3)
+        app.gui.setvar(group, "merge_bc_wlev", True)
+        app.gui.setvar(group, "boundary_point_names", [])
+        app.gui.setvar(group, "nr_boundary_points", 0)
+        app.gui.setvar(group, "active_boundary_point", 0)
+
+        # Observation points 
+        app.gui.setvar(group, "observation_point_names", [])
+        app.gui.setvar(group, "nr_observation_points", 0)
+        app.gui.setvar(group, "active_observation_point", 0)
+
         app.gui.setvar(group, "depthcontour_value", 0.0)
         app.gui.setvar(group, "flowboundarypoints_length", 0)
         app.gui.setvar(group, "boundaryspline_length", 0)
@@ -138,14 +171,20 @@ class Model(GenericModel):
         app.gui.setvar(group, "wind", True)
         app.gui.setvar(group, "rain", True)
 
-    def set_input_variables(self, varid=None, value=None):
+    def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input
         group = "sfincs_hmt"
 
         for var_name in self.domain.config:
-            self.domain.set_config(
-                var_name, app.gui.variables[group][var_name]["value"]
-            )
+            if var_name == "epsg":
+                self.domain.set_config(var_name, app.crs.to_epsg())
+            else:
+                try:
+                    self.domain.set_config(
+                        var_name, app.gui.variables[group][var_name]["value"]
+                    )
+                except:
+                    print("No GUI variable " + var_name + " in sfincs input file")
 
     def open(self):
         # Open input file, and change working directory
@@ -186,6 +225,8 @@ class Model(GenericModel):
 
         # Write sfincs model
         self.domain.write()
+        # write setup yml file
+        app.toolbox["modelmaker_sfincs_hmt"].write_setup_yaml()
 
         # self.domain.write_batch_file()
 

@@ -51,6 +51,13 @@ element:
     method: set_variables
     tooltipstring: Edit background pressure for inverse barometer correction at the boundaries
     textposition: right
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: baro
+        operator: eq
+        value: 1
   - style: edit
     position:
       x: 110
@@ -62,21 +69,10 @@ element:
     method: set_variables
     tooltipstring: Edit background air pressure
     textposition: right
-- style: panel
-  title: Rain
-  position:
-    x: 530
-    y: 10
-    width: 180
-    height: 120
-  element:
-  - style: edit
-    position:
-      x: 120
-      y: 90
-      width: 50
-      height: 20
-    text: Infiltration Rate (mm/h)
-    variable: qinf
-    tooltipstring: Edit infiltration rate
-    textposition: right
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: baro
+        operator: eq
+        value: 1    

@@ -9,9 +9,6 @@ element:
   - string: Constants
     module: models.sfincs.physics_constants
     element: physics_constants.yml
-  - string: Roughness
-    module: models.sfincs.physics_roughness
-    element: physics_roughness.yml
   - string: Advection
     module: models.sfincs.physics_advection
     element: physics_advection.yml

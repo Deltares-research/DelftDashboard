@@ -1,5 +1,6 @@
 element:
 - style: panel
+  title: "Specify the time frame for the simulation"
   position:
     x: 10
     y: 10
@@ -13,6 +14,7 @@ element:
       width: 110
       height: 20
     text: Reference Time
+    variable_group: sfincs_hmt
     variable: tref
     method: set_variables
   - style: datetimeedit
@@ -22,7 +24,7 @@ element:
       width: 110
       height: 20
     text: Start Time
-    variable_group: sfincs
+    variable_group: sfincs_hmt
     variable: tstart
     method: set_variables
   - style: datetimeedit
@@ -32,7 +34,7 @@ element:
       width: 110
       height: 20
     text: Stop Time
-    variable_group: sfincs
+    variable_group: sfincs_hmt
     variable: tstop
     method: set_variables
   - style: edit
@@ -42,6 +44,6 @@ element:
       width: 110
       height: 20
     text: Spin-up Time (s)
-    variable_group: sfincs
+    variable_group: sfincs_hmt
     variable: tspinup
     method: set_variables

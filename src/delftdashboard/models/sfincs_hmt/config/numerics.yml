@@ -1,5 +1,6 @@
 element:
 - style: panel
+  title: "Set numerical parameters"
   position:
     x: 10
     y: 10

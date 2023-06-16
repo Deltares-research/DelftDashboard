@@ -2,7 +2,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 from hydromt_sfincs import utils
-
+import geopandas as gpd
 
 def select(*args):
     # De-activate existing layers
@@ -32,7 +32,8 @@ def delete_mask_init_polygon(*args):
         return
 
     gdf = app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon
-    gdf = gdf.drop(gdf.index, inplace=True)
+    # gdf = gdf.drop(gdf.index, inplace=True)
+    gdf = gpd.GeoDataFrame()
 
     app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon = gdf
     layer = app.map.layer["modelmaker_sfincs_hmt"].layer["mask_init"]

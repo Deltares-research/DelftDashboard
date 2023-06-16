@@ -1,0 +1,157 @@
+element:
+- style: panel
+  title: Select method
+  position:
+    x: 10
+    y: 10
+    width: 120
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 100
+      height: 20
+    select: index
+    tooltip: Select how you want to generate the water level boundary points
+    variable: bc_wlev_methods_index
+    option_string: 
+      variable: bc_wlev_methods
+- style: panel
+  title: Manually add points
+  position:
+    x: 140
+    y: 10
+    width: 140
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: bc_wlev_methods_index
+      operator: eq
+      value: 0
+  element:    
+  - style: pushbutton
+    text: Add Point
+    position:
+      x: 10
+      y: 90
+      width: 120
+      height: 20
+    method: add_boundary_point_on_map
+    tooltip: Add boundary point on map
+  - style: pushbutton
+    text: Delete Point
+    position:
+      x: 10
+      y: 65
+      width: 120
+      height: 20
+    method: delete_point_from_list
+    tooltip: Delete boundary point from list
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_boundary_points
+        operator: gt
+        value: 0
+- style: panel
+  title: Generate along boundary
+  position:
+    x: 140
+    y: 10
+    width: 140
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: bc_wlev_methods_index
+      operator: eq
+      value: 1
+  element:
+  - style: edit
+    position:
+      x: -10
+      y: 90
+      width: 45
+      height: 20
+    text: Distance (m)
+    tooltip: Distance between boundary points
+    variable: bc_dist_along_msk
+  - style: checkbox
+    position:
+      x: 10
+      y: 65
+      width: 40
+      height: 20
+    text: Add to existing points
+    text_position: left
+    tooltip: If checked, points are added to existing points, else, existing points are deleted.
+    variable: merge_bc_wlev
+  - style: pushbutton
+    text: Generate
+    position:
+      x: 10
+      y: 40
+      width: 120
+      height: 20
+    method: generate_boundary_points_from_msk
+    tooltip: Generate boundary points
+- style: panel
+  title: Load from file
+  position:
+    x: 140
+    y: 10
+    width: 100
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: bc_wlev_methods_index
+      operator: eq
+      value: 2
+  element:
+  - style: pushbutton
+    text: Load from file
+    position:
+      x: -10
+      y: 90
+      width: 80
+      height: 20
+    method: load_boundary_points_from_file
+    tooltip: Load boundary points from file
+- style: panel
+  title: Add timeseries
+  position:
+    x: 290
+    y: 10
+    width: 200
+    height: 120
+  element:
+  - style: edit
+    text: Constant water level
+    position:
+      x: -10
+      y: 90
+      width: 45
+      height: 20
+    tooltip: Add constant water level
+- style: listbox
+  position:
+    x: -10
+    y: 10
+    width: 120
+    height: 110
+  method: select_boundary_point_from_list
+  variable: active_boundary_point
+  select: index
+  option_string:
+    variable: boundary_point_names
+  tooltip: Select boundary point
+  text: Boundary Points
+  text_postion: above
