@@ -42,6 +42,7 @@ element:
       width: 100
       height: 20
     text: Import NSI values
+    method: set_feedback_damage_values
     dependency:
     - action: visible
       checkfor: all
@@ -56,6 +57,7 @@ element:
       width: 100
       height: 20
     text: Import Hazus values
+    method: set_feedback_damage_values
     dependency:
     - action: visible
       checkfor: all
@@ -70,6 +72,7 @@ element:
       width: 100
       height: 20
     text: Create damage values
+    method: set_feedback_damage_values
     dependency:
     - action: visible
       checkfor: all
@@ -77,6 +80,27 @@ element:
       - variable: damages_source
         operator: eq
         value: create
+  - style: panel
+    position:
+      x: 10
+      y: 35
+      width: 100
+      height: 20
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: text_feedback_damage_values
+        operator: ne
+        value: 
+    element:
+    - style: text
+      position:
+        x: 10
+        y: 0
+        width: 80
+        height: 18
+      variable: text_feedback_damage_values
 - style: panel
   title: Damage values
   position:

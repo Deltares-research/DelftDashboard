@@ -157,18 +157,12 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "selected_secondary_classification_string",
-            [
-                "*House*",
-                "*Appartment*",
-                "*Office*",
-                "*School*",
-                "*Airport*",
-            ],
+            [""],
         )
         app.gui.setvar(
             group,
             "selected_secondary_classification_value",
-            ["house", "appartment", "office", "school", "airport"],
+            [""],
         )
         app.gui.setvar(group, "selected_secondary_classification_value", 0)
         app.gui.setvar(group, "show_primary_classification", None)
@@ -196,24 +190,25 @@ class Model(GenericModel):
             ["hazus", "jrc", "manual"],
         )
         app.gui.setvar(group, "vulnerability_source_input", "hazus")
-        app.gui.setvar(group, "created_vulnerability_curves", [""])
+        app.gui.setvar(group, "created_vulnerability_curves_string", [""])
+        app.gui.setvar(group, "created_vulnerability_curves_value", [""])
         app.gui.setvar(
             group,
             "curve_classification_string",
             [
-                "*Concrete house - Residential*",
-                "*Concrete shop - Commercial*",
-                "*Concrete office - Industrial*",
+                "",
             ],
         )
         app.gui.setvar(
             group,
             "curve_classification_value",
-            ["curve_class_1", "curve_class_2", "curve_class_3"],
+            [""],
         )
-        app.gui.setvar(group, "curve_classification_value", 0)
         app.gui.setvar(group, "selected_vulnerability_curve", "")
         app.gui.setvar(group, "selected_secondary_classification_type", "")
+        app.gui.setvar(group, "text_feedback_vulnerability_source_input", "")
+        app.gui.setvar(group, "show_vulnerability_curves", "")
+        app.gui.setvar(group, "text_feedback_damage_values", "")
 
     def set_input_variables(self):
         # Update all model input variables

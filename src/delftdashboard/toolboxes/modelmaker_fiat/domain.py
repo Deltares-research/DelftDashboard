@@ -2,6 +2,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 import geopandas as gpd
+import time
 
 
 def select(*args):
@@ -144,3 +145,7 @@ def generate_aoi(*args):
         hydromt_vm.exposure_vm.create_interest_area(
             fpath=str(HydroMtViewModel.database.drive / "aoi.geojson")
         )
+
+        app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
+        time.sleep(0.5)
+        app.map.layer["modelmaker_fiat"].layer[active_layer].show()
