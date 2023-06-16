@@ -23,6 +23,7 @@ class Model(GenericModel):
         print("Model " + self.name + " added!")
         self.active_domain = 0
 
+        # Set GUI variables
         self.set_gui_variables()
 
     def add_layers(self):
@@ -163,6 +164,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "selected_scenario", "MyScenario")
         app.gui.setvar(group, "created_nsi_assets", None)
         app.gui.setvar(group, "text_feedback_create_asset_locations", "")
+        app.gui.setvar(group, "scenario_folder", "")
 
     def set_input_variables(self):
         # Update all model input variables

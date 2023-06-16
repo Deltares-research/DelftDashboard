@@ -7,6 +7,7 @@ Created on Mon May 10 12:18:09 2021
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 
 
 def select(*args):
@@ -30,6 +31,13 @@ def activate_create_nsi_assets(*args):
     app.gui.setvar("fiat", "created_nsi_assets", "nsi")
     app.gui.setvar(
         "fiat", "text_feedback_create_asset_locations", "NSI assets created"
+    )
+
+    hydro_vm = HydroMtViewModel(
+        app.config["working_directory"], app.config["data_libs_fiat"][0]
+    )
+    hydro_vm.exposure_vm.set_asset_locations_source(
+        input_source="NSI", fiat_model=hydro_vm.fiat_model
     )
 
 

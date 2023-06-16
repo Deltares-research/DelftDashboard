@@ -16,6 +16,14 @@ def select_method(*args):
     app.gui.setvar("modelmaker_fiat", "selected_aoi_method", args[0])
 
 
+def set_scenario(*args):
+    hydromt_vm = app.toolbox["modelmaker_fiat"].set_scenario()
+
+
+def set_crs(*args):
+    app.toolbox["modelmaker_fiat"].set_crs()
+
+
 def clear_aoi_layers():
     aoi_layers = [
         "area_of_interest_bbox",
@@ -134,10 +142,8 @@ def generate_aoi(*args):
     if active_layer:
         gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
 
-        hydro_vm = HydroMtViewModel(
-            app.config["working_directory"], app.config["data_libs_fiat"][0]
-        )
+        hydromt_vm = app.toolbox["modelmaker_fiat"].set_scenario()
         gdf.to_file(HydroMtViewModel.database.drive / "aoi.geojson", driver="GeoJSON")
-        hydro_vm.exposure_vm.create_interest_area(
-            filepath=str(HydroMtViewModel.database.drive / "aoi.geojson")
+        hydromt_vm.exposure_vm.create_interest_area(
+            fpath=str(HydroMtViewModel.database.drive / "aoi.geojson")
         )

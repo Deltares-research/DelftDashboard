@@ -39,6 +39,7 @@ element:
       y: 65
       width: 60
       height: 20
+    method: set_crs
 - style: panel
   title: "Model extent"
   position:
