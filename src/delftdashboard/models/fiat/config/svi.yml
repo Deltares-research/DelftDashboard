@@ -8,9 +8,74 @@ element:
     height: 160
   element:
   - style: panel
-    text: TBD
-    position:    
+    title: Input
+    position:
       x: 10
       y: 10
-      width: 200
+      width: 150
       height: 120
+    element:
+    - style: pushbutton
+      position:
+        x: 10
+        y: 80
+        width: 110
+        height: 20
+      text: Specify state
+      method: set_hazus_curves
+    - style: pushbutton
+      position:
+        x: 10
+        y: 50
+        width: 110
+        height: 20
+      text: Upload block group
+      method: set_hazus_curves
+    - style: pushbutton
+      position:
+        x: 10
+        y: 20
+        width: 110
+        height: 20
+      text: Show block group
+      method: set_hazus_curves
+  - style: panel
+    title: Build
+    position:
+      x: 170
+      y: 10
+      width: 150
+      height: 120
+    element:
+    - style: pushbutton
+      position:
+        x: 10
+        y: 80
+        width: 110
+        height: 20
+      text: Build SVI
+      method: set_hazus_curves
+  - style: panel
+    title: Visualize
+    position:
+      x: 330
+      y: 10
+      width: 150
+      height: 120
+    element:
+    - style: pushbutton
+      position:
+        x: 10
+        y: 80
+        width: 110
+        height: 20
+      text: Composite scores / Domain
+      method: set_hazus_curves
+    - style: pushbutton
+      position:
+        x: 10
+        y: 50
+        width: 110
+        height: 20
+      text: SVI layer
+      method: set_hazus_curves
