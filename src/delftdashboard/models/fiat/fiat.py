@@ -56,9 +56,9 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "asset_locations_value", ["nsi", "file"])
         app.gui.setvar(group, "asset_locations", "nsi")
-        app.gui.setvar(group, "damages_source_string", ["Hazus", "Create"])
-        app.gui.setvar(group, "damages_source_value", ["hazus", "create"])
-        app.gui.setvar(group, "damages_source", None)
+        app.gui.setvar(group, "damages_source_string", ["NSI", "Hazus", "Create"])
+        app.gui.setvar(group, "damages_source_value", ["nsi", "hazus", "create"])
+        app.gui.setvar(group, "damages_source", "nsi")
         app.gui.setvar(
             group,
             "curve_join_type_string",
@@ -177,7 +177,22 @@ class Model(GenericModel):
         app.gui.setvar(group, "scenario_folder", "")
         app.gui.setvar(group, "apply_extraction_method", None)
         app.gui.setvar(group, "extraction_method_exception_apply", None)
-
+        app.gui.setvar(
+            group,
+            "vulnerability_source_input_string",
+            [
+                "Hazus",
+                "JRC",
+                "Manual Input",
+            ],
+        )
+        app.gui.setvar(
+            group,
+            "vulnerability_source_input_value",
+            ["hazus", "jrc", "manual"],
+        )
+        app.gui.setvar(group, "vulnerability_source_input", "hazus")
+        
     def set_input_variables(self):
         # Update all model input variables
         for var_name in vars(self.domain.input.variables):
