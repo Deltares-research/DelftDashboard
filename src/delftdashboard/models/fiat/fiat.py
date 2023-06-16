@@ -30,6 +30,14 @@ class Model(GenericModel):
         # Add main DDB layer
         layer = app.map.add_layer("fiat")
 
+        layer.add_layer(
+            "exposure_points",
+            type="circle",
+            circle_radius=3,
+            fill_color="orange",
+            line_color="transparent",
+        )
+
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Everything made visible
