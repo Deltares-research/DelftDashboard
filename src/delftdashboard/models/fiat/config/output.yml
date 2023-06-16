@@ -9,7 +9,7 @@ element:
   element:
   - style: edit
     position:
-      x: 65
+      x: 75
       y: 130
       width: 70
       height: 20
@@ -24,12 +24,42 @@ element:
         value: 999
   - style: edit
     position:
-      x: 65
+      x: 75
       y: 105
       width: 70
       height: 20
     text: CRS
     variable: selected_crs
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: control_enable
+        operator: eq
+        value: 999
+  - style: edit
+    position:
+      x: 75
+      y: 80
+      width: 70
+      height: 20
+    text: Asset source
+    variable: asset_locations
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: control_enable
+        operator: eq
+        value: 999
+  - style: edit
+    position:
+      x: 75
+      y: 55
+      width: 70
+      height: 20
+    text: Extraction method
+    variable: extraction_method
     dependency:
     - action: enable
       checkfor: all

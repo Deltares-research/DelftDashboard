@@ -130,7 +130,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "classification_field", None)
         app.gui.setvar(group, "selected_crs", "EPSG:4326")
         app.gui.setvar(group, "selected_scenario", "MyScenario")
-        app.gui.setvar(group, "created_assets", 0)
+        app.gui.setvar(group, "created_nsi_assets", None)
         app.gui.setvar(group, "text_feedback_create_asset_locations", "")
         app.gui.setvar(group, "scenario_folder", "")
 

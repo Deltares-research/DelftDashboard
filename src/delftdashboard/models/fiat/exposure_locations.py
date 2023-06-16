@@ -28,9 +28,9 @@ def set_asset_locations_field(*args):
 
 
 def activate_create_nsi_assets(*args):
-    app.gui.setvar("fiat", "created_assets", "nsi")
+    app.gui.setvar("fiat", "created_nsi_assets", "nsi")
     app.gui.setvar(
-        "fiat", "text_feedback_create_asset_locations", "Assets created from NSI"
+        "fiat", "text_feedback_create_asset_locations", "NSI assets created"
     )
 
     hydro_vm = HydroMtViewModel(
