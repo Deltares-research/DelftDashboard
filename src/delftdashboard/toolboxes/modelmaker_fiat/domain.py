@@ -8,7 +8,6 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the grid outline layer
-    app.map.layer["fiat"].layer["grid"].set_mode("active")
     app.map.layer["modelmaker_fiat"].layer["area_of_interest"].set_mode("active")
 
 
@@ -70,20 +69,16 @@ def load_aoi_file(*args):
     if fname[0]:
         gdf = gpd.read_file(fname[0])
 
-        # get the center of the polygon
-        x0 = gdf.geometry.centroid.x[0]
-        y0 = gdf.geometry.centroid.y[0]
-
-        # Fly to the site
-        app.map.fly_to(x0, y0, 7)
-
         # Add the polygon to the map
         layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
-        layer.add_feature(gdf)
+        layer.set_data(gdf)
         app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
         app.gui.setvar(
             "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file"
         )
+
+        # Fly to the site
+        fly_to_site()
 
 
 def load_sfincs_domain(*args):

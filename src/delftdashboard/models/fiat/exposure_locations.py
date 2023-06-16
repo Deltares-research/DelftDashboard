@@ -29,15 +29,16 @@ def set_asset_locations_field(*args):
 
 def activate_create_nsi_assets(*args):
     app.gui.setvar("fiat", "created_nsi_assets", "nsi")
-    app.gui.setvar(
-        "fiat", "text_feedback_create_asset_locations", "NSI assets created"
-    )
+    app.gui.setvar("fiat", "text_feedback_create_asset_locations", "NSI assets created")
 
     hydro_vm = HydroMtViewModel(
         app.config["working_directory"], app.config["data_libs_fiat"][0]
     )
-    hydro_vm.exposure_vm.set_asset_locations_source(
-        input_source="NSI", fiat_model=hydro_vm.fiat_model
+    crs = app.gui.getvar("fiat", "selected_crs")
+    gdf = hydro_vm.exposure_vm.set_asset_locations_source(input_source="NSI", crs=crs)
+
+    app.map.layer["fiat"].layer["exposure_points"].set_data(
+        gdf, hover_property="Object ID"
     )
 
 
