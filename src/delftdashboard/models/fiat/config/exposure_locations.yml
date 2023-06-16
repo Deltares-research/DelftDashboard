@@ -42,7 +42,7 @@ element:
       height: 20
     text: Create asset location
     method: activate_create_nsi_assets
-    variable: created_assets
+    variable: created_nsi_assets
     dependency:
     - action: visible
       checkfor: all
@@ -60,9 +60,12 @@ element:
     - action: visible
       checkfor: all
       check:
-      - variable: created_assets
-        operator: nq
-        value: 0
+      - variable: created_nsi_assets
+        operator: eq
+        value: nsi
+      - variable: asset_locations
+        operator: eq
+        value: nsi
     element:
     - style: text
       position:
