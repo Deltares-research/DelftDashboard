@@ -13,7 +13,7 @@ element:
       y: 10
       width: 130
       height: 100
-    text: "Best\ndescription\never"
+    text: "Indicate the primary and secondary \ncategories you would like to apply to \nthe identified assets."
 - style: panel
   title: Classification source
   position:

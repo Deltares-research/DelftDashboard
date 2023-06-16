@@ -197,6 +197,21 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "vulnerability_source_input", "hazus")
         app.gui.setvar(group, "created_vulnerability_curves", [""])
+        app.gui.setvar(
+            group,
+            "curve_classification_string",
+            [
+                "*Concrete house - Residential*",
+                "*Concrete shop - Commercial*",
+                "*Concrete office - Industrial*",
+            ],
+        )
+        app.gui.setvar(
+            group,
+            "curve_classification_value",
+            ["curve_class_1", "curve_class_2", "curve_class_3"],
+        )
+        app.gui.setvar(group, "curve_classification_value", 0)
 
     def set_input_variables(self):
         # Update all model input variables
