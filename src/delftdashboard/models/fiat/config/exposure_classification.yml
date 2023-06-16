@@ -75,11 +75,11 @@ element:
     height: 85
   text: "Primary Classification"
   text_position: "above"
-  method: select_selected_bathymetry_dataset
-  variable: selected_bathymetry_dataset_index
+  method: select_selected_primary_classification
+  variable: selected_primary_classification_value
   select: index
   option_string:
-    variable: selected_bathymetry_dataset_names
+    variable: selected_primary_classification_string
 - style: pushbutton
   position:
     x: 490
@@ -142,11 +142,11 @@ element:
     height: 85
   text: "Secondary Classification"
   text_position: "above"
-  method: select_selected_bathymetry_dataset
-  variable: selected_bathymetry_dataset_index
+  method: select_selected_secondary_classification
+  variable: selected_secondary_classification_value
   select: index
   option_string:
-    variable: selected_bathymetry_dataset_names
+    variable: selected_secondary_classification_string
 - style: pushbutton
   position:
     x: 680

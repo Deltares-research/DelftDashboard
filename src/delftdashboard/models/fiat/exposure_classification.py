@@ -20,3 +20,7 @@ def set_variables(*args):
 
 def add_classification_field(*args):
     print("Add classification field")
+
+
+def select_selected_primary_classification(*args):
+    print("Select primary classification type")
