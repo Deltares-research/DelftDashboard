@@ -109,9 +109,9 @@ element:
   element:
   - style: popupmenu
     position:
-      x: -10
+      x: 40
       y: 90
-      width: 100
+      width: 60
       height: 20
     text: Default
     variable: extraction_method
@@ -119,6 +119,15 @@ element:
       variable: extraction_method_string
     option_value:
       variable: extraction_method_value
+  - style: pushbutton
+    position:
+      x: -15
+      y: 90
+      width: 50
+      height: 20
+    text: Apply
+    variable: extraction_method_apply
+    method: apply_extraction_method
   - style: panel
     title: Exceptions
     position:
@@ -139,6 +148,15 @@ element:
         variable: extraction_method_exception_string
       option_value:
         variable: extraction_method_exception_value
+    - style: pushbutton
+      position:
+        x: -5
+        y: 28
+        width: 50
+        height: 18
+      text: Apply
+      variable: extraction_method_exception_apply
+      method: apply_extraction_exception_method
     - style: pushbutton
       position:
         x: 10

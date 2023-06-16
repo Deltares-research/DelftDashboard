@@ -67,3 +67,47 @@ element:
       - variable: control_enable
         operator: eq
         value: 999
+  - style: listbox
+    position:
+      x: 160
+      y: 35
+      width: 150
+      height: 100
+    text: "Primary Classification"
+    text_position: "above"
+    method: select_selected_primary_classification
+    variable: selected_primary_classification_value
+    select: index
+    option_string:
+      variable: selected_primary_classification_string
+  - style: checkbox
+    position:
+      x: 160
+      y: 10
+      width: 150
+      height: 20
+    text: Display primary classification
+    variable: show_primary_classification
+    method: display_primary_classification
+  - style: listbox
+    position:
+      x: 320
+      y: 35
+      width: 150
+      height: 100
+    text: "Secondary Classification"
+    text_position: "above"
+    method: select_selected_secondary_classification
+    variable: selected_secondary_classification_value
+    select: index
+    option_string:
+      variable: selected_secondary_classification_string
+  - style: checkbox
+    position:
+      x: 320
+      y: 10
+      width: 150
+      height: 20
+    text: Display secondary classification
+    variable: show_secondary_classification
+    method: display_secondary_classification

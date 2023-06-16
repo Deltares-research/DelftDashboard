@@ -167,6 +167,8 @@ class Model(GenericModel):
         app.gui.setvar(group, "created_nsi_assets", None)
         app.gui.setvar(group, "text_feedback_create_asset_locations", "")
         app.gui.setvar(group, "scenario_folder", "")
+        app.gui.setvar(group, "apply_extraction_method", None)
+        app.gui.setvar(group, "extraction_method_exception_apply", None)
 
     def set_input_variables(self):
         # Update all model input variables

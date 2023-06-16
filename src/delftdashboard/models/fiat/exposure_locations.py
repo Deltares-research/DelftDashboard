@@ -51,3 +51,11 @@ def display_extraction_method(*args):
 
 def draw_extraction_method_exception(*args):
     print("Draw extraction method")
+
+
+def apply_extraction_method(*args):
+    print("Apply extraction method")
+
+
+def apply_extraction_exception_method(*args):
+    print("Apply extraction exception")

@@ -14,3 +14,19 @@ def select(*args):
 
 def edit(*args):
     app.model["fiat"].set_model_variables()
+
+
+def select_selected_primary_classification(*args):
+    print("Select primary classification type")
+
+
+def select_selected_secondary_classification(*args):
+    print("Select secondary classification type")
+
+
+def display_primary_classification(*args):
+    print("Display primary classification fields")
+
+
+def display_secondary_classification(*args):
+    print("Display secondary classification fields")
