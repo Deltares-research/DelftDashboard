@@ -212,6 +212,8 @@ class Model(GenericModel):
             ["curve_class_1", "curve_class_2", "curve_class_3"],
         )
         app.gui.setvar(group, "curve_classification_value", 0)
+        app.gui.setvar(group, "selected_vulnerability_curve", "")
+        app.gui.setvar(group, "selected_secondary_classification_type", "")
 
     def set_input_variables(self):
         # Update all model input variables
