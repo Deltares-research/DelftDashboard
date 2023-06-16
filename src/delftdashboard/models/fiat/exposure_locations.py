@@ -53,6 +53,12 @@ def activate_create_nsi_assets(*args):
     app.gui.setvar(
         "fiat", "selected_secondary_classification_string", unique_secondary_types
     )
+    app.gui.setvar(
+        "fiat", "selected_primary_classification_value", unique_primary_types
+    )
+    app.gui.setvar(
+        "fiat", "selected_secondary_classification_value", unique_secondary_types
+    )
 
     app.gui.setvar("fiat", "show_asset_locations", True)
 

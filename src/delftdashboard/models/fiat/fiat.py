@@ -208,7 +208,11 @@ class Model(GenericModel):
         app.gui.setvar(group, "selected_secondary_classification_type", "")
         app.gui.setvar(group, "text_feedback_vulnerability_source_input", "")
         app.gui.setvar(group, "show_vulnerability_curves", "")
-        app.gui.setvar(group, "text_feedback_damage_values", "")
+        app.gui.setvar(group, "text_feedback_damage_values", "empty")
+        app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
+        app.gui.setvar(group, "show_damage_values", 0)
+        app.gui.setvar(group, "created_vulnerability_curves", 0)
+        app.gui.setvar(group, "linking_object_type", 0)
 
     def set_input_variables(self):
         # Update all model input variables

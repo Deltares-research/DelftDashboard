@@ -30,7 +30,7 @@ element:
       height: 20
     text: ""
     variable: damages_source
-    method: set_damages_source
+    select: item
     option_string:
       variable: damages_source_string
     option_value:
@@ -92,7 +92,7 @@ element:
       check:
       - variable: text_feedback_damage_values
         operator: ne
-        value: 
+        value: empty
     element:
     - style: text
       position:
