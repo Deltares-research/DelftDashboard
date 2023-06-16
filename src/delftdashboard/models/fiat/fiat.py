@@ -141,7 +141,7 @@ class Model(GenericModel):
             "selected_primary_classification_value",
             ["residential", "commercial", "industrial",],
         )
-        app.gui.setvar(group, "selected_primary_classification_value", None)
+        app.gui.setvar(group, "selected_primary_classification_value", 0)
         app.gui.setvar(
             group,
             "selected_secondary_classification_string",
@@ -158,7 +158,9 @@ class Model(GenericModel):
             "selected_secondary_classification_value",
             ["house", "appartment", "office", "school", "airport"],
         )
-        app.gui.setvar(group, "selected_secondary_classification_value", None)
+        app.gui.setvar(group, "selected_secondary_classification_value", 0)
+        app.gui.setvar(group, "show_primary_classification", None)
+        app.gui.setvar(group, "show_secondary_classification", None)
         app.gui.setvar(group, "classification_field", None)
         app.gui.setvar(group, "selected_crs", "EPSG:4326")
         app.gui.setvar(group, "selected_scenario", "MyScenario")

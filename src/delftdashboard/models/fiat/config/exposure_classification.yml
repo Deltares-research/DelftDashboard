@@ -87,14 +87,7 @@ element:
     width: 20
     height: 20
   text: "\u25B2"
-  method: move_up_selected_bathymetry_dataset
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
+  method: move_up_selected_primary_classification
 - style: pushbutton
   position:
     x: 490
@@ -102,14 +95,7 @@ element:
     width: 20
     height: 20
   text: "\u25BC"
-  method: move_down_selected_bathymetry_dataset
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
+  method: move_down_selected_primary_classification
 - style: pushbutton
   position:
     x: 490
@@ -117,14 +103,7 @@ element:
     width: 20
     height: 20
   text: "\u2716"
-  method: remove_selected_bathymetry_dataset
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
+  method: remove_selected_primary_classification
 - style: checkbox
   position:
     x: 335
@@ -154,14 +133,7 @@ element:
     width: 20
     height: 20
   text: "\u25B2"
-  method: move_up_selected_bathymetry_dataset
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
+  method: move_up_selected_secondary_classification
 - style: pushbutton
   position:
     x: 680
@@ -169,14 +141,7 @@ element:
     width: 20
     height: 20
   text: "\u25BC"
-  method: move_down_selected_bathymetry_dataset
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
+  method: move_down_selected_secondary_classification
 - style: pushbutton
   position:
     x: 680
@@ -184,14 +149,7 @@ element:
     width: 20
     height: 20
   text: "\u2716"
-  method: remove_selected_bathymetry_dataset
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
+  method: remove_selected_secondary_classification
 - style: checkbox
   position:
     x: 525
