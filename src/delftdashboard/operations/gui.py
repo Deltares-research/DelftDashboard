@@ -168,7 +168,7 @@ def build_gui_config():
             menu["menu"].append(source_menu)
 
     # also add hydromt datasets
-    if app.config["data_libs_sfincs"] is not None:
+    if app.config["data_libs"] is not None:
         source_menu = {}
         source_menu["text"] = "hydromt"
         source_menu["menu"] = []

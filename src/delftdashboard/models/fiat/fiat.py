@@ -277,7 +277,7 @@ class Model(GenericModel):
         # Set the ini file to the correct variables for creating a FIAT model from NSI
         # data
         hydro_vm = HydroMtViewModel(
-            app.config["working_directory"], app.config["data_libs_fiat"][0]
+            app.config["working_directory"], app.config["data_libs"]
         )
         hydro_vm.exposure_vm.set_asset_locations_source(
             input_source="NSI",

@@ -19,25 +19,9 @@ def edit(*args):
     app.model["fiat"].set_model_variables()
 
 
-def select_selected_primary_classification(*args):
-    print("Select primary classification type")
-
-
-def select_selected_secondary_classification(*args):
-    print("Select secondary classification type")
-
-
-def display_primary_classification(*args):
-    print("Display primary classification fields")
-
-
-def display_secondary_classification(*args):
-    print("Display secondary classification fields")
-
-
-def create_model_setup(*args):
+def create_model_setup2(*args):
     hydro_vm = HydroMtViewModel(
-        app.config["working_directory"], app.config["data_libs_fiat"][0]
+        app.config["working_directory"], app.config["data_libs"]
     )
     hydro_vm.save_data_catalog()
     hydro_vm.build_config_ini()

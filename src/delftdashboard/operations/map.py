@@ -86,7 +86,7 @@ def update_background():
         dataset_list = [{"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}]
 
         # NOTE : we first check if hydromt data is initiated, if not we use the ddb data
-        if app.config["data_libs_sfincs"] is not None:
+        if app.config["data_libs"] is not None:
             # we then check if the background topography is in the hydromt data catalog
             if app.background_topography in app.data_catalog.keys:
                 try:

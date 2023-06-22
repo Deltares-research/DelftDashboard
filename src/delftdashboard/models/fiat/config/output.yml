@@ -74,7 +74,7 @@ element:
       width: 140
       height: 40
     text: Create model setup
-    method: create_model_setup
+    method: create_model_setup2
   - style: listbox
     position:
       x: 160
@@ -83,7 +83,6 @@ element:
       height: 100
     text: "Primary Classification"
     text_position: "above"
-    method: select_selected_primary_classification
     variable: selected_primary_classification_value
     select: index
     option_string:
@@ -96,7 +95,6 @@ element:
       height: 20
     text: Display primary classification
     variable: show_primary_classification
-    method: display_primary_classification
   - style: listbox
     position:
       x: 295
@@ -105,7 +103,6 @@ element:
       height: 100
     text: "Secondary Classification"
     text_position: "above"
-    method: select_selected_secondary_classification
     variable: selected_secondary_classification_value
     select: index
     option_string:

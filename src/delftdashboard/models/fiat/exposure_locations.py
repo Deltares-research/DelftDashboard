@@ -32,7 +32,7 @@ def activate_create_nsi_assets(*args):
     app.gui.setvar("fiat", "text_feedback_create_asset_locations", "NSI assets created")
 
     hydro_vm = HydroMtViewModel(
-        app.config["working_directory"], app.config["data_libs_fiat"][0]
+        app.config["working_directory"], app.config["data_libs"]
     )
     crs = app.gui.getvar("fiat", "selected_crs")
     (

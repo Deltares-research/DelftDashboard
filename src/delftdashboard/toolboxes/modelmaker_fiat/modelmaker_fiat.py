@@ -103,7 +103,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar("fiat", "scenario_folder", scenario_folder)
         hydromt_vm = HydroMtViewModel(
             app.config["working_directory"],
-            app.config["data_libs_fiat"][0],
+            app.config["data_libs"],
             scenario_folder,
         )
         return hydromt_vm

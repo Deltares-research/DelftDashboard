@@ -76,7 +76,7 @@ class Toolbox(GenericToolbox):
         source_names = []
         # if app.config["bathymetry_database"] is not None:
         # source_names, sources = bathymetry_database.sources()
-        if app.config["data_libs_sfincs"] is not None:
+        if app.config["data_libs"] is not None:
             source_names.append("hydromt")
 
         app.gui.setvar(group, "bathymetry_source_names", source_names)
@@ -85,7 +85,7 @@ class Toolbox(GenericToolbox):
         dataset_names = []
         # if app.config["bathymetry_database"] is not None:
         # dataset_names = bathymetry_database.dataset_names(source=source_names[0])[0]
-        if app.config["data_libs_sfincs"] is not None:
+        if app.config["data_libs"] is not None:
             for key in app.data_catalog.keys:
                 if app.data_catalog[key].driver == "raster":
                     if app.data_catalog[key].meta["category"] == "topography":
