@@ -3,7 +3,7 @@ element:
   position:
     x: 10
     y: 40
-    width: 100
+    width: 150
     height: 80
   text: Refinement Polygons  
   text_position: above  
@@ -16,7 +16,7 @@ element:
   position:
     x: 10
     y: 10
-    width: 100
+    width: 150
     height: 20
   method: select_refinement_level
   variable: refinement_polygon_level
@@ -33,7 +33,7 @@ element:
 - style: pushbutton
   text: Draw Polygon
   position:
-    x: 120
+    x: 170
     y: 100
     width: 80
     height: 20
@@ -41,7 +41,7 @@ element:
 - style: pushbutton
   text: Delete Polygon
   position:
-    x: 120
+    x: 170
     y: 75
     width: 80
     height: 20
@@ -56,7 +56,7 @@ element:
 - style: pushbutton
   text: Load Polygons
   position:
-    x: 120
+    x: 170
     y: 50
     width: 80
     height: 20
@@ -64,7 +64,7 @@ element:
 - style: pushbutton
   text: Save Polygons
   position:
-    x: 120
+    x: 170
     y: 25
     width: 80
     height: 20
@@ -79,7 +79,7 @@ element:
 - style: pushbutton
   text: Generate Quadtree Mesh
   position:
-    x: 220
+    x: 270
     y: 100
     width: 120
     height: 20

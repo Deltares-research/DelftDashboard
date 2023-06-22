@@ -141,6 +141,13 @@ def advanced_merge_options_bathymetry_dataset(*args):
 def edit_buffer_cells_bathymetry_dataset(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_buffer_cells", args[0])
 
+    subgrid_buffer_cells = app.gui.getvar(
+        "modelmaker_sfincs_hmt", "nr_subgrid_pixels"
+    ) * app.gui.getvar("modelmaker_sfincs_hmt", "bathymetry_dataset_buffer_cells")
+    app.gui.setvar(
+        "modelmaker_sfincs_hmt", "subgrid_buffer_cells", subgrid_buffer_cells
+    )
+
 
 def select_interp_method(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_interp_method", args[0])
@@ -176,3 +183,7 @@ def update():
 
 def generate_bathymetry(*args):
     app.toolbox["modelmaker_sfincs_hmt"].generate_bathymetry()
+
+
+def info(*args):
+    pass

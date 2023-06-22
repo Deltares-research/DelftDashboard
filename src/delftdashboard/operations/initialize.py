@@ -28,6 +28,7 @@ def initialize():
     app.config = {}
     app.config["gui_framework"] = "pyqt5"
     app.config["server_port"] = 3000
+    app.config["server_nodejs"] = False
     app.config["stylesheet"] = ""
     app.config["title"] = "Delft Dashboard"
     app.config["width"] = 800
@@ -60,6 +61,7 @@ def initialize():
         framework=app.config["gui_framework"],
         config_path=app.config_path,
         server_path=app.server_path,
+        server_nodejs=app.config["server_nodejs"],
         server_port=app.config["server_port"],
         stylesheet=app.config["stylesheet"],
         icon=app.config["window_icon"],

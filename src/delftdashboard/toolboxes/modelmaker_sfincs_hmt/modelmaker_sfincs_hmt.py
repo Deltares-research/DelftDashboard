@@ -45,6 +45,8 @@ class Toolbox(GenericToolbox):
         self.outflow_include_polygon = gpd.GeoDataFrame()
         # self.outflow_exclude_polygon = gpd.GeoDataFrame()
 
+        self.setup_dict = {}
+
         # Set GUI variable
         group = "modelmaker_sfincs_hmt"
 
@@ -62,8 +64,12 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "y0", 0.0)
         app.gui.setvar(group, "nmax", 10)
         app.gui.setvar(group, "mmax", 10)
-        app.gui.setvar(group, "dx", 0.1)
-        app.gui.setvar(group, "dy", 0.1)
+        if app.crs.is_geographic:
+            app.gui.setvar(group, "dx", 0.1)
+            app.gui.setvar(group, "dy", 0.1)
+        else:
+            app.gui.setvar(group, "dx", 500)
+            app.gui.setvar(group, "dy", 500)
         app.gui.setvar(group, "rotation", 0.0)
 
         # Bathymetry
@@ -112,13 +118,19 @@ class Toolbox(GenericToolbox):
 
         manning_dataset_names = []
         lulc_dataset_names = []
-        if app.config["data_libs_sfincs"] is not None:
+        cn_dataset_names = []
+        qinf_dataset_names = []
+        if app.config["data_libs"] is not None:
             for key in app.data_catalog.keys:
                 if app.data_catalog[key].driver == "raster":
                     if app.data_catalog[key].meta["category"] == "landuse":
                         lulc_dataset_names.append(key)
                     elif app.data_catalog[key].meta["category"] == "roughness":
                         manning_dataset_names.append(key)
+                    elif app.data_catalog[key].meta["category"] == "soil":
+                        cn_dataset_names.append(key)
+                    elif app.data_catalog[key].meta["category"] == "infiltration":
+                        qinf_dataset_names.append(key)
 
         app.gui.setvar(group, "lulc_dataset_names", lulc_dataset_names)
         app.gui.setvar(group, "lulc_dataset_index", 0)
@@ -129,9 +141,19 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "manning_polygon_values", [])
         app.gui.setvar(group, "manning_polygon_index", 0)
         app.gui.setvar(group, "nr_manning_polygons", 0)
-        app.gui.setvar(group, "selected_manning_dataset_names", [])
+        app.gui.setvar(group, "selected_manning_dataset_names", ["Constant values"])
         app.gui.setvar(group, "selected_manning_dataset_index", 0)
         app.gui.setvar(group, "nr_selected_manning_datasets", 0)
+
+        infiltration_methods = ["Constant value", "CN dataset", "Qinf dataset"]
+        app.gui.setvar(group, "infiltration_methods", infiltration_methods)
+        app.gui.setvar(group, "infiltration_methods_index", 0)
+
+        app.gui.setvar(group, "cn_dataset_names", cn_dataset_names)
+        app.gui.setvar(group, "cn_dataset_index", 0)
+        app.gui.setvar(group, "cn_antecedent_moisture", "avg")
+        app.gui.setvar(group, "qinf_dataset_names", qinf_dataset_names)
+        app.gui.setvar(group, "qinf_dataset_index", 0)
 
         # Mask active
         mask_polygon_methods = [
@@ -313,22 +335,23 @@ class Toolbox(GenericToolbox):
         )
 
     def generate_grid(self):
-        import time
-
-        tic = time.perf_counter()
-        dlg = app.gui.window.dialog_wait("Generating grid ...")
-
         model = app.model["sfincs_hmt"].domain
 
+        dlg = app.gui.window.dialog_wait("Generating grid ...")
+
         group = "modelmaker_sfincs_hmt"
-        model.set_config("x0", app.gui.getvar(group, "x0"))
-        model.set_config("y0", app.gui.getvar(group, "y0"))
-        model.set_config("dx", app.gui.getvar(group, "dx"))
-        model.set_config("dy", app.gui.getvar(group, "dy"))
-        model.set_config("nmax", app.gui.getvar(group, "nmax"))
-        model.set_config("mmax", app.gui.getvar(group, "mmax"))
-        model.set_config("rotation", app.gui.getvar(group, "rotation"))
-        model.set_config("epsg", app.crs.to_epsg())
+        setup_grid = {
+            "x0": float(app.gui.getvar(group, "x0")),
+            "y0": float(app.gui.getvar(group, "y0")),
+            "dx": float(app.gui.getvar(group, "dx")),
+            "dy": float(app.gui.getvar(group, "dy")),
+            "nmax": int(app.gui.getvar(group, "nmax")),
+            "mmax": int(app.gui.getvar(group, "mmax")),
+            "rotation": float(app.gui.getvar(group, "rotation")),
+            "epsg": app.crs.to_epsg(),
+        }
+        model.setup_grid(**setup_grid)
+        self.setup_dict.update({"setup_grid": setup_grid})
 
         group = "sfincs_hmt"
         app.gui.setvar(group, "x0", model.config.get("x0"))
@@ -338,103 +361,112 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "nmax", model.config.get("nmax"))
         app.gui.setvar(group, "mmax", model.config.get("mmax"))
         app.gui.setvar(group, "rotation", model.config.get("rotation"))
-
-        model.update_grid_from_config()
+        app.gui.setvar(group, "epsg", model.config.get("epsg"))
 
         # NOTE this only works for regular grids (quadtee also not implemented)
         gdf = model.reggrid.to_vector_lines()
         app.map.layer["sfincs_hmt"].layer["grid"].set_data(gdf)
 
         dlg.close()
-        toc = time.perf_counter()
-        print(f"Done in {toc - tic:0.4f} seconds")
 
     def generate_bathymetry(self):
+        model = app.model["sfincs_hmt"].domain
+
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
 
-        datasets_dep = app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets
-        app.model["sfincs_hmt"].domain.setup_dep(
-            datasets_dep=datasets_dep,
-            buffer_cells=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "bathymetry_dataset_buffer_cells"
-            ),
-            interp_method=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "bathymetry_dataset_interp_method"
-            ),
-        )
+        group = "modelmaker_sfincs_hmt"
+        setup_dep = {
+            "datasets_dep": app.toolbox[group].selected_bathymetry_datasets,
+            "buffer_cells": app.gui.getvar(group, "bathymetry_dataset_buffer_cells"),
+            "interp_method": app.gui.getvar(group, "bathymetry_dataset_interp_method"),
+        }
+
+        model.setup_dep(**setup_dep)
+        self.setup_dict.update({"setup_dep": setup_dep})
 
         dlg.close()
 
     def generate_manning(self):
+        model = app.model["sfincs_hmt"].domain
+
         dlg = app.gui.window.dialog_wait("Generating manning roughness ...")
 
-        datasets_rgh = app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets
-
-        # get constant values
-        manning_land = app.gui.getvar("modelmaker_sfincs_hmt", "manning_land")
-        manning_sea = app.gui.getvar("modelmaker_sfincs_hmt", "manning_sea")
-        rgh_lev_land = app.gui.getvar("modelmaker_sfincs_hmt", "rgh_lev_land")
-
-        for dataset in datasets_rgh:
-            if "name" in dataset:
-                # pop dataset from datasets_rgh
-                constant_values = datasets_rgh.pop(datasets_rgh.index(dataset))
-                manning_land = constant_values["manning_land"]
-                manning_sea = constant_values["manning_sea"]
-                rgh_lev_land = constant_values["rgh_lev_land"]
+        group = "modelmaker_sfincs_hmt"
+        setup_manning_roughness = {
+            "datasets_rgh": app.toolbox[group].selected_manning_datasets,
+            "manning_land": app.gui.getvar(group, "manning_land"),
+            "manning_sea": app.gui.getvar(group, "manning_sea"),
+            "rgh_lev_land": app.gui.getvar(group, "rgh_lev_land"),
+        }
 
         # NOTE setup methods parse the dataset-names to xarray datasets
-        app.model["sfincs_hmt"].domain.setup_manning_roughness(
-            datasets_rgh=datasets_rgh,
-            manning_land=manning_land,
-            manning_sea=manning_sea,
-            rgh_lev_land=rgh_lev_land,
-        )
+        model.setup_manning_roughness(**setup_manning_roughness)
+        self.setup_dict.update({"setup_manning_roughness": setup_manning_roughness})
+
         dlg.close()
 
     def update_mask_active(self):
-        app.model["sfincs_hmt"].domain.setup_mask_active(
-            mask=app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon
-            if not app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon.empty
-            else None,
-            include_mask=app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon,
-            exclude_mask=app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon,
-            zmin=app.gui.getvar("modelmaker_sfincs_hmt", "mask_active_zmin"),
-            zmax=app.gui.getvar("modelmaker_sfincs_hmt", "mask_active_zmax"),
-            drop_area=app.gui.getvar("modelmaker_sfincs_hmt", "mask_active_drop_area"),
-            fill_area=app.gui.getvar("modelmaker_sfincs_hmt", "mask_active_fill_area"),
-            reset_mask=app.gui.getvar("modelmaker_sfincs_hmt", "mask_active_reset"),
-        )
+        model = app.model["sfincs_hmt"].domain
 
-        mask = app.model["sfincs_hmt"].domain.mask
+        dlg = app.gui.window.dialog_wait("Generating active mask  ...")
+        group = "modelmaker_sfincs_hmt"
+        setup_mask_active = {
+            "mask": app.toolbox[group].mask_init_polygon
+            if not app.toolbox[group].mask_init_polygon.empty
+            else None,
+            "include_mask": app.toolbox[group].mask_include_polygon,
+            "exclude_mask": app.toolbox[group].mask_exclude_polygon,
+            "zmin": app.gui.getvar(group, "mask_active_zmin"),
+            "zmax": app.gui.getvar(group, "mask_active_zmax"),
+            "drop_area": app.gui.getvar(group, "mask_active_drop_area"),
+            "fill_area": app.gui.getvar(group, "mask_active_fill_area"),
+            "reset_mask": app.gui.getvar(group, "mask_active_reset"),
+        }
+
+        model.setup_mask_active(**setup_mask_active)
+        self.setup_dict.update({"setup_mask_active": setup_mask_active})
+
+        mask = model.mask
 
         gdf = mask2gdf(mask, option="active")
         if gdf is not None:
             app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
 
+        dlg.close()
+
     def update_mask_bounds(self):
-        app.model["sfincs_hmt"].domain.setup_mask_bounds(
-            btype="waterlevel",
-            include_mask=app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon
-            if app.gui.getvar("modelmaker_sfincs_hmt", "nr_wlev_include_polygons") > 0
-            else None,
-            zmin=app.gui.getvar("modelmaker_sfincs_hmt", "wlev_zmin"),
-            zmax=app.gui.getvar("modelmaker_sfincs_hmt", "wlev_zmax"),
-            reset_bounds=app.gui.getvar("modelmaker_sfincs_hmt", "wlev_reset"),
-        )
+        model = app.model["sfincs_hmt"].domain
 
-        app.model["sfincs_hmt"].domain.setup_mask_bounds(
-            btype="outflow",
-            include_mask=app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon
-            if app.gui.getvar("modelmaker_sfincs_hmt", "nr_outflow_include_polygons")
-            > 0
-            else None,
-            zmin=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_zmin"),
-            zmax=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_zmax"),
-            reset_bounds=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_reset"),
-        )
+        dlg = app.gui.window.dialog_wait("Generating mask boundaries ...")
 
-        mask = app.model["sfincs_hmt"].domain.mask
+        group = "modelmaker_sfincs_hmt"
+        setup_mask_bounds = {
+            "btype": "waterlevel",
+            "include_mask": app.toolbox[group].wlev_include_polygon
+            if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
+            else None,
+            "zmin": app.gui.getvar(group, "wlev_zmin"),
+            "zmax": app.gui.getvar(group, "wlev_zmax"),
+            "reset_bounds": app.gui.getvar(group, "wlev_reset"),
+        }
+
+        model.setup_mask_bounds(**setup_mask_bounds)
+        self.setup_dict.update({"setup_mask_bounds": setup_mask_bounds})
+
+        setup_mask_bounds2 = {
+            "btype": "outflow",
+            "include_mask": app.toolbox[group].outflow_include_polygon
+            if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
+            else None,
+            "zmin": app.gui.getvar(group, "outflow_zmin"),
+            "zmax": app.gui.getvar(group, "outflow_zmax"),
+            "reset_bounds": app.gui.getvar(group, "outflow_reset"),
+        }
+
+        app.model["sfincs_hmt"].domain.setup_mask_bounds(**setup_mask_bounds2)
+        self.setup_dict.update({"setup_mask_bounds2": setup_mask_bounds2})
+
+        mask = model.mask
 
         gdf_wlev = mask2gdf(mask, option="wlev")
         if gdf_wlev is not None:
@@ -446,59 +478,137 @@ class Toolbox(GenericToolbox):
                 gdf_outflow
             )
 
+        dlg.close()
+
     def reset_mask_bounds(self):
-        if app.gui.getvar("modelmaker_sfincs_hmt", "wlev_reset"):
-            mask = app.model["sfincs_hmt"].domain.create_mask_bounds(
-                reset_bounds=True, btype="waterlevel"
-            )
+        model = app.model["sfincs_hmt"].domain
+
+        group = "modelmaker_sfincs_hmt"
+        if app.gui.getvar(group, "wlev_reset"):
+            model.setup_mask_bounds(reset_bounds=True, btype="waterlevel")
             # remove old waterlevel mask data
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].clear()
+            # remove settings from setup_dict
+            self.setup_dict.pop("setup_mask_bounds", None)
 
-            # possibly mask active has ben changed so, recalculate it
-            gdf = mask2gdf(mask, option="active")
-            if gdf is not None:
-                app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
-
-        if app.gui.getvar("modelmaker_sfincs_hmt", "outflow_reset"):
-            mask = app.model["sfincs_hmt"].domain.create_mask_bounds(
-                reset_bounds=True, btype="outflow"
-            )
+        if app.gui.getvar(group, "outflow_reset"):
+            model.setup_mask_bounds(reset_bounds=True, btype="outflow")
             # remove old outflow mask data
             app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].clear()
+            # remove settings from setup_dict
+            self.setup_dict.pop("setup_mask_bounds2", None)
 
-            # possibly mask active has ben changed so, recalculate it
-            gdf = mask2gdf(mask, option="active")
-            if gdf is not None:
-                app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
+        mask = model.mask
+        # possibly mask active has ben changed so, recalculate it
+        gdf = mask2gdf(mask, option="active")
+        if gdf is not None:
+            app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
 
     def generate_subgrid(self):
-        datasets_dep = app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets
-        datasets_rgh = app.toolbox["modelmaker_sfincs_hmt"].selected_manning_datasets
+        model = app.model["sfincs_hmt"].domain
 
-        # get constant values
-        manning_land = app.gui.getvar("modelmaker_sfincs_hmt", "manning_land")
-        manning_sea = app.gui.getvar("modelmaker_sfincs_hmt", "manning_sea")
-        rgh_lev_land = app.gui.getvar("modelmaker_sfincs_hmt", "rgh_lev_land")
+        dlg = app.gui.window.dialog_wait("Generating subgrid ...")
 
-        app.model["sfincs_hmt"].domain.setup_subgrid(
-            datasets_dep=datasets_dep,
-            datasets_rgh=datasets_rgh,
-            manning_land=manning_land,
-            manning_sea=manning_sea,
-            rgh_lev_land=rgh_lev_land,
-            buffer_cells=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "subgrid_buffer_cells"
-            ),
-            nr_subgrid_pixels=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "nr_subgrid_pixels"
-            ),
-            nbins=app.gui.getvar("modelmaker_sfincs_hmt", "nbins"),
-            max_gradient=app.gui.getvar("modelmaker_sfincs_hmt", "max_gradient"),
-            nrmax=app.gui.getvar("modelmaker_sfincs_hmt", "nrmax"),
-            z_minimum=app.gui.getvar("modelmaker_sfincs_hmt", "z_minimum"),
-            write_dep_tif=app.gui.getvar("modelmaker_sfincs_hmt", "write_dep_tif"),
-            write_man_tif=app.gui.getvar("modelmaker_sfincs_hmt", "write_man_tif"),
-            extrapolate_values=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "extrapolate_values"
-            ),
+        group = "modelmaker_sfincs_hmt"
+        setup_subgrid = {
+            "datasets_dep": app.toolbox[group].selected_bathymetry_datasets,
+            "datasets_rgh": app.toolbox[group].selected_manning_datasets,
+            "manning_land": app.gui.getvar(group, "manning_land"),
+            "manning_sea": app.gui.getvar(group, "manning_sea"),
+            "rgh_lev_land": app.gui.getvar(group, "rgh_lev_land"),
+            "buffer_cells": app.gui.getvar(group, "subgrid_buffer_cells"),
+            "nr_subgrid_pixels": app.gui.getvar(group, "nr_subgrid_pixels"),
+            "nbins": app.gui.getvar(group, "nbins"),
+            "max_gradient": app.gui.getvar(group, "max_gradient"),
+            "nrmax": app.gui.getvar(group, "nrmax"),
+            "z_minimum": app.gui.getvar(group, "z_minimum"),
+            "write_dep_tif": app.gui.getvar(group, "write_dep_tif"),
+            "write_man_tif": app.gui.getvar(group, "write_man_tif"),
+            "extrapolate_values": app.gui.getvar(group, "extrapolate_values"),
+        }
+
+        model.setup_subgrid(**setup_subgrid)
+        self.setup_dict.update({"setup_subgrid": setup_subgrid})
+
+        dlg.close()
+
+        dlg = app.gui.window.dialog_wait("Writing SFINCS model ...")
+        app.model["sfincs_hmt"].save()
+        dlg.close()
+
+    def generate_infiltration(self):
+        model = app.model["sfincs_hmt"].domain
+        index = app.gui.getvar("modelmaker_sfincs_hmt", "infiltration_methods_index")
+
+        dlg = app.gui.window.dialog_wait("Generating infiltration ...")
+
+        if index == 0:  # constant infiltration
+            # drop other methods
+            model.config.pop("scsfile", None)
+            model.config.pop("qinffile", None)
+        elif index == 1:
+            # drop other methods
+            model.config.pop("qinffile", None)
+            model.config["qinf"] = 0.0
+
+            # generate CN infiltration
+            model.setup_cn_infiltration(
+                cn=app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_names")[
+                    app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_index")
+                ],
+                antecedent_moisture=app.gui.getvar(
+                    "modelmaker_sfincs_hmt", "cn_antecedent_moisture"
+                ),
+            )
+        elif index == 2:
+            # drop other methods
+            model.config.pop("scsfile", None)
+            model.config["qinf"] = 0.0
+
+            # generate Qinf infiltration
+            model.setup_constant_infiltration(
+                qinf=app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_names")[
+                    app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_index")
+                ],
+            )
+        dlg.close()
+
+    def read_setup_yaml(self):
+        fname = app.gui.window.dialog_open_file(
+            "Select SFINCS setup yaml-file", filter="*.yml *.yaml"
         )
+        if fname[0]:
+            self.setup_dict = configread(config_fn=fname[0])
+
+    def write_setup_yaml(self):
+        _parse_setup_dict(self.setup_dict)
+        configwrite(config_fn="sfincs_build.yaml", cfdict=self.setup_dict)
+
+    def build(self):
+        model = app.model["sfincs_hmt"].domain
+
+        model.build()
+
+
+## Helper functions
+def _parse_setup_dict(dictionary):
+    keys_to_remove = []
+    for key, value in dictionary.items():
+        if isinstance(value, dict):
+            _parse_setup_dict(value)
+        elif isinstance(value, gpd.GeoDataFrame):
+            # Drop the GeoDataFrame from the dict if empty
+            if value.empty:
+                keys_to_remove.append(key)
+            else:
+                # Generate a unique filename based on the key
+                filename = key + ".geojson"
+                # Write the GeoDataFrame to a GeoJSON file
+                value.to_file(filename, driver="GeoJSON")
+                # Replace the entry with the filename
+                dictionary[key] = filename
+        elif value is None:
+            keys_to_remove.append(key)
+
+    for key in keys_to_remove:
+        dictionary.pop(key)

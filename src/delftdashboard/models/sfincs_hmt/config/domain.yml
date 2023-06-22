@@ -123,7 +123,7 @@ element:
       width: 70
       height: 20
     text: Input Format
-    variable_group: sfincs
+    variable_group: sfincs_hmt
     variable: inputformat
     method: set_variables
     option_string:

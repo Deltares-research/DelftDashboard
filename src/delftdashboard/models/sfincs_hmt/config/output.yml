@@ -1,5 +1,6 @@
 element:
 - style: panel
+  title: Specify output parameters
   position:
     x: 10
     y: 10
@@ -15,8 +16,8 @@ element:
     tooltipstring: Edit map output interval (in seconds)
     text: Map output interval (s)
     textposition: left
-    variable_group: sfincs
-    variable: dtmapout
+    variable_group: sfincs_hmt
+    variable: dtout
     method: set_variables
   - style: edit
     position:
@@ -27,7 +28,7 @@ element:
     tooltipstring: Edit max output interval (in seconds)
     text: Max output interval (s)
     textposition: left
-    variable_group: sfincs
+    variable_group: sfincs_hmt
     variable: dtmaxout
     method: set_variables
   - style: edit
@@ -39,7 +40,7 @@ element:
     tooltipstring: Edit history output interval (in seconds)
     text: His output interval (s)
     textposition: left
-    variable_group: sfincs
+    variable_group: sfincs_hmt
     variable: dthisout
     method: set_variables
   - style: edit
@@ -51,7 +52,7 @@ element:
     tooltipstring: Edit restart output interval (in seconds)
     text: Restart output interval (s)
     textposition: left
-    variable_group: sfincs
+    variable_group: sfincs_hmt
     variable: dtrstout
     method: set_variables
   - style: popupmenu
@@ -61,7 +62,7 @@ element:
       width: 80
       height: 20
     text: Output Format
-    variable_group: sfincs
+    variable_group: sfincs_hmt
     variable: outputformat
     method: set_variables
     option_string:

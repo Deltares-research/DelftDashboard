@@ -54,5 +54,12 @@ def select_working_directory(option):
         app.gui.config["working_directory"] = path
 
 
+        for model in app.model:
+            try:
+                app.model[model].select_working_directory()
+            except:
+                print("No method select_working_directory for model: ", model)
+                pass
+
 def exit(option):
     app.gui.quit()

@@ -2,8 +2,6 @@ from delftdashboard.operations.model import GenericModel
 from delftdashboard.app import app
 import os
 
-# from cht.sfincs.sfincs import SFINCS
-
 from hydromt_sfincs import SfincsModel
 
 
@@ -12,7 +10,7 @@ class Model(GenericModel):
         super().__init__()
 
         self.name = name
-        self.long_name = "HydroMT SFINCS"
+        self.long_name = "SFINCS (HydroMT)"
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -23,7 +21,9 @@ class Model(GenericModel):
     def initialize_domain(self):
         root = os.getcwd()
         self.domain = SfincsModel(
-            data_libs=app.config["data_libs_sfincs"], root=root, mode="w+"
+            data_libs=app.config["data_libs"],
+            root=root,
+            mode="w+",
         )
 
     def add_layers(self):
@@ -65,7 +65,7 @@ class Model(GenericModel):
         )
 
         # Move this to hurrywave.py
-        from .boundary_conditions import select_boundary_point_from_map
+        from .boundary_conditions_wlev import select_boundary_point_from_map
 
         layer.add_layer(
             "boundary_points",
@@ -94,6 +94,19 @@ class Model(GenericModel):
             fill_color_selected="red",
         )
 
+        layer.add_layer(
+            "cross_sections",
+            type="line_selector",
+            line_color="white",
+            line_opacity=1.0,
+            fill_color="blue",
+            fill_opacity=1.0,
+            circle_radius=3,
+            circle_radius_selected=4,
+            line_color_selected="white",
+            fill_color_selected="red",
+        )
+
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Mask is made invisible
@@ -108,6 +121,7 @@ class Model(GenericModel):
             app.map.layer["sfincs_hmt"].layer["boundary_points"].set_mode("inactive")
             # Observation points are made grey
             app.map.layer["sfincs_hmt"].layer["observation_points"].set_mode("inactive")
+            app.map.layer["sfincs_hmt"].layer["cross_sections"].set_mode("inactive")
         if mode == "invisible":
             app.map.layer["sfincs_hmt"].set_mode("invisible")
 
@@ -116,7 +130,10 @@ class Model(GenericModel):
         group = "sfincs_hmt"
 
         for var_name in self.domain.config:
-            app.gui.setvar(group, var_name, self.domain.config.get(var_name))
+            try:
+                app.gui.setvar(group, var_name, self.domain.config.get(var_name))
+            except:
+                print("No GUI variable " + var_name)
 
         app.gui.setvar(group, "roughness_type", "landsea")
 
@@ -129,6 +146,21 @@ class Model(GenericModel):
 
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
 
+        # Boundary conditions
+        bc_wlev_methods = ["Click points", "Generate along boundary", "Load from file"]
+        app.gui.setvar(group, "bc_wlev_methods", bc_wlev_methods)
+        app.gui.setvar(group, "bc_wlev_methods_index", 0)
+        app.gui.setvar(group, "bc_dist_along_msk", 5e3)
+        app.gui.setvar(group, "merge_bc_wlev", True)
+        app.gui.setvar(group, "boundary_point_names", [])
+        app.gui.setvar(group, "nr_boundary_points", 0)
+        app.gui.setvar(group, "active_boundary_point", 0)
+
+        # Observation points
+        app.gui.setvar(group, "observation_point_names", [])
+        app.gui.setvar(group, "nr_observation_points", 0)
+        app.gui.setvar(group, "active_observation_point", 0)
+
         app.gui.setvar(group, "depthcontour_value", 0.0)
         app.gui.setvar(group, "flowboundarypoints_length", 0)
         app.gui.setvar(group, "boundaryspline_length", 0)
@@ -138,24 +170,34 @@ class Model(GenericModel):
         app.gui.setvar(group, "wind", True)
         app.gui.setvar(group, "rain", True)
 
-    def set_input_variables(self, varid=None, value=None):
+    def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input
         group = "sfincs_hmt"
 
         for var_name in self.domain.config:
-            self.domain.set_config(
-                var_name, app.gui.variables[group][var_name]["value"]
-            )
+            if var_name == "epsg":
+                self.domain.set_config(var_name, app.crs.to_epsg())
+            else:
+                try:
+                    self.domain.set_config(
+                        var_name, app.gui.variables[group][var_name]["value"]
+                    )
+                except:
+                    print("No GUI variable " + var_name + " in sfincs input file")
 
     def open(self):
         # Open input file, and change working directory
-        fname = app.gui.open_file_name("Open file", "SFINCS input file (sfincs.inp)")
+        fname = app.gui.window.dialog_open_file(
+            "Open SFINCS input file", filter="*.inp"
+        )
         if fname:
-            path = os.path.dirname(fname)
-            self.domain.set_root(root=path, mode="r")
+            root = os.path.dirname(fname)
+            self.domain.set_root(root=root, mode="r")
             self.domain.read()
+
             # Change working directory
-            os.chdir(path)
+            os.chdir(root)
+
             # Change CRS
             app.crs = self.domain.crs
 
@@ -166,23 +208,40 @@ class Model(GenericModel):
             if self.domain._write and self.domain._read
             else ("w" if self.domain._write else "r")
         )
+
         if mode == "r":
-            fname = app.gui.select_path(
-                "Select model directory",
-                "Select the directory where you want to store your model",
+            q = app.gui.window.dialog_yes_no(
+                "Do you want to overwrite the existing model?"
             )
-            self.domain.set_root(root=fname, mode="w+")
+            if q.Yes:
+                self.domain.set_root(root=fname, mode="w+")
+            else:
+                fname = app.gui.window.dialog_select_path(
+                    "Select the directory where you want to store your model",
+                    path=os.getcwd(),
+                )
+                self.domain.set_root(root=fname, mode="w+")
 
         # Write sfincs model
         self.domain.write()
+        # write setup yml file
+        app.toolbox["modelmaker_sfincs_hmt"].write_setup_yaml()
 
         # self.domain.write_batch_file()
 
     def load(self):
         self.domain.read()
 
-    def set_crs(self, crs):
-        self.domain.set_crs(crs)
+    def set_crs(self):
+        crs = app.crs
+        if self.domain.crs != crs:
+            self.domain.set_crs(crs)
+            # self.plot()
+
+    def select_working_directory(self):
+        root = os.getcwd()
+        if self.domain.root != root:
+            self.domain.set_root(root=root, mode="w+")
 
     def plot(self):
         pass

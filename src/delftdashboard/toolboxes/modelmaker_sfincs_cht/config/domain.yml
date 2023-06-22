@@ -78,23 +78,6 @@ element:
     width: 120
     height: 20
   method: generate_grid
-- style: checkbox
-  text: Build Quadtree Grid
-  position:
-    x: 230
-    y: 60
-    width: 120
-    height: 20
-  variable: build_quadtree_grid
-- style: checkbox
-  text: Use SnapWave
-  position:
-    x: 230
-    y: 35
-    width: 120
-    height: 20
-  variable: use_snapwave
-  method: toggle_snapwave
 - style: pushbutton
   text: Read Set-up File
   position:

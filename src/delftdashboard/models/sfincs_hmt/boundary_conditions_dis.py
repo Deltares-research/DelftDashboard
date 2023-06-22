@@ -3,15 +3,15 @@ import pandas as pd
 import geopandas as gpd
 
 from delftdashboard.app import app
+from delftdashboard.operations import map
 
 
 def select(*args):
     # Set all layer inactive, except boundary_points
-    app.update_map()
+    map.update
     app.map.layer["sfincs_hmt"].layer["boundary_points"].set_mode("active")
     app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("active")
     app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode("active")
-    update()
 
 
 def add_boundary_point_on_map(*args):

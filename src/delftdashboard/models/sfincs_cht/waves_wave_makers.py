@@ -71,3 +71,4 @@ def update():
     app.gui.setvar("sfincs_cht", "wave_maker_names", app.model["sfincs_cht"].domain.wave_makers.list_names())
     app.gui.setvar("sfincs_cht", "nr_wave_makers", len(gdf))
     app.gui.window.update()
+    

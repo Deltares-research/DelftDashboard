@@ -5,11 +5,8 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 
-#import math
 import numpy as np
 import geopandas as gpd
-#import shapely
-#import json
 from pyproj import CRS
 
 from delftdashboard.operations.toolbox import GenericToolbox
@@ -68,8 +65,14 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "y0", 0.0)
         app.gui.setvar(group, "nmax", 0)
         app.gui.setvar(group, "mmax", 0)
-        app.gui.setvar(group, "dx", 0.1)
-        app.gui.setvar(group, "dy", 0.1)
+
+        if app.crs.is_geographic:
+            app.gui.setvar(group, "dx", 0.1)
+            app.gui.setvar(group, "dy", 0.1)
+        else:
+            app.gui.setvar(group, "dx", 1000.0)
+            app.gui.setvar(group, "dy", 1000.0)
+
         app.gui.setvar(group, "rotation", 0.0)
 
         # Bathymetry
@@ -264,15 +267,20 @@ class Toolbox(GenericToolbox):
                              polygon_fill_color="orange",
                              polygon_fill_opacity=0.3)
 
+    def set_crs(self):
+        group = "modelmaker_sfincs_cht"
+        if app.crs.is_geographic:
+            app.gui.setvar(group, "dx", 0.1)
+            app.gui.setvar(group, "dy", 0.1)
+        else:
+            app.gui.setvar(group, "dx", 1000.0)
+            app.gui.setvar(group, "dy", 1000.0)
 
     def generate_grid(self):
-
         group = "modelmaker_sfincs_cht"
-
         dlg = app.gui.window.dialog_wait("Generating grid ...")
-
         model = app.model["sfincs_cht"].domain
-
+        model.clear_spatial_attributes()    
         x0       = app.gui.getvar(group, "x0")
         y0       = app.gui.getvar(group, "y0")
         dx       = app.gui.getvar(group, "dx")
@@ -280,13 +288,8 @@ class Toolbox(GenericToolbox):
         nmax     = app.gui.getvar(group, "nmax")
         mmax     = app.gui.getvar(group, "mmax")
         rotation = app.gui.getvar(group, "rotation")
-
-#        if app.gui.getvar(group, "build_quadtree_grid"):
-
-#            model.set_grid_type("quadtree")
-
-        model.input.variables.qtrfile = "sfincs.qtr"
-        app.gui.setvar(group, "qtrfile", model.input.variables.qtrfile)
+        model.input.variables.qtrfile = "sfincs.nc"
+        app.gui.setvar("sfincs_cht", "qtrfile", model.input.variables.qtrfile)
 
         if len(self.refinement_polygon) == 0:
             refpol = None
@@ -301,57 +304,19 @@ class Toolbox(GenericToolbox):
         model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation, refinement_polygons=refpol, refinement_levels=reflev)
         model.grid.write()
 
-        # else:
-
-        #     model.set_grid_type("regular")
-
-        #     model.input.variables.x0       = x0
-        #     model.input.variables.y0       = y0
-        #     model.input.variables.dx       = dx
-        #     model.input.variables.dy       = dy
-        #     model.input.variables.nmax     = nmax
-        #     model.input.variables.mmax     = mmax
-        #     model.input.variables.rotation = rotation
-
-        #     group = "sfincs_cht"
-        #     app.gui.setvar(group, "x0", model.input.variables.x0)
-        #     app.gui.setvar(group, "y0", model.input.variables.y0)
-        #     app.gui.setvar(group, "dx", model.input.variables.dx)
-        #     app.gui.setvar(group, "dy", model.input.variables.dy)
-        #     app.gui.setvar(group, "nmax", model.input.variables.nmax)
-        #     app.gui.setvar(group, "mmax", model.input.variables.mmax)
-        #     app.gui.setvar(group, "rotation", model.input.variables.rotation)
-
-        #     model.grid.build()
-
-        # Clear mask from map
-        app.map.layer["sfincs_cht"].layer["mask_include"].clear()
-        app.map.layer["sfincs_cht"].layer["mask_open_boundary"].clear()
-        app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].clear()
-
-        app.map.layer["sfincs_cht"].layer["grid"].set_data(model.grid, 
-                                                          xlim=[app.gui.getvar(group, "x0"),
-                                                                app.gui.getvar(group, "x0")],                                                                
-                                                          ylim=[app.gui.getvar(group, "y0"),
-                                                                 app.gui.getvar(group, "y0")])
+        # Replot everything
+        app.model["sfincs_cht"].plot()
 
         dlg.close()
 
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
         bathymetry_list = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
-        # if not app.model["sfincs_cht"].domain.input.variables.depfile:
-        #     app.model["sfincs_cht"].domain.input.variables.depfile = "sfincs.dep"
         app.model["sfincs_cht"].domain.grid.set_bathymetry(bathymetry_list)
-        # if app.model["sfincs_cht"].domain.grid_type == "regular":
-        #     app.model["sfincs_cht"].domain.grid.write_dep_file()
-        #     app.gui.setvar("sfincs_cht", "depfile", app.model["sfincs_cht"].domain.input.variables.depfile)
-        # else:
         app.model["sfincs_cht"].domain.grid.write()
         dlg.close()
 
     def update_mask(self):
-
         # Should improve on this check
         grid = app.model["sfincs_cht"].domain.grid
         mask = app.model["sfincs_cht"].domain.mask
@@ -359,9 +324,7 @@ class Toolbox(GenericToolbox):
         if np.all(np.isnan(z)):
             app.gui.window.dialog_warning("Please first generate a bathymetry !")
             return
-
         dlg = app.gui.window.dialog_wait("Updating mask ...")
-
         mask.build(zmin=app.gui.getvar("modelmaker_sfincs_cht", "global_zmin"),
                    zmax=app.gui.getvar("modelmaker_sfincs_cht", "global_zmax"),
                    include_polygon=app.toolbox["modelmaker_sfincs_cht"].include_polygon,
@@ -380,24 +343,16 @@ class Toolbox(GenericToolbox):
         app.map.layer["sfincs_cht"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
         app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_data(mask.to_gdf(option="open"))
         app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_data(mask.to_gdf(option="outflow"))
-        # if not app.model["sfincs_cht"].domain.input.variables.mskfile:
-        #     app.model["sfincs_cht"].domain.input.variables.mskfile = "sfincs.msk"
-        grid.write()
-        # # GUI variables
-        # app.gui.setvar("sfincs_cht", "mskfile", app.model["sfincs_cht"].domain.input.variables.mskfile)
-
+        grid.write() # Write new qtr file
         dlg.close()
 
     def update_mask_snapwave(self):
-
         grid = app.model["sfincs_cht"].domain.grid
         mask = app.model["sfincs_cht"].domain.snapwave.mask
         if np.all(np.isnan(grid.data["z"])):
             app.gui.window.dialog_warning("Please first generate a bathymetry !")
             return
-
         dlg = app.gui.window.dialog_wait("Updating SnapWave mask ...")
-
         mask.build(zmin=app.gui.getvar("modelmaker_sfincs_cht", "global_zmin_snapwave"),
                    zmax=app.gui.getvar("modelmaker_sfincs_cht", "global_zmax_snapwave"),
                    include_polygon=app.toolbox["modelmaker_sfincs_cht"].include_polygon_snapwave,
@@ -413,7 +368,6 @@ class Toolbox(GenericToolbox):
         grid.write()
         # GUI variables
         app.gui.setvar("sfincs_cht", "snapwave_mskfile", app.model["sfincs_cht"].domain.input.variables.snapwave_mskfile)
-
         dlg.close()
 
     def generate_subgrid(self):
@@ -437,30 +391,15 @@ class Toolbox(GenericToolbox):
         app.model["sfincs_cht"].domain.input.variables.sbgfile = "sfincs.sbg"
         app.gui.setvar("sfincs_cht", "sbgfile", app.model["sfincs_cht"].domain.input.variables.sbgfile)
         app.gui.setvar("sfincs_cht", "bathymetry_type", "subgrid")
-    # def create_boundary_points(self):
 
-    #     dlg = app.gui.window.dialog_wait("Making boundary points ...")
+    def cut_inactive_cells(self):
+        dlg = app.gui.window.dialog_wait("Cutting Inactive Cells ...")
+        app.model["sfincs_cht"].domain.grid.cut_inactive_cells()
+        app.model["sfincs_cht"].domain.grid.write()
+        # Replot everything
+        app.model["sfincs_cht"].plot()
+        dlg.close()
 
-    #     # First check if there are already boundary points
-    #     if len(app.model["sfincs_cht"].domain.boundary_conditions.gdf.index)>0:
-    #         ok = app.gui.window.dialog_ok_cancel("Existing boundary points will be overwritten! Continue?",                                
-    #                                    title="Warning")
-    #         if not ok:
-    #             return
-    #     # Create points from mask
-    #     bnd_dist = app.gui.getvar("modelmaker_sfincs_cht", "boundary_dx")
-    #     app.model["sfincs_cht"].domain.boundary_conditions.get_boundary_points_from_mask(bnd_dist=bnd_dist)
-    #     # Drop time series (MapBox doesn't like it)
-    #     gdf = app.model["sfincs_cht"].domain.boundary_conditions.gdf.drop(["timeseries"], axis=1)
-    #     app.map.layer["sfincs_cht"].layer["boundary_points"].set_data(gdf, 0)
-    #     # Save points to bnd file
-    #     app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_points()
-    #     # Set all boundary conditions to constant values
-    #     app.model["sfincs_cht"].domain.boundary_conditions.set_timeseries_uniform(1.0, 8.0, 45.0, 20.0)
-    #     # Save points to bhs, etc. files
-    #     app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_conditions_timeseries()
-
-    #     dlg.close()
 
     def build_model(self):
         self.generate_grid()
@@ -468,7 +407,7 @@ class Toolbox(GenericToolbox):
         self.update_mask()
         self.generate_subgrid()
 
-    def update_polygons(self):
+    def update_polygons(self): # This should really be moved to the callback modules
 
         nrp = len(self.include_polygon)
         incnames = []

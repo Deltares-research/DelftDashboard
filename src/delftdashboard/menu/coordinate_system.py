@@ -11,7 +11,12 @@ from delftdashboard.app import app
 from pyproj import CRS
 
 def wgs84(option):
-    print("WGS 84")
+    new_crs = CRS(4326)
+    if new_crs == app.crs:
+        return    
+    app.crs = new_crs
+    app.map.fly_to(0.0, 0.0, 1)
+    update_crs()
 
 def other_geographic(option):
     print("Other")
@@ -28,12 +33,27 @@ def utm_zone(option):
     lon = -180.0 + utm_number*6.0 - 3.0
     lat = -80.0 + index*8.0 - 4.0
     zoom = 6
-    app.crs = CRS("WGS 84 / UTM zone " + utm)
-    app.map.crs = app.crs
-    # Also change the model crs
-    for model in app.model:
-        app.model[model].set_crs(app.crs)
+    new_crs = CRS("WGS 84 / UTM zone " + utm)
+    if new_crs == app.crs:
+        return    
+    app.crs = new_crs
     app.map.fly_to(lon, lat, zoom)
+    update_crs()
+
 
 def other_projected(option):
     print("Other")
+
+def update_crs():
+    app.map.crs = app.crs
+    # Also change the model crs
+    for model in app.model:
+        try:
+            app.model[model].set_crs()
+        except:
+            print("No method set_crs for model: ", model)
+    # Also change the toolbox crs
+    for toolbox in app.toolbox:
+        app.toolbox[toolbox].set_crs()
+    app.gui.window.update()    
+

@@ -18,7 +18,7 @@ class Model(GenericModel):
         super().__init__()
 
         self.name = name
-        self.long_name = "fiat"
+        self.long_name = "FIAT"
 
         print("Model " + self.name + " added!")
         self.active_domain = 0

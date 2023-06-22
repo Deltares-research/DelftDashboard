@@ -25,7 +25,9 @@ def delete_wlev_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "boundary_wlev_index")
     # or: iac = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon.loc[index, "id"]
+    feature_id = app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon.loc[
+        index, "id"
+    ]
     # Delete from map
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].delete_feature(feature_id)
     # Delete from app
@@ -52,7 +54,9 @@ def save_wlev_polygon(*args):
 
 def select_wlev_polygon(*args):
     index = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon.loc[index, "id"]
+    feature_id = app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon.loc[
+        index, "id"
+    ]
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].activate_feature(
         feature_id
     )
@@ -88,7 +92,9 @@ def delete_outflow_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "boundary_outflow_index")
     # or: iac = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon.loc[index, "id"]
+    feature_id = app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon.loc[
+        index, "id"
+    ]
     # Delete from map
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_outflow"].delete_feature(
         feature_id
@@ -117,7 +123,9 @@ def save_outflow_polygon(*args):
 
 def select_outflow_polygon(*args):
     index = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon.loc[index, "id"]
+    feature_id = app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon.loc[
+        index, "id"
+    ]
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_outflow"].activate_feature(
         feature_id
     )

@@ -2,7 +2,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 from hydromt_sfincs import utils
-
+import geopandas as gpd
 
 def select(*args):
     # De-activate existing layers
@@ -30,19 +30,21 @@ def draw_mask_init_polygon(*args):
 def delete_mask_init_polygon(*args):
     if len(app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon) == 0:
         return
-    # Delete from map
-    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_init"].clear()
-    # Delete from app
+
     gdf = app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon
-    app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon = gdf.drop(
-        gdf.index, inplace=True
-    )
+    # gdf = gdf.drop(gdf.index, inplace=True)
+    gdf = gpd.GeoDataFrame()
+
+    app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon = gdf
+    layer = app.map.layer["modelmaker_sfincs_hmt"].layer["mask_init"]
+    layer.set_data(gdf)
     update()
 
 
 def load_mask_init_polygon(*args):
     fname = app.gui.window.dialog_open_file(
-        "Select polygon file to initiliaze active mask with", filter="*.pol *.shp *.geojson"
+        "Select polygon file to initiliaze active mask with",
+        filter="*.pol *.shp *.geojson",
     )
     if fname[0]:
         # for .pol files we assume that they are in the coordinate system of the current map
@@ -51,12 +53,11 @@ def load_mask_init_polygon(*args):
         else:
             gdf = app.model["sfincs_hmt"].domain.data_catalog.get_geodataframe(fname[0])
 
-        gdf = gdf.to_crs(4326)
+        gdf = gdf.to_crs(app.crs)
 
         # Add the polygon to the map
         layer = app.map.layer["modelmaker_sfincs_hmt"].layer["mask_init"]
-        layer.clear()
-        layer.add_feature(gdf)
+        layer.set_data(gdf)
 
         mask_init_polygon_created(gdf, 0, 0)
 
@@ -84,7 +85,9 @@ def delete_include_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "mask_include_polygon_index")
     # or: iac = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon.loc[index, "id"]
+    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon.loc[
+        index, "id"
+    ]
     # Delete from map
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].delete_feature(
         feature_id
@@ -113,7 +116,9 @@ def save_include_polygon(*args):
 
 def select_include_polygon(*args):
     index = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon.loc[index, "id"]
+    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon.loc[
+        index, "id"
+    ]
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].activate_feature(
         feature_id
     )
@@ -144,7 +149,9 @@ def delete_exclude_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "mask_exclude_polygon_index")
     # or: iac = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon.loc[index, "id"]
+    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon.loc[
+        index, "id"
+    ]
     # Delete from map
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].delete_feature(
         feature_id
@@ -173,7 +180,9 @@ def save_exclude_polygon(*args):
 
 def select_exclude_polygon(*args):
     index = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon.loc[index, "id"]
+    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon.loc[
+        index, "id"
+    ]
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].activate_feature(
         feature_id
     )
@@ -200,7 +209,7 @@ def tick_box(*args):
 
 
 def update():
-    nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_polygon)
+    nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon)
     incnames = []
     for ip in range(nrp):
         incnames.append(str(ip + 1))
@@ -213,7 +222,7 @@ def update():
     app.gui.setvar("modelmaker_sfincs_hmt", "nr_mask_include_polygons", nrp)
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_include_polygon_names", incnames)
 
-    nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon)
+    nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon)
     excnames = []
     for ip in range(nrp):
         excnames.append(str(ip + 1))

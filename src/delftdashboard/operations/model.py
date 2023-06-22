@@ -83,7 +83,7 @@ class GenericModel:
 
         app.gui.window.update()
 
-    def set_crs(self, crs):        
+    def set_crs(self):        
         pass
 
 def select_model(model_name):

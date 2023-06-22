@@ -21,7 +21,13 @@ def select(*args):
     # Strings for refinement levels
     levstr = []
     for i in range(10):
-        levstr.append("x" + str(2**(i + 1)))
+        dx = app.gui.getvar("modelmaker_sfincs_cht", "dx")
+        if app.map.crs.is_geographic:
+            sfx = str(dx/(2**(i + 1))) + "°  ~" + str(int(dx*111000/(2**(i + 1)))) + " m"
+        else:
+            sfx = str(dx/(2**(i + 1))) + " m"
+
+        levstr.append("x" + str(2**(i + 1)) + " (" + sfx + ")") 
     app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_levels", levstr)    
 
 def draw_refinement_polygon(*args):

@@ -32,30 +32,31 @@ class Model(GenericModel):
 
         layer.add_layer("grid", type="image")
 
+        layer.add_layer("grid_exterior",
+                        type="line",
+                        circle_radius=0,
+                        line_color="yellow")
+
         layer.add_layer("mask_include",
                         type="circle",
-                        file_name="sfincs_mask_include.geojson",
                         circle_radius=3,
                         fill_color="yellow",
                         line_color="transparent")
 
         layer.add_layer("mask_open_boundary",
                         type="circle",
-                        file_name="sfincs_mask_open_boundary.geojson",
                         circle_radius=3,
                         fill_color="red",
                         line_color="transparent")
 
         layer.add_layer("mask_outflow_boundary",
                         type="circle",
-                        file_name="sfincs_mask_outflow_boundary.geojson",
                         circle_radius=3,
                         fill_color="green",
                         line_color="transparent")
 
         layer.add_layer("mask_include_snapwave",
                         type="circle",
-                        file_name="sfincs_mask_include_snapwave.geojson",
                         circle_radius=3,
                         fill_color="yellow",
                         line_color="transparent")
@@ -98,7 +99,7 @@ class Model(GenericModel):
                              shape="polygon",
                              create=boundary_enclosure_created,
                              modify=boundary_enclosure_modified,
-                             add=boundary_enclosure_modified,
+#                             add=boundary_enclosure_created,
                              polygon_line_color="red")
 
         # Wave makers
@@ -112,29 +113,37 @@ class Model(GenericModel):
                              select=wave_maker_selected,
                              add=wave_maker_modified,
                              polygon_line_color="red")
-
+        
     def set_layer_mode(self, mode):
+        layer = app.map.layer["sfincs_cht"]
         if mode == "inactive":
             # Grid is made visible
-            app.map.layer["sfincs_cht"].layer["grid"].set_mode("inactive")
+            layer.layer["grid"].set_mode("inactive")
+            # Grid exterior is made visible
+            layer.layer["grid_exterior"].set_mode("inactive")
             # Mask is made invisible
-            app.map.layer["sfincs_cht"].layer["mask_include"].set_mode("invisible")
-            app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_mode("invisible")
-            app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_mode("invisible")
-            app.map.layer["sfincs_cht"].layer["mask_include_snapwave"].set_mode("invisible")
+            layer.layer["mask_include"].set_mode("invisible")
+            layer.layer["mask_open_boundary"].set_mode("invisible")
+            layer.layer["mask_outflow_boundary"].set_mode("invisible")
+            layer.layer["mask_include_snapwave"].set_mode("invisible")
             # Boundary points are made grey
-            app.map.layer["sfincs_cht"].layer["boundary_points"].set_mode("inactive")
+            layer.layer["boundary_points"].set_mode("inactive")
             # Observation points are made grey
-            app.map.layer["sfincs_cht"].layer["observation_points"].set_mode("inactive")
+            layer.layer["observation_points"].set_mode("inactive")
             # SnapWave boundary enclosure is made invisible
-            app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].set_mode("invisible")
+            layer.layer["snapwave_boundary_enclosure"].set_mode("invisible")
             # Wave makers are made invisible
-            app.map.layer["sfincs_cht"].layer["wave_makers"].set_mode("invisible")
+            layer.layer["wave_makers"].set_mode("invisible")
         if mode == "invisible":
-            app.map.layer["sfincs_cht"].set_mode("invisible")
+           layer.set_mode("invisible")
 
-    def set_crs(self, crs):
-        self.domain.crs = crs
+    def set_crs(self):
+        crs = app.crs
+        old_crs = self.domain.crs
+        if old_crs != crs:
+            self.domain.crs = crs
+            self.domain.clear_spatial_attributes()
+            self.plot()
 
     def open(self):
         # Open input file, and change working directory
@@ -149,9 +158,14 @@ class Model(GenericModel):
             # Change working directory
             os.chdir(path)
             # Change CRS
+            old_crs = app.crs
             app.crs = self.domain.crs
+            app.map.crs = self.domain.crs
             self.plot()
+            if old_crs != app.crs:
+                app.map.fly_to(-80.0, 30.0, 6)
             dlg.close()
+
 
     def save(self):
         # Write sfincs.inp
@@ -168,6 +182,8 @@ class Model(GenericModel):
 #        app.map.add_layer("sfincs_cht").clear()
         # Grid
         app.map.layer["sfincs_cht"].layer["grid"].set_data(app.model["sfincs_cht"].domain.grid)
+        # Grid exterior
+        app.map.layer["sfincs_cht"].layer["grid_exterior"].set_data(app.model["sfincs_cht"].domain.grid.exterior)
         # Mask
         app.map.layer["sfincs_cht"].layer["mask_include"].set_data(app.model["sfincs_cht"].domain.mask.to_gdf(option="include"))
         app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_data(app.model["sfincs_cht"].domain.mask.to_gdf(option="open"))
@@ -176,6 +192,10 @@ class Model(GenericModel):
         app.map.layer["sfincs_cht"].layer["observation_points"].set_data(app.model["sfincs_cht"].domain.observation_points.gdf, 0)
         # Boundary points
         app.map.layer["sfincs_cht"].layer["boundary_points"].set_data(app.model["sfincs_cht"].domain.boundary_conditions.gdf, 0)
+        # SnapWave boundary enclosure
+        app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].set_data(app.model["sfincs_cht"].domain.snapwave.boundary_enclosure.gdf)
+        # Wave makers
+        app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(app.model["sfincs_cht"].domain.wave_makers.gdf)
 
     def plot_wave_makers(self):
         layer = app.map.layer["sfincs_cht"].layer["wave_makers"]

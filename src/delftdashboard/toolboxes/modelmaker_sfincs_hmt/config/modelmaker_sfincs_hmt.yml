@@ -25,3 +25,6 @@ element:
   - string: Sub Grid
     module: toolboxes.modelmaker_sfincs_hmt.subgrid
     element: subgrid.yml
+  - string: Infiltration
+    module: toolboxes.modelmaker_sfincs_hmt.infiltration
+    element: infiltration.yml

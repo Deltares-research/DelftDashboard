@@ -16,10 +16,3 @@ def set_variables(*args):
     # All variables will be set
     app.model["sfincs_hmt"].set_model_variables()
 
-
-def set_theta(*args):
-    #    models.model["sfincs_hmt"].set_model_variables()
-    #    # OR:
-    app.model["sfincs_hmt"].domain.input.theta = app.gui.variables.var["sfincs_hmt"][
-        "theta"
-    ]["value"]
