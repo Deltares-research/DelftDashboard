@@ -22,7 +22,7 @@ def other_geographic(option):
     print("Other")
 
 def utm_zone(option):
-    okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "select_utm_zone","utm_zone.yml"), None)
+    okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "select_utm_zone","utm_zone.yml"), id="utm_zone", data=None)
     if not okay:
         return
     letters = ['C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']

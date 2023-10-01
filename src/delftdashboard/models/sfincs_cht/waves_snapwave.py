@@ -12,9 +12,9 @@ from delftdashboard.operations import map
 
 
 def select(*args):
-    # De-activate existing layers
+    # De-activate() existing layers
     map.update()
-    app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].set_mode("active")
+    app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].activate()
 
 
 def set_model_variables(*args):
