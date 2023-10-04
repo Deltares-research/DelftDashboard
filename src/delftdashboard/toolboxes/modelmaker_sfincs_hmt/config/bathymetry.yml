@@ -1,46 +1,53 @@
 element:
-- style: listbox
+- style: panel
+  title: "Select dataset(s)"
   position:
     x: 10
-    y: 35
-    width: 180
-    height: 85
-  text: "Available Datasets"
-  text_position: "above"
-  tooltip: List of all available bathymetry datasets
-  method: select_bathymetry_dataset
-  variable: bathymetry_dataset_index
-  select: index
-  option_string:
-    variable: bathymetry_dataset_names
-- style: popupmenu
-  position:
-    x: 10
-    y: 10
-    width: 180
-    height: 20
-  method: select_bathymetry_source
-  variable: active_bathymetry_source
-  select: item
-  option_string:
-    variable: bathymetry_source_names
-  option_value:
-    variable: bathymetry_source_names
+    y: 5
+    width: 200
+    height: 125
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 95
+      width: 180
+      height: 20
+    tooltip: Select the data source
+    method: select_bathymetry_source
+    variable: active_bathymetry_source
+    select: item
+    option_string:
+      variable: bathymetry_source_names
+    option_value:
+      variable: bathymetry_source_names
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 180
+      height: 80
+    tooltip: List of all available bathymetry datasets provided by selected source
+    method: select_bathymetry_dataset
+    variable: bathymetry_dataset_index
+    select: index
+    option_string:
+      variable: bathymetry_dataset_names
 - style: pushbutton
   position:
-    x: 200
+    x: 220
     y: 100
-    width: 80
+    width: 20
     height: 20
-  text: "Use Dataset ->"
+  text: "\u25B6"
   method: use_dataset
 - style: pushbutton
   position:
-    x: 200
+    x: 220
     y: 75
-    width: 80
+    width: 20
     height: 20
-  text: "<- Remove"
+  text: "\u25C0"
   method: remove_selected_bathymetry_dataset
   dependency:
   - action: enable
@@ -49,18 +56,9 @@ element:
     - variable: nr_selected_bathymetry_datasets
       operator: gt
       value: 0  
-- style: pushbutton
-  position:
-    x: 200
-    y: 50
-    width: 80
-    height: 20
-  text: "Info"
-  method: info
-  enable: False
 - style: listbox
   position:
-    x: 290
+    x: 250
     y: 35
     width: 180
     height: 85
@@ -75,11 +73,11 @@ element:
     variable: selected_bathymetry_dataset_names
 - style: pushbutton
   position:
-    x: 300
-    y: 10
-    width: 75
+    x: 440
+    y: 100
+    width: 20
     height: 20
-  text: "Move Up"
+  text: "\u25B2"
   method: move_up_selected_bathymetry_dataset
   dependency:
   - action: enable
@@ -90,11 +88,11 @@ element:
       value: 0
 - style: pushbutton
   position:
-    x: 385
-    y: 10
-    width: 75
+    x: 440
+    y: 75
+    width: 20
     height: 20
-  text: "Move Down"
+  text: "\u25BC"
   method: move_down_selected_bathymetry_dataset
   dependency:
   - action: enable
@@ -103,15 +101,13 @@ element:
     - variable: nr_selected_bathymetry_datasets
       operator: gt
       value: 0
-- style: panel
-  title: Merge options per dataset
-  tooltip: "Specify merge options per dataset, i.e. where to use the dataset and
-    how to merge it with other datasets."
+- style: pushbutton
   position:
-    x: 480
+    x: 250
     y: 10
-    width: 120
-    height: 120
+    width: 85
+    height: 20
+  text: "Properties"
   dependency:
   - action: enable
     checkfor: all
@@ -119,118 +115,27 @@ element:
     - variable: nr_selected_bathymetry_datasets
       operator: gt
       value: 0  
-  element:           
-  - style: edit
-    position:
-      x: -10
-      y: 85
-      width: 50
-      height: 20
-    text: "Zmax"
-    tooltip: "Maximum valid elevation of the dataset. Values above this elevation
-      will be set to NaN."
-    method: edit_zmax_bathymetry_dataset
-    variable: selected_bathymetry_dataset_zmax
-  - style: edit
-    position:
-      x: -10
-      y: 60
-      width: 50
-      height: 20
-    text: "Zmin"
-    tooltip: "Minimum valid elevation of the dataset. Values below this elevation
-      will be set to NaN."
-    method: edit_zmin_bathymetry_dataset
-    variable: selected_bathymetry_dataset_zmin
-  - style: edit
-    position:
-      x: -10
-      y: 35
-      width: 50
-      height: 20
-    text: "Offset"
-    tooltip: "Offset to be added to the dataset. This is useful to correct for
-      the mean sea level."
-    method: edit_offset_bathymetry_dataset
-    variable: selected_bathymetry_dataset_offset
-  - style: pushbutton
-    position:
-      x: -10
-      y: 10
-      width: 100
-      height: 20
-    text: "Advanced options"
-    method: advanced_merge_options_bathymetry_dataset
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: nr_selected_bathymetry_datasets
-        operator: gt
-        value: 10
-- style: panel
-  title: Merge all
-  tooltip: "Merge all datasets. \n Note that you have to specify at least one dataset
-    in the list of selected datasets."
+- style: pushbutton
   position:
-    x: -10
+    x: 345
     y: 10
-    width: 120
-    height: 120
+    width: 85
+    height: 20
+  text: "Merge options"
   dependency:
   - action: enable
     checkfor: all
     check:
     - variable: nr_selected_bathymetry_datasets
       operator: gt
-      value: 0
-  element:    
-  - style: edit
-    position:
-      x: 10
-      y: 80
-      width: 100
-      height: 20
-    text: "Buffer cells"
-    text_position: above
-    tooltip: "Number of buffer cells between datasets to ensure smooth transitions"
-    method: edit_buffer_cells_bathymetry_dataset
-    variable: bathymetry_dataset_buffer_cells
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: nr_selected_bathymetry_datasets
-        operator: gt
-        value: 1    
-  - style: popupmenu
-    position:
-      x: 10
-      y: 40
-      width: 100
-      height: 20
-    text: "Interp method"
-    text_position: above
-    tooltip: "Method used to interpolate the buffer cells"
-    method: select_interp_method
-    variable: bathymetry_dataset_interp_method
-    select: item
-    option_string: ["Linear", "Nearest", "Cubic"]     
-    option_value: ["linear", "nearest", "cubic"]     
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: nr_selected_bathymetry_datasets
-        operator: gt
-        value: 1
-  - style: pushbutton
-    position:
-      x: 10
-      y: 10
-      width: 100
-      height: 20
-    text: "Generate Bathymetry"
-    tooltip: "Generate bathymetry from the selected datasets. \n Note that you have
-      to specify at least one dataset in the list of selected datasets."
-    method: generate_bathymetry
+      value: 1
+- style: pushbutton
+  position:
+    x: -10
+    y: 10
+    width: 100
+    height: 20
+  text: "Generate Bathymetry"
+  tooltip: "Generate bathymetry from the selected datasets. \n Note that you have
+    to specify at least one dataset in the list of selected datasets."
+  method: generate_bathymetry

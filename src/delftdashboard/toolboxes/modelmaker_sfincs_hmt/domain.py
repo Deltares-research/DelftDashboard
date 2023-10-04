@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import os
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -11,9 +12,9 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the grid outline layer
-    app.map.layer["sfincs_hmt"].layer["grid"].set_mode("active")
-    app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].set_mode("active")
-    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].set_mode("active")
+    app.map.layer["sfincs_hmt"].layer["grid"].set_activity(True)
+    app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].set_activity(True)
+    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].set_activity(True)
 
 
 def select_method(*args):
@@ -21,20 +22,17 @@ def select_method(*args):
 
 
 def draw_bbox(*args):
-    # Clear grid outline layer
-    app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].crs = app.crs
-    app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].draw()
-    app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
+    group = "modelmaker_sfincs_hmt"
 
-    # Remove the area of interest
-    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].clear()
-
+    app.map.layer[group].layer["grid_outline"].crs = app.crs
+    app.map.layer[group].layer["grid_outline"].draw()
 
 def draw_aio(*args):
-    # Clear grid outline layer
-    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].crs = app.crs
-    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].draw()
-    app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
+    group = "modelmaker_sfincs_hmt"
+
+    app.map.layer[group].layer["area_of_interest"].crs = app.crs
+    app.map.layer[group].layer["area_of_interest"].draw()
+
 
 
 def load_aio(*args):
@@ -59,9 +57,10 @@ def load_aio(*args):
         layer = app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"]
         layer.set_data(gdf)
 
-        app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
-
         aio_created(gdf.to_crs(app.crs), 0, 0)
+
+        if not app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].gdf.empty:
+            app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
 
 
 def fly_to_site(*args):
@@ -70,17 +69,34 @@ def fly_to_site(*args):
     lon = gdf.to_crs(4326).geometry.centroid.x[0]
     lat = gdf.to_crs(4326).geometry.centroid.y[0]
 
-    # Fly to the site
-    app.map.fly_to(lon, lat, 7)
+    # specify a logical zoom level based on the extent of the bbox to make it fit in the window
+    bbox = gdf.to_crs(4326).geometry.total_bounds
+    dx = bbox[2] - bbox[0]
+    dy = bbox[3] - bbox[1]
+
+    zoom = 15 - math.log(max(dx, dy), 2)
+
+    # Fly to the site'
+    app.map.fly_to(lon, lat, zoom)
 
 
 def grid_outline_created(gdf, index, id):
+    group = "modelmaker_sfincs_hmt"
     if len(gdf) > 1:
-        # Remove the old grid outline
+        # Only keep the latest grid outline
         id0 = gdf["id"][0]
-        app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].delete_feature(id0)
-        gdf = gdf.drop([0]).reset_index()
+        app.map.layer[group].layer["grid_outline"].delete_feature(id0)
+        gdf = gdf.drop([0]).reset_index(drop=True)
     app.toolbox["modelmaker_sfincs_hmt"].grid_outline = gdf
+
+    # check if bbox is defined
+    if not gdf.empty:
+        app.gui.setvar(group, "grid_outline", 1)
+
+    # Remove area of interest (if present)
+    if not app.map.layer[group].layer["area_of_interest"].gdf.empty:
+        app.map.layer[group].layer["area_of_interest"].clear()
+    
     update_geometry()
     app.gui.window.update()
 
@@ -92,18 +108,19 @@ def grid_outline_modified(gdf, index, id):
 
 
 def aio_created(gdf, index, id):
+    group = "modelmaker_sfincs_hmt"
     if len(gdf) > 1:
         # Remove the old area of interest
         id0 = gdf["id"][0]
-        app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].delete_feature(
+        app.map.layer[group].layer["area_of_interest"].delete_feature(
             id0
         )
-        gdf = gdf.drop([0]).reset_index()
-    app.toolbox["modelmaker_sfincs_hmt"].area_of_interest = gdf
+        gdf = gdf.drop([0]).reset_index(drop=True)
+    app.toolbox[group].area_of_interest = gdf
 
     # Get grid resolution
-    dx = app.gui.getvar("modelmaker_sfincs_hmt", "dx")
-    dy = app.gui.getvar("modelmaker_sfincs_hmt", "dy")
+    dx = app.gui.getvar(group, "dx")
+    dy = app.gui.getvar(group, "dy")
     res = np.mean([dx, dy])
 
     # Create grid outline
@@ -115,21 +132,26 @@ def aio_created(gdf, index, id):
     x0, y0, mmax, nmax, rot = utils.rotated_grid(
         gdf.unary_union, res, dec_origin=precision
     )
-    app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0, precision))
-    app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0, precision))
-    app.gui.setvar("modelmaker_sfincs_hmt", "mmax", mmax)
-    app.gui.setvar("modelmaker_sfincs_hmt", "nmax", nmax)
-    app.gui.setvar("modelmaker_sfincs_hmt", "rotation", round(rot, 3))
+    app.gui.setvar(group, "x0", round(x0, precision))
+    app.gui.setvar(group, "y0", round(y0, precision))
+    app.gui.setvar(group, "mmax", mmax)
+    app.gui.setvar(group, "nmax", nmax)
+    app.gui.setvar(
+        group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
+    )    
+    app.gui.setvar(group, "rotation", round(rot, 3))
     redraw_rectangle()
+
     app.gui.window.update()
 
 
 def aio_modified(gdf, index, id):
-    app.toolbox["modelmaker_sfincs_hmt"].area_of_interest = gdf
+    group = "modelmaker_sfincs_hmt"
+    app.toolbox[group].area_of_interest = gdf
 
     # Get grid resolution
-    dx = app.gui.getvar("modelmaker_sfincs_hmt", "dx")
-    dy = app.gui.getvar("modelmaker_sfincs_hmt", "dy")
+    dx = app.gui.getvar(group, "dx")
+    dy = app.gui.getvar(group, "dy")
     res = np.mean([dx, dy])
 
     # Create grid outline
@@ -141,11 +163,14 @@ def aio_modified(gdf, index, id):
     x0, y0, mmax, nmax, rot = utils.rotated_grid(
         gdf.unary_union, res, dec_origin=precision
     )
-    app.gui.setvar("modelmaker_sfincs_hmt", "x0", round(x0, precision))
-    app.gui.setvar("modelmaker_sfincs_hmt", "y0", round(y0, precision))
-    app.gui.setvar("modelmaker_sfincs_hmt", "mmax", mmax)
-    app.gui.setvar("modelmaker_sfincs_hmt", "nmax", nmax)
-    app.gui.setvar("modelmaker_sfincs_hmt", "rotation", round(rot, 3))
+    app.gui.setvar(group, "x0", round(x0, precision))
+    app.gui.setvar(group, "y0", round(y0, precision))
+    app.gui.setvar(group, "mmax", mmax)
+    app.gui.setvar(group, "nmax", nmax)
+    app.gui.setvar(
+        group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
+    )
+    app.gui.setvar(group, "rotation", round(rot, 3))
     redraw_rectangle()
     app.gui.window.update()
 
@@ -155,8 +180,8 @@ def generate_grid(*args):
 
 
 def update_geometry():
-    gdf = app.toolbox["modelmaker_sfincs_hmt"].grid_outline
     group = "modelmaker_sfincs_hmt"
+    gdf = app.toolbox[group].grid_outline
 
     if app.crs.is_geographic:
         precision = 6
@@ -167,8 +192,8 @@ def update_geometry():
     app.gui.setvar(group, "y0", round(gdf["y0"][0], precision))
     lenx = gdf["dx"][0]
     leny = gdf["dy"][0]
-    app.toolbox["modelmaker_sfincs_hmt"].lenx = lenx
-    app.toolbox["modelmaker_sfincs_hmt"].leny = leny
+    app.toolbox[group].lenx = lenx
+    app.toolbox[group].leny = leny
     app.gui.setvar(group, "rotation", round(gdf["rotation"][0] * 180 / math.pi, 1))
     app.gui.setvar(
         group, "nmax", np.floor(leny / app.gui.getvar(group, "dy")).astype(int)
@@ -176,7 +201,9 @@ def update_geometry():
     app.gui.setvar(
         group, "mmax", np.floor(lenx / app.gui.getvar(group, "dx")).astype(int)
     )
-
+    app.gui.setvar(
+        group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
+    )
 
 def edit_origin(*args):
     redraw_rectangle()
@@ -192,35 +219,56 @@ def edit_rotation(*args):
 
 def edit_dxdy(*args):
     group = "modelmaker_sfincs_hmt"
-    lenx = app.toolbox["modelmaker_sfincs_hmt"].lenx
-    leny = app.toolbox["modelmaker_sfincs_hmt"].leny
+    lenx = app.toolbox[group].lenx
+    leny = app.toolbox[group].leny
     app.gui.setvar(
         group, "nmax", np.floor(leny / app.gui.getvar(group, "dy")).astype(int)
     )
     app.gui.setvar(
         group, "mmax", np.floor(lenx / app.gui.getvar(group, "dx")).astype(int)
     )
+    app.gui.setvar(
+        group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
+    )
 
+def edit_res(*args):
+    group = "modelmaker_sfincs_hmt"
+    
+    # set dx and dy to res
+    app.gui.setvar(group, "dx", app.gui.getvar(group, "res"))
+    app.gui.setvar(group, "dy", app.gui.getvar(group, "res"))
+
+    edit_dxdy(*args)
+
+def edit_domain(*args):
+    toolbox_name = "modelmaker_sfincs_hmt"
+    path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
+    pop_win_config_path  = os.path.join(path, "edit_domain.yml")
+    okay, data = app.gui.popup(pop_win_config_path , None)
+    if not okay:
+        return
 
 def redraw_rectangle():
     group = "modelmaker_sfincs_hmt"
-    app.toolbox["modelmaker_sfincs_hmt"].lenx = app.gui.getvar(
+    app.toolbox[group].lenx = app.gui.getvar(
         group, "dx"
     ) * app.gui.getvar(group, "mmax")
-    app.toolbox["modelmaker_sfincs_hmt"].leny = app.gui.getvar(
+    app.toolbox[group].leny = app.gui.getvar(
         group, "dy"
     ) * app.gui.getvar(group, "nmax")
-    app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].clear()
-    app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].add_rectangle(
+    app.map.layer[group].layer["grid_outline"].clear()
+    app.map.layer[group].layer["grid_outline"].add_rectangle(
         app.gui.getvar(group, "x0"),
         app.gui.getvar(group, "y0"),
-        app.toolbox["modelmaker_sfincs_hmt"].lenx,
-        app.toolbox["modelmaker_sfincs_hmt"].leny,
+        app.toolbox[group].lenx,
+        app.toolbox[group].leny,
         app.gui.getvar(group, "rotation"),
     )
-    # if app.toolbox["modelmaker_sfincs_hmt"].grid_outline.empty:
-    gdf = app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].get_gdf()
-    app.toolbox["modelmaker_sfincs_hmt"].grid_outline = gdf
+
+    gdf = app.map.layer[group].layer["grid_outline"].get_gdf()
+    app.toolbox[group].grid_outline = gdf
+    if not app.toolbox[group].grid_outline.empty:
+        app.gui.setvar(group, "grid_outline", 1)
 
 
 def read_setup_yaml(*args):

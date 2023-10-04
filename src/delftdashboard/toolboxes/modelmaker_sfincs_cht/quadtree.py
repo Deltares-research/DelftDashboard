@@ -14,9 +14,9 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the refinement layer
-    app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].set_mode("active")
-    app.map.layer["sfincs_cht"].layer["grid"].set_mode("active")
-    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].set_mode("active")
+    app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].set_activity(True)
+    app.map.layer["sfincs_cht"].layer["grid"].set_activity(True)
+    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].set_activity(True)
 
     # Strings for refinement levels
     levstr = []

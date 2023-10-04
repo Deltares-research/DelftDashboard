@@ -1,0 +1,261 @@
+element:
+- style: panel
+  title: Select method
+  position:
+    x: 10
+    y: 10
+    width: 120
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 100
+      height: 20
+    select: index
+    tooltip: "Select a method to define the Manning's n roughness in your model domain"
+    method: select_roughness_method
+    variable: roughness_methods_index
+    option_string:
+      variable: roughness_methods
+  - style: pushbutton
+    position:
+      x: 10
+      y: 35
+      width: 100
+      height: 20
+    text: Add method
+    tooltip: "Add selected method to the list of selected Manning's n datasets"
+    method: add_selected_manning_dataset
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: roughness_methods_index
+        operator: ge
+        value: 1
+  - style: pushbutton
+    position:
+      x: 10
+      y: 10
+      width: 100
+      height: 20
+    text: Remove method
+    tooltip: "Remove selected method from the list of selected Manning's n datasets"
+    method: remove_selected_manning_dataset
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_selected_manning_datasets
+        operator: gt
+        value: 0
+      - variable: roughness_methods_index
+        operator: ge
+        value: 1
+- style: panel
+  title: Constant values
+  position:
+    x: 140
+    y: 10
+    width: 240
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: roughness_methods_index
+      operator: eq
+      value: 0
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 80
+      width: 220
+      height: 30
+    text: "Define constant values for Mannings' n roughness. Note that 
+          \nthese values are also used for areas where no spatially varying 
+          \nManning roughness is provided."
+  - style: edit
+    position:
+      x: -10
+      y: 60
+      width: 45
+      height: 20
+    text: Manning land
+    tooltip: Constant manning roughness values for land
+    variable: manning_land
+  - style: edit
+    position:
+      x: -10
+      y: 35
+      width: 45
+      height: 20
+    text: Manning sea
+    tooltip: Constant manning roughness values for sea
+    variable: manning_sea
+  - style: edit
+    position:
+      x: -10
+      y: 10
+      width: 45
+      height: 20
+    text: Land level
+    tooltip: "Elevation to distinguish land from sea. \n Values below this level are
+      considered sea and values above are considered land."
+    variable: rgh_lev_land  
+- style: panel
+  title: Landuse/Landcover dataset
+  position:
+    x: 140
+    y: 10
+    width: 240
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: roughness_methods_index
+      operator: eq
+      value: 1
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 90
+      width: 220
+      height: 20
+    text: "Choose a landuse/landcover dataset. Manning's n values 
+          \nare computed based on the reclass table."      
+  - style: popupmenu
+    position:
+      x: 10
+      y: 60
+      width: 220
+      height: 20
+    select: index
+    tooltip: "Select a landuse/landcover dataset to determine Manning's n roughness values in your model domain"
+    method: select_lulc_dataset
+    variable: lulc_dataset_index
+    option_string:
+      variable: lulc_dataset_names
+  - style: pushbutton
+    text: Load reclass table
+    tooltip: "Load a reclass table to map landuse/landcover to Manning roughness values on the model grid. \n 
+    Note that default tables are used if not specified."
+    position:
+      x: 10
+      y: 35
+      width: 220
+      height: 20
+    method: select_reclass_table
+  - style: edit
+    position:
+      x: 10
+      y: 10
+      width: 220
+      height: 20
+    variable: lulc_reclass_table
+- style: panel
+  title: Manning dataset
+  position:
+    x: 140
+    y: 10
+    width: 240
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: roughness_methods_index
+      operator: eq
+      value: 2  
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 90
+      width: 220
+      height: 20
+    text: "Choose a Manning's n dataset."  
+  - style: popupmenu
+    position:
+      x: 10
+      y: 60
+      width: 220
+      height: 20
+    select: index
+    tooltip: "Select a Manning's n dataset to derive roughness values in your model domain"
+    method: select_manning_dataset
+    variable: manning_dataset_index
+    option_string:
+      variable: manning_dataset_names
+- style: panel
+  title: Manning shape
+  position:
+    x: 140
+    y: 10
+    width: 240
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: roughness_methods_index
+      operator: eq
+      value: 3
+- style: listbox
+  position:
+    x: -95
+    y: 35
+    width: 180
+    height: 85
+  text: "Selected methods"
+  text_position: "above"
+  tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
+    they appear in this list, unless specified otherwise.
+  method: select_selected_manning_dataset
+  variable: selected_manning_dataset_index
+  select: index
+  option_string:
+    variable: selected_manning_dataset_names
+- style: pushbutton
+  position:
+    x: -10
+    y: 90
+    width: 75
+    height: 20
+  text: "Move Up"
+  method: move_up_selected_manning_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_manning_datasets
+      operator: gt
+      value: 1
+- style: pushbutton
+  position:
+    x: -10
+    y: 65
+    width: 75
+    height: 20
+  text: "Move Down"
+  method: move_down_selected_manning_dataset
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_manning_datasets
+      operator: gt
+      value: 1        
+- style: pushbutton
+  position:
+    x: -95
+    y: 10
+    width: 180
+    height: 20
+  text: "Generate Manning"
+  method: generate_manning

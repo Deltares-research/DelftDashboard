@@ -55,29 +55,46 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(
             group,
             "setup_grid_methods",
-            ["Draw Bounding Box", "Draw Area of Interest", "Load Area of Interest"],
+            ["Draw Bounding Box", "Draw polygon", "Load Area of Interest"],
         )
         app.gui.setvar(group, "setup_grid_methods_index", 0)
 
         # Domain
         app.gui.setvar(group, "x0", 0.0)
         app.gui.setvar(group, "y0", 0.0)
-        app.gui.setvar(group, "nmax", 10)
-        app.gui.setvar(group, "mmax", 10)
+        app.gui.setvar(group, "nmax", 0)
+        app.gui.setvar(group, "mmax", 0)
+        app.gui.setvar(
+            group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
+            )
         if app.crs.is_geographic:
             app.gui.setvar(group, "dx", 0.1)
             app.gui.setvar(group, "dy", 0.1)
+            app.gui.setvar(group, "res", 0.1)
         else:
             app.gui.setvar(group, "dx", 500)
             app.gui.setvar(group, "dy", 500)
+            app.gui.setvar(group, "res", 500)
         app.gui.setvar(group, "rotation", 0.0)
+        app.gui.setvar(group, "lenx", 0.0)
+        app.gui.setvar(group, "leny", 0.0)
 
         # Bathymetry
         source_names = []
         # if app.config["bathymetry_database"] is not None:
         # source_names, sources = bathymetry_database.sources()
         if app.config["data_libs"] is not None:
-            source_names.append("hydromt")
+            for key in app.data_catalog.keys:
+                # only keep raster datasets
+                if app.data_catalog[key].driver == "raster":
+                    # only keep topography datasets
+                    if app.data_catalog[key].meta["category"] == "topography":
+                        # retrieve source name
+                        source= app.data_catalog[key].meta["source"]
+                        if source not in source_names:
+                            source_names.append(source)
+
+            # source_names.append("hydromt")
 
         app.gui.setvar(group, "bathymetry_source_names", source_names)
         app.gui.setvar(group, "active_bathymetry_source", source_names[0])
@@ -89,7 +106,8 @@ class Toolbox(GenericToolbox):
             for key in app.data_catalog.keys:
                 if app.data_catalog[key].driver == "raster":
                     if app.data_catalog[key].meta["category"] == "topography":
-                        dataset_names.append(key)
+                        if app.data_catalog[key].meta["source"] == source_names[0]:
+                            dataset_names.append(key)
 
         app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
         app.gui.setvar(group, "bathymetry_dataset_index", 0)
@@ -217,9 +235,9 @@ class Toolbox(GenericToolbox):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Make all layers invisible
-            app.map.layer["modelmaker_sfincs_hmt"].set_mode("invisible")
+            app.map.layer["modelmaker_sfincs_hmt"].set_visibility(False)
         if mode == "invisible":
-            app.map.layer["modelmaker_sfincs_hmt"].set_mode("invisible")
+            app.map.layer["modelmaker_sfincs_hmt"].set_visibility(False)
 
     def add_layers(self):
         # Add Mapbox layers

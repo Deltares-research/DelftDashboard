@@ -14,11 +14,11 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the mask include and exclude polygons
-    app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon_snapwave"].set_mode("active")
-    app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon_snapwave"].set_mode("active")
+    app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon_snapwave"].set_activity(True)
+    app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon_snapwave"].set_activity(True)
     # Show the grid and mask
-    app.map.layer["sfincs_cht"].layer["grid"].set_mode("active")
-    app.map.layer["sfincs_cht"].layer["mask_include_snapwave"].set_mode("active")
+    app.map.layer["sfincs_cht"].layer["grid"].set_activity(True)
+    app.map.layer["sfincs_cht"].layer["mask_include_snapwave"].set_activity(True)
 
 def draw_include_polygon_snapwave(*args):
     app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon_snapwave"].crs = app.crs

@@ -149,12 +149,13 @@ def build_gui_config():
 
     # also add hydromt datasets
     if app.config["data_libs"] is not None:
-        source_menu = {}
-        source_menu["text"] = "hydromt"
-        source_menu["menu"] = []
         for key in app.data_catalog.keys:
+            # only keep raster datasets
             if app.data_catalog[key].driver == "raster":
+                # only keep topography datasets
                 if app.data_catalog[key].meta["category"] == "topography":
+                    # retrieve source name
+                    source = app.data_catalog[key].meta["source"]
                     dependency = [
                         {   
                             "action": "check",
@@ -164,19 +165,76 @@ def build_gui_config():
                                         "value": key}],
                         }
                     ]
-                    source_menu["menu"].append(
-                        {
-                            "id": "topography." + key,
-                            "variable_group": "menu",
-                            "text": key,
-                            "separator": False,
-                            "checkable": True,
-                            "option": key,
-                            "method": "select_dataset",
-                            "dependency": dependency,
-                        }
-                    )
-        menu["menu"].append(source_menu)
+
+                    # Add dataset to source
+                    for source_menu in menu["menu"]:
+                        okay = False
+                        if source_menu["text"] == source:
+                            source_menu["menu"].append(
+                                {
+                                    "id": "topography." + key,
+                                    "variable_group": "menu",
+                                    "text": key,
+                                    "separator": False,
+                                    "checkable": True,
+                                    "option": key,
+                                    "method": "select_dataset",
+                                    "dependency": dependency,
+                                }
+                            )
+                            okay = True
+                            break
+                    if not okay:
+                        # New source
+                        source_menu = {}
+                        source_menu["text"] = source
+                        source_menu["menu"] = []
+                        source_menu["menu"].append(
+                            {
+                                "id": "topography." + key,
+                                "variable_group": "menu",
+                                "text": key,
+                                "separator": False,
+                                "checkable": True,
+                                "option": key,
+                                "method": "select_dataset",
+                                "dependency": dependency,
+                            }
+                        )                            
+                        menu["menu"].append(source_menu)
+
+
+                    
+
+
+        # source_menu = {}
+        # source_menu["text"] = "hydromt"
+        # source_menu["menu"] = []
+        # for key in app.data_catalog.keys:
+        #     if app.data_catalog[key].driver == "raster":
+        #         if app.data_catalog[key].meta["category"] == "topography":
+        #             dependency = [
+        #                 {   
+        #                     "action": "check",
+        #                     "checkfor": "all",
+        #                     "check": [{ "variable": "active_topography_name",
+        #                                 "operator": "eq",
+        #                                 "value": key}],
+        #                 }
+        #             ]
+        #             source_menu["menu"].append(
+        #                 {
+        #                     "id": "topography." + key,
+        #                     "variable_group": "menu",
+        #                     "text": key,
+        #                     "separator": False,
+        #                     "checkable": True,
+        #                     "option": key,
+        #                     "method": "select_dataset",
+        #                     "dependency": dependency,
+        #                 }
+        #             )
+        # menu["menu"].append(source_menu)
 
     app.gui.config["menu"].append(menu)
 

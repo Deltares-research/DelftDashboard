@@ -8,14 +8,14 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the mask include and exclude polygons
-    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_init"].set_mode("active")
-    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].set_mode("active")
-    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].set_mode("active")
+    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_init"].set_activity(True)
+    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].set_activity(True)
+    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].set_activity(True)
     # Show the grid and mask
-    app.map.layer["sfincs_hmt"].layer["grid"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_active"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode("active")
+    app.map.layer["sfincs_hmt"].layer["grid"].set_activity(True)
+    app.map.layer["sfincs_hmt"].layer["mask_active"].set_activity(True)
+    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_activity(True)
+    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_activity(True)
 
 
 def select_mask_init_polygon_method(*args):

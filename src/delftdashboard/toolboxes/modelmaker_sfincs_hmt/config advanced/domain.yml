@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: "Select model domain"
+  title: "Model extent"
   position:
     x: 10
     y: 10
@@ -13,6 +13,7 @@ element:
       y: 90
       width: 100
       height: 20
+    text: Select method
     tooltip: Select method to determine model extent
     select: index
     method: select_method
@@ -20,7 +21,7 @@ element:
     option_string:
       variable: setup_grid_methods
   - style: pushbutton
-    text: Start drawing
+    text: Draw Bounding Box
     tooltip: Draw a bounding box around the area of interest
     position:
       x: 10
@@ -36,7 +37,7 @@ element:
         operator: eq
         value: 0 
   - style: pushbutton
-    text: Start drawing
+    text: Draw Area of Interest
     tooltip: Draw a polygon describing the area of interest
     position:
       x: 10
@@ -52,7 +53,7 @@ element:
         operator: eq
         value: 1
   - style: pushbutton
-    text: Load
+    text: Load Area of Interest
     tooltip: Load a polygon describing the area of interest
     position:
       x: 10
@@ -66,13 +67,13 @@ element:
       check:
       - variable: setup_grid_methods_index
         operator: eq
-        value: 2
+        value: 2   
   - style: pushbutton
-    text: Zoom to domain
+    text: Fly to site
     tooltip: Move the map to the area of interest
     position:
       x: 10
-      y: 10
+      y: 40
       width: 100
       height: 20
     method: fly_to_site
@@ -82,37 +83,14 @@ element:
         check:
         - variable: grid_outline
           operator: eq
-          value: 1                      
-- style: panel
-  title: "Select model resolution"
-  position:
-    x: 140
-    y: 10
-    width: 160
-    height: 120
-  element:
-  - style: text
-    position:
-      x: 10
-      y: 90
-      width: 75
-      height: 20
-    text: "Model grid resolution"
-  - style: edit
-    position:
-      x: 95
-      y: 90
-      width: 55
-      height: 20
-    variable: res
-    method: edit_res
+          value: 1             
   - style: pushbutton
     text: Generate Grid
     tooltip: Generate a grid within the area of interest
     position:
       x: 10
-      y: 65
-      width: 140
+      y: 15
+      width: 100
       height: 20
     method: generate_grid
     dependency:
@@ -121,72 +99,99 @@ element:
         check:
         - variable: grid_outline
           operator: eq
-          value: 1          
+          value: 1     
 - style: panel
-  title: "Domain properties - summary"
+  title: "Grid parameters"
   position:
-    x: 310
+    x: 140
     y: 10
     width: 230
     height: 120
-  element:  
-  - style: text
+  element:
+  - style: edit
     position:
-      x: 10
+      x: 60
       y: 90
-      width: 100
+      width: 60
       height: 20
-    text: "Model grid resolution: "
+    text: X0
+    variable: x0
+    method: edit_origin
   - style: edit
     position:
-      x: 120
+      x: 160
       y: 90
-      width: 100
+      width: 60
       height: 20
-    variable: res
-    enable: False
-  - style: text
-    position:
-      x: 10
-      y: 65
-      width: 100
-      height: 20
-    text: "Nr. of grid cells:"
+    text: Y0
+    variable: y0
+    method: edit_origin
   - style: edit
     position:
-      x: 120
+      x: 60
       y: 65
-      width: 100
+      width: 60
       height: 20
-    variable: nr_cells
-    enable: False
-  - style: text
-    position:
-      x: 10
-      y: 40
-      width: 100
-      height: 20
-    text: "Rotation angle: "
+    text: MMax
+    variable: mmax
+    method: edit_nmmax
   - style: edit
     position:
-      x: 120
-      y: 40
-      width: 100
+      x: 160
+      y: 65
+      width: 60
       height: 20
+    text: NMax
+    variable: nmax
+    method: edit_nmmax
+  - style: edit
+    position:
+      x: 60
+      y: 40
+      width: 60
+      height: 20
+    text: dX
+    variable: dx
+    method: edit_dxdy
+  - style: edit
+    position:
+      x: 160
+      y: 40
+      width: 60
+      height: 20
+    text: dY
+    variable: dy
+    method: edit_dxdy
+  - style: edit
+    position:
+      x: 60
+      y: 15
+      width: 60
+      height: 20
+    text: Rotation
     variable: rotation
-    enable: False    
-  - style: pushbutton
-    text: View more
-    position:
-      x: -10
-      y: 10
-      width: 100
-      height: 20
-    method: edit_domain
-    dependency:
-      - action: enable
-        checkfor: all
-        check:
-        - variable: grid_outline
-          operator: eq
-          value: 1     
+    method: edit_rotation
+- style: pushbutton
+  text: Read Set-up File
+  position:
+    x: -10
+    y: 60
+    width: 120
+    height: 20
+  method: read_setup_yaml
+- style: pushbutton
+  text: Write Set-up File
+  position:
+    x: -10
+    y: 35
+    width: 120
+    height: 20
+  method: write_setup_yaml
+- style: pushbutton
+  text: Build Model
+  position:
+    x: -10
+    y: 10
+    width: 120
+    height: 20
+  method: build

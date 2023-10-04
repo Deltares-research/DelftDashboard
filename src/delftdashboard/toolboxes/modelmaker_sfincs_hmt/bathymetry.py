@@ -7,24 +7,23 @@ from cht.bathymetry.bathymetry_database import bathymetry_database
 def select(*args):
     # De-activate existing layers
     map.update()
-    app.map.layer["sfincs_hmt"].layer["grid"].set_mode("active")
+    app.map.layer["sfincs_hmt"].layer["grid"].set_activity(True)
 
 
 def select_bathymetry_source(*args):
     source = args[0]
+    
+    dataset_names = []
     # Bathymetry
-    source_names = []
-    # if app.config["bathymetry_database"] is not None:
-    # source_names, sources = bathymetry_database.sources()
-    # dataset_names = bathymetry_database.dataset_names(source=source_names[source])[0]
     if app.config["data_libs"] is not None:
-        source_names.append("HydroMT")
-
-        dataset_names = []
         for key in app.data_catalog.keys:
+            # only keep raster datasets
             if app.data_catalog[key].driver == "raster":
+                # only keep topography datasets
                 if app.data_catalog[key].meta["category"] == "topography":
-                    dataset_names.append(key)
+                    # retrieve source name
+                    if app.data_catalog[key].meta["source"] == source:
+                        dataset_names.append(key)
 
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_names", dataset_names)
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_index", 0)

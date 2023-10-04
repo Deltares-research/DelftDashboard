@@ -5,7 +5,7 @@ from delftdashboard.operations import map
 def select(*args):
     # De-activate existing layers
     map.update()
-    app.map.layer["sfincs_hmt"].layer["grid"].set_mode("active")
+    app.map.layer["sfincs_hmt"].layer["grid"].set_activity(True)
 
 
 def edit_nr_subgrid_pixels(*args):

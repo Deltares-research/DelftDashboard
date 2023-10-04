@@ -14,13 +14,13 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the mask include and exclude polygons
-    app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].set_mode("active")
-    app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon"].set_mode("active")
+    app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].set_activity(True)
+    app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon"].set_activity(True)
     # Show the grid and mask
-    app.map.layer["sfincs_cht"].layer["grid"].set_mode("active")
-    app.map.layer["sfincs_cht"].layer["mask_include"].set_mode("active")
-    app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_mode("active")
-    app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_mode("active")
+    app.map.layer["sfincs_cht"].layer["grid"].set_activity(True)
+    app.map.layer["sfincs_cht"].layer["mask_include"].set_activity(True)
+    app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_activity(True)
+    app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_activity(True)
 
 def draw_include_polygon(*args):
     app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].crs = app.crs
