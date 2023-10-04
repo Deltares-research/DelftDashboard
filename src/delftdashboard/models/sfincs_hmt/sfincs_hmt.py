@@ -25,6 +25,7 @@ class Model(GenericModel):
             root=root,
             mode="w+",
         )
+        self.set_crs()
 
     def add_layers(self):
         # Add main app layer
@@ -32,7 +33,8 @@ class Model(GenericModel):
 
         layer.add_layer(
             "grid",
-            type="deck_geojson",
+            type="line",
+            circle_radius=0,
             file_name="sfincs_grid.geojson",
             line_color="black",
         )
@@ -110,14 +112,17 @@ class Model(GenericModel):
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
+
+            app.map.layer["sfincs_hmt"].layer["grid"].deactivate()
+
             # Mask is made invisible
-            app.map.layer["sfincs_hmt"].layer["grid"].hide()
             app.map.layer["sfincs_hmt"].layer["mask_active"].hide()
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].hide()
             app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].hide()
 
             # Boundary points are made grey
             app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
+            
             # Observation points are made grey
             app.map.layer["sfincs_hmt"].layer["observation_points"].deactivate()
             app.map.layer["sfincs_hmt"].layer["cross_sections"].deactivate()
