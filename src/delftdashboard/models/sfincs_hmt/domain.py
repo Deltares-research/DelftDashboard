@@ -5,10 +5,10 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the grid and mask
-    app.map.layer["sfincs_hmt"].layer["grid"].set_activity(True)
-    app.map.layer["sfincs_hmt"].layer["mask_active"].set_activity(True)
-    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_activity(True)
-    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_activity(True)
+    app.map.layer["sfincs_hmt"].layer["grid"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask_active"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].activate()
 
 
 def set_variables(*args):

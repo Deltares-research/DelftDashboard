@@ -118,24 +118,24 @@ class Model(GenericModel):
         layer = app.map.layer["sfincs_cht"]
         if mode == "inactive":
             # Grid is made visible
-            layer.layer["grid"].set_activity(False)
+            layer.layer["grid"].deactivate()
             # Grid exterior is made visible
-            layer.layer["grid_exterior"].set_activity(False)
+            layer.layer["grid_exterior"].deactivate()
             # Mask is made invisible
-            layer.layer["mask_include"].set_visibility(False)
-            layer.layer["mask_open_boundary"].set_visibility(False)
-            layer.layer["mask_outflow_boundary"].set_visibility(False)
-            layer.layer["mask_include_snapwave"].set_visibility(False)
+            layer.layer["mask_include"].hide()
+            layer.layer["mask_open_boundary"].hide()
+            layer.layer["mask_outflow_boundary"].hide()
+            layer.layer["mask_include_snapwave"].hide()
             # Boundary points are made grey
-            layer.layer["boundary_points"].set_activity(False)
+            layer.layer["boundary_points"].deactivate()
             # Observation points are made grey
-            layer.layer["observation_points"].set_activity(False)
+            layer.layer["observation_points"].deactivate()
             # SnapWave boundary enclosure is made invisible
-            layer.layer["snapwave_boundary_enclosure"].set_visibility(False)
+            layer.layer["snapwave_boundary_enclosure"].hide()
             # Wave makers are made invisible
-            layer.layer["wave_makers"].set_visibility(False)
+            layer.layer["wave_makers"].hide()
         if mode == "invisible":
-           layer.set_visibility(False)
+           layer.hide()
 
     def set_crs(self):
         crs = app.crs

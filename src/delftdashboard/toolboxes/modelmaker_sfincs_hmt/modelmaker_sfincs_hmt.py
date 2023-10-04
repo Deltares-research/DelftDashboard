@@ -235,9 +235,9 @@ class Toolbox(GenericToolbox):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Make all layers invisible
-            app.map.layer["modelmaker_sfincs_hmt"].set_visibility(False)
+            app.map.layer["modelmaker_sfincs_hmt"].hide()
         if mode == "invisible":
-            app.map.layer["modelmaker_sfincs_hmt"].set_visibility(False)
+            app.map.layer["modelmaker_sfincs_hmt"].hide()
 
     def add_layers(self):
         # Add Mapbox layers

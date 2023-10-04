@@ -7,7 +7,7 @@ from cht.bathymetry.bathymetry_database import bathymetry_database
 def select(*args):
     # De-activate existing layers
     map.update()
-    app.map.layer["sfincs_hmt"].layer["grid"].set_activity(True)
+    app.map.layer["sfincs_hmt"].layer["grid"].activate()
 
 
 def select_bathymetry_source(*args):

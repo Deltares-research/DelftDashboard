@@ -10,9 +10,9 @@ from cht.bathymetry.bathymetry_database import bathymetry_database
 from delftdashboard.operations import map
 
 def select(*args):
-    # De-activate existing layers
+    # De-activate() existing layers
     map.update()
-    app.map.layer["sfincs_cht"].layer["grid"].set_mode("active")
+    app.map.layer["sfincs_cht"].layer["grid"].activate()
 
 def select_bathymetry_source(*args):
     source = args[0]

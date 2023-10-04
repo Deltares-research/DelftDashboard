@@ -11,12 +11,12 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 def select(*args):
-    # De-activate existing layers
+    # De-activate() existing layers
     map.update()
     # Show the refinement layer
-    app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].set_activity(True)
-    app.map.layer["sfincs_cht"].layer["grid"].set_activity(True)
-    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].set_activity(True)
+    app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].activate()
+    app.map.layer["sfincs_cht"].layer["grid"].activate()
+    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].activate()
 
     # Strings for refinement levels
     levstr = []

@@ -9,9 +9,9 @@ from delftdashboard.operations import map
 def select(*args):
     # Set all layer inactive, except boundary_points
     map.update
-    app.map.layer["sfincs_hmt"].layer["boundary_points"].set_activity(True)
-    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_activity(True)
-    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_activity(True)
+    app.map.layer["sfincs_hmt"].layer["boundary_points"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].activate()
 
 
 def add_boundary_point_on_map(*args):

@@ -157,9 +157,9 @@ class Toolbox(GenericToolbox):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Make all layers invisible
-            app.map.layer["modelmaker_sfincs_cht"].set_visibility(False)
+            app.map.layer["modelmaker_sfincs_cht"].hide()
         if mode == "invisible":
-            app.map.layer["modelmaker_sfincs_cht"].set_visibility(False)
+            app.map.layer["modelmaker_sfincs_cht"].hide()
 
     def add_layers(self):
         # Add Mapbox layers
@@ -593,8 +593,8 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "boundary_zmin", dct["mask"]["open_boundary_polygon"][0]["zmin"])
             app.gui.setvar(group, "boundary_zmax", dct["mask"]["open_boundary_polygon"][0]["zmax"])
             # Now read in polygons from geojson file (or other file)
-            self.read_boundary_polygon()
-            self.plot_boundary_polygon()
+            self.read_open_boundary_polygon()
+            self.plot_open_boundary_polygon()
         else:
             self.boundary_polygon = gpd.GeoDataFrame()    
 

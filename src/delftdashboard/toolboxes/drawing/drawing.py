@@ -45,9 +45,9 @@ class Toolbox(GenericToolbox):
     def set_layer_mode(self, mode):
         try:
             if mode == "inactive":
-                app.map.layer["drawing"].set_mode("invisible")
+                app.map.layer["drawing"].hide()
             if mode == "invisible":
-                app.map.layer["drawing"].set_mode("invisible")
+                app.map.layer["drawing"].hide()
         except:
             pass        
 

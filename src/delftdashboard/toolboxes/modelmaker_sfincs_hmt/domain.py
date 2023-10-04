@@ -12,9 +12,9 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the grid outline layer
-    app.map.layer["sfincs_hmt"].layer["grid"].set_activity(True)
-    app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].set_activity(True)
-    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].set_activity(True)
+    app.map.layer["sfincs_hmt"].layer["grid"].activate()
+    app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].activate()
+    app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].activate()
 
 
 def select_method(*args):

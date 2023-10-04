@@ -8,7 +8,7 @@ def open():
     pass
 
 def map_ready(*args):
-    mp = app.gui.popup_window.find_element_by_id("utm_map").widget
+    mp = app.gui.popup_window["utm_zone"].find_element_by_id("utm_map").widget
     mp.jump_to(0.0, 0.0, 1)
     # Add UTM polygons
     lon = np.arange(-180.0, 180.0, 6.0)
@@ -39,4 +39,4 @@ def map_moved(*args):
     pass
 
 def select_utm_zone(feature, widget):
-    app.gui.popup_data = feature["properties"]
+    app.gui.popup_data["utm_zone"] = feature["properties"]

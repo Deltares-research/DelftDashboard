@@ -111,18 +111,18 @@ class Model(GenericModel):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Mask is made invisible
-            app.map.layer["sfincs_hmt"].layer["grid"].set_visibility(False)
-            app.map.layer["sfincs_hmt"].layer["mask_active"].set_visibility(False)
-            app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_visibility(False)
-            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_visibility(False)
+            app.map.layer["sfincs_hmt"].layer["grid"].hide()
+            app.map.layer["sfincs_hmt"].layer["mask_active"].hide()
+            app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].hide()
+            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].hide()
 
             # Boundary points are made grey
-            app.map.layer["sfincs_hmt"].layer["boundary_points"].set_activity(False)
+            app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
             # Observation points are made grey
-            app.map.layer["sfincs_hmt"].layer["observation_points"].set_activity(False)
-            app.map.layer["sfincs_hmt"].layer["cross_sections"].set_activity(False)
+            app.map.layer["sfincs_hmt"].layer["observation_points"].deactivate()
+            app.map.layer["sfincs_hmt"].layer["cross_sections"].deactivate()
         if mode == "invisible":
-            app.map.layer["sfincs_hmt"].set_visibility(False)
+            app.map.layer["sfincs_hmt"].hide()
 
     def set_gui_variables(self):
         # Copies sfincs input to gui variables

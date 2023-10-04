@@ -41,10 +41,10 @@ class Model(GenericModel):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Grid is made visible
-            app.map.layer["fiat"].layer["grid"].set_activity(False)
+            app.map.layer["fiat"].layer["grid"].deactivate()
         elif mode == "invisible":
             # Everything set to invisible
-            app.map.layer["fiat"].set_visibility(False)
+            app.map.layer["fiat"].hide()
 
     def set_gui_variables(self):
         group = "fiat"

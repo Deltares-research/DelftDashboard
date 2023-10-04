@@ -13,11 +13,11 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 def select(*args):
-    # De-activate existing layers
+    # De-activate() existing layers
     map.update()
     # Show the grid outline layer
-    app.map.layer["sfincs_cht"].layer["grid"].set_activity(True)
-    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].set_activity(True)
+    app.map.layer["sfincs_cht"].layer["grid"].activate()
+    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].activate()
 
 
 def draw_grid_outline(*args):

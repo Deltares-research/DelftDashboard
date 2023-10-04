@@ -13,7 +13,7 @@ def select(*args):
     # De-activate existing layers
     map.update()
     # Show the grid and mask
-    app.map.layer["fiat"].layer["domain"].set_activity(True)
+    app.map.layer["fiat"].layer["domain"].activate()
 
 
 def set_variables(*args):

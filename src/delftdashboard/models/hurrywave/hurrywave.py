@@ -99,18 +99,18 @@ class Model(GenericModel):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Grid is made visible
-            app.map.layer["hurrywave"].layer["grid"].set_activity(False)
+            app.map.layer["hurrywave"].layer["grid"].deactivate()
             # Mask is made invisible
-            app.map.layer["hurrywave"].layer["mask_include"].set_visibility(False)
-            app.map.layer["hurrywave"].layer["mask_boundary"].set_visibility(False)
+            app.map.layer["hurrywave"].layer["mask_include"].hide()
+            app.map.layer["hurrywave"].layer["mask_boundary"].hide()
             # Boundary points are made grey
-            app.map.layer["hurrywave"].layer["boundary_points"].set_activity(False)
+            app.map.layer["hurrywave"].layer["boundary_points"].deactivate()
             # Observation points are made grey
-            app.map.layer["hurrywave"].layer["observation_points_regular"].set_activity(False)
-            app.map.layer["hurrywave"].layer["observation_points_spectra"].set_activity(False)
+            app.map.layer["hurrywave"].layer["observation_points_regular"].deactivate()
+            app.map.layer["hurrywave"].layer["observation_points_spectra"].deactivate()
         elif mode == "invisible":
             # Everything set to invisible
-            app.map.layer["hurrywave"].set_visibility(False)
+            app.map.layer["hurrywave"].hide()
 
     def set_gui_variables(self):
         group = "hurrywave"
