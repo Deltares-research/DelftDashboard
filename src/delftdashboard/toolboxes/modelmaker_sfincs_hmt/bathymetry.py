@@ -1,3 +1,5 @@
+import yaml
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
@@ -27,10 +29,17 @@ def select_bathymetry_source(*args):
 
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_names", dataset_names)
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_index", 0)
-
+    
+    name = dataset_names[0]
+    meta = app.data_catalog[name].meta
+    meta_str = yaml.dump(meta, default_flow_style=False)
+    app.gui.setvar("modelmaker_sfincs_hmt", "selected_bathymetry_dataset_meta", meta_str)
 
 def select_bathymetry_dataset(*args):
-    pass
+    name = app.gui.getvar("modelmaker_sfincs_hmt", "bathymetry_dataset_names")[args[0]]
+    meta = app.data_catalog[name].meta
+    meta_str = yaml.dump(meta, default_flow_style=False)
+    app.gui.setvar("modelmaker_sfincs_hmt", "selected_bathymetry_dataset_meta", meta_str)
 
 
 def use_dataset(*args):

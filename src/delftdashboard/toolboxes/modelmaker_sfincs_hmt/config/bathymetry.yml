@@ -32,7 +32,7 @@ element:
     variable: bathymetry_dataset_index
     select: index
     option_string:
-      variable: bathymetry_dataset_names
+      variable: bathymetry_dataset_names  
 - style: pushbutton
   position:
     x: 220
@@ -71,6 +71,21 @@ element:
   select: index
   option_string:
     variable: selected_bathymetry_dataset_names
+- style: panel
+  title: "Dataset properties"
+  position:
+    x: 480
+    y: 5
+    width: 160
+    height: 125
+  element:    
+  - style: text
+    position:
+      x: 10
+      y: 10
+      width: 140
+      height: 105
+    variable: selected_bathymetry_dataset_meta
 - style: pushbutton
   position:
     x: 440

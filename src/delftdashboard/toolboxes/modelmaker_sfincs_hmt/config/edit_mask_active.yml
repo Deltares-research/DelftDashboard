@@ -1,0 +1,105 @@
+window:
+  title: Grid properties
+  width: 600
+  height: 400
+  variable_group: modelmaker_sfincs_hmt
+  module: toolboxes.modelmaker_sfincs_hmt.mask_active_cells
+  modal: True
+  cancel: True
+element:
+- style: panel
+  title: "Type of model"
+  position:
+    x: 10
+    y: 340
+    width: 580
+    height: 50
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 10
+      width: 160
+      height: 20
+    text: "What type of model are you making?"
+    text_position: above
+    variable: model_type
+    select: item
+    method: select_model_type
+    option_string: ["Surge model", "Inundation model"]
+    option_value: [0,1]
+- style: panel
+  title: "Are you planning to include rainfall (and/or river discharge) in your model?"
+  position:
+    x: 10
+    y: 290
+    width: 580
+    height: 40
+  element:
+  - style: checbox
+    position:
+      x: 10
+      y: 10
+      width: 160
+      height: 20
+    text: "Are you planning to include rainfall (and/or river discharge) in your model?"
+    text_position: above
+    variable: include_rainfall
+    select: item
+    method: select_include_rainfall
+    option_string: ["No", "Yes"]
+    option_value: [0,1]
+- style: panel
+  title: "Active domain settings"
+  position:
+    x: 10
+    y: 170
+    width: 580
+    height: 110
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: include_rainfall
+      operator: eq
+      value: 0
+  element:
+  - style: edit
+    position:
+      x: -10
+      y: 80
+      width: 45
+      height: 20
+    text: Maximum elevation (m) to include in your active domain
+    variable: mask_active_zmax
+  - style: edit
+    position:
+      x: -10
+      y: 55
+      width: 45
+      height: 20
+    text: Minimum elevation (m) to include in your active domain
+    variable: mask_active_zmin
+  - style: edit
+    position:
+      x: -10
+      y: 30
+      width: 45
+      height: 20
+    text: Maximum area (km2) of cells surrounded by active cells to include in your active domain
+    variable: mask_active_fill_area
+  - style: edit
+    position:
+      x: -10
+      y: 5
+      width: 45
+      height: 20
+    text: Maxmium area (km2) of isolated cells to remove from your active domain
+    variable: mask_active_drop_area   
+- style: panel
+  title: "Load watershed data"
+  position:
+    x: 10
+    y: 170
+    width: 580
+    height: 110

@@ -113,6 +113,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "bathymetry_dataset_index", 0)
         app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
         app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
+        app.gui.setvar(group, "selected_bathymetry_dataset_meta", "")
         app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
         app.gui.setvar(group, "selected_bathymetry_dataset_offset", 0)

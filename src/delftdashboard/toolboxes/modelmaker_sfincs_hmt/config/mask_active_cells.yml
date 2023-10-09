@@ -7,147 +7,24 @@ element:
     width: 200
     height: 120
   element:
-  - style: text
+  - style: pushbutton
+    text: "View default active cells"
     position:
       x: 10
-      y: 95
+      y: 90
       width: 180
       height: 20
-    text: "Initialize the active mask with a polygon."
-  - style: popupmenu
+    method: update_mask_active
+  - style: pushbutton
+    text: "Modify default settings"
     position:
       x: 10
-      y: 75
-      width: 85
-      height: 20
-    select: index
-    tooltip: "Initialize the active mask with a polygon"
-    method: select_mask_init_polygon_method
-    variable: mask_init_polygon_methods_index
-    option_string:
-      variable: mask_init_polygon_methods
-  - style: pushbutton
-    text: Load Polygon
-    position:
-      x: 105
-      y: 75
-      width: 85
-      height: 20
-    method: load_mask_init_polygon
-    dependency:
-    - action: visible
-      checkfor: any
-      check:
-      - variable: mask_init_polygon_methods_index
-        operator: eq
-        value: 0
-  - style: pushbutton
-    text: Draw Polygon
-    position:
-      x: 105
-      y: 75
-      width: 85
-      height: 20
-    method: draw_mask_init_polygon
-    dependency:
-    - action: visible
-      checkfor: any
-      check:
-      - variable: mask_init_polygon_methods_index
-        operator: eq
-        value: 1
-  - style: pushbutton
-    text: Delete Polygon
-    position:
-      x: 105
-      y: 75
-      width: 85
-      height: 20
-    method: delete_mask_init_polygon
-    dependency:
-    - action: visible
-      checkfor: any
-      check:
-      - variable: mask_init_polygon_methods_index
-        operator: eq
-        value: 2
-  - style: pushbutton
-    text: Save Polygon
-    position:
-      x: 105
-      y: 75
-      width: 85
-      height: 20
-    method: save_mask_init_polygon
-    dependency:
-    - action: visible
-      checkfor: any
-      check:
-      - variable: mask_init_polygon_methods_index
-        operator: eq
-        value: 3
-  - style: text
-    position:
-      x: 10
-      y: 55
+      y: 65
       width: 180
       height: 20
-    text: "Active mask is initialized based on Zmax and Zmin"
-    dependency:
-    - action: visible
-      checkfor: any
-      check:
-      - variable: nr_mask_init_polygons
-        operator: eq
-        value: 0          
-  - style: text
-    position:
-      x: 10
-      y: 55
-      width: 180
-      height: 20
-    text: "NOTE: Zmax and Zmin only apply to the active (initialized) mask."
-    dependency:
-    - action: visible
-      checkfor: any
-      check:
-      - variable: nr_mask_init_polygons
-        operator: ge
-        value: 1   
-  - style: edit
-    position:
-      x: 40
-      y: 35
-      width: 45
-      height: 20
-    text: Zmax
-    variable: mask_active_zmax
-  - style: edit
-    position:
-      x: 40
-      y: 10
-      width: 45
-      height: 20
-    text: Zmin
-    variable: mask_active_zmin
-  - style: edit
-    position:
-      x: -10
-      y: 35
-      width: 45
-      height: 20
-    text: Fill area
-    variable: mask_active_fill_area
-  - style: edit
-    position:
-      x: -10
-      y: 10
-      width: 45
-      height: 20
-    text: Drop area
-    variable: mask_active_drop_area   
+    method: edit_mask_active
 - style: panel
-  title: Include Polygons
+  title: Add cells
   position:
     x: 220
     y: 10
@@ -193,27 +70,12 @@ element:
     text: Load Polygon
     position:
       x: 100
-      y: 40
-      width: 80
-      height: 20
-    method: load_include_polygon
-  - style: pushbutton
-    text: Save Polygon
-    position:
-      x: 100
       y: 15
       width: 80
       height: 20
-    method: save_include_polygon
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: nr_mask_include_polygons
-        operator: gt
-        value: 0
+    method: load_include_polygon
 - style: panel
-  title: Exclude Polygons
+  title: Remove cells
   position:
     x: 420
     y: 10
@@ -259,25 +121,10 @@ element:
     text: Load Polygon
     position:
       x: 100
-      y: 40
-      width: 80
-      height: 20
-    method: load_exclude_polygon
-  - style: pushbutton
-    text: Save Polygon
-    position:
-      x: 100
       y: 15
       width: 80
       height: 20
-    method: save_exclude_polygon
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: nr_mask_exclude_polygons
-        operator: gt
-        value: 0
+    method: load_exclude_polygon
 # - style: checkbox
 #   position:
 #     x: -10
