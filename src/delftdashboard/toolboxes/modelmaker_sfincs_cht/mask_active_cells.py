@@ -36,7 +36,6 @@ def delete_include_polygon(*args):
     app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].delete_feature(feature_id)
     # Delete from app
     app.toolbox["modelmaker_sfincs_cht"].include_polygon = app.toolbox["modelmaker_sfincs_cht"].include_polygon.drop(index).reset_index()
-
     # If the last polygon was deleted, set index to last available polygon
     if index > len(app.toolbox["modelmaker_sfincs_cht"].include_polygon) - 1:
         app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_index", len(app.toolbox["modelmaker_sfincs_cht"].include_polygon) - 1)

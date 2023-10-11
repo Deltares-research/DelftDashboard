@@ -51,6 +51,7 @@ class Toolbox(GenericToolbox):
         # Refinement
         self.refinement_levels = []
         self.refinement_polygon = gpd.GeoDataFrame()
+        self.refinement_file_name = "refinement.geojson"
 
         self.setup_dict = {}
 
@@ -299,7 +300,7 @@ class Toolbox(GenericToolbox):
             refpol = gdf2list(self.refinement_polygon)
             reflev = []
             for ipol in range(app.gui.getvar(group, "nr_refinement_polygons")):
-                reflev.append(self.refinement_levels[ipol] + 1) 
+                reflev.append(self.refinement_levels[ipol]) 
 
         model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation, refinement_polygons=refpol, refinement_levels=reflev)
         model.grid.write()
@@ -455,6 +456,15 @@ class Toolbox(GenericToolbox):
         # app.toolbox["modelmaker_sfincs_cht"].write_exclude_polygon()
         # app.toolbox["modelmaker_sfincs_cht"].write_boundary_polygon()
 
+    # READ
+
+    def read_refinement_polygon(self):
+        self.refinement_polygon = gpd.read_file(self.refinement_file_name)
+        # Loop through rows in geodataframe and set refinement levels        
+        self.refinement_levels = []
+        for i in range(len(self.refinement_polygon)):
+            self.refinement_levels.append(self.refinement_polygon["refinement_level"][i])
+
     def read_include_polygon(self):
         self.include_polygon = gpd.read_file(self.include_file_name)
         self.update_polygons()
@@ -479,6 +489,18 @@ class Toolbox(GenericToolbox):
         self.exclude_polygon_snapwave = gpd.read_file(self.exclude_file_name_snapwave)
         self.update_polygons()
 
+    # WRITE
+
+    def write_refinement_polygon(self):
+        if len(self.refinement_polygon) == 0:
+            return
+        gdf = gpd.GeoDataFrame({"geometry": self.refinement_polygon["geometry"],
+                                "refinement_level": self.refinement_levels})
+        # Iterate over all polygons and add refinement level
+        # refinement_level = 1 means one level of refinement
+        # refinement_level = 2 means two levels of refinement
+        # etc.
+        gdf.to_file(self.refinement_file_name, driver='GeoJSON')
 
     def write_include_polygon(self):
         if len(self.include_polygon) == 0:
@@ -516,7 +538,12 @@ class Toolbox(GenericToolbox):
         gdf = gpd.GeoDataFrame(geometry=self.exclude_polygon_snapwave["geometry"])
         gdf.to_file(self.exclude_file_name_snapwave, driver='GeoJSON')
 
+    # PLOT
 
+    def plot_refinement_polygon(self):
+        layer = app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"]
+        layer.clear()
+        layer.add_feature(self.refinement_polygon)
 
     def plot_include_polygon(self):
         layer = app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"]

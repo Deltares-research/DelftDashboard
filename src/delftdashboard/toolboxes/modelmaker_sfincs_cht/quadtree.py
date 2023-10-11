@@ -39,11 +39,13 @@ def delete_refinement_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_index")
     app.toolbox["modelmaker_sfincs_cht"].refinement_levels.pop(index)
-    feature_id = app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.loc[index, "id"]
+    feature_id = app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].get_feature_id(index)
     # Delete from map
     app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].delete_feature(feature_id)
     # Delete from app
-    app.toolbox["modelmaker_sfincs_cht"].refinement_polygon = app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.drop(index).reset_index()
+    app.toolbox["modelmaker_sfincs_cht"].refinement_polygon = app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.drop(index)
+    if len(app.toolbox["modelmaker_sfincs_cht"].refinement_polygon) > 0:
+        app.toolbox["modelmaker_sfincs_cht"].refinement_polygon = app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.reset_index(drop=True)
 
     # If the last polygon was deleted, set index to last available polygon
     if index > len(app.toolbox["modelmaker_sfincs_cht"].refinement_polygon) - 1:
@@ -57,53 +59,53 @@ def load_refinement_polygon(*args):
         app.toolbox["modelmaker_sfincs_cht"].refinement_file_name = fname[2]
     app.toolbox["modelmaker_sfincs_cht"].read_refinement_polygon()
     app.toolbox["modelmaker_sfincs_cht"].plot_refinement_polygon()
+    update()
 
 def save_refinement_polygon(*args):
     app.toolbox["modelmaker_sfincs_cht"].write_refinement_polygon()
 
 def select_refinement_polygon(*args):
     index = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.loc[index, "id"]
+    feature_id = app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].get_feature_id(index)
+#    feature_id = app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.loc[index, "id"]
     app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].activate_feature(feature_id)
-    levels = app.toolbox["modelmaker_sfincs_cht"].refinement_levels
-    app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_level", levels[index])
 
 def select_refinement_level(*args):
     level_index = args[0]
+    # Get index of selected polygon 
     index = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_index")
-    app.toolbox["modelmaker_sfincs_cht"].refinement_levels[index] = level_index
+    app.toolbox["modelmaker_sfincs_cht"].refinement_levels[index] = level_index + 1
     update()
 
 def refinement_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].refinement_polygon = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_cht"].refinement_polygon)
     app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_index", nrp - 1)
-    app.toolbox["modelmaker_sfincs_cht"].refinement_levels.append(0)
+    # Add refinement level
+    app.toolbox["modelmaker_sfincs_cht"].refinement_levels.append(1)
     update()
 
 def refinement_polygon_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].refinement_polygon = gdf
 
 def refinement_polygon_selected(index):
-    app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_index", index)
-    levels = app.toolbox["modelmaker_sfincs_cht"].refinement_levels
-    app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_level", levels[index])
     update()
 
-
-
 def update():
-    index = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_index")    
+    index = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_index")
+    levels = app.toolbox["modelmaker_sfincs_cht"].refinement_levels
+    if len(levels) > 0:
+        app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_level", levels[index] - 1)
+    else:
+        app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_level", 0)
     nrp = len(app.toolbox["modelmaker_sfincs_cht"].refinement_polygon)
     refnames = []
-    levels = app.toolbox["modelmaker_sfincs_cht"].refinement_levels
     levstr = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_levels")
     if nrp>0:
         for ip in range(nrp):
-            refnames.append(str(ip + 1) + " (" + levstr[levels[ip]] + ")")
-        app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_level", levels[index])
+            refnames.append(str(ip + 1) + " (" + levstr[levels[ip] - 1] + ")")
     else:        
-        app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_level", 0)
+        pass
     app.gui.setvar("modelmaker_sfincs_cht", "nr_refinement_polygons", nrp)
     app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_names", refnames)
     app.gui.window.update()
