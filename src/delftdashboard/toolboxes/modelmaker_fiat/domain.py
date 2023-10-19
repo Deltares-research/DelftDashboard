@@ -13,6 +13,14 @@ def select(*args):
     if active_layer:
         app.map.layer["modelmaker_fiat"].layer[active_layer].set_mode("active")
 
+def draw_boundary(*args):
+    print("Draw boundary")
+
+def zoom_to_boundary(*args):
+    print("Zoom to boundary")
+
+def generate_boundary(*args):
+    print("Generate boundary")
 
 def select_method(*args):
     app.gui.setvar("modelmaker_fiat", "selected_aoi_method", args[0])

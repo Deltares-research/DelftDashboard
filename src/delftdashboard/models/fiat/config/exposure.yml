@@ -6,6 +6,9 @@ element:
     width: -10
     height: 160
   tab:
+  - string: NSI Quick Build
+    module: models.fiat.exposure_nsi_quick_build
+    element: exposure_nsi_quick_build.yml
   - string: Asset Locations
     module: models.fiat.exposure_locations
     element: exposure_locations.yml

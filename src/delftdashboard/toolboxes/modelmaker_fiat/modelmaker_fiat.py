@@ -18,21 +18,21 @@ class Toolbox(GenericToolbox):
         super().__init__()
 
         self.name = name
-        self.long_name = "Domain"
+        self.long_name = "Model boundary"
 
         # Set GUI variable
         group = "modelmaker_fiat"
 
-        app.gui.setvar(group, "selected_aoi_method", "Draw Polygon")
+        app.gui.setvar(group, "selected_aoi_method", "polygon")
         app.gui.setvar(
             group,
             "setup_aoi_method_string",
-            ["Draw Polygon", "Draw Bounding Box", "Use SFINCS Domain", "Load File"],
+            ["Draw Polygon", "Draw box", "Select SFINCS model domain", "Upload file"],
         )
         app.gui.setvar(
             group,
             "setup_aoi_method_value",
-            ["Draw Polygon", "Draw Bounding Box", "Use SFINCS Domain", "Load File"],
+            ["polygon", "box", "sfincs", "file"],
         )
         app.gui.setvar(group, "active_area_of_interest", "")
         app.gui.setvar(group, "area_of_interest", 0)

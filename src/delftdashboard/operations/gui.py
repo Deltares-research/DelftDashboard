@@ -52,7 +52,7 @@ def build_gui_config():
     for model_name in app.model:
         # First insert tabs for Layers and Toolbox
         tab_panel = app.model[model_name].element
-        tab_panel["tab"].insert(0, {"string": "Layers", "element": [], "module": ""})
+        # tab_panel["tab"].insert(0, {"string": "Layers", "element": [], "module": ""}) #COMMENTED OUT BY LUIS TO REMOVE LAYERS TAB
         tab_panel["tab"].insert(0, {"string": "Toolbox", "element": [], "module": ""})
         app.gui.config["element"].append(app.model[model_name].element)
 

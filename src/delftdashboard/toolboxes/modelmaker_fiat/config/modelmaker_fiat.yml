@@ -7,6 +7,6 @@ element:
     width: -10
     height: 160
   tab:
-  - string: Domain
+  - string: Model boundary
     module: toolboxes.modelmaker_fiat.domain
     element: domain.yml
