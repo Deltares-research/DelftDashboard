@@ -12,9 +12,9 @@ element:
     element: exposure.yml
   - string: Vulnerability
     element: vulnerability.yml
-  - string: Hazard
-    element: hazard.yml
-  - string: SVI
-    element: svi.yml
-  - string: Output
-    element: output.yml
+  # - string: Hazard
+  #   element: hazard.yml
+  # - string: SVI
+  #   element: svi.yml
+  - string: Create Model
+    element: create_model.yml

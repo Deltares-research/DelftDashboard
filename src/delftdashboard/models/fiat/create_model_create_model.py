@@ -14,6 +14,8 @@ def select(*args):
     # De-activate existing layers
     map.update()
 
+def create_model(*args):
+    print("Create Delft-FIAT model")
 
 def edit(*args):
     app.model["fiat"].set_model_variables()

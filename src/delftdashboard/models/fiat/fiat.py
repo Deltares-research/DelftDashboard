@@ -5,6 +5,8 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 import os
+import geopandas as gpd
+import pandas as pd
 from PyQt5.QtWidgets import QFileDialog
 from pathlib import Path
 
@@ -49,6 +51,18 @@ class Model(GenericModel):
     def set_gui_variables(self):
         group = "fiat"
         # Input variables
+        csv_file_path = "c:\\users\\rodrigue\\GitHub\\DelftDashboard\\data\\default_hazus_iwr_curve_linking.csv"
+        df = pd.read_csv(csv_file_path, usecols=["Exposure Link", "Damage Type", "Description", "Source"])
+        df = df[["Exposure Link", "Damage Type", "Source", "Description"]]
+        app.gui.setvar(group, "damage_curves", df)
+        
+        app.gui.setvar(group, "display_asset_locations", None)
+        app.gui.setvar(group, "display_classification", None)
+        app.gui.setvar(group, "display_asset_heights", None)
+        app.gui.setvar(group, "display_max_potential_values", None)
+        app.gui.setvar(group, "display_aggregation", None)
+        app.gui.setvar(group, "display_damage_curves", None)
+        
         app.gui.setvar(
             group,
             "asset_locations_string",
@@ -267,6 +281,22 @@ class Model(GenericModel):
             / self.name
             / "config"
             / "exposure_asset_locations_fields.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, None)
+        if not okay:
+            return
+
+    def specify_damage_curves(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "vulnerability_specify_damage_curves.yml"
         )
         # Create pop-up and only continue if user presses ok
         okay, data = app.gui.popup(pop_win_config_path, None)

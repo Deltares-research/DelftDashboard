@@ -21,8 +21,9 @@ class Toolbox(GenericToolbox):
         self.long_name = "Model boundary"
 
         # Set GUI variable
+        
         group = "modelmaker_fiat"
-
+        
         app.gui.setvar(group, "selected_aoi_method", "polygon")
         app.gui.setvar(
             group,
