@@ -20,17 +20,6 @@ def set_variables(*args):
 
 
 def build_nsi_exposure(*args):
-    print("Build NSI exposure")
-
-def set_asset_locations(*args):
-    print("Set asset locations")
-
-
-def set_asset_locations_field(*args):
-    app.model["fiat"].set_asset_locations_field()
-
-
-def activate_create_nsi_assets(*args):
     app.gui.setvar("fiat", "created_nsi_assets", "nsi")
     app.gui.setvar("fiat", "text_feedback_create_asset_locations", "NSI assets created")
 
@@ -47,7 +36,7 @@ def activate_create_nsi_assets(*args):
 
     app.map.layer["fiat"].layer["exposure_points"].crs = crs
     app.map.layer["fiat"].layer["exposure_points"].set_data(
-        gdf, hover_property="Object ID"
+        gdf #, hover_property="Object ID"
     )
 
     app.gui.setvar(
@@ -64,6 +53,13 @@ def activate_create_nsi_assets(*args):
     )
 
     app.gui.setvar("fiat", "show_asset_locations", True)
+
+def set_asset_locations(*args):
+    print("Set asset locations")
+
+
+def set_asset_locations_field(*args):
+    app.model["fiat"].set_asset_locations_field()
 
 
 def display_asset_locations(*args):
