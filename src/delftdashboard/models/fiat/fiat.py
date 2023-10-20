@@ -5,7 +5,6 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 import os
-import geopandas as gpd
 import pandas as pd
 from PyQt5.QtWidgets import QFileDialog
 from pathlib import Path
@@ -51,10 +50,9 @@ class Model(GenericModel):
     def set_gui_variables(self):
         group = "fiat"
         # Input variables
-        csv_file_path = "c:\\users\\rodrigue\\GitHub\\DelftDashboard\\data\\default_hazus_iwr_curve_linking.csv"
-        df = pd.read_csv(csv_file_path, usecols=["Exposure Link", "Damage Type", "Description", "Source"])
-        df = df[["Exposure Link", "Damage Type", "Source", "Description"]]
-        app.gui.setvar(group, "damage_curves", df)
+        default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
+        default_curves = default_curves[["Exposure Link", "Damage Type", "Source", "Description"]]
+        app.gui.setvar(group, "damage_curves", default_curves)
         
         app.gui.setvar(group, "display_asset_locations", None)
         app.gui.setvar(group, "display_classification", None)
