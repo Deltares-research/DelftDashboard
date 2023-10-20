@@ -25,6 +25,6 @@ dependencies:
   - pip
   - pip:
     - NDBC
-    - git+https://github.com/Deltares/hydromt_fiat.git@fiat_integrator
+    - git+https://github.com/Deltares/hydromt_fiat.git
     - git+https://github.com/Deltares/Guitares.git@env_fix
     - git+https://github.com/Deltares/CoastalHazardsToolkit.git@mvo
