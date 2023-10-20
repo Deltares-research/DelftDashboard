@@ -66,7 +66,7 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "asset_locations_string",
-            ["National Structure Inventory (NSI)", "Upload data"],
+            ["National Structure Inventory (NSI)", "Upload file"],
         )
         app.gui.setvar(group, "asset_locations_value", ["nsi", "file"])
         app.gui.setvar(group, "asset_locations", "nsi")
@@ -168,6 +168,12 @@ class Model(GenericModel):
             ],
         )
         app.gui.setvar(group, "selected_primary_classification_value", 0)
+        app.gui.setvar(group, "selected_asset_locations", 0)
+        app.gui.setvar(
+            group,
+            "selected_asset_locations_string",
+            [""],
+        )
         app.gui.setvar(
             group,
             "selected_secondary_classification_string",
