@@ -14,20 +14,45 @@ def select(*args):
         app.map.layer["modelmaker_fiat"].layer[active_layer].set_mode("active")
 
 def draw_boundary(*args):
-    print("Draw boundary")
+    selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
+    if selected_method == "polygon":
+        draw_polygon()
+    elif selected_method == "box":
+        draw_bbox()
+    elif selected_method == "sfincs":
+        print("Not yet implemented")
+        pass
+    elif selected_method == "file":
+        load_aoi_file()
 
 def zoom_to_boundary(*args):
-    print("Zoom to boundary")
+    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+    gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
+
+    # get the aoi bounds
+    bounds = gdf.geometry.bounds
+
+    # Fly to the site
+    app.map.fit_bounds(bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0])
 
 def generate_boundary(*args):
-    print("Generate boundary")
+    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+    if active_layer:
+        gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
+
+        hydromt_vm = app.toolbox["modelmaker_fiat"].set_scenario()
+        gdf.to_file(HydroMtViewModel.database.drive / "aoi.geojson", driver="GeoJSON")
+        hydromt_vm.exposure_vm.create_interest_area(
+            fpath=str(HydroMtViewModel.database.drive / "aoi.geojson")
+        )
+
+        app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
+        time.sleep(0.5)
+        app.map.layer["modelmaker_fiat"].layer[active_layer].show()
+
 
 def select_method(*args):
     app.gui.setvar("modelmaker_fiat", "selected_aoi_method", args[0])
-
-
-def set_scenario(*args):
-    hydromt_vm = app.toolbox["modelmaker_fiat"].set_scenario()
 
 
 def set_crs(*args):
@@ -47,7 +72,7 @@ def clear_aoi_layers():
             layer.clear()
 
 
-def draw_bbox(*args):
+def draw_bbox():
     clear_aoi_layers()
 
     # Clear grid outline layer
@@ -59,7 +84,7 @@ def draw_bbox(*args):
     )
 
 
-def draw_polygon(*args):
+def draw_polygon():
     clear_aoi_layers()
 
     # Set the crs of the polygon layer and draw it
@@ -71,7 +96,7 @@ def draw_polygon(*args):
     )
 
 
-def load_aoi_file(*args):
+def load_aoi_file():
     clear_aoi_layers()
 
     fname = app.gui.window.dialog_open_file(
@@ -89,7 +114,7 @@ def load_aoi_file(*args):
         )
 
         # Fly to the site
-        fly_to_site()
+        zoom_to_boundary()
 
 
 def load_sfincs_domain(*args):
@@ -115,17 +140,6 @@ def load_sfincs_domain(*args):
     )
 
 
-def fly_to_site(*args):
-    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
-    gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
-
-    # get the aoi bounds
-    bounds = gdf.geometry.bounds
-
-    # Fly to the site
-    app.map.fit_bounds(bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0])
-
-
 def read_setup_yaml(*args):
     fname = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
     if fname[0]:
@@ -141,19 +155,3 @@ def write_setup_yaml(*args):
 
 def build_model(*args):
     app.toolbox["modelmaker_fiat"].build_model()
-
-
-def generate_aoi(*args):
-    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
-    if active_layer:
-        gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
-
-        hydromt_vm = app.toolbox["modelmaker_fiat"].set_scenario()
-        gdf.to_file(HydroMtViewModel.database.drive / "aoi.geojson", driver="GeoJSON")
-        hydromt_vm.exposure_vm.create_interest_area(
-            fpath=str(HydroMtViewModel.database.drive / "aoi.geojson")
-        )
-
-        app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
-        time.sleep(0.5)
-        app.map.layer["modelmaker_fiat"].layer[active_layer].show()
