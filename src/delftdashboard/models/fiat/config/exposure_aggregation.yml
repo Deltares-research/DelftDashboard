@@ -1,8 +1,51 @@
 element:
-- style: panel
-  text: TBD
-  position:    
-    x: 10
-    y: 10
-    width: 200
-    height: 120
+- style: listbox
+  position:
+      x: 10
+      y: 35
+      width: 150
+      height: 85
+  text: "Loaded Datasets"
+  text_position: "above"
+  method: select_selected_primary_classification
+  variable: selected_primary_classification_value
+  select: index
+  option_string:
+    variable: selected_primary_classification_string
+- style: pushbutton
+  position:
+    x: 170
+    y: 95
+    width: 20
+    height: 20
+  text: "\u25B2"
+  method: move_up_selected_secondary_classification
+- style: pushbutton
+  position:
+    x: 170
+    y: 75
+    width: 20
+    height: 20
+  text: "\u25BC"
+  method: move_down_selected_secondary_classification
+- style: pushbutton
+  position:
+    x: 170
+    y: 45
+    width: 20
+    height: 20
+  text: "\u2716"
+  method: remove_selected_secondary_classification
+- style: listbox
+  position:
+      x: 200
+      y: 35
+      width: 150
+      height: 85
+  text: "Selected aggregation"
+  text_position: "above"
+  method: select_selected_primary_classification
+  variable: selected_primary_classification_value
+  select: index
+  option_string:
+    variable: selected_primary_classification_string
