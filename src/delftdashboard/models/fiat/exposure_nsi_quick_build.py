@@ -36,7 +36,7 @@ def build_nsi_exposure(*args):
 
     app.map.layer["fiat"].layer["exposure_points"].crs = crs
     app.map.layer["fiat"].layer["exposure_points"].set_data(
-        gdf #, hover_property="Object ID"
+        gdf
     )
 
     app.gui.setvar(

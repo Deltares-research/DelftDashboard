@@ -37,6 +37,7 @@ class Model(GenericModel):
             circle_radius=3,
             fill_color="orange",
             line_color="transparent",
+            hover_property="Secondary Object Type"
         )
 
     def set_layer_mode(self, mode):
@@ -242,7 +243,7 @@ class Model(GenericModel):
     def open(self):
         # Open input file, and change working directory
         fname = app.gui.window.dialog_open_file(
-            "Open file", filter="fiat input file;;ini files (*.ini)"
+            "Open file", filter="FIAT model configuration;;yaml files (*.yaml)"
         )
         fname = fname[0]
         if fname:

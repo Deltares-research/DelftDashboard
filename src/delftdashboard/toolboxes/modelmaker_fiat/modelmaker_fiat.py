@@ -6,7 +6,6 @@ Created on Mon May 10 12:18:09 2021
 """
 
 import geopandas as gpd
-from pyproj import CRS
 
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 from delftdashboard.operations.toolbox import GenericToolbox
@@ -28,7 +27,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(
             group,
             "setup_aoi_method_string",
-            ["Draw Polygon", "Draw box", "Select SFINCS model domain", "Upload file"],
+            ["Draw polygon", "Draw box", "SFINCS model domain", "Upload file"],
         )
         app.gui.setvar(
             group,
@@ -112,66 +111,3 @@ class Toolbox(GenericToolbox):
     def set_crs(self):
         selected_crs = app.gui.getvar("modelmaker_fiat", "selected_crs")
         app.gui.setvar("fiat", "selected_crs", selected_crs)
-
-    def generate_grid(self):
-        dlg = app.gui.window.dialog_wait("Generating grid ...")
-
-        # model = app.model["fiat"].domain
-
-        # group = "modelmaker_fiat"
-        # model.input.variables.x0 = app.gui.getvar(group, "x0")
-
-        # group = "fiat"
-        # app.gui.setvar(group, "x0", model.input.variables.x0)
-
-        # model.grid.build()
-
-        # app.map.layer["fiat"].layer["grid"].set_data(
-        #     model.grid,
-        #     xlim=[app.gui.getvar(group, "x0"), app.gui.getvar(group, "x0")],
-        #     ylim=[app.gui.getvar(group, "y0"), app.gui.getvar(group, "y0")],
-        # )
-
-        dlg.close()
-
-    def build_model(self):
-        self.generate_grid()
-        self.update_mask()
-
-    def update_polygons(self):
-        nrp = len(self.include_polygon)
-        incnames = []
-        for ip in range(nrp):
-            incnames.append(str(ip + 1))
-        app.gui.setvar("modelmaker_fiat", "nr_include_polygons", nrp)
-        app.gui.setvar("modelmaker_fiat", "include_polygon_names", incnames)
-
-        nrp = len(self.exclude_polygon)
-        excnames = []
-        for ip in range(nrp):
-            excnames.append(str(ip + 1))
-        app.gui.setvar("modelmaker_fiat", "nr_exclude_polygons", nrp)
-        app.gui.setvar("modelmaker_fiat", "exclude_polygon_names", excnames)
-
-        nrp = len(self.boundary_polygon)
-        bndnames = []
-        for ip in range(nrp):
-            bndnames.append(str(ip + 1))
-        app.gui.setvar("modelmaker_fiat", "nr_boundary_polygons", nrp)
-        app.gui.setvar("modelmaker_fiat", "boundary_polygon_names", bndnames)
-
-        app.toolbox["modelmaker_fiat"].write_boundary_polygon()
-
-    def plot_include_polygon(self):
-        layer = app.map.layer["modelmaker_fiat"].layer["mask_include"]
-        layer.clear()
-        layer.add_feature(self.include_polygon)
-
-    def read_setup_yaml(self, file_name):
-        pass
-
-    def write_setup_yaml(self):
-        pass
-
-    def generate_aoi(self):
-        pass
