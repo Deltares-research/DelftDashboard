@@ -18,6 +18,21 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].activate()
     app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].activate()
 
+def select_model_type(*args):
+    group = "modelmaker_sfincs_hmt"
+    model_type = app.gui.getvar(group, "model_type")
+
+    if model_type == 0: #inundation
+        app.gui.setvar(group, "mask_active_zmax", 10.0)
+        app.gui.setvar(group, "mask_active_zmin", -10.0)
+        app.gui.setvar(group, "mask_active_drop_area", 10.0)
+        app.gui.setvar(group, "mask_active_fill_area", 10.0)
+    elif model_type == 1: #surge
+        app.gui.setvar(group, "mask_active_zmax", 5.0)
+        app.gui.setvar(group, "mask_active_zmin", -500.0)
+        app.gui.setvar(group, "mask_active_drop_area", 10.0)
+        app.gui.setvar(group, "mask_active_fill_area", 100.0)
+
 
 def select_mask_init_polygon_method(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_init_polygon_methods_index", args[0])
@@ -204,6 +219,12 @@ def exclude_polygon_selected(index):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_exclude_polygon_index", index)
     update()
 
+
+def mask_add_tick_box(*args):
+    app.gui.setvar("modelmaker_sfincs_hmt", "mask_active_add", args[0])
+
+def mask_del_tick_box(*args):
+    app.gui.setvar("modelmaker_sfincs_hmt", "mask_active_del", args[0])
 
 def tick_box(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_active_reset", args[0])

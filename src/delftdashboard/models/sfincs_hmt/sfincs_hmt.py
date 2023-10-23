@@ -35,14 +35,14 @@ class Model(GenericModel):
             "grid",
             type="line",
             circle_radius=0,
-            file_name="sfincs_grid.geojson",
+            # file_name="sfincs_grid.geojson",
             line_color="black",
         )
 
         layer.add_layer(
             "mask_active",
             type="circle",
-            file_name="sfincs_mask_active.geojson",
+            # file_name="sfincs_mask_active.geojson",
             circle_radius=3,
             fill_color="yellow",
             line_color="transparent",
@@ -51,7 +51,7 @@ class Model(GenericModel):
         layer.add_layer(
             "mask_bound_wlev",
             type="circle",
-            file_name="sfincs_mask_bound_wlev.geojson",
+            # file_name="sfincs_mask_bound_wlev.geojson",
             circle_radius=3,
             fill_color="blue",
             line_color="transparent",
@@ -60,7 +60,7 @@ class Model(GenericModel):
         layer.add_layer(
             "mask_bound_outflow",
             type="circle",
-            file_name="sfincs_mask_bound_outflow.geojson",
+            # file_name="sfincs_mask_bound_outflow.geojson",
             circle_radius=3,
             fill_color="red",
             line_color="transparent",
@@ -240,6 +240,17 @@ class Model(GenericModel):
         crs = app.crs
         if self.domain.crs != crs:
             self.domain.set_crs(crs)
+
+            # change default resolutions
+            group = "modelmaker_sfincs_hmt"
+            if app.crs.is_geographic:
+                app.gui.setvar(group, "dx", 0.1)
+                app.gui.setvar(group, "dy", 0.1)
+                app.gui.setvar(group, "res", 0.1)
+            else:
+                app.gui.setvar(group, "dx", 500)
+                app.gui.setvar(group, "dy", 500)
+                app.gui.setvar(group, "res", 500)
             # self.plot()
 
     def select_working_directory(self):

@@ -1,119 +1,61 @@
 element:
 - style: panel
-  title: "Subgrid settings"
+  title: "Summary of used datasets"
   position:
     x: 10
     y: 10
-    width: 220
+    width: 390
     height: 120
   element:
-  - style: edit
+  - style: listbox
     position:
-      x: 60
-      y: 95
-      width: 45
-      height: 15
-    text: Nr of pixels
-    variable: nr_subgrid_pixels
-    method: edit_nr_subgrid_pixels
-  - style: edit
+      x: 10
+      y: 10
+      width: 180
+      height: 80
+    text: "Selected Bathyemtry Datasets"
+    text_position: "above"
+    tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
+      they appear in this list, unless specified otherwise.
+    option_string:
+      variable: selected_bathymetry_dataset_names
+    enable: False
+  - style: listbox
     position:
-      x: 60
-      y: 75
-      width: 45
-      height: 15
-    text: Nr of bins
-    variable: nbins
-  - style: edit
-    position:
-      x: 60
-      y: 55
-      width: 45
-      height: 15
-    text: Max gradient
-    variable: max_gradient
-  - style: edit
-    position:
-      x: 60
-      y: 35
-      width: 45
-      height: 15
-    text: Block size
-    variable: nrmax
-  - style: edit
-    position:
-      x: 60
-      y: 15
-      width: 45
-      height: 15
-    text: Min elevation
-    variable: z_minimum
-  - style: checkbox
-    position:
-      x: -10
-      y: 95
-      width: 80
-      height: 15
-    variable: write_dep_tif
-    text: Write dep tif
-  - style: checkbox
-    position:
-      x: -10
-      y: 75
-      width: 80
-      height: 15
-    variable: write_man_tif
-    text: Write manning tif
-  - style: checkbox 
-    position:
-      x: -10
-      y: 55
-      width: 80
-      height: 15
-    variable: extrapolate_values
-    text: Extrapolate Values
-- style: listbox
-  position:
-    x: 240
-    y: 10
-    width: 180
-    height: 110
-  text: "Selected Bathyemtry Datasets"
-  text_position: "above"
-  tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
-    they appear in this list, unless specified otherwise.
-  option_string:
-    variable: selected_bathymetry_dataset_names
-  enable: False
-- style: listbox
-  position:
-    x: 430
-    y: 10
-    width: 180
-    height: 110
-  text: "Selected Manning Datasets"
-  text_position: "above"
-  tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
-    they appear in this list, unless specified otherwise.
-  option_string:
-    variable: selected_manning_dataset_names
-  enable: False
-- style: edit
-  position:
-    x: -10
-    y: 35
-    width: 45
-    height: 20
-  text: "Buffer cells"
-  variable: subgrid_buffer_cells
-  enable: False
+      x: 200
+      y: 10
+      width: 180
+      height: 80
+    text: "Selected Manning Datasets"
+    text_position: "above"
+    tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
+      they appear in this list, unless specified otherwise.
+    option_string:
+      variable: selected_manning_dataset_names
+    enable: False
+# - style: checkbox
+#   position:
+#     x: -10
+#     y: 50
+#     width: 80
+#     height: 15
+#   variable: write_dep_tif
+#   text: Write elevation tif
+# - style: checkbox
+#   position:
+#     x: -10
+#     y: 35
+#     width: 80
+#     height: 15
+#   variable: write_man_tif
+#   text: Write manning tif    
 - style: pushbutton
   position:
     x: -10
     y: 10
     width: 90
     height: 20
-  text: "Generate Subgrid"
+  text: "Build model"
   method: generate_subgrid
   dependency:
   - action: enable

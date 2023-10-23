@@ -48,8 +48,19 @@ def update_crs(new_crs):
     app.map.crs = app.crs
 
     # Re-initialize all models with new CRS
-    file.new(None)
+    # file.new(None)
+
+    # Also change the model crs
+    for model in app.model:
+        try:
+            app.model[model].set_crs()
+        except:
+            print("No method set_crs for model: ", model)
+    # Also change the toolbox crs
+    for toolbox in app.toolbox:
+        app.toolbox[toolbox].set_crs()
 
     # Update GUI
     app.gui.window.update()
+
 

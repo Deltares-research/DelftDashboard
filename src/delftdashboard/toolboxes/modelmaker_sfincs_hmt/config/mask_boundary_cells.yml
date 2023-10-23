@@ -9,29 +9,31 @@ element:
   element:
   - style: listbox
     position:
-      x: 10
+      x: 130
       y: 10
       width: 80
-      height: 100
+      height: 70
+    text: "Restrict area with polygons: "
+    text_position: left
     method: select_wlev_polygon
     variable: wlev_include_polygon_index
     select: index
     option_string:
       variable: wlev_include_polygon_names
   - style: pushbutton
-    text: Draw Polygon
+    text: Draw
     position:
-      x: 100
-      y: 90
-      width: 80
+      x: 220
+      y: 60
+      width: 40
       height: 20
     method: draw_wlev_polygon
   - style: pushbutton
-    text: Delete Polygon
+    text: Delete
     position:
-      x: 100
-      y: 65
-      width: 80
+      x: 220
+      y: 35
+      width: 40
       height: 20
     method: delete_wlev_polygon
     dependency:
@@ -42,53 +44,22 @@ element:
         operator: gt
         value: 0
   - style: pushbutton
-    text: Load Polygon
+    text: Load
     position:
-      x: 100
-      y: 40
-      width: 80
+      x: 220
+      y: 10
+      width: 40
       height: 20
     method: load_wlev_polygon
-  - style: pushbutton
-    text: Save Polygon
-    position:
-      x: 100
-      y: 15
-      width: 80
-      height: 20
-    method: save_wlev_polygon
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: nr_wlev_include_polygons
-        operator: gt
-        value: 0
   - style: edit
     position:
       x: 215
       y: 90
       width: 45
       height: 20
-    text: Zmax
-    variable: wlev_zmax
-  - style: edit
-    position:
-      x: 215
-      y: 65
-      width: 45
-      height: 20
-    text: Zmin
-    variable: wlev_zmin
-  - style: checkbox
-    position:
-      x: 215
-      y: 40
-      width: 45
-      height: 20
-    text: Reset
-    method: tick_box_wlev
-    variable: wlev_reset        
+    text:  "Restrict to cells with a maximum elevation of (in m+MSL): "
+    text_position: left
+    variable: wlev_zmax  
 - style: panel
   title: Outflow boundaries
   position:
@@ -99,29 +70,31 @@ element:
   element:
   - style: listbox
     position:
-      x: 10
+      x: 130
       y: 10
       width: 80
-      height: 100
+      height: 70
+    text: "Restrict area with polygons: "
+    text_position: left      
     method: select_outflow_polygon
     variable: outflow_include_polygon_index
     select: index
     option_string:
       variable: outflow_include_polygon_names
   - style: pushbutton
-    text: Draw Polygon
+    text: Draw
     position:
-      x: 100
-      y: 90
-      width: 80
+      x: 220
+      y: 60
+      width: 40
       height: 20
     method: draw_outflow_polygon
   - style: pushbutton
-    text: Delete Polygon
+    text: Delete
     position:
-      x: 100
-      y: 65
-      width: 80
+      x: 220
+      y: 35
+      width: 40
       height: 20
     method: delete_outflow_polygon
     dependency:
@@ -132,53 +105,22 @@ element:
         operator: gt
         value: 0
   - style: pushbutton
-    text: Load Polygon
+    text: Load
     position:
-      x: 100
-      y: 40
-      width: 80
+      x: 220
+      y: 10
+      width: 40
       height: 20
     method: load_outflow_polygon
-  - style: pushbutton
-    text: Save Polygon
-    position:
-      x: 100
-      y: 15
-      width: 80
-      height: 20
-    method: save_outflow_polygon
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: nr_outflow_include_polygons
-        operator: gt
-        value: 0
   - style: edit
     position:
       x: 215
       y: 90
       width: 45
       height: 20
-    text: Zmax
-    variable: outflow_zmax
-  - style: edit
-    position:
-      x: 215
-      y: 65
-      width: 45
-      height: 20
-    text: Zmin
-    variable: outflow_zmin
-  - style: checkbox
-    position:
-      x: 215
-      y: 40
-      width: 45
-      height: 20
-    text: Reset
-    method: tick_box_outflow
-    variable: outflow_reset            
+    text:  "Restrict to cells with a minimum elevation of (in m+MSL): "
+    text_position: left
+    variable: outflow_zmin        
 - style: pushbutton
   text: Reset Bounds
   position:

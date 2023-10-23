@@ -196,6 +196,8 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "mask_exclude_polygon_names", [])
         app.gui.setvar(group, "mask_exclude_polygon_index", 0)
         app.gui.setvar(group, "nr_mask_exclude_polygons", 0)
+        app.gui.setvar(group, "mask_active_add", False)
+        app.gui.setvar(group, "mask_active_del", False)
 
         # Mask bounds
         app.gui.setvar(group, "wlev_include_polygon_names", [])
@@ -433,8 +435,12 @@ class Toolbox(GenericToolbox):
             "mask": app.toolbox[group].mask_init_polygon
             if not app.toolbox[group].mask_init_polygon.empty
             else None,
-            "include_mask": app.toolbox[group].mask_include_polygon,
-            "exclude_mask": app.toolbox[group].mask_exclude_polygon,
+            "include_mask": app.toolbox[group].mask_include_polygon
+            if not app.toolbox[group].mask_include_polygon.empty
+            else None,
+            "exclude_mask": app.toolbox[group].mask_exclude_polygon
+            if not app.toolbox[group].mask_exclude_polygon.empty
+            else None,
             "zmin": app.gui.getvar(group, "mask_active_zmin"),
             "zmax": app.gui.getvar(group, "mask_active_zmax"),
             "drop_area": app.gui.getvar(group, "mask_active_drop_area"),
@@ -492,7 +498,7 @@ class Toolbox(GenericToolbox):
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_data(gdf_wlev)
 
         gdf_outflow = mask2gdf(mask, option="outflow")
-        if gdf_wlev is not None:
+        if gdf_outflow is not None:
             app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_data(
                 gdf_outflow
             )

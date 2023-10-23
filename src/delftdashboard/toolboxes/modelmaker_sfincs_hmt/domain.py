@@ -6,7 +6,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 from hydromt_sfincs import utils
-
+import time
 
 def select(*args):
     # De-activate existing layers
@@ -265,10 +265,15 @@ def redraw_rectangle():
         app.gui.getvar(group, "rotation"),
     )
 
+    # pause the code for 5 seconds to allow the map to update
+    time.sleep(5)
+
     gdf = app.map.layer[group].layer["grid_outline"].get_gdf()
     app.toolbox[group].grid_outline = gdf
-    if not app.toolbox[group].grid_outline.empty:
-        app.gui.setvar(group, "grid_outline", 1)
+    # if not app.toolbox[group].grid_outline.empty:
+    #NOTE apparently this needs time to update the map hence first time the gdf is empty
+    # howeevr, the bbox should be present once reaching this part of the code
+    app.gui.setvar(group, "grid_outline", 1)
 
 
 def read_setup_yaml(*args):

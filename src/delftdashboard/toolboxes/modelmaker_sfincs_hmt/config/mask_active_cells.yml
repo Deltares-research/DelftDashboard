@@ -23,6 +23,26 @@ element:
       width: 180
       height: 20
     method: edit_mask_active
+  - style: checkbox
+    position:
+      x: 10
+      y: 35
+      width: 180
+      height: 20
+    text: "Manually add cells to your active mask"
+    text_position: right
+    method: mask_add_tick_box
+    variable: mask_active_add
+  - style: checkbox
+    position:
+      x: 10
+      y: 10
+      width: 180
+      height: 20
+    text: "Manually remove cells from your active mask"
+    text_position: right
+    method: mask_del_tick_box
+    variable: mask_active_del
 - style: panel
   title: Add cells
   position:
@@ -30,6 +50,13 @@ element:
     y: 10
     width: 190
     height: 120
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: mask_active_add
+      operator: eq
+      value: true
   element:
   - style: listbox
     position:
@@ -81,6 +108,16 @@ element:
     y: 10
     width: 190
     height: 120
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: mask_active_del
+      operator: eq
+      value: true
+    - variable: mask_active_add
+      operator: eq
+      value: true
   element:
   - style: listbox
     position:
@@ -125,15 +162,67 @@ element:
       width: 80
       height: 20
     method: load_exclude_polygon
-# - style: checkbox
-#   position:
-#     x: -10
-#     y: 35
-#     width: 80
-#     height: 20
-#   text: Reset Mask
-#   method: tick_box
-#   variable: mask_active_reset       
+- style: panel
+  title: Remove cells
+  position:
+    x: 220
+    y: 10
+    width: 190
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: mask_active_del
+      operator: eq
+      value: true
+    - variable: mask_active_add
+      operator: eq
+      value: false
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 80
+      height: 100
+    method: select_exclude_polygon
+    variable: mask_exclude_polygon_index
+    select: index
+    option_string:
+      variable: mask_exclude_polygon_names
+    tooltip: "Areas within these polygons are explicitly excluded in the active mask. \nNote: exclude polygons overrule the include polygons."
+  - style: pushbutton
+    text: Draw Polygon
+    position:
+      x: 100
+      y: 90
+      width: 80
+      height: 20
+    method: draw_exclude_polygon
+  - style: pushbutton
+    text: Delete Polygon
+    position:
+      x: 100
+      y: 65
+      width: 80
+      height: 20
+    method: delete_exclude_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_mask_exclude_polygons
+        operator: gt
+        value: 0
+  - style: pushbutton
+    text: Load Polygon
+    position:
+      x: 100
+      y: 15
+      width: 80
+      height: 20
+    method: load_exclude_polygon   
 - style: pushbutton
   text: Update Mask
   position:

@@ -26,8 +26,8 @@ element:
     variable: model_type
     select: item
     method: select_model_type
-    option_string: ["Surge model", "Inundation model"]
-    option_value: [0,1]
+    option_string: ["Inundation model", "Surge model", "Other"]
+    option_value: [0,1,2]
 - style: panel
   title: "Are you planning to include rainfall (and/or river discharge) in your model?"
   position:
@@ -36,14 +36,12 @@ element:
     width: 580
     height: 40
   element:
-  - style: checbox
+  - style: popupmenu
     position:
       x: 10
       y: 10
       width: 160
       height: 20
-    text: "Are you planning to include rainfall (and/or river discharge) in your model?"
-    text_position: above
     variable: include_rainfall
     select: item
     method: select_include_rainfall
@@ -57,44 +55,48 @@ element:
     width: 580
     height: 110
   dependency:
-  - action: enable
+  - action: visible
     checkfor: all
     check:
     - variable: include_rainfall
-      operator: eq
-      value: 0
+      operator: neq
+      value: 1
   element:
   - style: edit
     position:
-      x: -10
+      x: 10
       y: 80
       width: 45
       height: 20
     text: Maximum elevation (m) to include in your active domain
+    text_position: right
     variable: mask_active_zmax
   - style: edit
     position:
-      x: -10
+      x: 10
       y: 55
       width: 45
       height: 20
     text: Minimum elevation (m) to include in your active domain
+    text_position: right
     variable: mask_active_zmin
   - style: edit
     position:
-      x: -10
+      x: 10
       y: 30
       width: 45
       height: 20
     text: Maximum area (km2) of cells surrounded by active cells to include in your active domain
+    text_position: right
     variable: mask_active_fill_area
   - style: edit
     position:
-      x: -10
+      x: 10
       y: 5
       width: 45
       height: 20
     text: Maxmium area (km2) of isolated cells to remove from your active domain
+    text_position: right
     variable: mask_active_drop_area   
 - style: panel
   title: "Load watershed data"
@@ -103,3 +105,26 @@ element:
     y: 170
     width: 580
     height: 110
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: include_rainfall
+      operator: eq
+      value: 1
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 80
+      width: 160
+      height: 20
+    text: "It is recommended to align your model domain with the watersheds."
+  - style: pushbutton
+    text: Load watershed data from a file
+    position:
+      x: 10
+      y: 55
+      width: 160
+      height: 20
+    method: load_include_polygon
