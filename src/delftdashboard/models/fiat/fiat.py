@@ -5,8 +5,6 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 import os
-import pandas as pd
-from PyQt5.QtWidgets import QFileDialog
 from pathlib import Path
 
 from delftdashboard.app import app
