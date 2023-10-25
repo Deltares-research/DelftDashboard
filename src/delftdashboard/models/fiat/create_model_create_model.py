@@ -15,16 +15,20 @@ def select(*args):
     map.update()
 
 def create_model(*args):
-    print("Create Delft-FIAT model")
-
-def edit(*args):
-    app.model["fiat"].set_model_variables()
-
-
-def create_model_setup2(*args):
     hydro_vm = HydroMtViewModel(
-        app.config["working_directory"], app.config["data_libs"]
+    app.config["working_directory"], app.config["data_libs"]
     )
     hydro_vm.save_data_catalog()
     hydro_vm.build_config_ini()
     hydro_vm.run_hydromt_fiat()
+
+def edit(*args):
+    app.model["fiat"].set_model_variables()
+
+def display_asset_locations(*args):
+    """Show/hide buildings layer"""
+    app.gui.setvar("fiat", "show_asset_locations", args[0])
+    if args[0]:
+        app.map.layer["fiat"].layer["exposure_points"].show()
+    else:
+        app.map.layer["fiat"].layer["exposure_points"].hide()

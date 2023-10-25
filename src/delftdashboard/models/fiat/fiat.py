@@ -33,9 +33,12 @@ class Model(GenericModel):
             "exposure_points",
             type="circle",
             circle_radius=3,
+            legend_position="top-right",
             fill_color="orange",
             line_color="transparent",
-            hover_property="Secondary Object Type"
+            color_property="Secondary Object Type",
+            hover_property="Secondary Object Type",
+            legend_title="Asset locations"
         )
 
     def set_layer_mode(self, mode):
@@ -51,7 +54,9 @@ class Model(GenericModel):
         # Input variables
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         default_curves = default_curves[["Exposure Link", "Damage Type", "Source", "Description"]]
-        app.gui.setvar(group, "damage_curves", default_curves)
+        app.gui.setvar(group, "damage_curves_table", default_curves)
+        app.gui.setvar(group, "selected_damage_curve_database", "default_vulnerability_curves")
+        app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
         
         app.gui.setvar(group, "display_asset_locations", None)
         app.gui.setvar(group, "display_classification", None)
