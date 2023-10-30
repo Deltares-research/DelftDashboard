@@ -37,7 +37,7 @@ def map_ready(*args):
     app.background_topography_layer.update = update_background
 
     # Go to point
-    app.map.jump_to(0.0, 0.0, 2)
+    app.map.jump_to(-98.74, 39.22, 3)  # SHOULD WE MAKE THIS CONFIGURABLE (FG)?
 
     # Add layers to map (we can only do this after the map has finished loading)
     for name, model in app.model.items():

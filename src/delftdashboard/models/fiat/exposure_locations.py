@@ -23,29 +23,35 @@ def set_asset_locations(*args):
     print("Set asset locations")
 
 
+def load_nsi_assets(*args):
+    print("Load NSI assets")
+
+
 def set_asset_locations_field(*args):
     app.model["fiat"].set_asset_locations_field()
 
 
-def activate_create_nsi_assets(*args):
-    app.gui.setvar("fiat", "created_nsi_assets", "nsi")
-    app.gui.setvar("fiat", "text_feedback_create_asset_locations", "NSI assets created")
 
-    hydro_vm = HydroMtViewModel(
-        app.config["working_directory"], app.config["data_libs"]
-    )
-    crs = app.gui.getvar("fiat", "selected_crs")
-    (
-        gdf,
-        unique_primary_types,
-        unique_secondary_types,
-    ) = hydro_vm.exposure_vm.set_asset_locations_source(input_source="NSI", crs=crs)
-    gdf.set_crs(crs, inplace=True)
+# COMMENTED OUT BY LUIS, CHECK IF IT CAN BE USED
+# def activate_create_nsi_assets(*args):
+#     app.gui.setvar("fiat", "created_nsi_assets", "nsi")
+#     app.gui.setvar("fiat", "text_feedback_create_asset_locations", "NSI assets created")
 
-    app.map.layer["fiat"].layer["exposure_points"].crs = crs
-    app.map.layer["fiat"].layer["exposure_points"].set_data(
-        gdf, hover_property="Object ID"
-    )
+#     hydro_vm = HydroMtViewModel(
+#         app.config["working_directory"], app.config["data_libs"]
+#     )
+#     crs = app.gui.getvar("fiat", "selected_crs")
+#     (
+#         gdf,
+#         unique_primary_types,
+#         unique_secondary_types,
+#     ) = hydro_vm.exposure_vm.set_asset_locations_source(input_source="NSI", crs=crs)
+#     gdf.set_crs(crs, inplace=True)
+
+#     app.map.layer["fiat"].layer["exposure_points"].crs = crs
+#     app.map.layer["fiat"].layer["exposure_points"].set_data(
+#         gdf, hover_property="Object ID"
+#     )
 
     app.gui.setvar(
         "fiat", "selected_primary_classification_string", unique_primary_types

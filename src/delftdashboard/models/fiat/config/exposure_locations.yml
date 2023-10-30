@@ -15,20 +15,19 @@ element:
       height: 100
     text: "After selecting your area of interest, \nin this tab you can specify the \nlocation of the assets to evaluate by \nimporting them from existing \ndatasets or uploading your own, \nas well as choosing their flood \nextraction method."
 - style: panel
-  title: Asset locations
+  title: Select asset data source
   position:
     x: 170
-    y: 10
+    y: 45
     width: 170
-    height: 120
+    height: 85
   element:
   - style: popupmenu
     position:
       x: 10
-      y: 90
+      y: 55
       width: 150
       height: 20
-    text: ""
     variable: asset_locations
     option_string:
       variable: asset_locations_string
@@ -37,12 +36,11 @@ element:
   - style: pushbutton
     position:
       x: 10
-      y: 65
+      y: 30
       width: 100
       height: 20
-    text: Create asset locations
-    method: activate_create_nsi_assets
-    variable: created_nsi_assets
+    text: Load source
+    method: load_nsi_assets
     dependency:
     - action: visible
       checkfor: all
@@ -50,39 +48,18 @@ element:
       - variable: asset_locations
         operator: eq
         value: nsi
-  - style: panel
-    position:
-      x: 10
-      y: 35
-      width: 100
-      height: 20
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: created_nsi_assets
-        operator: eq
-        value: nsi
-      - variable: asset_locations
-        operator: eq
-        value: nsi
-    element:
-    - style: text
-      position:
-        x: 10
-        y: 0
-        width: 80
-        height: 18
-      variable: text_feedback_create_asset_locations
-  - style: pushbutton
+  - style: pushselectfile
     position:
       x: 10
       y: 65
       width: 100
       height: 20
-    text: Upload asset location
-    variable: asset_locations_field
-    method: set_asset_locations_field
+    text: Load source
+    variable: asset_locations
+    showfilename: True
+    filter: "Geometry (*.shp *.gpkg *.geojson)"
+    title: Select geometry
+    tooltipstring: Select geometry
     dependency:
     - action: visible
       checkfor: all
@@ -99,21 +76,32 @@ element:
     text: Display assets
     variable: show_asset_locations
     method: display_asset_locations
-- style: panel
-  title: Extraction method
+- style: listbox
   position:
     x: 350
     y: 10
-    width: 170
-    height: 120
+    width: 150
+    height: 110
+  text: "Selected datasets"
+  text_position: "above"
+  variable: selected_asset_locations
+  select: index
+  option_string:
+    variable: selected_asset_locations_string
+- style: panel
+  title: Extraction method
+  position:
+    x: 510
+    y: 80
+    width: 135
+    height: 50
   element:
   - style: popupmenu
     position:
-      x: 40
-      y: 90
+      x: 10
+      y: 20
       width: 60
       height: 20
-    text: Default
     variable: extraction_method
     option_string:
       variable: extraction_method_string
@@ -121,69 +109,9 @@ element:
       variable: extraction_method_value
   - style: pushbutton
     position:
-      x: -15
-      y: 90
+      x: 75
+      y: 20
       width: 50
       height: 20
     text: Apply
-    variable: extraction_method_apply
     method: apply_extraction_method
-  - style: panel
-    title: Exceptions
-    position:
-      x: 10
-      y: 25
-      width: 150
-      height: 55
-    element:
-    - style: popupmenu
-      position:
-        x: 10
-        y: 28
-        width: 70
-        height: 18
-      text: ""
-      variable: extraction_method_exception
-      option_string:
-        variable: extraction_method_exception_string
-      option_value:
-        variable: extraction_method_exception_value
-    - style: pushbutton
-      position:
-        x: -5
-        y: 28
-        width: 50
-        height: 18
-      text: Apply
-      variable: extraction_method_exception_apply
-      method: apply_extraction_exception_method
-    - style: pushbutton
-      position:
-        x: 10
-        y: 5
-        width: 50
-        height: 18
-      text: Draw
-      variable: extraction_method_exception_draw
-      method: draw_extraction_method_exception
-    - style: pushselectfile
-      position:
-        x: 70
-        y: 5
-        width: 50
-        height: 18
-      text: Upload
-      variable: extraction_method_exception_file
-      showfilename: True
-      filter: "Geometry (*.shp *.gpkg *.geojson)"
-      title: Select geometry
-      tooltipstring: Select geometry
-  - style: checkbox
-    position:
-      x: 10
-      y: 5
-      width: 100
-      height: 20
-    text: Display method
-    variable: show_extraction_method
-    method: display_extraction_method

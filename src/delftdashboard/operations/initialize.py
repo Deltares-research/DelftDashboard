@@ -109,10 +109,6 @@ def initialize():
     app.active_model = app.model[list(app.model)[0]]
     app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
 
-    # Read bathymetry database
-
-    # Read tide database
-
     # Read color maps
     rgb = read_colormap(os.path.join(app.config_path, "colormaps", "earth.txt"))
     app.color_map_earth = ListedColormap(rgb)

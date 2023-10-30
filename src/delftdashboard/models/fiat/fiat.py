@@ -5,8 +5,6 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 import os
-import pandas as pd
-from PyQt5.QtWidgets import QFileDialog
 from pathlib import Path
 
 from delftdashboard.app import app
@@ -35,8 +33,12 @@ class Model(GenericModel):
             "exposure_points",
             type="circle",
             circle_radius=3,
+            legend_position="top-right",
             fill_color="orange",
             line_color="transparent",
+            color_property="Secondary Object Type",
+            hover_property="Secondary Object Type",
+            legend_title="Asset locations"
         )
 
     def set_layer_mode(self, mode):
@@ -52,7 +54,9 @@ class Model(GenericModel):
         # Input variables
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         default_curves = default_curves[["Exposure Link", "Damage Type", "Source", "Description"]]
-        app.gui.setvar(group, "damage_curves", default_curves)
+        app.gui.setvar(group, "damage_curves_table", default_curves)
+        app.gui.setvar(group, "selected_damage_curve_database", "default_vulnerability_curves")
+        app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
         
         app.gui.setvar(group, "display_asset_locations", None)
         app.gui.setvar(group, "display_classification", None)
@@ -64,7 +68,7 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "asset_locations_string",
-            ["National Structure Inventory (NSI)", "Upload data"],
+            ["National Structure Inventory (NSI)", "Upload file"],
         )
         app.gui.setvar(group, "asset_locations_value", ["nsi", "file"])
         app.gui.setvar(group, "asset_locations", "nsi")
@@ -166,6 +170,12 @@ class Model(GenericModel):
             ],
         )
         app.gui.setvar(group, "selected_primary_classification_value", 0)
+        app.gui.setvar(group, "selected_asset_locations", 0)
+        app.gui.setvar(
+            group,
+            "selected_asset_locations_string",
+            [""],
+        )
         app.gui.setvar(
             group,
             "selected_secondary_classification_string",
@@ -236,7 +246,7 @@ class Model(GenericModel):
     def open(self):
         # Open input file, and change working directory
         fname = app.gui.window.dialog_open_file(
-            "Open file", filter="fiat input file;;ini files (*.ini)"
+            "Open file", filter="FIAT model configuration;;yaml files (*.yaml)"
         )
         fname = fname[0]
         if fname:

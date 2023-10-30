@@ -55,7 +55,8 @@ element:
     width: 130
     height: 20
   text: Display asset locations
-  variable: display_asset_locations
+  variable: show_asset_locations
+  method: display_asset_locations
 - style: checkbox
   position:
     x: 160
