@@ -13,5 +13,4 @@ mapbox_token.txt
 /hydromt.log
 /src/delftdashboard/config/data_catalog_USA.yml
 temp_database
-test1/hydromt.log
-MyScenario/hydromt.log
+fiat_database

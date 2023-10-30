@@ -38,10 +38,21 @@ def zoom_to_boundary(*args):
 
 
 def generate_boundary(*args):
+    if app.model["fiat"].domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+        
+        # Initiate a new FIAT model
+        app.model["fiat"].new()
+
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
     if active_layer:
         gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
-        gdf.to_file(app.model["fiat"].domain.database.drive / "aoi.geojson", driver="GeoJSON")
+        gdf.to_file(
+            app.model["fiat"].domain.database.drive / "aoi.geojson", driver="GeoJSON"
+        )
 
         app.model["fiat"].domain.exposure_vm.create_interest_area(
             fpath=str(app.model["fiat"].domain.database.drive / "aoi.geojson")

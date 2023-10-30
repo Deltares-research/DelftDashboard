@@ -21,6 +21,7 @@ class Model(GenericModel):
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
+        self.domain = None
 
         # Set GUI variables
         self.set_gui_variables()
@@ -174,7 +175,7 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "selected_asset_locations_string",
-            [""],
+            [],
         )
         app.gui.setvar(
             group,
@@ -278,11 +279,7 @@ class Model(GenericModel):
             dlg.close()
 
     def save(self):
-        print("TODO")
-        # Write fiat.inp
-        self.domain.path = os.getcwd()
-        self.domain.input.write()
-        self.domain.write_batch_file()
+        self.domain.write()
 
     def load(self):
         self.domain.read()

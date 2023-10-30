@@ -65,19 +65,3 @@ def display_asset_locations(*args):
         app.map.layer["fiat"].layer["exposure_points"].show()
     else:
         app.map.layer["fiat"].layer["exposure_points"].hide()
-
-
-def display_extraction_method(*args):
-    print("Display extraction method")
-
-
-def draw_extraction_method_exception(*args):
-    print("Draw extraction method")
-
-
-def apply_extraction_method(*args):
-    print("Apply extraction method")
-
-
-def apply_extraction_exception_method(*args):
-    print("Apply extraction exception")

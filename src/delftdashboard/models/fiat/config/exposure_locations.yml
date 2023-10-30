@@ -40,7 +40,7 @@ element:
       width: 100
       height: 20
     text: Load source
-    method: load_nsi_assets
+    method: load_asset_locations_nsi
     dependency:
     - action: visible
       checkfor: all
@@ -48,18 +48,15 @@ element:
       - variable: asset_locations
         operator: eq
         value: nsi
-  - style: pushselectfile
+  - style: pushbutton
     position:
       x: 10
       y: 30
       width: 100
       height: 20
     text: Load source
-    variable: asset_locations
-    showfilename: True
-    filter: "Geometry (*.shp *.gpkg *.geojson)"
-    title: Select geometry
     tooltipstring: Select geometry
+    method: load_asset_locations_file
     dependency:
     - action: visible
       checkfor: all

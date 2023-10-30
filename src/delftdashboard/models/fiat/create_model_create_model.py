@@ -17,6 +17,10 @@ def create_model(*args):
     app.model["fiat"].domain.save_data_catalog()
     app.model["fiat"].domain.build_config_ini()
     app.model["fiat"].domain.run_hydromt_fiat()
+    app.gui.window.dialog_info(
+            f"A FIAT model is created in:\n{app.model['fiat'].domain.fiat_model.root}",
+            "FIAT model created",
+        )
 
 def edit(*args):
     app.model["fiat"].set_model_variables()
