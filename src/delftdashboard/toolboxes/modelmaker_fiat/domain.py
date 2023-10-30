@@ -1,6 +1,5 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
-from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 import geopandas as gpd
 import time
 
@@ -12,6 +11,7 @@ def select(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
     if active_layer:
         app.map.layer["modelmaker_fiat"].layer[active_layer].set_mode("active")
+
 
 def draw_boundary(*args):
     selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
@@ -25,6 +25,7 @@ def draw_boundary(*args):
     elif selected_method == "file":
         load_aoi_file()
 
+
 def zoom_to_boundary(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
     gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
@@ -35,15 +36,15 @@ def zoom_to_boundary(*args):
     # Fly to the site
     app.map.fit_bounds(bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0])
 
+
 def generate_boundary(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
     if active_layer:
         gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
+        gdf.to_file(app.model["fiat"].domain.database.drive / "aoi.geojson", driver="GeoJSON")
 
-        hydromt_vm = app.toolbox["modelmaker_fiat"].set_scenario()
-        gdf.to_file(HydroMtViewModel.database.drive / "aoi.geojson", driver="GeoJSON")
-        hydromt_vm.exposure_vm.create_interest_area(
-            fpath=str(HydroMtViewModel.database.drive / "aoi.geojson")
+        app.model["fiat"].domain.exposure_vm.create_interest_area(
+            fpath=str(app.model["fiat"].domain.database.drive / "aoi.geojson")
         )
 
         app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
@@ -138,20 +139,3 @@ def load_sfincs_domain(*args):
     app.gui.setvar(
         "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_sfincs"
     )
-
-
-def read_setup_yaml(*args):
-    fname = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
-    if fname[0]:
-        app.toolbox["modelmaker_fiat"].read_setup_yaml(fname[0])
-
-
-def write_setup_yaml(*args):
-    app.toolbox["modelmaker_fiat"].write_setup_yaml()
-    app.toolbox["modelmaker_fiat"].write_include_polygon()
-    app.toolbox["modelmaker_fiat"].write_exclude_polygon()
-    app.toolbox["modelmaker_fiat"].write_boundary_polygon()
-
-
-def build_model(*args):
-    app.toolbox["modelmaker_fiat"].build_model()

@@ -7,7 +7,6 @@ Created on Mon May 10 12:18:09 2021
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
-from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 
 
 def select(*args):

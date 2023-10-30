@@ -243,26 +243,42 @@ class Model(GenericModel):
                 self.domain.input.variables, var_name, app.gui.getvar("fiat", var_name)
             )
 
+    def new(self):
+        fname = app.gui.window.dialog_select_path(
+            "Select an empty folder"
+        )
+        if fname:
+            app.gui.setvar("fiat", "selected_scenario", Path(fname).stem)
+            app.gui.setvar("fiat", "scenario_folder", fname)
+            self.domain = HydroMtViewModel(
+                app.config["working_directory"],
+                app.config["data_libs"],
+                fname,
+            )
+
     def open(self):
         # Open input file, and change working directory
-        fname = app.gui.window.dialog_open_file(
-            "Open file", filter="FIAT model configuration;;yaml files (*.yaml)"
+        fname = app.gui.window.dialog_select_path(
+            "Select an existing model folder"
         )
-        fname = fname[0]
         if fname:
             dlg = app.gui.window.dialog_wait("Loading fiat model ...")
-            path = os.path.dirname(fname)
-            self.domain.path = path
+            self.domain = HydroMtViewModel(
+                app.config["working_directory"],
+                app.config["data_libs"],
+                fname,
+            )
             self.domain.read()
             self.set_gui_variables()
             # Change working directory
-            os.chdir(path)
+            os.chdir(fname)
             # Change CRS
             app.crs = self.domain.crs
             self.plot()
             dlg.close()
 
     def save(self):
+        print("TODO")
         # Write fiat.inp
         self.domain.path = os.getcwd()
         self.domain.input.write()
@@ -314,9 +330,6 @@ class Model(GenericModel):
     def create_nsi_assets(self):
         # Set the ini file to the correct variables for creating a FIAT model from NSI
         # data
-        hydro_vm = HydroMtViewModel(
-            app.config["working_directory"], app.config["data_libs"]
-        )
-        hydro_vm.exposure_vm.set_asset_locations_source(
+        app.model["fiat"].domain.exposure_vm.set_asset_locations_source(
             input_source="NSI",
         )

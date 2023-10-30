@@ -36,6 +36,9 @@ def new(option):
     app.active_model = app.model[list(app.model)[0]]
     app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
 
+    # Create a new model
+    app.active_model.new()
+
 
 def open(option):
     app.active_model.open()

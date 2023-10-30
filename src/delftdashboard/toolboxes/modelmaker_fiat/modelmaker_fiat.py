@@ -7,7 +7,6 @@ Created on Mon May 10 12:18:09 2021
 
 import geopandas as gpd
 
-from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 
@@ -95,18 +94,6 @@ class Toolbox(GenericToolbox):
             polygon_fill_opacity=0.3,
             rotate=True,
         )
-
-    def set_scenario(self):
-        selected_scenario = app.gui.getvar("modelmaker_fiat", "selected_scenario")
-        scenario_folder = app.config["working_directory"] + "\\" + selected_scenario
-        app.gui.setvar("fiat", "selected_scenario", selected_scenario)
-        app.gui.setvar("fiat", "scenario_folder", scenario_folder)
-        hydromt_vm = HydroMtViewModel(
-            app.config["working_directory"],
-            app.config["data_libs"],
-            scenario_folder,
-        )
-        return hydromt_vm
 
     def set_crs(self):
         selected_crs = app.gui.getvar("modelmaker_fiat", "selected_crs")
