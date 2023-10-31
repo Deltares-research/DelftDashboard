@@ -98,5 +98,6 @@ def display_extraction_method(*args):
 
 
 def apply_extraction_method(*args):
+    # TODO: only apply to the selected dataset?
     extraction_method = app.gui.getvar("fiat", "extraction_method")
     app.model["fiat"].domain.exposure_vm.setup_extraction_method(extraction_method)
