@@ -30,6 +30,10 @@ def load_loaded_classification_source(*args):
     print("Load loaded classification source")
 
 
+def load_upload_classification_source(*args): # TODO This method should also popup and upload file window
+    print("Load upload classification source")
+
+
 def display_primary_classification(*args):
     print("Display primary classification fields")
 

@@ -49,18 +49,14 @@ element:
       - variable: classification_source
         operator: eq
         value: loaded_data
-  - style: pushselectfile
+  - style: pushbutton
     position:
       x: 10
       y: 10
       width: 160
       height: 20
     text: Load source
-    variable: upload_classification
-    showfilename: True
-    filter: "Geometry (*.shp *.gpkg *.geojson)"
-    title: Select geometry
-    tooltipstring: Select geometry
+    method: load_upload_classification_source # TODO This method should also popup and upload file window
     dependency:
     - action: visible
       checkfor: all
@@ -76,6 +72,13 @@ element:
     y: 35
     width: 135
     height: 95
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: classification_source
+      operator: ne
+      value: nsi_data
   element:
   - style: popupmenu
     position:

@@ -1,32 +1,33 @@
 element:
-- style: panel
-  title: Info
+- style: pushbutton
   position:
     x: 10
-    y: 10
-    width: 150
-    height: 120
-  element:
-  - style: text
-    position:
-      x: 10
-      y: 10
-      width: 130
-      height: 100
-    text: "After selecting your area of interest, \nin this tab you can specify the \nlocation of the assets to evaluate by \nimporting them from existing \ndatasets or uploading your own, \nas well as choosing their flood \nextraction method."
+    y: 110
+    width: 20
+    height: 20
+  text: "\u24D8"
+  tooltip: "After selecting your area of interest, \nin this tab you can specify the \nlocation of the assets to evaluate by \nimporting them from existing \ndatasets or uploading your own, \nas well as choosing their flood \nextraction method."
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: asset_locations
+      operator: eq
+      value: 999
+
 - style: panel
   title: Select asset data source
   position:
-    x: 170
+    x: 40
     y: 45
-    width: 170
+    width: 180
     height: 85
   element:
   - style: popupmenu
     position:
       x: 10
       y: 55
-      width: 150
+      width: 160
       height: 20
     variable: asset_locations
     option_string:
@@ -73,9 +74,10 @@ element:
     text: Display assets
     variable: show_asset_locations
     method: display_asset_locations
+
 - style: listbox
   position:
-    x: 350
+    x: 230
     y: 10
     width: 150
     height: 110
@@ -85,10 +87,11 @@ element:
   select: index
   option_string:
     variable: selected_asset_locations_string
+
 - style: panel
   title: Extraction method
   position:
-    x: 510
+    x: 390
     y: 90
     width: 135
     height: 40
@@ -115,7 +118,7 @@ element:
 
 - style: pushbutton
   position:
-    x: 510
+    x: 390
     y: 10
     width: 95
     height: 20
