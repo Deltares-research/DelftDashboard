@@ -2,50 +2,57 @@ element:
 - style: listbox
   position:
       x: 10
-      y: 35
+      y: 65
       width: 150
-      height: 85
-  text: "Loaded Datasets"
+      height: 50
+  text: "Loaded datasets"
   text_position: "above"
-  method: select_selected_primary_classification
-  variable: selected_primary_classification_value
+  variable: loaded_aggregation_files
   select: index
   option_string:
-    variable: selected_primary_classification_string
-- style: pushbutton
-  position:
-    x: 170
-    y: 95
-    width: 20
-    height: 20
-  text: "\u25B2"
-  method: move_up_selected_secondary_classification
-- style: pushbutton
-  position:
-    x: 170
-    y: 75
-    width: 20
-    height: 20
-  text: "\u25BC"
-  method: move_down_selected_secondary_classification
-- style: pushbutton
-  position:
-    x: 170
-    y: 45
-    width: 20
-    height: 20
-  text: "\u2716"
-  method: remove_selected_secondary_classification
+    variable: loaded_aggregation_files_string
 - style: listbox
   position:
       x: 200
-      y: 35
+      y: 65
       width: 150
-      height: 85
+      height: 50
   text: "Selected aggregation"
   text_position: "above"
-  method: select_selected_primary_classification
-  variable: selected_primary_classification_value
+  variable: selected_aggregation_files
   select: index
   option_string:
-    variable: selected_primary_classification_string
+    variable: selected_aggregation_files_string
+- style: pushbutton
+  position:
+    x: 170
+    y: 90
+    width: 20
+    height: 20
+  text: "\u2B9E"
+  method: selected_aggregation
+- style: pushbutton
+  position:
+    x: 170
+    y: 70
+    width: 20
+    height: 20
+  text: "\u2B9C"
+  method: deselected_aggregation
+- style: pushbutton
+    position:
+      x: 10
+      y: 30
+      width: 50
+      height: 20
+    text: Load source
+    tooltipstring: Select geometry
+    method: load_aggregation_file
+  - style: pushbutton
+  position:
+    x: 630
+    y: 10
+    width: 110
+    height: 20
+  text: "Add aggregations to model"
+  method: add_aggregations
