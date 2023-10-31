@@ -22,36 +22,12 @@ def add_classification_field(*args):
     print("Add classification field")
 
 
-def select_selected_primary_classification(*args):
-    print("Select primary classification type")
+def load_nsi_classification_source(*args):
+    print("Load NSI classification source")
 
 
-def move_up_selected_primary_classification(*args):
-    print("Move up primary classification field")
-
-
-def move_down_selected_primary_classification(*args):
-    print("Move down primary classification field")
-
-
-def remove_selected_primary_classification(*args):
-    print("Remove primary classification field")
-
-
-def select_selected_secondary_classification(*args):
-    print("Select secondary classification type")
-
-
-def move_up_selected_secondary_classification(*args):
-    print("Move up primary classification field")
-
-
-def move_down_selected_secondary_classification(*args):
-    print("Move down primary classification field")
-
-
-def remove_selected_secondary_classification(*args):
-    print("Remove primary classification field")
+def load_loaded_classification_source(*args):
+    print("Load loaded classification source")
 
 
 def display_primary_classification(*args):
@@ -60,3 +36,11 @@ def display_primary_classification(*args):
 
 def display_secondary_classification(*args):
     print("Display secondary classification fields")
+
+
+def standarize_classification(*args):
+    app.model["fiat"].classification_standarize()
+
+
+def add_classification(*args):
+    print("Add classification to model")
