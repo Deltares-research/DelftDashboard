@@ -1,44 +1,87 @@
 element:
 - style: panel
-  title: Info
+  title: Classification source
   position:
     x: 10
-    y: 10
-    width: 150
-    height: 120
+    y: 65
+    width: 180
+    height: 65
   element:
-  - style: text
+  - style: popupmenu
+    position:
+      x: 10
+      y: 35
+      width: 160
+      height: 20
+    text: ""
+    variable: classification_source
+    option_string:
+      variable: classification_source_string
+    option_value:
+      variable: classification_source_value
+  - style: pushbutton
     position:
       x: 10
       y: 10
-      width: 130
-      height: 100
-    text: "Indicate the primary and secondary \ncategories you would like to apply to \nthe identified assets."
-- style: panel
-  title: Classification source
-  position:
-    x: 170
-    y: 10
-    width: 150
-    height: 120
-  element:
+      width: 160
+      height: 20
+    text: Load source
+    method: load_nsi_classification_source
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: classification_source
+        operator: eq
+        value: nsi_data
+  - style: pushbutton
+    position:
+      x: 10
+      y: 10
+      width: 160
+      height: 20
+    text: Load source
+    method: load_loaded_classification_source
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: classification_source
+        operator: eq
+        value: loaded_data
   - style: pushselectfile
     position:
       x: 10
-      y: 90
-      width: 130
+      y: 10
+      width: 160
       height: 20
-    text: Upload classification
-    variable: area_classification
+    text: Load source
+    variable: upload_classification
     showfilename: True
     filter: "Geometry (*.shp *.gpkg *.geojson)"
     title: Select geometry
     tooltipstring: Select geometry
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: classification_source
+        operator: eq
+        value: upload_data
+
+- style: panel
+  title: Assign classification
+  position:
+    x: 200
+    y: 35
+    width: 135
+    height: 95
+  element:
   - style: popupmenu
     position:
       x: 10
-      y: 60
-      width: 130
+      y: 65
+      width: 115
       height: 20
     text: ""
     variable: object_type
@@ -49,8 +92,8 @@ element:
   - style: popupmenu
     position:
       x: 10
-      y: 35
-      width: 130
+      y: 40
+      width: 115
       height: 20
     text: ""
     variable: classification_file_field_name
@@ -61,101 +104,70 @@ element:
   - style: pushbutton
     position:
       x: 10
-      y: 5
-      width: 130
+      y: 10
+      width: 115
       height: 20
     text: Add
     variable: classification_field
     method: add_classification_field
+
 - style: listbox
   position:
-    x: 335
-    y: 30
-    width: 150
+    x: 345
+    y: 35
+    width: 145
     height: 85
   text: "Primary Classification"
   text_position: "above"
-  method: select_selected_primary_classification
   variable: selected_primary_classification_value
   select: index
   option_string:
     variable: selected_primary_classification_string
-- style: pushbutton
-  position:
-    x: 490
-    y: 95
-    width: 20
-    height: 20
-  text: "\u25B2"
-  method: move_up_selected_primary_classification
-- style: pushbutton
-  position:
-    x: 490
-    y: 75
-    width: 20
-    height: 20
-  text: "\u25BC"
-  method: move_down_selected_primary_classification
-- style: pushbutton
-  position:
-    x: 490
-    y: 45
-    width: 20
-    height: 20
-  text: "\u2716"
-  method: remove_selected_primary_classification
 - style: checkbox
   position:
-    x: 335
+    x: 345
     y: 10
-    width: 150
+    width: 145
     height: 20
   text: Display primary classification
   variable: show_primary_classification
   method: display_primary_classification
 - style: listbox
   position:
-    x: 525
-    y: 30
-    width: 150
+    x: 500
+    y: 35
+    width: 145
     height: 85
   text: "Secondary Classification"
   text_position: "above"
-  method: select_selected_secondary_classification
   variable: selected_secondary_classification_value
   select: index
   option_string:
     variable: selected_secondary_classification_string
-- style: pushbutton
-  position:
-    x: 680
-    y: 95
-    width: 20
-    height: 20
-  text: "\u25B2"
-  method: move_up_selected_secondary_classification
-- style: pushbutton
-  position:
-    x: 680
-    y: 75
-    width: 20
-    height: 20
-  text: "\u25BC"
-  method: move_down_selected_secondary_classification
-- style: pushbutton
-  position:
-    x: 680
-    y: 45
-    width: 20
-    height: 20
-  text: "\u2716"
-  method: remove_selected_secondary_classification
 - style: checkbox
   position:
-    x: 525
+    x: 500
     y: 10
-    width: 150
+    width: 145
     height: 20
   text: Display secondary classification
   variable: show_secondary_classification
   method: display_secondary_classification
+
+- style: pushbutton
+  position:
+    x: 655
+    y: 100
+    width: 95
+    height: 20
+  text: Standarize
+  method: standarize_classification
+
+- style: pushbutton
+  position:
+    x: 655
+    y: 15
+    width: 95
+    height: 20
+  text: Add to model
+  method: add_classification

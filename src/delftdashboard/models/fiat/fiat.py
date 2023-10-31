@@ -129,6 +129,14 @@ class Model(GenericModel):
         app.gui.setvar(group, "asset_location_file", "*asset location file path*")
         app.gui.setvar(group, "control_enable", 0)
         app.gui.setvar(group, "area_classification", None)
+        app.gui.setvar(group, "classification_source", "nsi_data")
+        app.gui.setvar(
+            group,
+            "classification_source_string",
+            ["National Structure Inventory (NSI)", "Any previously loaded data", "Upload data"],
+        )
+        app.gui.setvar(group, "classification_source_value", ["nsi_data", "loaded_data", "upload_data"])
+        app.gui.setvar(group, "upload_classification", None)
         app.gui.setvar(
             group,
             "object_type_string",
@@ -319,6 +327,19 @@ class Model(GenericModel):
             / "config"
             / "vulnerability_specify_damage_curves.yml"
         )
+
+    def classification_standarize(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "exposure_classification_standarize.yml"
+        )
+
         # Create pop-up and only continue if user presses ok
         okay, data = app.gui.popup(pop_win_config_path, None)
         if not okay:

@@ -100,3 +100,7 @@ def display_extraction_method(*args):
 def apply_extraction_method(*args):
     extraction_method = app.gui.getvar("fiat", "extraction_method")
     app.model["fiat"].domain.exposure_vm.setup_extraction_method(extraction_method)
+
+
+def add_exposure_locations_to_model(*args):
+    print("Add exposure locations to model")

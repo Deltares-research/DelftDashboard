@@ -89,7 +89,7 @@ element:
   title: Extraction method
   position:
     x: 510
-    y: 80
+    y: 90
     width: 135
     height: 40
   element:
@@ -112,3 +112,12 @@ element:
       height: 20
     text: Apply
     method: apply_extraction_method
+
+- style: pushbutton
+  position:
+    x: 510
+    y: 10
+    width: 95
+    height: 20
+  text: Add to model
+  method: add_exposure_locations_to_model
