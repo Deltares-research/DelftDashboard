@@ -36,11 +36,12 @@ element:
       width: 105
       height: 20
     method: zoom_to_boundary
+
 - style: pushbutton
   text: Generate model boundary
   position:
-    x: 150
+    x: 275
     y: 35
-    width: 105
+    width: 125
     height: 20
   method: generate_boundary
