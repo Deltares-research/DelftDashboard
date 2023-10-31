@@ -23,6 +23,7 @@ element:
       height: 20
     text: OSM Roads Quick Build
     method: build_roads_exposure_osm
+    tooltip: "This button builds a complete \nroads exposure dataset using open\nstreet maps (OSM) data."
   - style: text
     position:
       x: 10

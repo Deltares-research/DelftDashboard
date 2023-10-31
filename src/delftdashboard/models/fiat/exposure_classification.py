@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
-
-@author: ormondt
-"""
-
 from delftdashboard.app import app
 from delftdashboard.operations import map
+
+import geopandas as gpd
 
 
 def select(*args):
@@ -24,14 +19,23 @@ def add_classification_field(*args):
 
 def load_nsi_classification_source(*args):
     print("Load NSI classification source")
+    app.gui.setvar("fiat", "assign_classification_active", False)
 
 
 def load_loaded_classification_source(*args):
     print("Load loaded classification source")
 
 
-def load_upload_classification_source(*args): # TODO This method should also popup and upload file window
+def load_upload_classification_source(*args):
     print("Load upload classification source")
+    fn = app.gui.window.dialog_open_file(
+        "Select geometry", filter="Geometry (*.shp *.gpkg *.geojson)"
+    )
+    gdf = gpd.read_file(fn[0])
+    list_columns = list(gdf.columns)
+    
+    app.gui.setvar("fiat", "classification_file_field_name_string", list_columns)
+    app.gui.setvar("fiat", "assign_classification_active", True)
 
 
 def display_primary_classification(*args):

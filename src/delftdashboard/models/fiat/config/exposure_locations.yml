@@ -5,15 +5,8 @@ element:
     y: 110
     width: 20
     height: 20
-  text: "\u24D8"
+  text: "\u2139"
   tooltip: "After selecting your area of interest, \nin this tab you can specify the \nlocation of the assets to evaluate by \nimporting them from existing \ndatasets or uploading your own, \nas well as choosing their flood \nextraction method."
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: asset_locations
-      operator: eq
-      value: 999
 
 - style: panel
   title: Select asset data source

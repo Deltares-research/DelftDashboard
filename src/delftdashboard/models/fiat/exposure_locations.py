@@ -25,6 +25,8 @@ def set_asset_locations(*args):
 
 def load_asset_locations(name):
     current_list_string = app.gui.getvar("fiat", "selected_asset_locations_string")
+    if name in current_list_string:
+        return
     current_list_string.append(name)
     app.gui.setvar("fiat", "selected_asset_locations_string", current_list_string)
 
@@ -104,6 +106,11 @@ def apply_extraction_method(*args):
 
 
 def add_exposure_locations_to_model(*args):
-    print("Add exposure locations to model")
-    selected_asset_locations = app.gui.getvar("fiat", "selected_asset_locations")
+    selected_asset_locations = app.gui.getvar("fiat", "selected_asset_locations_string")
+    if len(selected_asset_locations) == 1 and selected_asset_locations[0] == 'National Structure Inventory (NSI)':
+        selected_asset_locations = "NSI"
+    else:
+        app.gui.window.dialog_info(text="The option to have multiple asset location sources is not implemented yet.", title="Not yet implemented")
+        return
+    
     app.model["fiat"].domain.exposure_vm.set_asset_data_source(selected_asset_locations)
