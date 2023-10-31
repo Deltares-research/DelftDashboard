@@ -27,7 +27,7 @@ def build_nsi_exposure(*args):
         gdf,
         unique_primary_types,
         unique_secondary_types,
-    ) = app.model["fiat"].domain.exposure_vm.set_asset_locations_source(input_source="NSI", crs=crs)
+    ) = app.model["fiat"].domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
     gdf.set_crs(crs, inplace=True)
 
     app.map.layer["fiat"].layer["exposure_points"].crs = crs
@@ -62,6 +62,6 @@ def display_asset_locations(*args):
     """Show/hide buildings layer"""
     app.gui.setvar("fiat", "show_asset_locations", args[0])
     if args[0]:
-        app.map.layer["fiat"].layer["exposure_points"].show()
+        app.model["fiat"].show_exposure_layers()
     else:
-        app.map.layer["fiat"].layer["exposure_points"].hide()
+        app.model["fiat"].hide_exposure_layers()

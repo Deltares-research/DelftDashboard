@@ -60,7 +60,7 @@ def set_asset_locations_field(*args):
     #         gdf,
     #         unique_primary_types,
     #         unique_secondary_types,
-    #     ) = hydro_vm.exposure_vm.set_asset_locations_source(input_source="NSI", crs=crs)
+    #     ) = hydro_vm.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
     #     gdf.set_crs(crs, inplace=True)
 
     #     app.map.layer["fiat"].layer["exposure_points"].crs = crs
@@ -88,9 +88,9 @@ def display_asset_locations(*args):
     """Show/hide buildings layer"""
     app.gui.setvar("fiat", "show_asset_locations", args[0])
     if args[0]:
-        app.map.layer["fiat"].layer["exposure_points"].show()
+        app.model["fiat"].show_exposure_layers()
     else:
-        app.map.layer["fiat"].layer["exposure_points"].hide()
+        app.model["fiat"].hide_exposure_layers()
 
 
 def display_extraction_method(*args):
@@ -105,3 +105,5 @@ def apply_extraction_method(*args):
 
 def add_exposure_locations_to_model(*args):
     print("Add exposure locations to model")
+    selected_asset_locations = app.gui.getvar("fiat", "selected_asset_locations")
+    app.model["fiat"].domain.exposure_vm.set_asset_data_source(selected_asset_locations)

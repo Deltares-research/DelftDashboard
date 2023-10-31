@@ -42,6 +42,19 @@ class Model(GenericModel):
             legend_title="Asset locations"
         )
 
+        layer.add_layer(
+            "exposure_lines",
+            type="line",
+            legend_position="top-right",
+            fill_color="purple",
+            line_color="purple",
+            line_width=3,
+            circle_radius=0,
+            color_property="Secondary Object Type",
+            hover_property="Secondary Object Type",
+            legend_title="Roads"
+        )
+
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Everything made visible
@@ -244,6 +257,8 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_damage_values", 0)
         app.gui.setvar(group, "created_vulnerability_curves", 0)
         app.gui.setvar(group, "linking_object_type", 0)
+        app.gui.setvar(group, "road_damage_threshold", 1)
+        
 
     def set_input_variables(self):
         # Update all model input variables
@@ -300,6 +315,14 @@ class Model(GenericModel):
         gdf = self.domain.grid.to_gdf()
         app.map.layer["fiat"].layer["grid"].set_data(gdf)
 
+    def show_exposure_layers(self):
+        app.map.layer["fiat"].layer["exposure_points"].show()
+        app.map.layer["fiat"].layer["exposure_lines"].show()
+
+    def hide_exposure_layers(self):
+        app.map.layer["fiat"].layer["exposure_points"].hide()
+        app.map.layer["fiat"].layer["exposure_lines"].hide()
+
     def set_asset_locations_field(self):
         # get window config yaml path
         pop_win_config_path = str(
@@ -344,10 +367,3 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, None)
         if not okay:
             return
-
-    def create_nsi_assets(self):
-        # Set the ini file to the correct variables for creating a FIAT model from NSI
-        # data
-        app.model["fiat"].domain.exposure_vm.set_asset_locations_source(
-            input_source="NSI",
-        )
