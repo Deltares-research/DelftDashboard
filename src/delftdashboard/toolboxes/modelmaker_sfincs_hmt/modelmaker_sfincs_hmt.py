@@ -196,6 +196,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "mask_exclude_polygon_names", [])
         app.gui.setvar(group, "mask_exclude_polygon_index", 0)
         app.gui.setvar(group, "nr_mask_exclude_polygons", 0)
+        app.gui.setvar(group, "mask_boundary_type", 2)
         app.gui.setvar(group, "mask_active_add", False)
         app.gui.setvar(group, "mask_active_del", False)
 
@@ -207,8 +208,7 @@ class Toolbox(GenericToolbox):
         # app.gui.setvar(group, "wlev_exclude_polygon_index", 0)
         # app.gui.setvar(group, "nr_wlev_exclude_polygons", 0)
         app.gui.setvar(group, "wlev_zmax", -2.0)
-        app.gui.setvar(group, "wlev_zmin", -99999.0)
-        app.gui.setvar(group, "wlev_reset", True)
+        # app.gui.setvar(group, "wlev_reset", True)
 
         app.gui.setvar(group, "outflow_include_polygon_names", [])
         app.gui.setvar(group, "outflow_include_polygon_index", 0)
@@ -216,9 +216,8 @@ class Toolbox(GenericToolbox):
         # app.gui.setvar(group, "outflow_exclude_polygon_names", [])
         # app.gui.setvar(group, "outflow_exclude_polygon_index", 0)
         # app.gui.setvar(group, "nr_outflow_exclude_polygons", 0)
-        app.gui.setvar(group, "outflow_zmax", 99999.0)
         app.gui.setvar(group, "outflow_zmin", 2.0)
-        app.gui.setvar(group, "outflow_reset", True)
+        # app.gui.setvar(group, "outflow_reset", True)
 
         # subgrid
         app.gui.setvar(group, "nr_subgrid_pixels", 20)
@@ -459,37 +458,40 @@ class Toolbox(GenericToolbox):
 
         dlg.close()
 
-    def update_mask_bounds(self):
+    def update_mask_bounds(self, btype):
         model = app.model["sfincs_hmt"].domain
 
-        dlg = app.gui.window.dialog_wait("Generating mask boundaries ...")
-
         group = "modelmaker_sfincs_hmt"
-        setup_mask_bounds = {
-            "btype": "waterlevel",
-            "include_mask": app.toolbox[group].wlev_include_polygon
-            if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
-            else None,
-            "zmin": app.gui.getvar(group, "wlev_zmin"),
-            "zmax": app.gui.getvar(group, "wlev_zmax"),
-            "reset_bounds": app.gui.getvar(group, "wlev_reset"),
-        }
 
-        model.setup_mask_bounds(**setup_mask_bounds)
-        self.setup_dict.update({"setup_mask_bounds": setup_mask_bounds})
+        if btype == "waterlevel":
+            dlg = app.gui.window.dialog_wait("Generating waterlevel boundaries ...")
 
-        setup_mask_bounds2 = {
-            "btype": "outflow",
-            "include_mask": app.toolbox[group].outflow_include_polygon
-            if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
-            else None,
-            "zmin": app.gui.getvar(group, "outflow_zmin"),
-            "zmax": app.gui.getvar(group, "outflow_zmax"),
-            "reset_bounds": app.gui.getvar(group, "outflow_reset"),
-        }
+            setup_mask_bounds = {
+                "btype": "waterlevel",
+                "include_mask": app.toolbox[group].wlev_include_polygon
+                if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
+                else None,
+                "zmin": app.gui.getvar(group, "wlev_zmin"),
+                "zmax": app.gui.getvar(group, "wlev_zmax"),
+                "reset_bounds": True,
+            }
 
-        app.model["sfincs_hmt"].domain.setup_mask_bounds(**setup_mask_bounds2)
-        self.setup_dict.update({"setup_mask_bounds2": setup_mask_bounds2})
+            model.setup_mask_bounds(**setup_mask_bounds)
+            self.setup_dict.update({"setup_mask_bounds": setup_mask_bounds})
+        elif btype == "outflow":
+            dlg = app.gui.window.dialog_wait("Generating outflow boundaries ...")
+            setup_mask_bounds2 = {
+                "btype": "outflow",
+                "include_mask": app.toolbox[group].outflow_include_polygon
+                if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
+                else None,
+                "zmin": app.gui.getvar(group, "outflow_zmin"),
+                "zmax": app.gui.getvar(group, "outflow_zmax"),
+                "reset_bounds": True,
+            }
+
+            app.model["sfincs_hmt"].domain.setup_mask_bounds(**setup_mask_bounds2)
+            self.setup_dict.update({"setup_mask_bounds2": setup_mask_bounds2})
 
         mask = model.mask
 
@@ -505,18 +507,16 @@ class Toolbox(GenericToolbox):
 
         dlg.close()
 
-    def reset_mask_bounds(self):
+    def reset_mask_bounds(self, btype):
         model = app.model["sfincs_hmt"].domain
 
-        group = "modelmaker_sfincs_hmt"
-        if app.gui.getvar(group, "wlev_reset"):
+        if btype == "waterlevel":
             model.setup_mask_bounds(reset_bounds=True, btype="waterlevel")
             # remove old waterlevel mask data
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].clear()
             # remove settings from setup_dict
             self.setup_dict.pop("setup_mask_bounds", None)
-
-        if app.gui.getvar(group, "outflow_reset"):
+        elif btype == "outflow":
             model.setup_mask_bounds(reset_bounds=True, btype="outflow")
             # remove old outflow mask data
             app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].clear()

@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: "Global mask parameters"
+  title: "Mask your active domain: "
   position:
     x: 10
     y: 10
@@ -44,7 +44,7 @@ element:
     method: mask_del_tick_box
     variable: mask_active_del
 - style: panel
-  title: Add cells
+  title: "Add cells: "
   position:
     x: 220
     y: 10
@@ -102,7 +102,7 @@ element:
       height: 20
     method: load_include_polygon
 - style: panel
-  title: Remove cells
+  title: "Remove cells: "
   position:
     x: 420
     y: 10

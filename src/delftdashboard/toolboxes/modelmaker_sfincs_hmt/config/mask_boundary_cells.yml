@@ -1,11 +1,52 @@
 element:
 - style: panel
-  title: Waterlevel boundaries
+  title: "Select boundary type: "
   position:
     x: 10
     y: 10
+    width: 120
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 100
+      height: 20
+    variable: mask_boundary_type
+    select: item
+    option_string:  ["Waterlevel", "Outflow"]
+    option_value: [2, 3]
+  - style: pushbutton
+    text: Update bounds
+    position:
+      x: 10
+      y: 35
+      width: 100
+      height: 20
+    method: update_mask_bounds
+  - style: pushbutton
+    text: Reset bounds
+    position:
+      x: 10
+      y: 10
+      width: 100
+      height: 20
+    method: reset_mask_bounds 
+- style: panel
+  title: "Waterlevel boundaries: "
+  position:
+    x: 140
+    y: 10
     width: 270
     height: 120
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: mask_boundary_type
+      operator: eq
+      value: 2
   element:
   - style: listbox
     position:
@@ -61,12 +102,19 @@ element:
     text_position: left
     variable: wlev_zmax  
 - style: panel
-  title: Outflow boundaries
+  title: "Outflow boundaries: "
   position:
-    x: 290
+    x: 140
     y: 10
     width: 270
     height: 120
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: mask_boundary_type
+      operator: eq
+      value: 3
   element:
   - style: listbox
     position:
@@ -121,20 +169,5 @@ element:
     text:  "Restrict to cells with a minimum elevation of (in m+MSL): "
     text_position: left
     variable: outflow_zmin        
-- style: pushbutton
-  text: Reset Bounds
-  position:
-    x: -10
-    y: 35
-    width: 80
-    height: 20
-  method: reset_mask_bounds 
-- style: pushbutton
-  text: Update Bounds
-  position:
-    x: -10
-    y: 10
-    width: 80
-    height: 20
-  method: update_mask_bounds
+
 

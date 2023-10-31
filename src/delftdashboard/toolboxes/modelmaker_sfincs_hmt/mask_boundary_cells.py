@@ -172,8 +172,18 @@ def update():
 
 
 def update_mask_bounds(*args):
-    app.toolbox["modelmaker_sfincs_hmt"].update_mask_bounds()
+    group = "modelmaker_sfincs_hmt"
+    if app.gui.getvar(group, "mask_boundary_type") == 2:
+        btype = "waterlevel"
+    elif app.gui.getvar(group, "mask_boundary_type") == 3:
+        btype = "outflow"
+    app.toolbox[group].update_mask_bounds(btype=btype)
 
 
 def reset_mask_bounds(*args):
-    app.toolbox["modelmaker_sfincs_hmt"].reset_mask_bounds()
+    group = "modelmaker_sfincs_hmt"
+    if app.gui.getvar(group, "mask_boundary_type") == 2:
+        btype = "waterlevel"
+    elif app.gui.getvar(group, "mask_boundary_type") == 3:
+        btype = "outflow"
+    app.toolbox["modelmaker_sfincs_hmt"].reset_mask_bounds(btype=btype)

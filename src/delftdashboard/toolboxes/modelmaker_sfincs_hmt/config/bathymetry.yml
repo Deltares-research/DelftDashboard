@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: "Select dataset(s)"
+  title: "Select dataset(s) from source: "
   position:
     x: 10
     y: 5
@@ -11,7 +11,7 @@ element:
     position:
       x: 10
       y: 95
-      width: 180
+      width: 150
       height: 20
     tooltip: Select the data source
     method: select_bathymetry_source
@@ -25,14 +25,23 @@ element:
     position:
       x: 10
       y: 10
-      width: 180
+      width: 150
       height: 80
     tooltip: List of all available bathymetry datasets provided by selected source
     method: select_bathymetry_dataset
     variable: bathymetry_dataset_index
     select: index
     option_string:
-      variable: bathymetry_dataset_names  
+      variable: bathymetry_dataset_names
+  - style: pushbutton
+    position:
+      x: 170
+      y: 10
+      width: 20
+      height: 20
+    text: "\u2139"
+    tooltip: "Show dataset properties"
+    method: info_selected_dataset     
 - style: pushbutton
   position:
     x: 220
@@ -55,7 +64,7 @@ element:
     check:
     - variable: nr_selected_bathymetry_datasets
       operator: gt
-      value: 0  
+      value: 0
 - style: listbox
   position:
     x: 250
@@ -71,21 +80,6 @@ element:
   select: index
   option_string:
     variable: selected_bathymetry_dataset_names
-- style: panel
-  title: "Dataset properties"
-  position:
-    x: 480
-    y: 5
-    width: 160
-    height: 125
-  element:    
-  - style: text
-    position:
-      x: 10
-      y: 10
-      width: 140
-      height: 105
-    variable: selected_bathymetry_dataset_meta
 - style: pushbutton
   position:
     x: 440
@@ -120,23 +114,11 @@ element:
   position:
     x: 250
     y: 10
-    width: 85
+    width: 180
     height: 20
-  text: "Properties"
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0  
-- style: pushbutton
-  position:
-    x: 345
-    y: 10
-    width: 85
-    height: 20
-  text: "Merge options"
+  text: "Advanced merge options"
+  method: advanced_merge_options_bathymetry_dataset
+  tooltip: "Specify the validity range and offset for the selected dataset. \n and how the different datasets are merged."
   dependency:
   - action: enable
     checkfor: all
