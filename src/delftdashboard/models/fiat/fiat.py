@@ -30,6 +30,8 @@ class Model(GenericModel):
         # Add main DDB layer
         layer = app.map.add_layer("fiat")
 
+        # Add colors as dictionary per attribute
+
         layer.add_layer(
             "exposure_points",
             type="circle",
@@ -160,12 +162,7 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "classification_file_field_name_string",
-            [
-                "*Field 1 from file*",
-                "*Field 2 from file*",
-                "*Field 3 from file*",
-                "*Field 4 from file*",
-            ],
+            [],
         )
         app.gui.setvar(
             group,
@@ -208,6 +205,7 @@ class Model(GenericModel):
             "selected_secondary_classification_value",
             [""],
         )
+        app.gui.setvar(group, "assign_classification_active", False)
         app.gui.setvar(group, "selected_secondary_classification_value", 0)
         app.gui.setvar(group, "show_primary_classification", None)
         app.gui.setvar(group, "show_secondary_classification", None)

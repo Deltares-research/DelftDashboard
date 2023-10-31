@@ -56,7 +56,7 @@ element:
       width: 160
       height: 20
     text: Load source
-    method: load_upload_classification_source # TODO This method should also popup and upload file window
+    method: load_upload_classification_source
     dependency:
     - action: visible
       checkfor: all
@@ -76,9 +76,9 @@ element:
   - action: visible
     checkfor: all
     check:
-    - variable: classification_source
-      operator: ne
-      value: nsi_data
+    - variable: assign_classification_active
+      operator: eq
+      value: True
   element:
   - style: popupmenu
     position:

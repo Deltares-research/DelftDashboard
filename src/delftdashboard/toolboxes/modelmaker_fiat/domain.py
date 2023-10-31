@@ -28,16 +28,24 @@ def draw_boundary(*args):
 
 def zoom_to_boundary(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
-    gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
+    if active_layer:
+        gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
 
-    # get the aoi bounds
-    bounds = gdf.geometry.bounds
+        # get the aoi bounds
+        bounds = gdf.geometry.bounds
 
-    # Fly to the site
-    app.map.fit_bounds(bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0])
+        # Fly to the site
+        app.map.fit_bounds(bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0])
+    else:
+        app.gui.window.dialog_info(text="Please first select a model boundary.", title="No model boundary selected")
 
 
 def generate_boundary(*args):
+    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+    if active_layer == "":
+        app.gui.window.dialog_info(text="Please first select a model boundary.", title="No model boundary selected")
+        return
+
     if app.model["fiat"].domain is None:
         app.gui.window.dialog_warning(
             "Please first select a folder for your FIAT model",
@@ -47,20 +55,18 @@ def generate_boundary(*args):
         # Initiate a new FIAT model
         app.model["fiat"].new()
 
-    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
-    if active_layer:
-        gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
-        gdf.to_file(
-            app.model["fiat"].domain.database.drive / "aoi.geojson", driver="GeoJSON"
-        )
+    gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
+    gdf.to_file(
+        app.model["fiat"].domain.database.drive / "aoi.geojson", driver="GeoJSON"
+    )
 
-        app.model["fiat"].domain.exposure_vm.create_interest_area(
-            fpath=str(app.model["fiat"].domain.database.drive / "aoi.geojson")
-        )
+    app.model["fiat"].domain.exposure_vm.create_interest_area(
+        fpath=str(app.model["fiat"].domain.database.drive / "aoi.geojson")
+    )
 
-        app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
-        time.sleep(0.5)
-        app.map.layer["modelmaker_fiat"].layer[active_layer].show()
+    app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
+    time.sleep(0.5)
+    app.map.layer["modelmaker_fiat"].layer[active_layer].show()
 
 
 def select_method(*args):

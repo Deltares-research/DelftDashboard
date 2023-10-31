@@ -19,36 +19,39 @@ def set_variables(*args):
 
 
 def build_nsi_exposure(*args):
-    app.gui.setvar("fiat", "created_nsi_assets", "nsi")
-    app.gui.setvar("fiat", "text_feedback_create_asset_locations", "NSI assets created")
+    try:
+        app.gui.setvar("fiat", "created_nsi_assets", "nsi")
+        app.gui.setvar("fiat", "text_feedback_create_asset_locations", "NSI assets created")
 
-    crs = app.gui.getvar("fiat", "selected_crs")
-    (
-        gdf,
-        unique_primary_types,
-        unique_secondary_types,
-    ) = app.model["fiat"].domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
-    gdf.set_crs(crs, inplace=True)
+        crs = app.gui.getvar("fiat", "selected_crs")
+        (
+            gdf,
+            unique_primary_types,
+            unique_secondary_types,
+        ) = app.model["fiat"].domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
+        gdf.set_crs(crs, inplace=True)
 
-    app.map.layer["fiat"].layer["exposure_points"].crs = crs
-    app.map.layer["fiat"].layer["exposure_points"].set_data(
-        gdf
-    )
+        app.map.layer["fiat"].layer["exposure_points"].crs = crs
+        app.map.layer["fiat"].layer["exposure_points"].set_data(
+            gdf
+        )
 
-    app.gui.setvar(
-        "fiat", "selected_primary_classification_string", unique_primary_types
-    )
-    app.gui.setvar(
-        "fiat", "selected_secondary_classification_string", unique_secondary_types
-    )
-    app.gui.setvar(
-        "fiat", "selected_primary_classification_value", unique_primary_types
-    )
-    app.gui.setvar(
-        "fiat", "selected_secondary_classification_value", unique_secondary_types
-    )
+        app.gui.setvar(
+            "fiat", "selected_primary_classification_string", unique_primary_types
+        )
+        app.gui.setvar(
+            "fiat", "selected_secondary_classification_string", unique_secondary_types
+        )
+        app.gui.setvar(
+            "fiat", "selected_primary_classification_value", unique_primary_types
+        )
+        app.gui.setvar(
+            "fiat", "selected_secondary_classification_value", unique_secondary_types
+        )
 
-    app.gui.setvar("fiat", "show_asset_locations", True)
+        app.gui.setvar("fiat", "show_asset_locations", True)
+    except FileNotFoundError:
+        app.gui.window.dialog_info(text="Please first select a model boundary.", title="No model boundary selected")
 
 def set_asset_locations(*args):
     print("Set asset locations")
