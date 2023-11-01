@@ -86,6 +86,8 @@ class Model(GenericModel):
         app.gui.setvar(group, "selected_damage_curve_database", "default_vulnerability_curves")
         app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
         
+        ## DISPLAY LAYERS ##
+        app.gui.setvar(group, "properties_to_display", "Asset locations")
         app.gui.setvar(group, "display_asset_locations", None)
         app.gui.setvar(group, "display_classification", None)
         app.gui.setvar(group, "display_asset_heights", None)
@@ -354,6 +356,10 @@ class Model(GenericModel):
         # Grid
         gdf = self.domain.grid.to_gdf()
         app.map.layer["fiat"].layer["grid"].set_data(gdf)
+
+    def show_asset_locations(self):
+        """Show exposure layer(s)"""
+        app.model["fiat"].show_exposure_layers()
 
     def show_exposure_layers(self):
         app.map.layer["fiat"].layer["exposure_points"].show()

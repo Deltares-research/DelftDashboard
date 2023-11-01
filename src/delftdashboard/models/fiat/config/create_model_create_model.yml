@@ -48,55 +48,16 @@ element:
     width: 100
     height: 20
   text: "<u>Damage curves</u>:"
-- style: checkbox
+- style: radiobuttongroup
   position:
     x: 160
-    y: 95
-    width: 130
-    height: 20
-  text: Display asset locations
-  variable: show_asset_locations
-  method: display_asset_locations
-- style: checkbox
-  position:
-    x: 160
-    y: 80
-    width: 130
-    height: 20
-  text: Display classification
-  variable: display_classification
-- style: checkbox
-  position:
-    x: 160
-    y: 65
-    width: 130
-    height: 20
-  text: Display asset heights
-  variable: display_asset_heights
-- style: checkbox
-  position:
-    x: 160
-    y: 50
-    width: 130
-    height: 20
-  text: Display max potential values
-  variable: display_max_potential_values
-- style: checkbox
-  position:
-    x: 160
-    y: 35
-    width: 130
-    height: 20
-  text: Display aggregation
-  variable: display_aggregation
-- style: checkbox
-  position:
-    x: 160
-    y: 20
-    width: 130
-    height: 20
-  text: Display damage curves
-  variable: display_damage_curves
+    y: 10
+    width: 100
+  text: Display properties
+  variable: properties_to_display
+  option_string: ["Asset locations", "Classification", "Asset heights", "Max potential damages", "Aggregation", "Damage curves"]
+  option_value: ["Asset locations", "Classification", "Asset heights", "Max potential damages", "Aggregation", "Damage curves"]
+  method: display_properties
 - style: pushbutton
   position:
     x: 300
