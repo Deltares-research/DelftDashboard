@@ -13,10 +13,10 @@ element:
     variable: loaded_aggregation_files_string
 - style: listbox
   position:
-      x: 200
-      y: 65
+      x: 500
+      y: 25
       width: 150
-      height: 50
+      height: 20
   text: "Selected aggregation"
   text_position: "above"
   variable: selected_aggregation_files
@@ -25,28 +25,48 @@ element:
     variable: selected_aggregation_files_string
 - style: pushbutton
   position:
-    x: 170
-    y: 90
-    width: 20
-    height: 20
-  text: "\u2B9E" 
-  method: select_aggregation
-- style: pushbutton
-  position:
-    x: 170
-    y: 70
-    width: 20
-    height: 20
-  text: "\u2B9C"
-  method: deselect_aggregation
-- style: pushbutton
-  position:
     x: 10
-    y: 30
-    width: 100
+    y: 40
+    width: 80
     height: 20
   text: "Load source"
   method: load_aggregation_file
+- style: pushbutton
+  position:
+    x: 110
+    y: 40
+    width: 50
+    height: 20
+  text: "select"
+  method: open_gdf
+- style: popupmenu
+  position:
+    x: 220
+    y: 95
+    width: 115
+    height: 20
+  text: "Attribute:"
+  variable: aggregation_file_field_name
+  option_string:
+    variable: aggregation_file_field_name_string
+  option_value:
+    variable: aggregation_file_field_name_value
+- style: edit
+  position:
+    x: 220
+    y: 65
+    width: 50
+    height: 18
+  text: "Label:"
+  variable: aggregation_label
+
+- style: pushbutton
+  position:
+    x: 220
+    y: 30
+    width: 50
+    height: 20
+  text: Add
 - style: pushbutton
   position:
     x: 530

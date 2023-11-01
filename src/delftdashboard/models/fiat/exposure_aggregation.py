@@ -19,8 +19,6 @@ def set_variables(*args):
     app.model["fiat"].set_input_variables()
 
 
-
-
 def select_aggregation(*args):
     selected_aggregation = app.gui.getvar("fiat", "loaded_aggregation_files")
     current_list_string = app.gui.getvar("fiat", "loaded_aggregation_files_string")
@@ -72,7 +70,28 @@ def load_aggregation(name):
     else:
         current_list_string.append(name)
     app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
+
+def open_gdf(*args):
+    index = app.gui.getvar("fiat", "loaded_aggregation_files")
+    path = app.gui.getvar("fiat", "loaded_aggregation_files_value")[index]
+    gdf = gpd.read_file(path)
+    list_columns = list(gdf.columns)
+   
+    app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
+
+def upload_attribute_source(*args):
+    print("Load upload aggregation source")
+    fn = app.gui.getvar("fiat", "loaded_aggregation_files_value")
+    selected_aggregation = app.gui.getvar("fiat", "selected_aggregation_files")
+    fn = fn[selected_aggregation]
+
+    gdf = gpd.read_file(fn)
+    list_columns = list(gdf.columns)
+   
+    app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
     
+
+
 def add_aggregations(*args):
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
     aggregation_files_string = app.gui.getvar("fiat", "selected_aggregation_files_string")
