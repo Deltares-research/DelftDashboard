@@ -30,7 +30,10 @@ def select_aggregation(*args):
 
 def selection(name):
     current_list_string = app.gui.getvar("fiat", "selected_aggregation_files_string")
-    current_list_string.append(name)
+    if name in current_list_string:
+        pass
+    else:
+        current_list_string.append(name)
     app.gui.setvar("fiat", "selected_aggregation_files_string", current_list_string)
     
 
