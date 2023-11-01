@@ -345,7 +345,7 @@ class Model(GenericModel):
         if not okay:
             return
 
-    def specify_damage_curves(self):
+    def damage_curves_specify(self):
         # get window config yaml path
         pop_win_config_path = str(
             Path(
@@ -356,6 +356,10 @@ class Model(GenericModel):
             / "config"
             / "vulnerability_specify_damage_curves.yml"
         )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, None)
+        if not okay:
+            return
 
     def classification_standarize(self):
         # get window config yaml path
@@ -368,7 +372,6 @@ class Model(GenericModel):
             / "config"
             / "exposure_classification_standarize.yml"
         )
-
         # Create pop-up and only continue if user presses ok
         okay, data = app.gui.popup(pop_win_config_path, None)
         if not okay:
