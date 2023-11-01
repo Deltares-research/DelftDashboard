@@ -25,10 +25,17 @@ def create_model(*args):
 def edit(*args):
     app.model["fiat"].set_model_variables()
 
-def display_asset_locations(*args):
-    """Show/hide buildings layer"""
-    app.gui.setvar("fiat", "show_asset_locations", args[0])
-    if args[0]:
-        app.model["fiat"].show_exposure_layers()
-    else:
-        app.model["fiat"].hide_exposure_layers()
+def display_properties(*args):
+    properties_to_display = app.gui.getvar("fiat", "properties_to_display")
+    if properties_to_display == "Asset locations":
+        app.model["fiat"].show_asset_locations()
+    elif properties_to_display == "Classification":
+        NotImplemented
+    elif properties_to_display == "Asset heights":
+        NotImplemented
+    elif properties_to_display == "Max potential damages":
+        NotImplemented
+    elif properties_to_display == "Aggregation":
+        NotImplemented
+    elif properties_to_display == "Damage curves":
+        NotImplemented
