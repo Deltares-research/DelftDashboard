@@ -25,17 +25,25 @@ def select_aggregation(*args):
     selected_aggregation = app.gui.getvar("fiat", "loaded_aggregation_files")
     current_list_string = app.gui.getvar("fiat", "loaded_aggregation_files_string")
     name = current_list_string[selected_aggregation]
-    aggregation(name)
+    selection(name)
 
 
-def aggregation(name):
+def selection(name):
     current_list_string = app.gui.getvar("fiat", "selected_aggregation_files_string")
     current_list_string.append(name)
     app.gui.setvar("fiat", "selected_aggregation_files_string", current_list_string)
     
 
 def deselect_aggregation(*args):
-    print("deselect")
+    deselected_aggregation = app.gui.getvar("fiat", "selected_aggregation_files")
+    current_list_string = app.gui.getvar("fiat", "selected_aggregation_files_string")
+    name = current_list_string[deselected_aggregation]
+    deselection(name)
+
+def deselection(name): 
+    current_list_string = app.gui.getvar("fiat", "selected_aggregation_files_string")
+    current_list_string.remove(name)
+    app.gui.setvar("fiat", "selected_aggregation_files_string", current_list_string)
     
 def add_aggregations(*args):
     print("Add aggregations to model")
@@ -50,6 +58,9 @@ def load_aggregation_file(*args):
 
 def load_aggregation(name):
     current_list_string = app.gui.getvar("fiat", "loaded_aggregation_files_string")
-    current_list_string.append(name)
+    if name in current_list_string:
+        pass
+    else:
+        current_list_string.append(name)
     app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
     
