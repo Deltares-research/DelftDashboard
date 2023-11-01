@@ -22,19 +22,20 @@ def set_variables(*args):
 def deselect_aggregation(*args):
     print("Deselect aggregation field")
 
-def add_aggregations():
+def add_aggregations(*args):
     print("Add aggregations to model")
 
 
-def load_aggregation_file(name):
-    current_list = app.gui.getvar("fiat", "loaded_aggregation_files_string")
-    current_list.append(name)
-    app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list)
+def load_aggregation_file(*args):
+    fn = app.gui.window.dialog_open_file("Select geometry",
+                                          filter="Geometry (*.shp *.gpkg *.geojson)")
+    
+    name = Path(fn).name
+    load_aggregation(name)
 
-    #app.gui.setvar("fiat", "loaded_aggregation_files", current_list)
-    #app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list)
-    #app.gui.setvar("fiat", "loaded_aggregation_files_value", current_list)
-
-#def select_aggregation(*args):
-    #aggregation_zones = app.gui.getvar("fiat", "loaded_aggregation_files")
-    #app.gui.setvar("fiat", "selected_aggregation_files_string",  [aggregation_zones])
+def load_aggregation(name):
+    current_list_string = app.gui.getvar("fiat", "loaded_aggregation_files_string")
+    if name in current_list_string:
+        return
+    current_list_string.append(name)
+    app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)

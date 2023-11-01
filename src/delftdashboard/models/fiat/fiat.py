@@ -205,6 +205,14 @@ class Model(GenericModel):
             "selected_secondary_classification_value",
             [""],
         )
+        app.gui.setvar(group, "loaded_aggregation_files", 0)
+        app.gui.setvar(
+            group,
+            "loaded_aggregation_files_string",
+            [],
+        )
+        app.gui.setvar(group, "selected_aggregation_files", 0)
+        app.gui.setvar(group, "selected_aggregation_files_string", [""])
         app.gui.setvar(group, "assign_classification_active", False)
         app.gui.setvar(group, "selected_secondary_classification_value", 0)
         app.gui.setvar(group, "show_primary_classification", None)
