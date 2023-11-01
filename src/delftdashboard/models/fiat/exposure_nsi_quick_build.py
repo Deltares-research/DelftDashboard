@@ -19,37 +19,47 @@ def set_variables(*args):
 
 
 def build_nsi_exposure(*args):
+    model = "fiat"
+    checkbox_group = "_main"
     try:
-        app.gui.setvar("fiat", "created_nsi_assets", "nsi")
-        app.gui.setvar("fiat", "text_feedback_create_asset_locations", "NSI assets created")
+        app.gui.setvar(model, "created_nsi_assets", "nsi")
+        app.gui.setvar(model, "text_feedback_create_asset_locations", "NSI assets created")
 
-        crs = app.gui.getvar("fiat", "selected_crs")
+        crs = app.gui.getvar(model, "selected_crs")
         (
             gdf,
             unique_primary_types,
             unique_secondary_types,
-        ) = app.model["fiat"].domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
+        ) = app.model[model].domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
         gdf.set_crs(crs, inplace=True)
 
-        app.map.layer["fiat"].layer["exposure_points"].crs = crs
-        app.map.layer["fiat"].layer["exposure_points"].set_data(
+        app.map.layer[model].layer["exposure_points"].crs = crs
+        app.map.layer[model].layer["exposure_points"].set_data(
             gdf
         )
 
         app.gui.setvar(
-            "fiat", "selected_primary_classification_string", unique_primary_types
+            model, "selected_primary_classification_string", unique_primary_types
         )
         app.gui.setvar(
-            "fiat", "selected_secondary_classification_string", unique_secondary_types
+            model, "selected_secondary_classification_string", unique_secondary_types
         )
         app.gui.setvar(
-            "fiat", "selected_primary_classification_value", unique_primary_types
+            model, "selected_primary_classification_value", unique_primary_types
         )
         app.gui.setvar(
-            "fiat", "selected_secondary_classification_value", unique_secondary_types
+            model, "selected_secondary_classification_value", unique_secondary_types
         )
 
-        app.gui.setvar("fiat", "show_asset_locations", True)
+        app.gui.setvar(model, "show_asset_locations", True)
+        
+        # Set the checkboxes checked
+        app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
+        app.gui.setvar(checkbox_group, "checkbox_classification", True)
+        app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
+        app.gui.setvar(checkbox_group, "checkbox_elevation", True)
+        app.gui.setvar(checkbox_group, "checkbox_aggregation_(optional)", True)
+
     except FileNotFoundError:
         app.gui.window.dialog_info(text="Please first select a model boundary.", title="No model boundary selected")
 

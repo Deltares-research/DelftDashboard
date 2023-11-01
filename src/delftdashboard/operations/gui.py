@@ -10,6 +10,7 @@ import importlib
 
 from delftdashboard.app import app
 from cht.bathymetry.bathymetry_database import bathymetry_database
+from .checklist import initialize_checklist
 
 
 def build_gui_config():
@@ -67,6 +68,10 @@ def build_gui_config():
     mpbox["position"]["height"] = -40
     mpbox["module"] = "delftdashboard.operations.map"
     app.gui.config["element"].append(mpbox)
+
+    # Add the checklist panel on top of the map for FIAT model building
+    checklist = initialize_checklist()
+    app.gui.config["element"].append(checklist)
 
     # Menu
 
