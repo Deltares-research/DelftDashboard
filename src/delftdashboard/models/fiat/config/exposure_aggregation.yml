@@ -41,17 +41,19 @@ element:
   method: deselect_aggregation
 - style: pushbutton
   position:
-    x: 630
-    y: 10
-    width: 160
-    height: 20
-  text: "Add aggregations to model"
-  method: add_aggregations
-- style: pushbutton
-  position:
     x: 10
     y: 30
     width: 100
     height: 20
   text: "Load source"
   method: load_aggregation_file
+- style: pushbutton
+  position:
+    x: 530
+    y: 10
+    width: 190
+    height: 30
+  text: "Add aggregations to model"
+  variable: selected_aggregation_files_value
+  select: item
+  method: add_aggregations

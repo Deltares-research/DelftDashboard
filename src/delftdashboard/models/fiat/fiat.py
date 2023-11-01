@@ -211,6 +211,11 @@ class Model(GenericModel):
             "loaded_aggregation_files_string",
             [],
         )
+        app.gui.setvar(
+            group,
+            "loaded_aggregation_files_value",
+            [],
+        )
         app.gui.setvar(group, "selected_aggregation_files", 0)
         app.gui.setvar(group, "selected_aggregation_files_string", [])
         app.gui.setvar(group, "assign_classification_active", False)
