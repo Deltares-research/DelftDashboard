@@ -66,8 +66,20 @@ class Model(GenericModel):
             app.map.layer["fiat"].set_mode("invisible")
 
     def set_gui_variables(self):
+        ## CHECKBOXES ##
+        group = "_main"
+        app.gui.setvar(group, "checkbox_model_boundary", False)
+        app.gui.setvar(group, "checkbox_asset_locations", False)
+        app.gui.setvar(group, "checkbox_classification", False)
+        app.gui.setvar(group, "checkbox_damage_values", False)
+        app.gui.setvar(group, "checkbox_elevation", False)
+        app.gui.setvar(group, "checkbox_aggregation_(optional)", False)
+        app.gui.setvar(group, "checkbox_vulnerability", False)
+        app.gui.setvar(group, "checkbox_svi_(optional)", False)
+
         group = "fiat"
-        # Input variables
+        
+        ## TO BE DESCRIBED ##
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         default_curves = default_curves[["Exposure Link", "Damage Type", "Source", "Description"]]
         app.gui.setvar(group, "damage_curves_table", default_curves)

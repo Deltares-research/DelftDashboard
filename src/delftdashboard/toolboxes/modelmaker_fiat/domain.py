@@ -68,6 +68,9 @@ def generate_boundary(*args):
     time.sleep(0.5)
     app.map.layer["modelmaker_fiat"].layer[active_layer].show()
 
+    # Check the checkbox
+    app.gui.setvar("_main", "checkbox_model_boundary", True)
+
 
 def select_method(*args):
     app.gui.setvar("modelmaker_fiat", "selected_aoi_method", args[0])

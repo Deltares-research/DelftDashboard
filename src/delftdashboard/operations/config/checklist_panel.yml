@@ -1,0 +1,8 @@
+module: delftdashboard.operations.checklist
+style: panel
+id: checklist
+position:
+  x: -30
+  y: 350
+  width: 120
+  height: -50
