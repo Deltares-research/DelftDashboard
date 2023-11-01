@@ -30,6 +30,7 @@ element:
     width: 20
     height: 20
   text: "\u2B9E" 
+  method: select_aggregation
 - style: pushbutton
   position:
     x: 170
@@ -37,7 +38,7 @@ element:
     width: 20
     height: 20
   text: "\u2B9C"
-  method: deselected_aggregation
+  method: deselect_aggregation
 - style: pushbutton
   position:
     x: 630
