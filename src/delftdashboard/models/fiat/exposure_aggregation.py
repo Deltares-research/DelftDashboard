@@ -102,12 +102,7 @@ def write_input_to_table(*args):
         df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
     df_all_aggregation.reset_index(drop=True, inplace=True)
     app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
-
-
 def add_aggregations(*args):
-    aggregation_table_list = []
-    count = 0
-    #FN get the file path of the file from value
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
     aggregation_table = app.gui.getvar("fiat", "aggregation_table")
     file_name = aggregation_table["File"].tolist()
@@ -124,13 +119,13 @@ def add_aggregations(*args):
     label = aggregation_table["Aggregation Label"].tolist()
     app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
 
-    attribute_to_visualize = "TO FILL"
-    data_to_visualize = "TO FILL"
-    gdf = gpd.read_file(data_to_visualize)
-    paint_properties = app.model["fiat"].create_paint_properties(
-        gdf, attribute_to_visualize, type="polygon", opacity=0.5
-    )
-    legend = []  # Still needs to be made in the mapbox code
-    app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
-        gdf, paint_properties, legend
-    )
+    #attribute_to_visualize = "TO FILL"
+    #data_to_visualize = "TO FILL"
+    #gdf = gpd.read_file(data_to_visualize)
+    #paint_properties = app.model["fiat"].create_paint_properties(
+    #    gdf, attribute_to_visualize, type="polygon", opacity=0.5
+    #)
+    #legend = []  # Still needs to be made in the mapbox code
+    #app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
+    #    gdf, paint_properties, legend
+    #)

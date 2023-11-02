@@ -79,10 +79,10 @@ element:
 - style: pushbutton
   position:
     x: 690
-    y: 5
+    y: 10
     width: 40
     height: 20
-  text: "Run"
+  text: "Add to model"
   variable: selected_aggregation_files_value
   select: item
   method: add_aggregations
