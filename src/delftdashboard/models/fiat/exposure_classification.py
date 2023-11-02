@@ -1,7 +1,7 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-import geopandas as gpd
+import fiona
 
 
 def select(*args):
@@ -31,8 +31,11 @@ def load_upload_classification_source(*args):
     fn = app.gui.window.dialog_open_file(
         "Select geometry", filter="Geometry (*.shp *.gpkg *.geojson)"
     )
-    gdf = gpd.read_file(fn[0])
-    list_columns = list(gdf.columns)
+    # Open the data source for reading
+    with fiona.open(fn[0]) as src:
+        # Access the schema to get the column names
+        schema = src.schema
+        list_columns = list(schema['properties'].keys())
     
     app.gui.setvar("fiat", "classification_file_field_name_string", list_columns)
     app.gui.setvar("fiat", "assign_classification_active", True)
