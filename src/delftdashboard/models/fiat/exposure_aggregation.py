@@ -86,12 +86,21 @@ def write_input_to_table(*args):
     app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
 
 def add_aggregations(*args):
+    #FN get the file path of the file from value
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
-    aggregation_files_string = app.gui.getvar("fiat", "selected_aggregation_files_string")
+    aggregation_table = app.gui.getvar("fiat",  "aggregation_table")
+    file_name = aggregation_table["File"].tolist()
     aggregation_fn = []
     for i in aggregation_files_values:
-        if i.name in aggregation_files_string:
+        if i.name in file_name:
             aggregation_fn.append(i)
     app.gui.setvar("fiat", "loaded_aggregation_files_value", aggregation_fn)
     a = app.gui.getvar("fiat", "loaded_aggregation_files_value")
     print(a)
+    #fn = 
+    #attribute =
+    #label = 
+    #app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
+
+
+    

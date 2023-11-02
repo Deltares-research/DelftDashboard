@@ -8,6 +8,7 @@ from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 
 
+
 class Model(GenericModel):
     def __init__(self, name):
         super().__init__()
