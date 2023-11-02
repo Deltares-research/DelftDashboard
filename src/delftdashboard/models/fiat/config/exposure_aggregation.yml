@@ -27,6 +27,14 @@ element:
     height: 20
   text: "select"
   method: open_gdf
+- style: pushbutton
+  position:
+    x: 170
+    y: 120
+    width: 10
+    height: 10
+  text: "x"
+  method: delete_loaded_file
 - style: popupmenu
   position:
     x: 220
@@ -47,7 +55,6 @@ element:
     height: 18
   text: "Label:"
   variable: aggregation_label_string
-
 - style: pushbutton
   position:
     x: 220
@@ -58,10 +65,10 @@ element:
   method: write_input_to_table
 - style: tableview
   position:
-    x: 390
+    x: 350
     y: 30
-    width: 340
-    height: 90
+    width: 300
+    height: 85
   tooltip: Selected aggregation zones
   title: Selected Aggregation Zones
   text_position: "above"
