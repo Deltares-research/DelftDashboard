@@ -100,7 +100,7 @@ def write_input_to_table(*args):
     if added_aggregation[0] in added_aggregation_list:
         pass
     else:
-        df_all_aggregation= df_all_aggregation.append(df_all_aggregation)
+        df_all_aggregation = df_all_aggregation.append(df_aggregation)
     app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
 
 def add_aggregations(*args):
