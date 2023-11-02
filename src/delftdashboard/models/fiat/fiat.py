@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
-
-@author: ormondt
-"""
 import os
 from pathlib import Path
+import random
+import geopandas as gpd
 
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
@@ -18,6 +14,8 @@ class Model(GenericModel):
 
         self.name = name
         self.long_name = "FIAT"
+        self.buildings = gpd.GeoDataFrame()
+        self.roads = gpd.GeoDataFrame()
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -356,6 +354,86 @@ class Model(GenericModel):
         # Grid
         gdf = self.domain.grid.to_gdf()
         app.map.layer["fiat"].layer["grid"].set_data(gdf)
+
+    @staticmethod
+    def generate_random_colors(n):
+        return ["#%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
+
+    def create_paint_properties(self, gdf, attribute):
+        unique_types = list(gdf[attribute].unique())
+        circle_color = [
+            "match",
+            ["get", "Secondary Object Type"],
+        ]
+        colors = self.generate_random_colors(len(unique_types))
+        attr_color_list = [item for pair in zip(unique_types, colors) for item in pair]
+        circle_color.extend(attr_color_list)
+        circle_color.append("#000000")
+
+        paint_properties = {
+            "circle-color": circle_color,
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "black",
+            "circle-stroke-opacity": 0,
+            "circle-radius": 3,
+            "circle-opacity": 1,
+        }
+        return paint_properties
+
+    def get_nsi_paint_properties(self):
+        circle_color = [
+            "match",
+            ["get", "Secondary Object Type"],
+            "AGR1", "#009c99",
+            "COM1", "#6590bb",
+            "COM10", "#5b6d47",
+            "COM2", "#b63f1d",
+            "COM3", "#70d073",
+            "COM4", "#f2facd",
+            "COM5", "#f4428d",
+            "COM6", "#2f5770",
+            "COM7", "#472d9c",
+            "COM8", "#816035",
+            "COM9", "#f9917f",
+            "EDU1", "#7665b1",
+            "EDU2", "#c85dcf",
+            "GOV1", "#710b60",
+            "GOV2", "#fd32f1",
+            "IND1", "#10f276",
+            "IND2", "#bc2db1",
+            "IND3", "#09459b",
+            "IND4", "#2c3d14",
+            "IND5", "#90f27d",
+            "IND6", "#388bb3",
+            "REL1", "#4cf6ce",
+            "RES1-1SNB", "#f55243",
+            "RES1-1SWB", "#1f520d",
+            "RES1-2SNB", "#143523",
+            "RES1-2SWB", "#301eb1",
+            "RES1-3SNB", "#80f304",
+            "RES1-3SWB", "#4aab4e",
+            "RES2", "#7e0309",
+            "RES3A", "#c6a083",
+            "RES3B", "#919900",
+            "RES3C", "#337adc",
+            "RES3D", "#571950",
+            "RES3E", "#a2863a",
+            "RES3F", "#330b34",
+            "RES4", "#37d6c8",
+            "RES5", "#939b8f",
+            "RES6", "#665435",
+            "#000000",
+        ]
+
+        paint_properties = {
+            "circle-color": circle_color,
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "black",
+            "circle-stroke-opacity": 0,
+            "circle-radius": 3,
+            "circle-opacity": 1,
+        }
+        return paint_properties
 
     def show_asset_locations(self):
         """Show exposure layer(s)"""
