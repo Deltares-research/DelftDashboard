@@ -14,7 +14,7 @@ element:
 - style: pushbutton
   position:
     x: 10
-    y: 40
+    y: 30
     width: 80
     height: 20
   text: "Load source"
@@ -22,7 +22,7 @@ element:
 - style: pushbutton
   position:
     x: 110
-    y: 40
+    y: 30
     width: 50
     height: 20
   text: "select"
@@ -58,22 +58,24 @@ element:
   method: write_input_to_table
 - style: tableview
   position:
-    x: 410
+    x: 390
     y: 30
-    width: 300
+    width: 340
     height: 90
   tooltip: Selected aggregation zones
+  title: Selected Aggregation Zones
+  text_position: "above"
   selection_type: extended
   sortable: true
   option_value:
     variable: aggregation_table
 - style: pushbutton
   position:
-    x: 530
-    y: 10
-    width: 190
-    height: 30
-  text: "Add aggregations to model"
+    x: 690
+    y: 5
+    width: 40
+    height: 20
+  text: "Run"
   variable: selected_aggregation_files_value
   select: item
   method: add_aggregations

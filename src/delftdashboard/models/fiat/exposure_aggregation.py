@@ -82,12 +82,26 @@ def open_gdf(*args):
    
     
 def write_input_to_table(*args):
-    aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
     aggregation_label = [app.gui.getvar("fiat", "aggregation_label_string")]
-    file = app.gui.getvar("fiat", "loaded_aggregation_files_string")
-    fn = app.gui.getvar("fiat", "loaded_aggregation_files_value")
-    df_aggregation = pd.DataFrame({"File": file, "Aggregation Label": aggregation_label, "Aggregation Attribute": aggregation_attribute })
-    app.gui.setvar("fiat", "aggregation_table", df_aggregation)
+    aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
+    file_index = app.gui.getvar("fiat", "loaded_aggregation_files")
+    file = app.gui.getvar("fiat", "loaded_aggregation_files_string")[file_index]
+    df_aggregation = pd.DataFrame({"File": file, "Aggregation Attribute": aggregation_attribute, "Aggregation Label": aggregation_label })
+    df_all_aggregation = app.gui.getvar("fiat", "aggregation_table")
+
+    if len(df_all_aggregation) ==0:
+       df_all_aggregation = pd.DataFrame(columns=["File", "Aggregation Attribute", "Aggregation Label"])
+    else:
+        pass
+    
+    added_aggregation = df_aggregation["File"].tolist()
+    added_aggregation_list = df_all_aggregation["File"].tolist()
+    
+    if added_aggregation[0] in added_aggregation_list:
+        pass
+    else:
+        df_all_aggregation= df_all_aggregation.append(df_all_aggregation)
+    app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
 
 def add_aggregations(*args):
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
