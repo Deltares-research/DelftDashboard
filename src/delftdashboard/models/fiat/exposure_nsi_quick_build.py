@@ -23,19 +23,29 @@ def build_nsi_exposure(*args):
     checkbox_group = "_main"
     try:
         app.gui.setvar(model, "created_nsi_assets", "nsi")
-        app.gui.setvar(model, "text_feedback_create_asset_locations", "NSI assets created")
+        app.gui.setvar(
+            model, "text_feedback_create_asset_locations", "NSI assets created"
+        )
 
         crs = app.gui.getvar(model, "selected_crs")
         (
             gdf,
             unique_primary_types,
             unique_secondary_types,
-        ) = app.model[model].domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
+        ) = app.model[
+            model
+        ].domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
         gdf.set_crs(crs, inplace=True)
+
+        # Set the buildings attribute to gdf for easy visualization of the buildings
+        app.model["fiat"].buildings = gdf
+
+        paint_properties = app.model["fiat"].get_nsi_paint_properties()
+        legend = []
 
         app.map.layer[model].layer["exposure_points"].crs = crs
         app.map.layer[model].layer["exposure_points"].set_data(
-            gdf
+            gdf, paint_properties, legend
         )
 
         app.gui.setvar(
@@ -52,7 +62,7 @@ def build_nsi_exposure(*args):
         )
 
         app.gui.setvar(model, "show_asset_locations", True)
-        
+
         # Set the checkboxes checked
         app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
         app.gui.setvar(checkbox_group, "checkbox_classification", True)
@@ -61,7 +71,11 @@ def build_nsi_exposure(*args):
         app.gui.setvar(checkbox_group, "checkbox_aggregation_(optional)", True)
 
     except FileNotFoundError:
-        app.gui.window.dialog_info(text="Please first select a model boundary.", title="No model boundary selected")
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
+
 
 def set_asset_locations(*args):
     print("Set asset locations")
