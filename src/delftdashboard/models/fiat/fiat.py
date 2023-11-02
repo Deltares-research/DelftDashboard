@@ -230,21 +230,12 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "selected_aggregation_files", 0)
         app.gui.setvar(group, "selected_aggregation_files_string", [])
-        app.gui.setvar(
-            group,
-            "aggregation_file_field_name_string",
-            [],
-        )
+        app.gui.setvar(group, "aggregation_file_field_name", 0)
+        app.gui.setvar(group, "aggregation_file_field_name_string",[])
         app.gui.setvar(
             group,
             "aggregation_file_field_name_value",
             ["field1", "field2", "field3", "field4"],
-        )
-        app.gui.setvar(group, "aggregation_file_field_name", None)
-        app.gui.setvar(
-            group,
-            "aggregation_file_field_name_string",
-            [],
         )
         app.gui.setvar(group, "aggregation_label_string", None )
         app.gui.setvar(group, "aggregation_label", 0)

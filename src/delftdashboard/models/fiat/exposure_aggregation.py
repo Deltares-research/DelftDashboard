@@ -79,11 +79,16 @@ def open_gdf(*args):
     list_columns = list(gdf.columns)
     app.gui.setvar("fiat", "aggregation_file_field_name_value", list_columns)
     app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
-   
+    aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
+    if len(aggregation_attribute) == 0:
+        pass
+    else:
+        app.gui.setvar("fiat", "aggregation_file_field_name",0)
+
     
 def write_input_to_table(*args):
-    aggregation_label = [app.gui.getvar("fiat", "aggregation_label_string")]
     aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
+    aggregation_label = [app.gui.getvar("fiat", "aggregation_label_string")]
     file_index = app.gui.getvar("fiat", "loaded_aggregation_files")
     file = app.gui.getvar("fiat", "loaded_aggregation_files_string")[file_index]
     df_aggregation = pd.DataFrame({"File": file, "Aggregation Attribute": aggregation_attribute, "Aggregation Label": aggregation_label })
@@ -100,7 +105,7 @@ def write_input_to_table(*args):
     if added_aggregation[0] in added_aggregation_list:
         pass
     else:
-        df_all_aggregation = df_all_aggregation.append(df_aggregation)
+        df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
     app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
 
 def add_aggregations(*args):
