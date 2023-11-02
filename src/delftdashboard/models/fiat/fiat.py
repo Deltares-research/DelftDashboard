@@ -357,11 +357,11 @@ class Model(GenericModel):
     def generate_random_colors(n):
         return ["#%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
 
-    def create_paint_properties(self, gdf, attribute, type="circle"):
+    def create_paint_properties(self, gdf, attribute, type="circle", opacity=1):
         unique_types = list(gdf[attribute].unique())
         color_properties = [
             "match",
-            ["get", "Secondary Object Type"],
+            ["get", attribute],
         ]
         colors = self.generate_random_colors(len(unique_types))
         attr_color_list = [item for pair in zip(unique_types, colors) for item in pair]
@@ -375,12 +375,12 @@ class Model(GenericModel):
                 "circle-stroke-color": "black",
                 "circle-stroke-opacity": 0,
                 "circle-radius": 3,
-                "circle-opacity": 1,
+                "circle-opacity": opacity,
             }
         elif type == "polygon":
             paint_properties = {
                 "fill-color": color_properties,
-                "fill-opacity": 1,
+                "fill-opacity": opacity,
             }
         return paint_properties
 
