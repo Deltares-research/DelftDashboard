@@ -7,7 +7,7 @@ import pandas as pd
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
-
+import pandas as pd
 
 
 class Model(GenericModel):
@@ -87,12 +87,19 @@ class Model(GenericModel):
         
         ## TO BE DESCRIBED ##
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
-        default_curves = default_curves[["Exposure Link", "Damage Type", "Source", "Description"]]
-        app.gui.setvar(group, "damage_curves_table", default_curves)
+        app.gui.setvar(group, "damage_curves_table", default_curves[["Exposure Link", "Damage Type", "Source", "Description"]])
         app.gui.setvar(group, "selected_damage_curve_database", "default_vulnerability_curves")
         app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
         
         ## DISPLAY LAYERS ##
+        damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
+        damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "ID", "Description"]]
+        app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
+        
+        cols = ["-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
+        app.gui.setvar(group, "damage_curves_standard_curves", damage_functions_database[["ID"] + cols])
+        app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
+
         app.gui.setvar(group, "properties_to_display", "Classification")
         app.gui.setvar(group, "show_asset_locations", False)
         app.gui.setvar(group, "show_classification", False)
@@ -102,6 +109,10 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_damage_curves", False)
         app.gui.setvar(group, "show_roads", False)
         app.gui.setvar(group, "show_extraction_method", False)
+        
+        app.gui.setvar(group, "active_damage_function", None)
+        
+        app.gui.setvar(group, "dmg_functions_html_filepath", "")
         
         app.gui.setvar(
             group,
@@ -488,7 +499,7 @@ class Model(GenericModel):
             / "vulnerability_specify_damage_curves.yml"
         )
         # Create pop-up and only continue if user presses ok
-        okay, data = app.gui.popup(pop_win_config_path, None)
+        okay, data = app.gui.popup(pop_win_config_path, data=None, id="specify_damage_curves")
         if not okay:
             return
 

@@ -102,12 +102,7 @@ def write_input_to_table(*args):
         df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
     df_all_aggregation.reset_index(drop=True, inplace=True)
     app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
-
-
 def add_aggregations(*args):
-    aggregation_table_list = []
-    count = 0
-    #FN get the file path of the file from value
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
     aggregation_table = app.gui.getvar("fiat", "aggregation_table")
     file_name = aggregation_table["File"].tolist()
