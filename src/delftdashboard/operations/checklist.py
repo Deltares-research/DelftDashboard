@@ -12,6 +12,7 @@ def initialize_checklist():
         "Aggregation (optional)",
         "Vulnerability",
         "SVI (optional)",
+        "Roads (optional)"
     ]
     checklist_items.reverse()  # Reverse because guitares places items from the bottom
     spacing = [10 + (y*20) for y in range(len(checklist_items))]

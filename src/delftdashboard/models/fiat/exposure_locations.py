@@ -46,53 +46,13 @@ def load_asset_locations_file(*args):
     load_asset_locations(name)
 
 
-def set_asset_locations_field(*args):
-    app.model["fiat"].set_asset_locations_field()
-
-    # COMMENTED OUT BY LUIS, CHECK IF IT CAN BE USED
-    # def activate_create_nsi_assets(*args):
-    #     app.gui.setvar("fiat", "created_nsi_assets", "nsi")
-    #     app.gui.setvar("fiat", "text_feedback_create_asset_locations", "NSI assets created")
-
-    #     hydro_vm = HydroMtViewModel(
-    #         app.config["working_directory"], app.config["data_libs"]
-    #     )
-    #     crs = app.gui.getvar("fiat", "selected_crs")
-    #     (
-    #         gdf,
-    #         unique_primary_types,
-    #         unique_secondary_types,
-    #     ) = hydro_vm.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
-    #     gdf.set_crs(crs, inplace=True)
-
-    #     app.map.layer["fiat"].layer["exposure_points"].crs = crs
-    #     app.map.layer["fiat"].layer["exposure_points"].set_data(
-    #         gdf, hover_property="Object ID"
-    #     )
-
-    app.gui.setvar(
-        "fiat", "selected_primary_classification_string", unique_primary_types
-    )
-    app.gui.setvar(
-        "fiat", "selected_secondary_classification_string", unique_secondary_types
-    )
-    app.gui.setvar(
-        "fiat", "selected_primary_classification_value", unique_primary_types
-    )
-    app.gui.setvar(
-        "fiat", "selected_secondary_classification_value", unique_secondary_types
-    )
-
-    app.gui.setvar("fiat", "show_asset_locations", True)
-
-
 def display_asset_locations(*args):
     """Show/hide buildings layer"""
     app.gui.setvar("fiat", "show_asset_locations", args[0])
     if args[0]:
-        app.model["fiat"].show_exposure_layers()
+        app.model["fiat"].show_exposure_buildings()
     else:
-        app.model["fiat"].hide_exposure_layers()
+        app.model["fiat"].hide_exposure_buildings()
 
 
 def display_extraction_method(*args):

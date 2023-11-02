@@ -1,12 +1,63 @@
+module: toolboxes.modelmaker_fiat.domain
 element:
-- style: tabpanel
+- style: panel
   id: modelmaker_fiat
   position:
     x: 10
     y: 10
     width: -10
     height: 160
-  tab:
-  - string: Model boundary
-    module: toolboxes.modelmaker_fiat.domain
-    element: domain.yml
+  element:
+  - style: panel
+    title: "Model Boundary"
+    position:
+      x: 10
+      y: 80
+      width: 255
+      height: 65
+    dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: titles_model_boundary_tab
+          operator: eq
+          value: 1
+    element:
+    - style: popupmenu
+      position:
+        x: 10
+        y: 35
+        width: 120
+        height: 20
+      tooltip: Specify model boundary
+      select: item
+      variable: selected_aoi_method
+      option_string:
+        variable: setup_aoi_method_string
+      option_value:
+        variable: setup_aoi_method_value
+    - style: pushbutton
+      text: Draw
+      position:
+        x: 140
+        y: 35
+        width: 105
+        height: 20
+      method: draw_boundary
+    - style: pushbutton
+      text: Zoom to boundary
+      position:
+        x: 140
+        y: 10
+        width: 105
+        height: 20
+      method: zoom_to_boundary
+
+  - style: pushbutton
+    text: Generate model boundary
+    position:
+      x: 275
+      y: 50
+      width: 125
+      height: 20
+    method: generate_boundary

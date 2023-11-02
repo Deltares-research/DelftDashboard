@@ -26,9 +26,7 @@ class Model(GenericModel):
 
     def add_layers(self):
         # Add main DDB layer
-        layer = app.map.add_layer("fiat")
-
-        # Add colors as dictionary per attribute
+        layer = app.map.add_layer("buildings")
 
         layer.add_layer(
             "exposure_points",
@@ -39,9 +37,9 @@ class Model(GenericModel):
             line_color="transparent",
             color_property="Secondary Object Type",
             hover_property="Secondary Object Type",
-            legend_title="Asset locations"
         )
 
+        layer = app.map.add_layer("roads")
         layer.add_layer(
             "exposure_lines",
             type="line",
@@ -52,16 +50,17 @@ class Model(GenericModel):
             circle_radius=0,
             color_property="Secondary Object Type",
             hover_property="Secondary Object Type",
-            legend_title="Roads"
         )
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Everything made visible
-            app.map.layer["fiat"].set_mode("inactive")
+            app.map.layer["buildings"].set_mode("inactive")
+            app.map.layer["roads"].set_mode("inactive")
         elif mode == "invisible":
             # Everything set to invisible
-            app.map.layer["fiat"].set_mode("invisible")
+            app.map.layer["buildings"].set_mode("invisible")
+            app.map.layer["roads"].set_mode("invisible")
 
     def set_gui_variables(self):
         ## CHECKBOXES ##
@@ -74,6 +73,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "checkbox_aggregation_(optional)", False)
         app.gui.setvar(group, "checkbox_vulnerability", False)
         app.gui.setvar(group, "checkbox_svi_(optional)", False)
+        app.gui.setvar(group, "checkbox_roads_(optional)", False)
 
         group = "fiat"
         
@@ -85,7 +85,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
         
         ## DISPLAY LAYERS ##
-        app.gui.setvar(group, "properties_to_display", "Asset locations")
+        app.gui.setvar(group, "properties_to_display", "Classification")
         app.gui.setvar(group, "display_asset_locations", None)
         app.gui.setvar(group, "display_classification", None)
         app.gui.setvar(group, "display_asset_heights", None)
@@ -343,11 +343,6 @@ class Model(GenericModel):
     def set_crs(self, crs):
         self.domain.crs = crs
 
-    def plot(self):
-        # Grid
-        gdf = self.domain.grid.to_gdf()
-        app.map.layer["fiat"].layer["grid"].set_data(gdf)
-
     @staticmethod
     def generate_random_colors(n):
         return ["#%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
@@ -428,17 +423,28 @@ class Model(GenericModel):
         }
         return paint_properties
 
-    def show_asset_locations(self):
+    def show_classification(self):
         """Show exposure layer(s)"""
-        app.model["fiat"].show_exposure_layers()
+        if not self.buildings.empty:
+            paint_properties = self.get_nsi_paint_properties()
+            legend = []
 
-    def show_exposure_layers(self):
-        app.map.layer["fiat"].layer["exposure_points"].show()
-        app.map.layer["fiat"].layer["exposure_lines"].show()
+            app.map.layer["buildings"].layer["exposure_points"].set_data(
+                self.buildings, paint_properties, legend
+            )
+            self.show_exposure_buildings()
 
-    def hide_exposure_layers(self):
-        app.map.layer["fiat"].layer["exposure_points"].hide()
-        app.map.layer["fiat"].layer["exposure_lines"].hide()
+    def show_exposure_buildings(self):
+        app.map.layer["buildings"].layer["exposure_points"].show()
+
+    def hide_exposure_buildings(self):
+        app.map.layer["buildings"].layer["exposure_points"].hide()
+
+    def show_exposure_roads(self):
+        app.map.layer["roads"].layer["exposure_lines"].show()
+
+    def hide_exposure_roads(self):
+        app.map.layer["roads"].layer["exposure_lines"].hide()
 
     def set_asset_locations_field(self):
         # get window config yaml path

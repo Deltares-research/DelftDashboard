@@ -36,7 +36,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "active_area_of_interest", "")
         app.gui.setvar(group, "area_of_interest", 0)
         app.gui.setvar(group, "selected_crs", "EPSG:4326")
-        app.gui.setvar(group, "selected_scenario", "MyScenario")
+
+        ## DEPENDENDY FOR THE TITLES IN THE MODEL BOUNDARY TAB
+        app.gui.setvar(group, "titles_model_boundary_tab", 1)
 
         # Area of Interest
         self.area_of_interest = gpd.GeoDataFrame()

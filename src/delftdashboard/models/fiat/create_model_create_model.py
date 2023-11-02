@@ -26,11 +26,10 @@ def edit(*args):
     app.model["fiat"].set_model_variables()
 
 def display_properties(*args):
+    model = "fiat"
     properties_to_display = app.gui.getvar("fiat", "properties_to_display")
-    if properties_to_display == "Asset locations":
-        app.model["fiat"].show_asset_locations()
-    elif properties_to_display == "Classification":
-        NotImplemented
+    if properties_to_display == "Classification":
+        app.model[model].show_classification()
     elif properties_to_display == "Asset heights":
         NotImplemented
     elif properties_to_display == "Max potential damages":
@@ -39,3 +38,5 @@ def display_properties(*args):
         NotImplemented
     elif properties_to_display == "Damage curves":
         NotImplemented
+    elif properties_to_display == "Roads":
+        app.model[model].show_exposure_roads()

@@ -40,12 +40,9 @@ def build_nsi_exposure(*args):
         # Set the buildings attribute to gdf for easy visualization of the buildings
         app.model["fiat"].buildings = gdf
 
-        paint_properties = app.model["fiat"].get_nsi_paint_properties()
-        legend = []
-
         app.map.layer[model].layer["exposure_points"].crs = crs
         app.map.layer[model].layer["exposure_points"].set_data(
-            gdf, paint_properties, legend
+            gdf
         )
 
         app.gui.setvar(
@@ -86,9 +83,9 @@ def set_asset_locations_field(*args):
 
 
 def display_asset_locations(*args):
-    """Show/hide buildings layer"""
+    """Show/hide buildings layer""" 
     app.gui.setvar("fiat", "show_asset_locations", args[0])
     if args[0]:
-        app.model["fiat"].show_exposure_layers()
+        app.model["fiat"].show_exposure_buildings()
     else:
-        app.model["fiat"].hide_exposure_layers()
+        app.model["fiat"].hide_exposure_buildings()
