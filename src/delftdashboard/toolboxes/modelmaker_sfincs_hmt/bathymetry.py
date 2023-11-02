@@ -9,7 +9,8 @@ def select(*args):
     # De-activate existing layers
     map.update()
     app.map.layer["sfincs_hmt"].layer["grid"].activate()
-
+    app.map.layer["sfincs_hmt"].layer["bed_levels"].show()
+    app.map.layer["sfincs_hmt"].layer["bed_levels"].activate()
 
 def select_bathymetry_source(*args):
     source = args[0]
@@ -202,7 +203,6 @@ def update():
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
         app.gui.setvar(group, "selected_bathymetry_dataset_offset", 0.0)
     app.gui.setvar(group, "nr_selected_bathymetry_datasets", nrd)
-
 
 def generate_bathymetry(*args):
     app.toolbox["modelmaker_sfincs_hmt"].generate_bathymetry()

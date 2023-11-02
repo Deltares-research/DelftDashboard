@@ -44,7 +44,9 @@ class Toolbox(GenericToolbox):
     def select_tab(self):
         map.update()
         app.map.layer["observation_stations"].layer["stations"].activate()
+        app.map.layer["observation_stations"].layer["stations"].show()
         opt = app.gui.getvar("observation_stations", "naming_option")
+        app.map.layer["observation_stations"].layer["stations"].hover_property = opt
         index = app.gui.getvar("observation_stations", "active_station_index")
         app.map.layer["observation_stations"].layer["stations"].set_data(self.gdf, index)
         self.update()
@@ -52,7 +54,7 @@ class Toolbox(GenericToolbox):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Make all layers invisible
-            app.map.layer["observation_stations"].hide()
+            app.map.layer["observation_stations"].deactivate()
         if mode == "invisible":
             # Make all layers invisible
             app.map.layer["observation_stations"].hide()

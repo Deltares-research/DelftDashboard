@@ -6,6 +6,8 @@ def select(*args):
     # De-activate existing layers
     map.update()
     app.map.layer["sfincs_hmt"].layer["grid"].activate()
+    app.map.layer["sfincs_hmt"].layer["bed_levels"].show()
+    app.map.layer["sfincs_hmt"].layer["bed_levels"].activate()    
 
 
 def edit_nr_subgrid_pixels(*args):

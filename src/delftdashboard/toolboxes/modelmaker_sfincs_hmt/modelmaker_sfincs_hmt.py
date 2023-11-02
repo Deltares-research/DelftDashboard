@@ -403,6 +403,9 @@ class Toolbox(GenericToolbox):
 
         model.setup_dep(**setup_dep)
         self.setup_dict.update({"setup_dep": setup_dep})
+    
+        # show merged bathymetry on map
+        app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
 
         dlg.close()
 

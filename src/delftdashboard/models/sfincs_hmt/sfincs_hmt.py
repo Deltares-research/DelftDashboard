@@ -39,6 +39,14 @@ class Model(GenericModel):
             line_color="black",
         )
 
+        bed_levels = layer.add_layer(
+            "bed_levels", 
+            type="raster"
+        )
+
+        # Set update method for topography layer
+        bed_levels.update = update_map
+
         layer.add_layer(
             "mask_active",
             type="circle",
@@ -116,6 +124,7 @@ class Model(GenericModel):
             app.map.layer["sfincs_hmt"].layer["grid"].deactivate()
 
             # Mask is made invisible
+            app.map.layer["sfincs_hmt"].layer["bed_levels"].hide()
             app.map.layer["sfincs_hmt"].layer["mask_active"].hide()
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].hide()
             app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].hide()
@@ -260,3 +269,55 @@ class Model(GenericModel):
 
     def plot(self):
         pass
+
+import numpy as np
+import xarray as xr
+
+def update_map():
+    # check if map extent is available
+    if not app.map.map_extent:
+        print("Map extent not yet available ...")
+        return
+
+    # check if grid is already defined
+    grid = app.model["sfincs_hmt"].domain.grid
+    if "dep" in grid:
+        da_dep = grid["dep"]
+        if np.isnan(da_dep).all():
+            return
+    else:
+        return
+    
+    if "msk" in grid:
+        da_dep = da_dep.where(grid["msk"] > 0) 
+
+    coords = app.map.map_extent
+    xl = [coords[0][0], coords[1][0]]
+    yl = [coords[0][1], coords[1][1]]
+    wdt = app.map.view.geometry().width()
+
+    npix = wdt
+
+    dxy = (xl[1] - xl[0]) / npix
+    xv = np.arange(xl[0], xl[1], dxy)
+    yv = np.arange(yl[0], yl[1], dxy)
+
+    # initilize empty xarray
+    da_like = xr.DataArray(
+        np.float32(np.full([len(yv), len(xv)], np.nan)),
+        coords={"y": yv, "x": xv},
+        dims=["y", "x"],
+    )
+    da_like.raster.set_crs(4326)
+
+    da_dep = da_dep.raster.reproject_like(da_like, method="bilinear").load()
+
+    da_dep.raster.set_nodata(np.nan)
+
+    app.map.layer["sfincs_hmt"].layer["bed_levels"].set_data(
+        x=xv,
+        y=yv,
+        z=da_dep.values,
+        colormap=app.color_map_earth,
+        decimals=0,
+    )
