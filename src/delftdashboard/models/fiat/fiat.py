@@ -246,7 +246,9 @@ class Model(GenericModel):
             "aggregation_file_field_name_string",
             [],
         )
-        app.gui.setvar(group, "aggregation_label", "")
+        app.gui.setvar(group, "aggregation_label_string", None )
+        app.gui.setvar(group, "aggregation_label", 0)
+        app.gui.setvar(group, "aggregation_table", [])
         app.gui.setvar(group, "assign_classification_active", False)
         app.gui.setvar(group, "selected_secondary_classification_value", 0)
         app.gui.setvar(group, "show_primary_classification", None)

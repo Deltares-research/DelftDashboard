@@ -9,6 +9,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 import geopandas as gpd 
 from pathlib import Path
+import pandas as pd
 
 
 def select(*args):
@@ -76,21 +77,31 @@ def open_gdf(*args):
     path = app.gui.getvar("fiat", "loaded_aggregation_files_value")[index]
     gdf = gpd.read_file(path)
     list_columns = list(gdf.columns)
-   
+    app.gui.setvar("fiat", "aggregation_file_field_name_value", list_columns)
     app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
-
-def upload_attribute_source(*args):
-    print("Load upload aggregation source")
-    fn = app.gui.getvar("fiat", "loaded_aggregation_files_value")
-    selected_aggregation = app.gui.getvar("fiat", "selected_aggregation_files")
-    fn = fn[selected_aggregation]
-
-    gdf = gpd.read_file(fn)
-    list_columns = list(gdf.columns)
    
-    app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
     
+def write_input_to_table(*args):
+    aggregation_label = [app.gui.getvar("fiat", "aggregation_label_string")]
+    aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
+    file_index = app.gui.getvar("fiat", "loaded_aggregation_files")
+    file = app.gui.getvar("fiat", "loaded_aggregation_files_string")[file_index]
+    df_aggregation = pd.DataFrame({"File": file, "Aggregation Attribute": aggregation_attribute, "Aggregation Label": aggregation_label })
+    df_all_aggregation = app.gui.getvar("fiat", "aggregation_table")
 
+    if len(df_all_aggregation) ==0:
+       df_all_aggregation = pd.DataFrame(columns=["File", "Aggregation Attribute", "Aggregation Label"])
+    else:
+        pass
+    
+    added_aggregation = df_aggregation["File"].tolist()
+    added_aggregation_list = df_all_aggregation["File"].tolist()
+    
+    if added_aggregation[0] in added_aggregation_list:
+        pass
+    else:
+        df_all_aggregation= df_all_aggregation.append(df_all_aggregation)
+    app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
 
 def add_aggregations(*args):
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
