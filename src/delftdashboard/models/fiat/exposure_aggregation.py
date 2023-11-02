@@ -9,6 +9,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 import geopandas as gpd 
 from pathlib import Path
+import pandas as pd
 
 
 def select(*args):
@@ -76,21 +77,17 @@ def open_gdf(*args):
     path = app.gui.getvar("fiat", "loaded_aggregation_files_value")[index]
     gdf = gpd.read_file(path)
     list_columns = list(gdf.columns)
-   
+    app.gui.setvar("fiat", "aggregation_file_field_name_value", list_columns)
     app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
-
-def upload_attribute_source(*args):
-    print("Load upload aggregation source")
-    fn = app.gui.getvar("fiat", "loaded_aggregation_files_value")
-    selected_aggregation = app.gui.getvar("fiat", "selected_aggregation_files")
-    fn = fn[selected_aggregation]
-
-    gdf = gpd.read_file(fn)
-    list_columns = list(gdf.columns)
    
-    app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
     
-
+def write_input_to_table(*args):
+    aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
+    aggregation_label = [app.gui.getvar("fiat", "aggregation_label_string")]
+    file = app.gui.getvar("fiat", "loaded_aggregation_files_string")
+    fn = app.gui.getvar("fiat", "loaded_aggregation_files_value")
+    df_aggregation = pd.DataFrame({"File": file, "Aggregation Label": aggregation_label, "Aggregation Attribute": aggregation_attribute })
+    app.gui.setvar("fiat", "aggregation_table", df_aggregation)
 
 def add_aggregations(*args):
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")

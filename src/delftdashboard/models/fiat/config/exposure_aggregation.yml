@@ -11,18 +11,6 @@ element:
   select: index
   option_string:
     variable: loaded_aggregation_files_string
-- style: listbox
-  position:
-      x: 500
-      y: 25
-      width: 150
-      height: 20
-  text: "Selected aggregation"
-  text_position: "above"
-  variable: selected_aggregation_files
-  select: index
-  option_string:
-    variable: selected_aggregation_files_string
 - style: pushbutton
   position:
     x: 10
@@ -58,7 +46,7 @@ element:
     width: 50
     height: 18
   text: "Label:"
-  variable: aggregation_label
+  variable: aggregation_label_string
 
 - style: pushbutton
   position:
@@ -67,6 +55,18 @@ element:
     width: 50
     height: 20
   text: Add
+  method: write_input_to_table
+- style: tableview
+  position:
+    x: 410
+    y: 30
+    width: 300
+    height: 90
+  tooltip: Selected aggregation zones
+  selection_type: extended
+  sortable: true
+  option_value:
+    variable: aggregation_table
 - style: pushbutton
   position:
     x: 530
