@@ -105,6 +105,3 @@ def add_aggregations(*args):
     attribute   = aggregation_table["Aggregation Attribute"].tolist()
     label = aggregation_table["Aggregation Label"].tolist()
     app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
-
-
-    

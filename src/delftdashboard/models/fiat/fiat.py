@@ -249,7 +249,7 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "aggregation_label_string", None )
         app.gui.setvar(group, "aggregation_label", 0)
-        app.gui.setvar(group, "aggregation_table", pd.DataFrame())
+        app.gui.setvar(group, "aggregation_table", pd.DataFrame(columns=["File", "Aggregation Attribute", "Aggregation Label"]))
         app.gui.setvar(group, "assign_classification_active", False)
         app.gui.setvar(group, "selected_secondary_classification_value", 0)
         app.gui.setvar(group, "show_primary_classification", None)
