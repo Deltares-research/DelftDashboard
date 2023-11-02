@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import random
 import geopandas as gpd
+import pandas as pd
 
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
@@ -53,6 +54,14 @@ class Model(GenericModel):
             hover_property="Secondary Object Type",
         )
 
+        layer = app.map.add_layer("aggregation")
+        layer.add_layer(
+            "aggregation_layer",
+            type="choropleth",
+            legend_position="top-right",
+            legend_title="Aggregation",
+        )
+
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Everything made visible
@@ -87,12 +96,14 @@ class Model(GenericModel):
         
         ## DISPLAY LAYERS ##
         app.gui.setvar(group, "properties_to_display", "Classification")
-        app.gui.setvar(group, "display_asset_locations", None)
-        app.gui.setvar(group, "display_classification", None)
-        app.gui.setvar(group, "display_asset_heights", None)
-        app.gui.setvar(group, "display_max_potential_values", None)
-        app.gui.setvar(group, "display_aggregation", None)
-        app.gui.setvar(group, "display_damage_curves", None)
+        app.gui.setvar(group, "show_asset_locations", False)
+        app.gui.setvar(group, "show_classification", False)
+        app.gui.setvar(group, "show_asset_heights", False)
+        app.gui.setvar(group, "show_max_potential_values", False)
+        app.gui.setvar(group, "show_aggregation", False)
+        app.gui.setvar(group, "show_damage_curves", False)
+        app.gui.setvar(group, "show_roads", False)
+        app.gui.setvar(group, "show_extraction_method", False)
         
         app.gui.setvar(
             group,
@@ -142,8 +153,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "data_field_name_2", None)
         app.gui.setvar(group, "data_field_name_3", None)
         app.gui.setvar(group, "data_field_name_4", None)
-        app.gui.setvar(group, "show_asset_locations", False)
-        app.gui.setvar(group, "show_extraction_method", False)
         app.gui.setvar(group, "extraction_method_string", ["Area", "Centroid"])
         app.gui.setvar(group, "extraction_method_value", ["area", "centroid"])
         app.gui.setvar(group, "extraction_method", "centroid")
@@ -240,7 +249,7 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "aggregation_label_string", None )
         app.gui.setvar(group, "aggregation_label", 0)
-        app.gui.setvar(group, "aggregation_table", [])
+        app.gui.setvar(group, "aggregation_table", pd.DataFrame())
         app.gui.setvar(group, "assign_classification_active", False)
         app.gui.setvar(group, "selected_secondary_classification_value", 0)
         app.gui.setvar(group, "show_primary_classification", None)
@@ -348,25 +357,31 @@ class Model(GenericModel):
     def generate_random_colors(n):
         return ["#%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
 
-    def create_paint_properties(self, gdf, attribute):
+    def create_paint_properties(self, gdf, attribute, type="circle"):
         unique_types = list(gdf[attribute].unique())
-        circle_color = [
+        color_properties = [
             "match",
             ["get", "Secondary Object Type"],
         ]
         colors = self.generate_random_colors(len(unique_types))
         attr_color_list = [item for pair in zip(unique_types, colors) for item in pair]
-        circle_color.extend(attr_color_list)
-        circle_color.append("#000000")
+        color_properties.extend(attr_color_list)
+        color_properties.append("#000000")
 
-        paint_properties = {
-            "circle-color": circle_color,
-            "circle-stroke-width": 2,
-            "circle-stroke-color": "black",
-            "circle-stroke-opacity": 0,
-            "circle-radius": 3,
-            "circle-opacity": 1,
-        }
+        if type == "circle":
+            paint_properties = {
+                "circle-color": color_properties,
+                "circle-stroke-width": 2,
+                "circle-stroke-color": "black",
+                "circle-stroke-opacity": 0,
+                "circle-radius": 3,
+                "circle-opacity": 1,
+            }
+        elif type == "polygon":
+            paint_properties = {
+                "fill-color": color_properties,
+                "fill-opacity": 1,
+            }
         return paint_properties
 
     def get_nsi_paint_properties(self):

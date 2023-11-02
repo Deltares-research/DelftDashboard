@@ -42,7 +42,6 @@ def load_asset_locations_file(*args):
     fn = app.gui.window.dialog_open_file("Select geometry",
                                           filter="Geometry (*.shp *.gpkg *.geojson)")
     name = Path(fn[0]).name
-    
     load_asset_locations(name)
 
 
@@ -53,10 +52,6 @@ def display_asset_locations(*args):
         app.model["fiat"].show_exposure_buildings()
     else:
         app.model["fiat"].hide_exposure_buildings()
-
-
-def display_extraction_method(*args):
-    print("Display extraction method")
 
 
 def apply_extraction_method(*args):

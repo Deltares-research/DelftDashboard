@@ -3,6 +3,6 @@ style: panel
 id: checklist
 position:
   x: -30
-  y: 350
+  y: -30
   width: 120
-  height: -50
+  height: 200

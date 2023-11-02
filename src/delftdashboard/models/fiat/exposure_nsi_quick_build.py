@@ -40,8 +40,8 @@ def build_nsi_exposure(*args):
         # Set the buildings attribute to gdf for easy visualization of the buildings
         app.model["fiat"].buildings = gdf
 
-        app.map.layer[model].layer["exposure_points"].crs = crs
-        app.map.layer[model].layer["exposure_points"].set_data(
+        app.map.layer["buildings"].layer["exposure_points"].crs = crs
+        app.map.layer["buildings"].layer["exposure_points"].set_data(
             gdf
         )
 

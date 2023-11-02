@@ -4,12 +4,12 @@ element:
   position:
     x: 10
     y: 10
-    width: 150
+    width: 170
     height: 120
   element:
   - style: edit
     position:
-      x: 70
+      x: 80
       y: 90
       width: 50
       height: 18
@@ -19,7 +19,7 @@ element:
     position:
       x: 25
       y: 60
-      width: 100
+      width: 110
       height: 20
     text: OSM Roads Quick Build
     method: build_roads_exposure_osm
@@ -28,6 +28,16 @@ element:
     position:
       x: 10
       y: 8
-      width: 130
+      width: 150
       height: 50
     text: "Once clicked, roads data from OSM\nwill be downloaded and processed\ninto Delft-FIAT format. The user is\nable to adjust the damage threshold."
+
+- style: checkbox
+  position:
+    x: 190
+    y: 10
+    width: 100
+    height: 20
+  text: Display roads
+  variable: show_roads
+  method: display_roads

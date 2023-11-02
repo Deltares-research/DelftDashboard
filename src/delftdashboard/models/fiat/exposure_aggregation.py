@@ -97,6 +97,14 @@ def add_aggregations(*args):
     app.gui.setvar("fiat", "loaded_aggregation_files_value", aggregation_fn)
     a = app.gui.getvar("fiat", "loaded_aggregation_files_value")
     print(a)
+    
+    gdf = gpd.read_file(a[0])
+    paint_properties = app.model["fiat"].create_paint_properties(gdf, aggregation_table["Aggregation Attribute"].values[0], type="polygon")
+    legend = []  #Still needs to be made in the mapbox code
+    app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
+        gdf, paint_properties, legend
+    )
+
     #fn = 
     #attribute =
     #label = 

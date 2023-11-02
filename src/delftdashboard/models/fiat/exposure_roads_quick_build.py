@@ -30,9 +30,18 @@ def build_roads_exposure_osm(*args):
 
         # Show the roads
         app.model["fiat"].show_exposure_roads()
+        app.gui.setvar("_main", "checkbox_roads_(optional)", True)
 
         # Set the checkbox checked
-        app.gui.setvar("_main", "checkbox_roads_(optional)", True)
+        app.gui.setvar("fiat", "show_roads", True)
     except KeyError:
         app.gui.window.dialog_info(text="No OSM roads found in this area, try another or a larger area.", title="No OSM roads found")
-    
+
+
+def display_roads(*args):
+    """Show/hide buildings layer""" 
+    app.gui.setvar("fiat", "show_roads", args[0])
+    if args[0]:
+        app.model["fiat"].show_exposure_roads()
+    else:
+        app.model["fiat"].hide_exposure_roads()
