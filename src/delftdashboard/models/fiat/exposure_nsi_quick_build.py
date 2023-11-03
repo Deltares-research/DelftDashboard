@@ -22,6 +22,7 @@ def build_nsi_exposure(*args):
     model = "fiat"
     checkbox_group = "_main"
     try:
+        dlg = app.gui.window.dialog_wait("Downloading NSI data...")
         app.gui.setvar(model, "created_nsi_assets", "nsi")
         app.gui.setvar(
             model, "text_feedback_create_asset_locations", "NSI assets created"
@@ -66,6 +67,8 @@ def build_nsi_exposure(*args):
         app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
         app.gui.setvar(checkbox_group, "checkbox_elevation", True)
         app.gui.setvar(checkbox_group, "checkbox_aggregation_(optional)", True)
+
+        dlg.close()
 
     except FileNotFoundError:
         app.gui.window.dialog_info(

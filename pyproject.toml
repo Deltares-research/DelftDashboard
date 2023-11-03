@@ -18,6 +18,7 @@ dependencies = [
     "numpy",
     "pandas",
     "pyproj",
+    "plotly",
     "rasterio",
     "shapely",
     "scipy",

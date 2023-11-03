@@ -37,7 +37,6 @@ class Model(GenericModel):
             legend_position="top-right",
             fill_color="orange",
             line_color="transparent",
-            color_property="Secondary Object Type",
             hover_property="Secondary Object Type",
         )
 
@@ -50,7 +49,6 @@ class Model(GenericModel):
             line_color="purple",
             line_width=3,
             circle_radius=0,
-            color_property="Secondary Object Type",
             hover_property="Secondary Object Type",
         )
 

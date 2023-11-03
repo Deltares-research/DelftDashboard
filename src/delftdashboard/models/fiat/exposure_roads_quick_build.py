@@ -13,6 +13,8 @@ def set_variables(*args):
 
 def build_roads_exposure_osm(*args):
     try:
+        dlg = app.gui.window.dialog_wait("Downloading OSM data...")
+        
         # Get the roads to show in the map
         gdf = app.model["fiat"].domain.exposure_vm.get_osm_roads()
 
@@ -34,6 +36,8 @@ def build_roads_exposure_osm(*args):
 
         # Set the checkbox checked
         app.gui.setvar("fiat", "show_roads", True)
+
+        dlg.close()
     except KeyError:
         app.gui.window.dialog_info(text="No OSM roads found in this area, try another or a larger area.", title="No OSM roads found")
 
