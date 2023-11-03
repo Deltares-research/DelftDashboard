@@ -78,7 +78,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "checkbox_classification", False)
         app.gui.setvar(group, "checkbox_damage_values", False)
         app.gui.setvar(group, "checkbox_elevation", False)
-        app.gui.setvar(group, "checkbox_aggregation_(optional)", False)
+        app.gui.setvar(group, "checkbox_attributes_(optional)", False)
         app.gui.setvar(group, "checkbox_vulnerability", False)
         app.gui.setvar(group, "checkbox_svi_(optional)", False)
         app.gui.setvar(group, "checkbox_roads_(optional)", False)
@@ -110,7 +110,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_roads", False)
         app.gui.setvar(group, "show_extraction_method", False)
         
-        app.gui.setvar(group, "active_damage_function", None)
+        app.gui.setvar(group, "active_damage_function", [0])
         
         app.gui.setvar(group, "dmg_functions_html_filepath", "")
         

@@ -13,7 +13,7 @@ def set_variables(*args):
 
 def build_roads_exposure_osm(*args):
     try:
-        dlg = app.gui.window.dialog_wait("Downloading OSM data...")
+        dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
         
         # Get the roads to show in the map
         gdf = app.model["fiat"].domain.exposure_vm.get_osm_roads()

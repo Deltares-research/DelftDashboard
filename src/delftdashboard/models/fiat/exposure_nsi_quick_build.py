@@ -22,7 +22,7 @@ def build_nsi_exposure(*args):
     model = "fiat"
     checkbox_group = "_main"
     try:
-        dlg = app.gui.window.dialog_wait("Downloading NSI data...")
+        dlg = app.gui.window.dialog_wait("\nDownloading NSI data...")
         app.gui.setvar(model, "created_nsi_assets", "nsi")
         app.gui.setvar(
             model, "text_feedback_create_asset_locations", "NSI assets created"
