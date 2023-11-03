@@ -102,6 +102,7 @@ def write_input_to_table(*args):
         df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
     df_all_aggregation.reset_index(drop=True, inplace=True)
     app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
+    
 def add_aggregations(*args):
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
     aggregation_table = app.gui.getvar("fiat", "aggregation_table")
@@ -118,14 +119,24 @@ def add_aggregations(*args):
     attribute   = aggregation_table["Aggregation Attribute"].tolist()
     label = aggregation_table["Aggregation Label"].tolist()
     app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
-    print("Aggregation zones added")
-    #attribute_to_visualize = "TO FILL"
-    #data_to_visualize = "TO FILL"
-    #gdf = gpd.read_file(data_to_visualize)
-    #paint_properties = app.model["fiat"].create_paint_properties(
-    #    gdf, attribute_to_visualize, type="polygon", opacity=0.5
-    #)
-    #legend = []  # Still needs to be made in the mapbox code
-    #app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
-    #    gdf, paint_properties, legend
-    #)
+
+    attribute_to_visualize = attribute[0] # Needs to be adjusted
+    data_to_visualize = fn[0]# Needs to be adjusted
+    gdf = gpd.read_file(data_to_visualize)
+    paint_properties = app.model["fiat"].create_paint_properties(
+        gdf, attribute_to_visualize, type="polygon", opacity=0.5
+    )
+    legend = []  # Still needs to be made in the mapbox code
+
+    # Clear previously made layers and add a new one with the right properties
+    app.map.layer["aggregation"].layer["aggregation_layer"].clear()
+    app.map.layer["aggregation"].add_layer(
+            "aggregation_layer",
+            type="choropleth",
+            legend_position="top-right",
+            legend_title="Aggregation",
+            hoover_property=attribute_to_visualize
+        )
+    app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
+        gdf, paint_properties, legend
+    )
