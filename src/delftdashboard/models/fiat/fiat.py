@@ -19,7 +19,8 @@ class Model(GenericModel):
         self.buildings = gpd.GeoDataFrame()
         self.roads = gpd.GeoDataFrame()
         self.damage_function_database = pd.DataFrame()
-        self.damage_function_dict = dict()
+        self.occupancy_to_description = dict()
+        self.description_to_occupancy = dict()
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -122,8 +123,8 @@ class Model(GenericModel):
 
         ## HAZUS IWR OCCUPANCY CLASSES ##
         occupancy_types = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
-        occupancy_types.set_index("Occupancy Class", inplace=True)
-        self.damage_function_dict = occupancy_types.to_dict(orient="index")
+        self.occupancy_to_description = occupancy_types.set_index("Occupancy Class").to_dict(orient="index")
+        self.description_to_occupancy = occupancy_types.set_index("Class Description").to_dict(orient="index")
         class_description = list(occupancy_types["Class Description"])
 
         app.gui.setvar(group, "occupancy_types_string", class_description)
@@ -383,9 +384,8 @@ class Model(GenericModel):
 
     def get_filtered_damage_function_database(self, filter: str, col: str="Occupancy"):
         df = copy.deepcopy(self.damage_function_database)
-        if len(filter) > 3:
-            filter = filter[:3].upper()
-        return df.loc[df[col].str.startswith(filter)]
+        occupancy_class = self.description_to_occupancy[filter]["Occupancy Class"]
+        return df.loc[df[col].str.startswith(occupancy_class)]
 
     @staticmethod
     def generate_random_colors(n):
