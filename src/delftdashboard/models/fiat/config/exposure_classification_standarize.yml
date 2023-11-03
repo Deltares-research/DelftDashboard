@@ -1,10 +1,58 @@
 window:
   title: Standarize classifications
-  width: 700
-  height: 550
+  width: 730
+  height: 310
   variable_group: fiat
+  module: models.fiat.exposure_classification_standarize
   modal: True
   cancel: True
+
+element:
+- style: tableview
+  position:
+    x: 347
+    y: 60
+    width: 373
+    height: 240
+  tooltip: Standard IWR classifications
+  selection_type: extended
+  sortable: true
+  option_value:
+    variable: hazus_iwr_occupancy_classes
+- style: pushbutton
+  position:
+    x: 347
+    y: 35
+    width: 100
+    height: 20
+  text: Select occupancy type
+  method: select_occupancy_type
+- style: popupmenu
+  position:
+    x: 80
+    y: 280
+    width: 120
+    height: 20
+  text: "Occupancy type"
+  method: filter_damage_curve_table
+  variable: selected_occupancy_type
+  option_string:
+    variable: occupancy_types_string
+  option_value:
+    variable: occupancy_types_value
+- style: tableview
+  position:
+    x: 10
+    y: 60
+    width: 287
+    height: 210
+  tooltip: Exposure categories to link
+  variable: active_exposure_category
+  selection_type: extended
+  sortable: true
+  option_value:
+    variable: exposure_categories_to_link
+
 # element:
 # - style: pushselectfile
 #   position:

@@ -97,7 +97,10 @@ class Model(GenericModel):
         damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "ID", "Description"]]
         self.damage_function_database = damage_functions_database_info
         app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
-        
+
+        default_occupancy_df = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
+        app.gui.setvar(group, "hazus_iwr_occupancy_classes", default_occupancy_df)
+
         cols = ["-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
         app.gui.setvar(group, "damage_curves_standard_curves", damage_functions_database[["ID"] + cols])
         app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
