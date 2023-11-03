@@ -66,6 +66,7 @@ def build_nsi_exposure(*args):
         df = pd.DataFrame(columns=["Assigned"])
         df_add = gdf[["Primary Object Type", "Secondary Object Type"]].drop_duplicates().reset_index()
         df = pd.concat([df, df_add[["Primary Object Type", "Secondary Object Type"]]], axis=1)
+        df.fillna("", inplace=True)
         
         app.gui.setvar(model, "exposure_categories_to_link", df)
 
