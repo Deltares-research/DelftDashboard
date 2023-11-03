@@ -9,7 +9,7 @@ def initialize_checklist():
         "Classification",
         "Damage values",
         "Elevation",
-        "Aggregation (optional)",
+        "Attributes (optional)",
         "Vulnerability",
         "SVI (optional)",
         "Roads (optional)"

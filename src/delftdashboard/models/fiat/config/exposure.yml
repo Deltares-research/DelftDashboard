@@ -24,6 +24,6 @@ element:
   - string: Elevation
     module: models.fiat.exposure_elevation
     element: exposure_elevation.yml
-  - string: Aggregation
+  - string: Additional Attributes
     module: models.fiat.exposure_aggregation
     element: exposure_aggregation.yml
