@@ -22,7 +22,7 @@ element:
         width: 110
         height: 20
       text: Specify state
-      method: set_hazus_curves
+      method: test_svi
     - style: pushbutton
       position:
         x: 10
@@ -30,7 +30,7 @@ element:
         width: 110
         height: 20
       text: Upload block group
-      method: set_hazus_curves
+      method: test_svi
     - style: pushbutton
       position:
         x: 10
@@ -38,7 +38,7 @@ element:
         width: 110
         height: 20
       text: Show block group
-      method: set_hazus_curves
+      method: test_svi
   - style: panel
     title: Build
     position:
@@ -54,7 +54,7 @@ element:
         width: 110
         height: 20
       text: Build SVI
-      method: set_hazus_curves
+      method: test_svi
   - style: panel
     title: Visualize
     position:
@@ -70,7 +70,7 @@ element:
         width: 110
         height: 20
       text: Composite scores / Domain
-      method: set_hazus_curves
+      method: test_svi
     - style: pushbutton
       position:
         x: 10
@@ -78,4 +78,4 @@ element:
         width: 110
         height: 20
       text: SVI layer
-      method: set_hazus_curves
+      method: test_svi

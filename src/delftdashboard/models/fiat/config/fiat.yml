@@ -12,9 +12,9 @@ element:
     element: exposure.yml
   - string: Vulnerability
     element: vulnerability.yml
-  # - string: Hazard
-  #   element: hazard.yml
-  # - string: SVI
-  #   element: svi.yml
+    module:  models.fiat.vulnerability_damage_curves
+  - string: SVI
+    element: svi.yml
+    module: models.fiat.svi
   - string: Create Model
     element: create_model.yml
