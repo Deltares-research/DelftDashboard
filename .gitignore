@@ -14,5 +14,5 @@ mapbox_token.txt
 /src/delftdashboard/config/data_catalog_USA.yml
 temp_database
 fiat_database
-src/delftdashboard/config/delftdashboard.ini
+/src/delftdashboard/config/delftdashboard.ini
 cache
