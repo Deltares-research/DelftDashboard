@@ -8,6 +8,8 @@ Created on Mon May 10 12:18:09 2021
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+import pandas as pd
+
 
 def select(*args):
     # De-activate existing layers
@@ -60,6 +62,12 @@ def build_nsi_exposure(*args):
         )
 
         app.gui.setvar(model, "show_asset_locations", True)
+
+        df = pd.DataFrame(columns=["Assigned"])
+        df_add = gdf[["Primary Object Type", "Secondary Object Type"]].drop_duplicates().reset_index()
+        df = pd.concat([df, df_add[["Primary Object Type", "Secondary Object Type"]]], axis=1)
+        
+        app.gui.setvar(model, "exposure_categories_to_link", df)
 
         # Set the checkboxes checked
         app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)

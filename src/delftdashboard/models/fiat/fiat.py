@@ -7,7 +7,7 @@ import pandas as pd
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
-import pandas as pd
+import copy
 
 
 class Model(GenericModel):
@@ -18,6 +18,7 @@ class Model(GenericModel):
         self.long_name = "FIAT"
         self.buildings = gpd.GeoDataFrame()
         self.roads = gpd.GeoDataFrame()
+        self.damage_function_database = pd.DataFrame()
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -94,6 +95,7 @@ class Model(GenericModel):
         ## DISPLAY LAYERS ##
         damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
         damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "ID", "Description"]]
+        self.damage_function_database = damage_functions_database_info
         app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
         
         cols = ["-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
@@ -109,8 +111,19 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_damage_curves", False)
         app.gui.setvar(group, "show_roads", False)
         app.gui.setvar(group, "show_extraction_method", False)
-        
+
+        ## SELECTING VULNERABILITY CURVES ##        
         app.gui.setvar(group, "active_damage_function", [0])
+        app.gui.setvar(group, "active_exposure_category", [0])
+        
+        df = pd.DataFrame(columns=["Assigned", "Primary Object Type", "Secondary Object Type", "Stories", "Basement"])
+        app.gui.setvar(group, "exposure_categories_to_link", df)
+
+        # TODO: REPLACE WITH TYPES FROM CSV
+        types = ["Residential", "Commercial", "Industrial"]
+        app.gui.setvar(group, "occupancy_types_string", types)
+        app.gui.setvar(group, "occupancy_types_value", types)
+        app.gui.setvar(group, "selected_occupancy_type", types[0])
         
         app.gui.setvar(group, "dmg_functions_html_filepath", "")
         
@@ -362,6 +375,12 @@ class Model(GenericModel):
 
     def set_crs(self, crs):
         self.domain.crs = crs
+
+    def get_filtered_damage_function_database(self, filter: str, col: str="Occupancy"):
+        df = copy.deepcopy(self.damage_function_database)
+        if len(filter) > 3:
+            filter = filter[:3].upper()
+        return df.loc[df[col].str.startswith(filter)]
 
     @staticmethod
     def generate_random_colors(n):
