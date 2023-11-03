@@ -64,7 +64,7 @@ element:
     position:
       x: 400
       y: 120
-      width: 200
+      width: 150
       height: 20
     tooltip: Select how you want to use the stations in the model
     variable: model_options_index
@@ -74,16 +74,16 @@ element:
   - style: pushbutton
     position:
       x: 400
-      y: 70
-      width: 200
+      y: 80
+      width: 150
       height: 20
     text: Add selected station to model
     method: add_stations_to_model
   - style: pushbutton
     position:
       x: 400
-      y: 45
-      width: 200
+      y: 55
+      width: 150
       height: 20
     text: Add all stations within model domain
     method: add_all_stations_to_model
@@ -93,5 +93,5 @@ element:
       y: 10
       width: 120
       height: 20
-    text: Jump back to Model Maker
-    # method: add_stations_to_model
+    text: Return to Model Maker
+    method: return_to_modelmaker

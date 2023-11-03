@@ -27,7 +27,7 @@ def generate_boundary_points_from_msk(*args):
     distance = app.gui.getvar("sfincs_hmt", "bc_dist_along_msk")
 
     # merge = app.gui.getvar("sfincs_hmt", "merge_bc_wlev")
-    model.setup_waterlevel_bnd_from_mask(distance=distance, merge=True)
+    model.setup_waterlevel_bnd_from_mask(distance=distance, merge=False)
 
     # retrieve all boundary points as gdf from xarray
     gdf = model.forcing["bzs"].vector.to_gdf()
@@ -35,6 +35,22 @@ def generate_boundary_points_from_msk(*args):
     # Add to map and select first point
     app.map.layer["sfincs_hmt"].layer["boundary_points"].set_data(gdf, 0)
     app.gui.setvar("sfincs_hmt", "active_boundary_point", 0)
+    update_list()
+
+def add_boundary_point(gdf, merge=True):
+    model = app.model["sfincs_hmt"].domain
+
+    # add to existing boundary conditions
+    model.set_forcing_1d(gdf_locs=gdf, name="bzs", merge=merge)
+
+    # retrieve all boundary points as gdf from xarray
+    gdf = model.forcing["bzs"].vector.to_gdf()
+
+    # get the last index of the gdf
+    index = int(gdf.index[-1])
+
+    app.map.layer["sfincs_hmt"].layer["boundary_points"].set_data(gdf, index)
+    app.gui.setvar("sfincs_hmt", "active_boundary_point", index)
     update_list()
 
 def add_boundary_point_on_map(*args):
@@ -102,22 +118,28 @@ def delete_point_from_list(*args):
         app.gui.setvar("sfincs_hmt", "active_boundary_point", index)
     update_list()
 
+def delete_all_points_from_list(*args):
+    model = app.model["sfincs_hmt"].domain
+    model.forcing.pop("bzs")
+    app.map.layer["sfincs_hmt"].layer["boundary_points"].clear()
+    update_list()
 
 def update_list():
     # Get boundary points
     gdf = app.map.layer["sfincs_hmt"].layer["boundary_points"].data
-    if gdf is None:
-        return
-    
     boundary_point_names = []    
-    # Loop through boundary points
-    for index, row in gdf.iterrows():
-        # Get the name of the boundary point if present
-        if "name" in row:
-            boundary_point_names.append(row["name"])
-        else:
-            boundary_point_names.append("Point {}".format(index))
+
+    if gdf is None:
+        index = 0
+    else:        
+        # Loop through boundary points
+        for index, row in gdf.iterrows():
+            # Get the name of the boundary point if present
+            if "name" in row:
+                boundary_point_names.append(row["name"])
+            else:
+                boundary_point_names.append("Point {}".format(index))
         
     app.gui.setvar("sfincs_hmt", "boundary_point_names", boundary_point_names)
-    app.gui.setvar("sfincs_hmt", "nr_boundary_points", len(gdf.index))
+    app.gui.setvar("sfincs_hmt", "nr_boundary_points", index)
     app.gui.window.update()

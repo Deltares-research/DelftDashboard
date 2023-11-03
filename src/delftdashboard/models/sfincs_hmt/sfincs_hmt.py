@@ -279,13 +279,17 @@ class Model(GenericModel):
     def plot(self):
         pass
 
-    def add_stations(self, gdf, naming_option="name"):
+    def add_stations(self, gdf, naming_option="name", model_option="obs"):
         from .observation_points import add_observation_point
-
+        from .boundary_conditions_wlev import add_boundary_point
         # if id is used as naming option, rename column
         if naming_option == "id":
             gdf = gdf.rename(columns={"id": "name"})
-        add_observation_point(gdf)
+
+        if model_option == "obs":
+            add_observation_point(gdf)
+        elif model_option == "bnd":
+            add_boundary_point(gdf)
 
 
 def update_map():

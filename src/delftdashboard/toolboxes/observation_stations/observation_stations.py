@@ -1,16 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
-
-@author: ormondt
-"""
-
-import math
-import numpy as np
 import geopandas as gpd
-import shapely
-import json
-from pyproj import CRS
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
@@ -44,9 +32,10 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "naming_option", "name")
 
         # Specify how to add to the model
-        options = [ "Observation Point", "Water level boundary"]
-        app.gui.setvar(group, "model_options", options)
-        app.gui.setvar(group, "model_option_index", 0)
+        self.model_options = {"obs": "Observation Point", "bnd": "Water level boundary"}
+
+        app.gui.setvar(group, "model_options", list(self.model_options.values()))
+        app.gui.setvar(group, "model_options_index", 0)
 
     def select_tab(self):
         map.update()
@@ -88,23 +77,29 @@ class Toolbox(GenericToolbox):
     def add_stations_to_model(self):
         index = app.gui.getvar("observation_stations", "active_station_index")
         gdf = self.gdf.iloc[[index]]
+
+        model_option_index =  app.gui.getvar("observation_stations", "model_options_index")
         app.active_model.add_stations(gdf, 
                                       naming_option=app.gui.getvar("observation_stations", "naming_option"),
-                                      model_option=app.gui.getvar("observation_stations", "model_option_index"))
+                                      model_option=list(self.model_options.keys())[model_option_index])
 
     def add_all_stations_to_model(self):
         gdf = self.gdf
 
         # get model extent
         try:
-            gdf = app.active_model.domain.region
+            gdf_model = app.active_model.domain.region
         except:
             print("Warning: No model extent found")
             return
+        
+        # only keep stations within model extent
+        gdf = gpd.sjoin(gdf, gdf_model, op='within')
 
+        model_option_index =  app.gui.getvar("observation_stations", "model_options_index")
         app.active_model.add_stations(gdf, 
                                       naming_option=app.gui.getvar("observation_stations", "naming_option"),
-                                      model_option=app.gui.getvar("observation_stations", "model_option_index"))
+                                      model_option=list(self.model_options.keys())[model_option_index])
     def select_naming_option(self):
         self.update()
         opt = app.gui.getvar("observation_stations", "naming_option")
@@ -146,6 +141,25 @@ def select_naming_option(*args):
 
 def add_stations_to_model(*args):
     app.toolbox["observation_stations"].add_stations_to_model()
+
+def add_all_stations_to_model(*args):
+    app.toolbox["observation_stations"].add_all_stations_to_model()
+
+def return_to_modelmaker(*args):
+    active_model = app.active_model
+
+    # are you sure you want to return to model maker?
+    ok = app.gui.window.dialog_yes_no("Do you want to return to the model maker?")
+    if not ok:
+        return
+    toolbox_name = "modelmaker_" + active_model.name
+
+    # back to model maker toolbox
+    app.active_toolbox = app.toolbox[toolbox_name]
+    app.active_toolbox.select()
+
+    #TODO back to observations model-tab
+    # app.active_toolbox.select_tab("observations")
 
 ##
 def get_station_names(source):

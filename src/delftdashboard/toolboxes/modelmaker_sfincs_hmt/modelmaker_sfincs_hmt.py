@@ -481,6 +481,9 @@ class Toolbox(GenericToolbox):
         if gdf is not None:
             app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
 
+        # update bathymetry on map
+        app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
+
         dlg.close()
 
     def update_mask_bounds(self, btype):

@@ -189,10 +189,13 @@ class Model(GenericModel):
         gdf = self.domain.observation_points_sp2.gdf
         app.map.layer["hurrywave"].layer["observation_points_spectra"].set_data(gdf, 0)
 
-    def add_stations(self, gdf_stations_to_add, naming_option="id"):
-        self.domain.observation_points_regular.add_points(gdf_stations_to_add, name=naming_option)
-        gdf = self.domain.observation_points_regular.gdf
-        app.map.layer["hurrywave"].layer["observation_points_regular"].set_data(gdf, 0)
-        if not self.domain.input.variables.obsfile:
-            self.domain.input.variables.obsfile = "hurrywave.obs"
-        self.domain.observation_points_regular.write()
+    def add_stations(self, gdf_stations_to_add, naming_option="id", model_option="obs"):
+        if model_option == "obs":
+            self.domain.observation_points_regular.add_points(gdf_stations_to_add, name=naming_option)
+            gdf = self.domain.observation_points_regular.gdf
+            app.map.layer["hurrywave"].layer["observation_points_regular"].set_data(gdf, 0)
+            if not self.domain.input.variables.obsfile:
+                self.domain.input.variables.obsfile = "hurrywave.obs"
+            self.domain.observation_points_regular.write()
+        else:
+            pass
