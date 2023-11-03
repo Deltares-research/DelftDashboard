@@ -241,6 +241,26 @@ class Model(GenericModel):
                 "industrial",
             ],
         )
+
+        app.gui.setvar(group, "loaded_asset_heights_files", 0)
+        app.gui.setvar(
+            group,
+            "loaded_asset_heights_files_string",
+            [],
+        )
+        app.gui.setvar(
+            group,
+            "loaded_asset_heights_files_value",
+            [],
+        )
+        app.gui.setvar(group, "asset_heights_file_field_name", 0)
+        app.gui.setvar(group, "asset_heights_file_field_name_string",[])
+        app.gui.setvar(
+            group,
+            "asset_heights_file_field_name_value",
+            ["field1", "field2", "field3", "field4"],
+        )
+
         app.gui.setvar(group, "selected_primary_classification_value", 0)
         app.gui.setvar(group, "selected_asset_locations", 0)
         app.gui.setvar(

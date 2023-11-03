@@ -1,0 +1,115 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 55
+    width: 175
+    height: 65
+  text: Loaded datasets
+  text_position: "above"
+  variable: loaded_asset_heights_files
+  select: index
+  option_string:
+    variable:
+- style: pushbutton
+  position:
+    x: 190
+    y: 102
+    width: 20
+    height: 20
+  text: "\u2192"
+  method: select_loaded_dataset
+- style: pushbutton
+  position:
+    x: 190
+    y: 82
+    width: 20
+    height: 20
+  text: "\u2190"
+  method: deselect_selected_dataset
+
+- style: pushbutton
+  position:
+    x: 10
+    y: 30
+    width: 85
+    height: 20
+  text: Load source
+  method: load_asset_heights_file
+
+- style: popupmenu
+  position:
+    x: 10
+    y: 10
+    width: 115
+    height: 20
+  text: "Attribute ID:"
+  variable: aggregation_file_field_name
+  option_string:
+    variable: aggregation_file_field_name_string
+  option_value:
+    variable: aggregation_file_field_name_value
+
+- style: listbox
+  position:
+    x: 215
+    y: 55
+    width: 175
+    height: 65
+  text: Selected datasets
+  text_position: "above"
+  variable:
+  select: index
+  option_string:
+    variable:
+- style: pushbutton
+  position:
+    x: 395
+    y: 102
+    width: 20
+    height: 20
+  text: "\u2191"
+  method: move_up_selected_dataset
+- style: pushbutton
+  position:
+    x: 395
+    y: 82
+    width: 20
+    height: 20
+  text: "\u2193"
+  method: move_down_selected_dataset
+
+- style: pushbutton
+  position:
+    x: 215
+    y: 30
+    width: 85
+    height: 20
+  text: Merge data
+  method: merge_data
+- style: pushbutton
+  position:
+    x: 305
+    y: 30
+    width: 85
+    height: 20
+  text: Advanced options
+  method: 
+
+- style: checkbox
+  position:
+    x: 215
+    y: 5
+    width: 150
+    height: 20
+  text: Display asset heights
+  method: display_asset_heights
+
+- style: pushbutton
+  position:
+    x: 420
+    y: 30
+    width: 85
+    height: 20
+  text: Add to model
+  method: add_to_model
