@@ -19,6 +19,7 @@ class Model(GenericModel):
         self.buildings = gpd.GeoDataFrame()
         self.roads = gpd.GeoDataFrame()
         self.damage_function_database = pd.DataFrame()
+        self.damage_function_dict = dict()
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -122,11 +123,15 @@ class Model(GenericModel):
         df = pd.DataFrame(columns=["Assigned", "Primary Object Type", "Secondary Object Type", "Stories", "Basement"])
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
-        # TODO: REPLACE WITH TYPES FROM CSV
-        types = ["Residential", "Commercial", "Industrial"]
-        app.gui.setvar(group, "occupancy_types_string", types)
-        app.gui.setvar(group, "occupancy_types_value", types)
-        app.gui.setvar(group, "selected_occupancy_type", types[0])
+        ## HAZUS IWR OCCUPANCY CLASSES ##
+        occupancy_types = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
+        occupancy_types.set_index("Occupancy Class", inplace=True)
+        self.damage_function_dict = occupancy_types.to_dict(orient="index")
+        class_description = list(occupancy_types["Class Description"])
+
+        app.gui.setvar(group, "occupancy_types_string", class_description)
+        app.gui.setvar(group, "occupancy_types_value", class_description)
+        app.gui.setvar(group, "selected_occupancy_type", class_description[0])
         
         app.gui.setvar(group, "dmg_functions_html_filepath", "")
         
