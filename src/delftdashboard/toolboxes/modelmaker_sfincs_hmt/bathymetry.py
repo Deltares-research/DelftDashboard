@@ -8,7 +8,8 @@ from delftdashboard.operations import map
 def select(*args):
     # De-activate existing layers
     map.update()
-    app.map.layer["sfincs_hmt"].layer["grid"].activate()
+    # app.map.layer["sfincs_hmt"].layer["grid"].show()
+    # app.map.layer["sfincs_hmt"].layer["grid"].deactivate()
     app.map.layer["sfincs_hmt"].layer["bed_levels"].show()
     app.map.layer["sfincs_hmt"].layer["bed_levels"].activate()
 

@@ -1,17 +1,79 @@
 element:
 - style: panel
-  title: "Select model domain"
+  title: "Model type: "
   position:
     x: 10
     y: 10
     width: 120
     height: 120
+  dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: grid_outline
+        operator: ge
+        value: 0        
   element:
   - style: popupmenu
     position:
       x: 10
       y: 90
       width: 100
+      height: 20
+    select: index
+    variable: model_type_index
+    option_string:
+      variable: model_type  
+    method: select_model_type
+  - style: text
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    text: "Are you modelling: "
+  - style: checkbox
+    position:
+      x: 10
+      y: 45
+      width: 100
+      height: 20
+    text: "Rainfall"
+    text_position: right
+    variable: include_rainfall
+    tooltip: "When you want to rainfall, we recommend to delineate your model domain with watershed boundaries."
+    method: select_model_type   
+  - style: checkbox
+    position:
+      x: 10
+      y: 25
+      width: 100
+      height: 20
+    text: "River discharge"
+    text_position: right
+    variable: include_rivers
+    tooltip: "When you want to river discharge, we recommend to delineate your model domain with watershed boundaries."
+    method: select_model_type     
+- style: panel
+  title: "Define model extent"
+  position:
+    x: 140
+    y: 10
+    width: 160
+    height: 120
+  dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: grid_outline
+        operator: ge
+        value: 0     
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 140
       height: 20
     tooltip: Select method to determine model extent
     select: index
@@ -25,7 +87,7 @@ element:
     position:
       x: 10
       y: 65
-      width: 100
+      width: 140
       height: 20
     method: draw_bbox
     dependency:
@@ -41,7 +103,7 @@ element:
     position:
       x: 10
       y: 65
-      width: 100
+      width: 140
       height: 20
     method: draw_aio
     dependency:
@@ -57,7 +119,7 @@ element:
     position:
       x: 10
       y: 65
-      width: 100
+      width: 140
       height: 20
     method: load_aio
     dependency:
@@ -67,45 +129,43 @@ element:
       - variable: setup_grid_methods_index
         operator: eq
         value: 2
-  - style: pushbutton
-    text: Zoom to domain
-    tooltip: Move the map to the area of interest
-    position:
-      x: 10
-      y: 10
-      width: 100
-      height: 20
-    method: fly_to_site
-    dependency:
-      - action: enable
-        checkfor: all
-        check:
-        - variable: grid_outline
-          operator: eq
-          value: 1                      
 - style: panel
-  title: "Select model resolution"
+  title: "Define model resolution: "
   position:
-    x: 140
+    x: 310
     y: 10
     width: 160
     height: 120
-  element:
+  dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: grid_outline
+        operator: eq
+        value: 1            
+  element:          
   - style: text
     position:
       x: 10
       y: 90
-      width: 75
+      width: 70
       height: 20
-    text: "Model grid resolution"
+    text: "Model grid resolution: "      
   - style: edit
     position:
-      x: 95
+      x: 85
       y: 90
-      width: 55
+      width: 45
       height: 20
     variable: res
     method: edit_res
+  - style: text
+    position:
+      x: 130
+      y: 90
+      width: 20
+      height: 20
+    variable: unit      
   - style: pushbutton
     text: Generate Grid
     tooltip: Generate a grid within the area of interest
@@ -114,79 +174,39 @@ element:
       y: 65
       width: 140
       height: 20
-    method: generate_grid
-    dependency:
-      - action: enable
-        checkfor: all
-        check:
-        - variable: grid_outline
-          operator: eq
-          value: 1          
-- style: panel
-  title: "Domain properties - summary"
+    method: generate_grid  
+- style: text
   position:
-    x: 310
-    y: 10
-    width: 230
-    height: 120
-  element:  
-  - style: text
-    position:
-      x: 10
-      y: 90
-      width: 100
-      height: 20
-    text: "Model grid resolution: "
-  - style: edit
-    position:
-      x: 120
-      y: 90
-      width: 100
-      height: 20
-    variable: res
-    enable: False
-  - style: text
-    position:
-      x: 10
-      y: 65
-      width: 100
-      height: 20
-    text: "Nr. of grid cells:"
-  - style: edit
-    position:
-      x: 120
-      y: 65
-      width: 100
-      height: 20
-    variable: nr_cells
-    enable: False
-  - style: text
-    position:
-      x: 10
-      y: 40
-      width: 100
-      height: 20
-    text: "Rotation angle: "
-  - style: edit
-    position:
-      x: 120
-      y: 40
-      width: 100
-      height: 20
-    variable: rotation
-    enable: False    
-  - style: pushbutton
-    text: View more
-    position:
-      x: -10
-      y: 10
-      width: 100
-      height: 20
-    method: edit_domain
-    dependency:
-      - action: enable
-        checkfor: all
-        check:
-        - variable: grid_outline
-          operator: eq
-          value: 1     
+    x: -10
+    y: 110
+    width: 140
+    height: 20
+  text: "Model domain summary: "
+- style: text
+  position:
+    x: -10
+    y: 80
+    width: 140
+    height: 20
+  variable: resolution_str
+- style: text
+  position:
+    x: -10
+    y: 60
+    width: 140
+    height: 20
+  variable: nr_cells_str
+- style: text
+  position:
+    x: -10
+    y: 40
+    width: 140
+    height: 20
+  variable: rotation_str
+- style: text
+  position:
+    x: -10
+    y: 20
+    width: 140
+    height: 20
+  variable: crs_str

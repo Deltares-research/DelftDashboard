@@ -133,7 +133,7 @@ def initialize_toolboxes():
     # Initialize toolboxes
     app.toolbox = {}
     for tlb in app.config["toolbox"]:
-        toolbox_name = tlb["name"]
+        toolbox_name = tlb["name"]        
         # And initialize this toolbox
         print("Adding toolbox : " + toolbox_name)
         module = importlib.import_module(

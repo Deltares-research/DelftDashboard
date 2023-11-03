@@ -5,34 +5,93 @@ element:
     y: 10
     width: -10
     height: 160
+  title: Add observation stations to model
   element:
+  - style: text
+    position:
+      x: 10
+      y: 145
+      width: 300
+      height: 10
+    text: "Select data source: "
+  - style: popupmenu
+    position:
+      x: 10
+      y: 120
+      width: 300
+      height: 20
+    tooltip: Select the data source
+    method: select_source
+    variable: active_source_index
+    select: index
+    option_string:
+      variable: source_names
+  - style: text
+    position:
+      x: 10
+      y: 105
+      width: 300
+      height: 10
+    text: "Available stations: "
   - style: listbox
     position:
       x: 10
       y: 10
       width: 300
-      height: 130
-    text: Stations
-    text_position: above
+      height: 90
     method: select_station
     variable: active_station_index
     select: index
     option_string:
       variable: station_names
-  - style: pushbutton
-    position:
-      x: 320
-      y: 120
-      width: 100
-      height: 20
-    text: Add to Model
-    method: add_stations_to_model
   - style: radiobuttongroup
     position:
       x: 320
-      y: 75
+      y: 60
       width: 100
     variable: naming_option
     option_string: ["Name", "ID"]
     option_value: ["name", "id"]
     method: select_naming_option
+  - style: text
+    position:
+      x: 400
+      y: 145
+      width: 300
+      height: 10
+    text: "Add stations to model as: "
+  - style: popupmenu
+    position:
+      x: 400
+      y: 120
+      width: 200
+      height: 20
+    tooltip: Select how you want to use the stations in the model
+    variable: model_options_index
+    select: index
+    option_string:
+      variable: model_options    
+  - style: pushbutton
+    position:
+      x: 400
+      y: 70
+      width: 200
+      height: 20
+    text: Add selected station to model
+    method: add_stations_to_model
+  - style: pushbutton
+    position:
+      x: 400
+      y: 45
+      width: 200
+      height: 20
+    text: Add all stations within model domain
+    method: add_all_stations_to_model
+  - style: pushbutton
+    position:
+      x: -10
+      y: 10
+      width: 120
+      height: 20
+    text: Jump back to Model Maker
+    # method: add_stations_to_model

@@ -1,67 +1,28 @@
 window:
-  title: Grid properties
-  width: 600
-  height: 400
+  title: Change default settings for active domain
+  width: 400
+  height: 180
   variable_group: modelmaker_sfincs_hmt
   module: toolboxes.modelmaker_sfincs_hmt.mask_active_cells
   modal: True
   cancel: True
 element:
 - style: panel
-  title: "Type of model"
-  position:
-    x: 10
-    y: 340
-    width: 580
-    height: 50
-  element:
-  - style: popupmenu
-    position:
-      x: 10
-      y: 10
-      width: 160
-      height: 20
-    text: "What type of model are you making?"
-    text_position: above
-    variable: model_type
-    select: item
-    method: select_model_type
-    option_string: ["Inundation model", "Surge model", "Other"]
-    option_value: [0,1,2]
-- style: panel
-  title: "Are you planning to include rainfall (and/or river discharge) in your model?"
-  position:
-    x: 10
-    y: 290
-    width: 580
-    height: 40
-  element:
-  - style: popupmenu
-    position:
-      x: 10
-      y: 10
-      width: 160
-      height: 20
-    variable: include_rainfall
-    select: item
-    method: select_include_rainfall
-    option_string: ["No", "Yes"]
-    option_value: [0,1]
-- style: panel
   title: "Active domain settings"
   position:
     x: 10
-    y: 170
-    width: 580
-    height: 110
-  dependency:
-  - action: visible
-    checkfor: all
-    check:
-    - variable: include_rainfall
-      operator: neq
-      value: 1
+    y: 40
+    width: 380
+    height: 130
   element:
+  - style: text
+    position:
+      x: 10
+      y: 105
+      width: 360
+      height: 20
+    text: "The default settings are based on the type of model you are making (domain tab). In case you used \n
+      watershed data to define your domain, we recommend to include the entire watersched in the active domain."
   - style: edit
     position:
       x: 10
@@ -98,33 +59,3 @@ element:
     text: Maxmium area (km2) of isolated cells to remove from your active domain
     text_position: right
     variable: mask_active_drop_area   
-- style: panel
-  title: "Load watershed data"
-  position:
-    x: 10
-    y: 170
-    width: 580
-    height: 110
-  dependency:
-  - action: visible
-    checkfor: all
-    check:
-    - variable: include_rainfall
-      operator: eq
-      value: 1
-  element:
-  - style: text
-    position:
-      x: 10
-      y: 80
-      width: 160
-      height: 20
-    text: "It is recommended to align your model domain with the watersheds."
-  - style: pushbutton
-    text: Load watershed data from a file
-    position:
-      x: 10
-      y: 55
-      width: 160
-      height: 20
-    method: load_include_polygon

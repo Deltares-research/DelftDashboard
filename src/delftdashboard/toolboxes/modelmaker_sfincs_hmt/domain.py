@@ -16,6 +16,43 @@ def select(*args):
     app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].activate()
     app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].activate()
 
+def select_model_type(*args):
+    """" change default model extent methods for different model types"""	
+    group = "modelmaker_sfincs_hmt"
+
+    model_type = app.gui.getvar(group, "model_type_index")
+
+    #model_type = 0 #overland
+    #model_type = 1 #surge
+    #model_type = 2 #quadtree
+
+    if model_type == 0:
+        app.gui.setvar(group, "mask_active_zmax", 10.0)
+        app.gui.setvar(group, "mask_active_zmin", -10.0)
+        app.gui.setvar(group, "mask_active_drop_area", 10.0)
+        app.gui.setvar(group, "mask_active_fill_area", 10.0)
+    elif model_type == 1:
+        app.gui.setvar(group, "mask_active_zmax", 5.0)
+        app.gui.setvar(group, "mask_active_zmin", -500.0)
+        app.gui.setvar(group, "mask_active_drop_area", 10.0)
+        app.gui.setvar(group, "mask_active_fill_area", 100.0)
+
+    include_precip =  app.gui.getvar(group, "include_rainfall")
+    include_rivers = app.gui.getvar(group, "include_rivers")
+    # include_waves = app.gui.setvar(group, "include_waves", False)    
+
+    watershed = False
+    if include_rivers or include_precip:
+        watershed = True
+
+    if model_type == 0 and watershed:
+        # we recommend to use watershed data to setup the model extent
+        app.gui.setvar(group, "setup_grid_methods_index", 2)
+    elif model_type == 0 and not watershed:
+        app.gui.setvar(group, "setup_grid_methods_index", 1)
+    elif model_type == 1:
+        app.gui.setvar(group, "setup_grid_methods_index", 0)
+
 
 def select_method(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "setup_grid_methods_index", args[0])

@@ -50,6 +50,17 @@ class Toolbox(GenericToolbox):
         # Set GUI variable
         group = "modelmaker_sfincs_hmt"
 
+        # Model type
+        app.gui.setvar(
+            group,
+            "model_type",
+            ["Overland model", "Surge model"],#, "Quadtree model"
+        )
+        app.gui.setvar(group, "model_type_index", 0)        
+        app.gui.setvar(group, "include_rainfall", False)
+        app.gui.setvar(group, "include_rivers", False)
+        # app.gui.setvar(group, "include_waves", False)
+
         # Model extent determination
         app.gui.setvar(group, "grid_outline", 0)
         app.gui.setvar(
@@ -71,18 +82,24 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "dx", 0.1)
             app.gui.setvar(group, "dy", 0.1)
             app.gui.setvar(group, "res", 0.1)
+            app.gui.setvar(group, "unit", " (in \u00B0)")
         else:
             app.gui.setvar(group, "dx", 500)
             app.gui.setvar(group, "dy", 500)
             app.gui.setvar(group, "res", 500)
+            app.gui.setvar(group, "unit", " (in m)")
         app.gui.setvar(group, "rotation", 0.0)
         app.gui.setvar(group, "lenx", 0.0)
         app.gui.setvar(group, "leny", 0.0)
 
+        # Domain summary
+        app.gui.setvar(group, "resolution_str", "")
+        app.gui.setvar(group, "nr_cells_str", "")
+        app.gui.setvar(group, "rotation_str", "")
+        app.gui.setvar(group, "crs_str", "")
+
         # Bathymetry
         source_names = []
-        # if app.config["bathymetry_database"] is not None:
-        # source_names, sources = bathymetry_database.sources()
         if app.config["data_libs"] is not None:
             for key in app.data_catalog.keys:
                 # only keep raster datasets
@@ -94,14 +111,10 @@ class Toolbox(GenericToolbox):
                         if source not in source_names:
                             source_names.append(source)
 
-            # source_names.append("hydromt")
-
         app.gui.setvar(group, "bathymetry_source_names", source_names)
         app.gui.setvar(group, "active_bathymetry_source", source_names[0])
 
         dataset_names = []
-        # if app.config["bathymetry_database"] is not None:
-        # dataset_names = bathymetry_database.dataset_names(source=source_names[0])[0]
         if app.config["data_libs"] is not None:
             for key in app.data_catalog.keys:
                 if app.data_catalog[key].driver == "raster":
@@ -386,6 +399,15 @@ class Toolbox(GenericToolbox):
         # NOTE this only works for regular grids (quadtee also not implemented)
         gdf = model.reggrid.to_vector_lines()
         app.map.layer["sfincs_hmt"].layer["grid"].set_data(gdf)
+
+        # Update grid summary
+        group = "modelmaker_sfincs_hmt"
+
+        app.gui.setvar(group, "resolution_str", "Resolution: {}{}".format(app.gui.getvar(group, "res"),app.gui.getvar(group, "unit")))
+        app.gui.setvar(group, "nr_cells_str", "Number of cells: {}".format(app.gui.getvar(group, "nr_cells")))
+        app.gui.setvar(group, "rotation_str", "Rotation amgle: {}".format(model.config.get("rotation")))
+        app.gui.setvar(group, "crs_str", "Coordinate system: {}".format(app.crs.to_string()))
+
 
         dlg.close()
 
