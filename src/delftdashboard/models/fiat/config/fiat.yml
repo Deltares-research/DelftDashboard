@@ -13,7 +13,7 @@ element:
   - string: Vulnerability
     element: vulnerability.yml
     module:  models.fiat.vulnerability_damage_curves
-  - string: SVI
+  - string: SVI + Equity
     element: svi.yml
     module: models.fiat.svi
   - string: Create Model
