@@ -38,6 +38,7 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
+            legend_title="Buildings",
             fill_color="orange",
             line_color="transparent",
             hover_property="Secondary Object Type",
@@ -96,7 +97,7 @@ class Model(GenericModel):
         
         ## DISPLAY LAYERS ##
         damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
-        damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "ID", "Description"]]
+        damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
         self.damage_function_database = damage_functions_database_info
         app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
 
@@ -121,7 +122,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "active_damage_function", [0])
         app.gui.setvar(group, "active_exposure_category", [0])
         
-        df = pd.DataFrame(columns=["Assigned", "Primary Object Type", "Secondary Object Type", "Stories", "Basement"])
+        df = pd.DataFrame(columns=["Assigned", "Secondary Object Type", "Stories", "Basement"])
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
         ## HAZUS IWR OCCUPANCY CLASSES ##
@@ -146,8 +147,8 @@ class Model(GenericModel):
         app.gui.setvar(group, "list_of_census_years", ["2020", "2021"])
         app.gui.setvar(group, "selected_year", "2020")
 
-        app.gui.setvar(group, "use_svi", False)
-        app.gui.setvar(group, "use_equity", False)
+        app.gui.setvar(group, "use_svi", True)
+        app.gui.setvar(group, "use_equity", True)
 
         app.gui.setvar(
             group,

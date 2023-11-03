@@ -53,28 +53,26 @@ element:
         variable: list_of_census_years
     - style: checkbox
       position:
-        x: 300
+        x: 220
         y: 80
         width: 110
         height: 20
       text: Social Vulnerability Index
       tooltip: Toggle to save the SVI score in the exposure data
-      method: toggle_svi
       variable: use_svi
     - style: checkbox
       position:
-        x: 300
+        x: 220
         y: 50
         width: 110
         height: 20
       text: Equity
       tooltip: Toggle to save the equity data in the exposure data
-      method: toggle_equity
       variable: use_equity
 
   - style: pushbutton
     position:
-      x: 360
+      x: 380
       y: 10
       width: 95
       height: 20
