@@ -119,8 +119,8 @@ def add_aggregations(*args):
     label = aggregation_table["Aggregation Label"].tolist()
     app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
 
-    attribute_to_visualize = "TO FILL"
-    data_to_visualize = "TO FILL"
+    attribute_to_visualize = attribute[0]
+    data_to_visualize = fn[0]
     gdf = gpd.read_file(data_to_visualize)
     paint_properties = app.model["fiat"].create_paint_properties(
         gdf, attribute_to_visualize, type="polygon", opacity=0.5
