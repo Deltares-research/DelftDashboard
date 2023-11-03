@@ -66,7 +66,7 @@ def build_nsi_exposure(*args):
         app.gui.setvar(checkbox_group, "checkbox_classification", True)
         app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
         app.gui.setvar(checkbox_group, "checkbox_elevation", True)
-        app.gui.setvar(checkbox_group, "checkbox_aggregation_(optional)", True)
+        app.gui.setvar(checkbox_group, "checkbox_attributes_(optional)", True)
 
         dlg.close()
 

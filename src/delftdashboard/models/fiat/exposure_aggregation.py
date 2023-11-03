@@ -84,7 +84,7 @@ def write_input_to_table(*args):
     df_aggregation = pd.DataFrame(
         {
             "File": file,
-            "Attribute": aggregation_attribute,
+            "Attribute ID": aggregation_attribute,
             "Attribute Label": aggregation_label,
         }
     )
@@ -92,7 +92,7 @@ def write_input_to_table(*args):
 
     if len(df_all_aggregation) == 0:
         df_all_aggregation = pd.DataFrame(
-            columns=["File", "Attribute", "Attribute Label"]
+            columns=["File", "Attribute ID", "Attribute Label"]
         )
 
     added_aggregation = df_aggregation["File"].tolist()
@@ -116,16 +116,19 @@ def get_table_data(*args):
             if row['File'] in name:
                 aggregation_table.at[idx, 'File'] = name
     fn = aggregation_table["File"].tolist()
-    attribute   = aggregation_table["Attribute"].tolist()
+    attribute   = aggregation_table["Attribute ID"].tolist()
     label = aggregation_table["Attribute Label"].tolist()
     return fn, attribute, label
 
-def add_aggregations():
+def add_aggregations(*args):
     fn, attribute, label = get_table_data()
     app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
-
-    attribute_to_visualize = attribute[0] # Needs to be adjusted
-    data_to_visualize = fn[0]# Needs to be adjusted
+    print("Attributes added to model")
+    
+def display_aggregation_zone(*args):
+    fn, attribute, label = get_table_data()
+    attribute_to_visualize = str(attribute[0]) # Needs to be adjusted
+    data_to_visualize = Path(fn[0])# Needs to be adjusted
     gdf = gpd.read_file(data_to_visualize)
     paint_properties = app.model["fiat"].create_paint_properties(
         gdf, attribute_to_visualize, type="polygon", opacity=0.5
