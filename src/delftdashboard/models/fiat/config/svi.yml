@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: SVI
+  title: Social vulnerability and equity
   position:
     x: 10
     y: 10
@@ -12,70 +12,69 @@ element:
     position:
       x: 10
       y: 10
-      width: 150
+      width: 350
       height: 120
     element:
-    - style: pushbutton
+    - style: popupmenu
       position:
-        x: 10
+        x: 80
         y: 80
         width: 110
         height: 20
       text: Specify state
-      method: test_svi
-    - style: pushbutton
+      variable: selected_state
+      option_string:
+        variable: list_of_states
+      option_value:
+        variable: list_of_states
+    - style: popupmenu
       position:
-        x: 10
+        x: 80
         y: 50
         width: 110
         height: 20
-      text: Upload block group
-      method: test_svi
-    - style: pushbutton
+      text: Specify county
+      variable: selected_county
+      option_string:
+        variable: list_of_counties
+      option_value:
+        variable: list_of_counties
+    - style: popupmenu
       position:
-        x: 10
+        x: 80
         y: 20
         width: 110
         height: 20
-      text: Show block group
-      method: test_svi
-  - style: panel
-    title: Build
-    position:
-      x: 170
-      y: 10
-      width: 150
-      height: 120
-    element:
-    - style: pushbutton
+      text: Specify year
+      variable: selected_year
+      option_string:
+        variable: list_of_census_years
+      option_value:
+        variable: list_of_census_years
+    - style: checkbox
       position:
-        x: 10
+        x: 220
         y: 80
         width: 110
         height: 20
-      text: Build SVI
-      method: test_svi
-  - style: panel
-    title: Visualize
-    position:
-      x: 330
-      y: 10
-      width: 150
-      height: 120
-    element:
-    - style: pushbutton
+      text: Social Vulnerability Index
+      tooltip: Toggle to save the SVI score in the exposure data
+      variable: use_svi
+    - style: checkbox
       position:
-        x: 10
-        y: 80
-        width: 110
-        height: 20
-      text: Composite scores / Domain
-      method: test_svi
-    - style: pushbutton
-      position:
-        x: 10
+        x: 220
         y: 50
         width: 110
         height: 20
-      text: SVI layer
-      method: test_svi
+      text: Equity
+      tooltip: Toggle to save the equity data in the exposure data
+      variable: use_equity
+
+  - style: pushbutton
+    position:
+      x: 380
+      y: 10
+      width: 95
+      height: 20
+    text: Add to model
+    method: add_svi

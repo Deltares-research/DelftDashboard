@@ -64,8 +64,7 @@ def build_nsi_exposure(*args):
         app.gui.setvar(model, "show_asset_locations", True)
 
         df = pd.DataFrame(columns=["Assigned"])
-        df_add = gdf[["Primary Object Type", "Secondary Object Type"]].drop_duplicates().reset_index()
-        df = pd.concat([df, df_add[["Primary Object Type", "Secondary Object Type"]]], axis=1)
+        df["Secondary Object Type"] = list(gdf["Secondary Object Type"].unique())
         df.fillna("", inplace=True)
         
         app.gui.setvar(model, "exposure_categories_to_link", df)
@@ -75,7 +74,6 @@ def build_nsi_exposure(*args):
         app.gui.setvar(checkbox_group, "checkbox_classification", True)
         app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
         app.gui.setvar(checkbox_group, "checkbox_elevation", True)
-        app.gui.setvar(checkbox_group, "checkbox_attributes_(optional)", True)
 
         dlg.close()
 

@@ -38,6 +38,7 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
+            legend_title="Buildings",
             fill_color="orange",
             line_color="transparent",
             hover_property="Secondary Object Type",
@@ -96,7 +97,7 @@ class Model(GenericModel):
         
         ## DISPLAY LAYERS ##
         damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
-        damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "ID", "Description"]]
+        damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
         self.damage_function_database = damage_functions_database_info
         app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
 
@@ -121,7 +122,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "active_damage_function", [0])
         app.gui.setvar(group, "active_exposure_category", [0])
         
-        df = pd.DataFrame(columns=["Assigned", "Primary Object Type", "Secondary Object Type", "Stories", "Basement"])
+        df = pd.DataFrame(columns=["Assigned", "Secondary Object Type", "Stories", "Basement"])
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
         ## HAZUS IWR OCCUPANCY CLASSES ##
@@ -136,6 +137,19 @@ class Model(GenericModel):
         
         app.gui.setvar(group, "dmg_functions_html_filepath", "")
         
+        ## SVI ##
+        app.gui.setvar(group, "list_of_states", [])
+        app.gui.setvar(group, "selected_state", "")
+
+        app.gui.setvar(group, "list_of_counties", [])
+        app.gui.setvar(group, "selected_county", "")
+
+        app.gui.setvar(group, "list_of_census_years", ["2020", "2021"])
+        app.gui.setvar(group, "selected_year", "2020")
+
+        app.gui.setvar(group, "use_svi", True)
+        app.gui.setvar(group, "use_equity", True)
+
         app.gui.setvar(
             group,
             "asset_locations_string",
@@ -300,7 +314,8 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "aggregation_label_string", None )
         app.gui.setvar(group, "aggregation_label", 0)
-        app.gui.setvar(group, "aggregation_table", pd.DataFrame(columns=["File", "Attribute ID", "Attribute Label"]))
+        app.gui.setvar(group, "aggregation_table_name", 0)
+        app.gui.setvar(group, "aggregation_table", pd.DataFrame(columns=["File", "Attribute ID", "Attribute Label", "File Path"]))
         app.gui.setvar(group, "assign_classification_active", False)
         app.gui.setvar(group, "selected_secondary_classification_value", 0)
         app.gui.setvar(group, "show_primary_classification", None)
@@ -375,6 +390,8 @@ class Model(GenericModel):
                 fname,
             )
 
+            self.fill_us_states()
+
     def open(self):
         # Open input file, and change working directory
         fname = app.gui.window.dialog_select_path(
@@ -388,6 +405,7 @@ class Model(GenericModel):
                 fname,
             )
             self.domain.read()
+            self.fill_us_states()
             self.set_gui_variables()
             # Change working directory
             os.chdir(fname)
@@ -404,6 +422,12 @@ class Model(GenericModel):
 
     def set_crs(self, crs):
         self.domain.crs = crs
+
+    def fill_us_states(self):
+        # Fill the states
+        states = self.domain.svi_vm.get_state_names()
+        app.gui.setvar("fiat", "list_of_states", states)
+        app.gui.setvar("fiat", "selected_state", states[0])
 
     def get_filtered_damage_function_database(self, filter: str, col: str="Occupancy"):
         df = copy.deepcopy(self.damage_function_database)
