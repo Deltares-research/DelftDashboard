@@ -137,13 +137,16 @@ def display_aggregation_zone(*args):
 
     # Clear previously made layers and add a new one with the right properties
     app.map.layer["aggregation"].layer["aggregation_layer"].clear()
-    app.map.layer["aggregation"].add_layer(
+    if args[0]:
+        app.map.layer["aggregation"].add_layer(
             "aggregation_layer",
             type="choropleth",
             legend_position="top-right",
             legend_title="Aggregation",
             hoover_property=attribute_to_visualize
         )
-    app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
+        app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
         gdf, paint_properties, legend
-    )
+        )
+    else:
+        app.map.layer["aggregation"].layer["aggregation_layer"].hide()
