@@ -27,14 +27,6 @@ element:
     height: 20
   text: "select"
   method: open_gdf
-- style: pushbutton
-  position:
-    x: 170
-    y: 100
-    width: 10
-    height: 10
-  text: "X"
-  method: delete_loaded_file
 - style: popupmenu
   position:
     x: 250
@@ -78,7 +70,7 @@ element:
     variable: aggregation_table
 - style: checkbox
   position:
-    x: 345
+    x: 400
     y: 10
     width: 145
     height: 20
