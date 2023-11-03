@@ -84,15 +84,15 @@ def write_input_to_table(*args):
     df_aggregation = pd.DataFrame(
         {
             "File": file,
-            "Aggregation Attribute": aggregation_attribute,
-            "Aggregation Label": aggregation_label,
+            "Attribute": aggregation_attribute,
+            "Attribute Label": aggregation_label,
         }
     )
     df_all_aggregation = copy.deepcopy(app.gui.getvar("fiat", "aggregation_table"))
 
     if len(df_all_aggregation) == 0:
         df_all_aggregation = pd.DataFrame(
-            columns=["File", "Aggregation Attribute", "Aggregation Label"]
+            columns=["File", "Attribute", "Attribute Label"]
         )
 
     added_aggregation = df_aggregation["File"].tolist()
@@ -102,7 +102,8 @@ def write_input_to_table(*args):
         df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
     df_all_aggregation.reset_index(drop=True, inplace=True)
     app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
-def add_aggregations(*args):
+
+def get_table_data(*args): 
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
     aggregation_table = app.gui.getvar("fiat", "aggregation_table")
     file_name = aggregation_table["File"].tolist()
@@ -115,17 +116,25 @@ def add_aggregations(*args):
             if row['File'] in name:
                 aggregation_table.at[idx, 'File'] = name
     fn = aggregation_table["File"].tolist()
-    attribute   = aggregation_table["Aggregation Attribute"].tolist()
-    label = aggregation_table["Aggregation Label"].tolist()
+    attribute   = aggregation_table["Attribute"].tolist()
+    label = aggregation_table["Attribute Label"].tolist()
+    return fn, attribute, label
+
+def add_aggregations():
+    fn, attribute, label = get_table_data()
     app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
-    print("Aggregation zones added")
-    #attribute_to_visualize = "TO FILL"
-    #data_to_visualize = "TO FILL"
-    #gdf = gpd.read_file(data_to_visualize)
-    #paint_properties = app.model["fiat"].create_paint_properties(
-    #    gdf, attribute_to_visualize, type="polygon", opacity=0.5
-    #)
-    #legend = []  # Still needs to be made in the mapbox code
-    #app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
-    #    gdf, paint_properties, legend
-    #)
+    print("Attributes added")
+
+def display_aggregation_zone(*args):
+    fn, attribute, label = get_table_data()
+    index = 0 #get index of selected row
+    attribute_to_visualize = str(attribute[index])
+    data_to_visualize = Path(fn[index])
+    gdf = gpd.read_file(data_to_visualize)
+    paint_properties = app.model["fiat"].create_paint_properties(
+        gdf, attribute_to_visualize, type="polygon", opacity=0.5
+    )
+    legend = []  # Still needs to be made in the mapbox code
+    crs = app.gui.getvar("fiat", "selected_crs")
+    app.map.layer["aggregation"].layer["aggregation_layer"].crs = crs
+    app.map.layer["aggregation"].layer["aggregation_layer"].set_data(gdf)

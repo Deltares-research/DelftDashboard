@@ -37,11 +37,11 @@ element:
   method: delete_loaded_file
 - style: popupmenu
   position:
-    x: 220
+    x: 250
     y: 95
     width: 115
     height: 20
-  text: "Attribute:"
+  text: "Attribute ID:"
   variable: aggregation_file_field_name
   option_string:
     variable: aggregation_file_field_name_string
@@ -49,7 +49,7 @@ element:
     variable: aggregation_file_field_name_value
 - style: edit
   position:
-    x: 220
+    x: 250
     y: 65
     width: 50
     height: 18
@@ -65,22 +65,31 @@ element:
   method: write_input_to_table
 - style: tableview
   position:
-    x: 350
+    x: 400
     y: 30
-    width: 300
+    width: 200
     height: 85
   tooltip: Selected aggregation zones
-  title: Selected Aggregation Zones
+  title: Selected Attributes
   text_position: "above"
   selection_type: extended
   sortable: true
   option_value:
     variable: aggregation_table
+- style: checkbox
+  position:
+    x: 345
+    y: 10
+    width: 145
+    height: 20
+  text: Display attribute
+  variable: show_aggregation_zone
+  method: display_aggregation_zone
 - style: pushbutton
   position:
-    x: 690
-    y: 10
-    width: 40
+    x: 655
+    y: 15
+    width: 95
     height: 20
   text: "Add to model"
   variable: selected_aggregation_files_value
