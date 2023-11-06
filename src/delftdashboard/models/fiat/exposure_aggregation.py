@@ -68,10 +68,6 @@ def load_aggregation(name):
     app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
 
 
-def delete_loaded_file(*args):
-    print("remove")
-
-
 def open_gdf(*args):
     index = app.gui.getvar("fiat", "loaded_aggregation_files")
     file_list = app.gui.getvar("fiat", "loaded_aggregation_files_value")
@@ -181,5 +177,14 @@ def display_aggregation_zone(*args):
         )
     else:
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
-def remove_attribute(*args):
-    print("remove")
+
+def deselect_attribute(*args):
+    current_aggregation = app.gui.getvar("fiat", "aggregation_table")
+    index = app.gui.getvar("fiat", "aggregation_table_name")[0]
+    if index > len(
+        current_aggregation.values
+    ) or index == len(current_aggregation.values):
+        index = 0
+    current_aggregation = current_aggregation.drop(index, axis=0)
+    app.gui.setvar("fiat", "aggregation_table", current_aggregation)
+        

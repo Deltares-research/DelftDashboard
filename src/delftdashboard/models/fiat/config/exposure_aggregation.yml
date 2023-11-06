@@ -65,9 +65,9 @@ element:
 - style: tableview
   position:
     x: 400
-    y: 30
+    y: 35
     width: 200
-    height: 85
+    height: 80
   tooltip: Selected aggregation zones
   title: Selected Attributes
   text_position: "above"
@@ -78,12 +78,12 @@ element:
      variable: aggregation_table
 - style: pushbutton
   position:
-    x: 100
-    y: 15
+    x: 550
+    y: 10
     width: 50
     height: 20
   text: Remove
-  method: remove_attribute
+  method: deselect_attribute
 - style: checkbox
   position:
     x: 620
