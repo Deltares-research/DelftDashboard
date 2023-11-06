@@ -11,7 +11,7 @@ from delftdashboard.operations import map
 
 def select(*args):
     map.update()
-    app.map.layer["sfincs_cht"].layer["observation_points"].set_mode("active")
+    app.map.layer["sfincs_cht"].layer["observation_points"].activate()
     update()
 
 def edit(*args):

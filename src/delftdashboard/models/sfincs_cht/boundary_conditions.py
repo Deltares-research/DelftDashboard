@@ -14,7 +14,7 @@ from delftdashboard.operations import map
 def select(*args):
     # Set all layer inactive, except boundary_points
     map.update()
-    app.map.layer["sfincs_cht"].layer["boundary_points"].set_mode("active")
+    app.map.layer["sfincs_cht"].layer["boundary_points"].activate()
     update_list()
 
 def write():

@@ -1,9 +1,11 @@
-from delftdashboard.operations.model import GenericModel
-from delftdashboard.app import app
 import os
+import numpy as np
+import xarray as xr
 
 from hydromt_sfincs import SfincsModel
 
+from delftdashboard.app import app
+from delftdashboard.operations.model import GenericModel
 
 class Model(GenericModel):
     def __init__(self, name):
@@ -25,6 +27,33 @@ class Model(GenericModel):
             root=root,
             mode="w+",
         )
+        self.set_crs()
+
+    def set_crs(self):
+        crs = app.crs
+        if self.domain.crs != crs:
+            self.domain.set_crs(crs)
+
+            # change default resolutions
+            group = "modelmaker_sfincs_hmt"
+            if app.crs.is_geographic:
+                app.gui.setvar(group, "dx", 0.1)
+                app.gui.setvar(group, "dy", 0.1)
+                app.gui.setvar(group, "res", 0.1)
+                app.gui.setvar(group, "unit", " (in \u00B0)")
+            else:
+                app.gui.setvar(group, "dx", 500)
+                app.gui.setvar(group, "dy", 500)
+                app.gui.setvar(group, "res", 500)
+                app.gui.setvar(group, "unit", " (in m)")
+        
+        # update map
+        self.plot()
+
+    def select_working_directory(self):
+        root = os.getcwd()
+        if self.domain.root != root:
+            self.domain.set_root(root=root, mode="w+")
 
     def add_layers(self):
         # Add main app layer
@@ -32,15 +61,26 @@ class Model(GenericModel):
 
         layer.add_layer(
             "grid",
-            type="deck_geojson",
-            file_name="sfincs_grid.geojson",
+            type="line",
+            circle_radius=0,
+            line_width=1,
             line_color="black",
+            line_width_inactive=0.5,
+            line_color_inactive="lightgrey",
+            line_opacity_inactive=0.5,
         )
+
+        bed_levels = layer.add_layer(
+            "bed_levels", 
+            type="raster"
+        )
+
+        # Set update method for topography layer
+        bed_levels.update = update_map
 
         layer.add_layer(
             "mask_active",
             type="circle",
-            file_name="sfincs_mask_active.geojson",
             circle_radius=3,
             fill_color="yellow",
             line_color="transparent",
@@ -49,7 +89,6 @@ class Model(GenericModel):
         layer.add_layer(
             "mask_bound_wlev",
             type="circle",
-            file_name="sfincs_mask_bound_wlev.geojson",
             circle_radius=3,
             fill_color="blue",
             line_color="transparent",
@@ -58,7 +97,6 @@ class Model(GenericModel):
         layer.add_layer(
             "mask_bound_outflow",
             type="circle",
-            file_name="sfincs_mask_bound_outflow.geojson",
             circle_radius=3,
             fill_color="red",
             line_color="transparent",
@@ -109,21 +147,25 @@ class Model(GenericModel):
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
+            # Grid is made inactive
+            app.map.layer["sfincs_hmt"].layer["grid"].deactivate()
+
+            # Bed levels are hidden
+            app.map.layer["sfincs_hmt"].layer["bed_levels"].hide()
+
             # Mask is made invisible
-            app.map.layer["sfincs_hmt"].layer["grid"].set_mode("invisible")
-            app.map.layer["sfincs_hmt"].layer["mask_active"].set_mode("invisible")
-            app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("invisible")
-            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode(
-                "invisible"
-            )
+            app.map.layer["sfincs_hmt"].layer["mask_active"].hide()
+            app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].hide()
+            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].hide()
 
             # Boundary points are made grey
-            app.map.layer["sfincs_hmt"].layer["boundary_points"].set_mode("inactive")
+            app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
+            
             # Observation points are made grey
-            app.map.layer["sfincs_hmt"].layer["observation_points"].set_mode("inactive")
-            app.map.layer["sfincs_hmt"].layer["cross_sections"].set_mode("inactive")
+            app.map.layer["sfincs_hmt"].layer["observation_points"].deactivate()
+            app.map.layer["sfincs_hmt"].layer["cross_sections"].deactivate()
         if mode == "invisible":
-            app.map.layer["sfincs_hmt"].set_mode("invisible")
+            app.map.layer["sfincs_hmt"].hide()
 
     def set_gui_variables(self):
         # Copies sfincs input to gui variables
@@ -231,17 +273,69 @@ class Model(GenericModel):
 
     def load(self):
         self.domain.read()
-
-    def set_crs(self):
-        crs = app.crs
-        if self.domain.crs != crs:
-            self.domain.set_crs(crs)
-            # self.plot()
-
-    def select_working_directory(self):
-        root = os.getcwd()
-        if self.domain.root != root:
-            self.domain.set_root(root=root, mode="w+")
+        self.plot()
 
     def plot(self):
         pass
+
+    def add_stations(self, gdf, naming_option="name", model_option="obs"):
+        from .observation_points import add_observation_point
+        from .boundary_conditions_wlev import add_boundary_point
+        # if id is used as naming option, rename column
+        if naming_option == "id":
+            gdf = gdf.rename(columns={"id": "name"})
+
+        if model_option == "obs":
+            add_observation_point(gdf)
+        elif model_option == "bnd":
+            add_boundary_point(gdf)
+
+
+def update_map():
+    # check if map extent is available
+    if not app.map.map_extent:
+        print("Map extent not yet available ...")
+        return
+
+    # check if grid is already defined
+    grid = app.model["sfincs_hmt"].domain.grid
+    if "dep" in grid:
+        da_dep = grid["dep"]
+        if np.isnan(da_dep).all():
+            return
+    else:
+        return
+    
+    if "msk" in grid:
+        da_dep = da_dep.where(grid["msk"] > 0) 
+
+    coords = app.map.map_extent
+    xl = [coords[0][0], coords[1][0]]
+    yl = [coords[0][1], coords[1][1]]
+    wdt = app.map.view.geometry().width()
+
+    npix = wdt
+
+    dxy = (xl[1] - xl[0]) / npix
+    xv = np.arange(xl[0], xl[1], dxy)
+    yv = np.arange(yl[0], yl[1], dxy)
+
+    # initilize empty xarray
+    da_like = xr.DataArray(
+        np.float32(np.full([len(yv), len(xv)], np.nan)),
+        coords={"y": yv, "x": xv},
+        dims=["y", "x"],
+    )
+    da_like.raster.set_crs(4326)
+
+    da_dep = da_dep.raster.reproject_like(da_like, method="bilinear").load()
+
+    da_dep.raster.set_nodata(np.nan)
+
+    app.map.layer["sfincs_hmt"].layer["bed_levels"].set_data(
+        x=xv,
+        y=yv,
+        z=da_dep.values,
+        colormap=app.color_map_earth,
+        decimals=0,
+    )

@@ -1,0 +1,100 @@
+  window:
+    title: Dataset properties
+    width: 450
+    height: 300
+    variable_group: modelmaker_sfincs_hmt
+    module: toolboxes.modelmaker_sfincs_hmt.bathymetry
+    modal: True
+    cancel: True
+  element:
+  - style: panel
+    title: "Specify the validity of this dataset"
+    position:
+      x: 10
+      y: 140
+      width: 430
+      height: 150
+    element:
+    - style: text
+      position:
+        x: 10
+        y: 120
+        width: 410
+        height: 20
+      text: "The following options are dataset specific. You can use these options to specify the validity of this dataset. \n 
+      Cells that are not within the validity range will be masked out."
+    - style: edit
+      position:
+        x: 10
+        y: 95
+        width: 45
+        height: 20
+      text: Maximum elevation (m) for which this dataset is valid.
+      text_position: right
+      variable: selected_bathymetry_dataset_zmax
+      method: edit_zmax_bathymetry_dataset
+    - style: edit
+      position:
+        x: 10
+        y: 70
+        width: 45
+        height: 20
+      text: Minimum elevation (m) for which this dataset is valid.
+      text_position: right
+      variable: selected_bathymetry_dataset_zmax
+      method: edit_zmin_bathymetry_dataset
+    - style: text
+      position:
+        x: 10
+        y: 35
+        width: 410
+        height: 20
+      text: "Add a constant offset to this dataset. This can be used to correct for a datum shift."
+    - style: edit
+      position:
+        x: 10
+        y: 10
+        width: 45
+        height: 20
+      text: Offset (m) to apply to this dataset. 
+      text_position: right
+      variable: selected_bathymetry_dataset_offset
+      method: edit_offset_bathymetry_dataset
+  - style: panel
+    title: "Merge options"
+    position:
+      x: 10
+      y: 40
+      width: 430
+      height: 90
+    element:
+    - style: text
+      position:
+        x: 10
+        y: 65
+        width: 410
+        height: 20
+      text: "The following options specify how the different datasets are merged: "
+    - style: edit
+      position:
+        x: -10
+        y: 40
+        width: 40
+        height: 20
+      text: "Number of buffer cells between datasets to ensure smooth transitions"
+      text_position: left
+      method: edit_buffer_cells_bathymetry_dataset
+      variable: bathymetry_dataset_buffer_cells
+    - style: popupmenu
+      position:
+        x: -10
+        y: 10
+        width: 80
+        height: 20
+      text: "Method used to interpolate the buffer cells"
+      text_position: left
+      method: select_interp_method
+      variable: bathymetry_dataset_interp_method
+      select: item
+      option_string: ["Linear", "Nearest", "Cubic"]     
+      option_value: ["linear", "nearest", "cubic"]     

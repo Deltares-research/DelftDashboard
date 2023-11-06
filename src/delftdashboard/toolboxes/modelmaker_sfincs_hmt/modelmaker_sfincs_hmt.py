@@ -50,51 +50,83 @@ class Toolbox(GenericToolbox):
         # Set GUI variable
         group = "modelmaker_sfincs_hmt"
 
+        # Model type
+        app.gui.setvar(
+            group,
+            "model_type",
+            ["Overland model", "Surge model"],#, "Quadtree model"
+        )
+        app.gui.setvar(group, "model_type_index", 0)        
+        app.gui.setvar(group, "include_rainfall", False)
+        app.gui.setvar(group, "include_rivers", False)
+        # app.gui.setvar(group, "include_waves", False)
+
         # Model extent determination
         app.gui.setvar(group, "grid_outline", 0)
         app.gui.setvar(
             group,
             "setup_grid_methods",
-            ["Draw Bounding Box", "Draw Area of Interest", "Load Area of Interest"],
+            ["Draw Bounding Box", "Draw polygon", "Load Area of Interest"],
         )
         app.gui.setvar(group, "setup_grid_methods_index", 0)
 
         # Domain
         app.gui.setvar(group, "x0", 0.0)
         app.gui.setvar(group, "y0", 0.0)
-        app.gui.setvar(group, "nmax", 10)
-        app.gui.setvar(group, "mmax", 10)
+        app.gui.setvar(group, "nmax", 0)
+        app.gui.setvar(group, "mmax", 0)
+        app.gui.setvar(
+            group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
+            )
         if app.crs.is_geographic:
             app.gui.setvar(group, "dx", 0.1)
             app.gui.setvar(group, "dy", 0.1)
+            app.gui.setvar(group, "res", 0.1)
+            app.gui.setvar(group, "unit", " (in \u00B0)")
         else:
             app.gui.setvar(group, "dx", 500)
             app.gui.setvar(group, "dy", 500)
+            app.gui.setvar(group, "res", 500)
+            app.gui.setvar(group, "unit", " (in m)")
         app.gui.setvar(group, "rotation", 0.0)
+        app.gui.setvar(group, "lenx", 0.0)
+        app.gui.setvar(group, "leny", 0.0)
+
+        # Domain summary
+        app.gui.setvar(group, "resolution_str", "")
+        app.gui.setvar(group, "nr_cells_str", "")
+        app.gui.setvar(group, "rotation_str", "")
+        app.gui.setvar(group, "crs_str", "")
 
         # Bathymetry
         source_names = []
-        # if app.config["bathymetry_database"] is not None:
-        # source_names, sources = bathymetry_database.sources()
         if app.config["data_libs"] is not None:
-            source_names.append("hydromt")
+            for key in app.data_catalog.keys:
+                # only keep raster datasets
+                if app.data_catalog[key].driver == "raster":
+                    # only keep topography datasets
+                    if app.data_catalog[key].meta["category"] == "topography":
+                        # retrieve source name
+                        source= app.data_catalog[key].meta["source"]
+                        if source not in source_names:
+                            source_names.append(source)
 
         app.gui.setvar(group, "bathymetry_source_names", source_names)
         app.gui.setvar(group, "active_bathymetry_source", source_names[0])
 
         dataset_names = []
-        # if app.config["bathymetry_database"] is not None:
-        # dataset_names = bathymetry_database.dataset_names(source=source_names[0])[0]
         if app.config["data_libs"] is not None:
             for key in app.data_catalog.keys:
                 if app.data_catalog[key].driver == "raster":
                     if app.data_catalog[key].meta["category"] == "topography":
-                        dataset_names.append(key)
+                        if app.data_catalog[key].meta["source"] == source_names[0]:
+                            dataset_names.append(key)
 
         app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
         app.gui.setvar(group, "bathymetry_dataset_index", 0)
         app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
         app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
+        app.gui.setvar(group, "selected_bathymetry_dataset_meta", "")
         app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
         app.gui.setvar(group, "selected_bathymetry_dataset_offset", 0)
@@ -177,6 +209,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "mask_exclude_polygon_names", [])
         app.gui.setvar(group, "mask_exclude_polygon_index", 0)
         app.gui.setvar(group, "nr_mask_exclude_polygons", 0)
+        app.gui.setvar(group, "mask_boundary_type", 2)
+        app.gui.setvar(group, "mask_active_add", False)
+        app.gui.setvar(group, "mask_active_del", False)
 
         # Mask bounds
         app.gui.setvar(group, "wlev_include_polygon_names", [])
@@ -186,8 +221,7 @@ class Toolbox(GenericToolbox):
         # app.gui.setvar(group, "wlev_exclude_polygon_index", 0)
         # app.gui.setvar(group, "nr_wlev_exclude_polygons", 0)
         app.gui.setvar(group, "wlev_zmax", -2.0)
-        app.gui.setvar(group, "wlev_zmin", -99999.0)
-        app.gui.setvar(group, "wlev_reset", True)
+        # app.gui.setvar(group, "wlev_reset", True)
 
         app.gui.setvar(group, "outflow_include_polygon_names", [])
         app.gui.setvar(group, "outflow_include_polygon_index", 0)
@@ -195,9 +229,8 @@ class Toolbox(GenericToolbox):
         # app.gui.setvar(group, "outflow_exclude_polygon_names", [])
         # app.gui.setvar(group, "outflow_exclude_polygon_index", 0)
         # app.gui.setvar(group, "nr_outflow_exclude_polygons", 0)
-        app.gui.setvar(group, "outflow_zmax", 99999.0)
         app.gui.setvar(group, "outflow_zmin", 2.0)
-        app.gui.setvar(group, "outflow_reset", True)
+        # app.gui.setvar(group, "outflow_reset", True)
 
         # subgrid
         app.gui.setvar(group, "nr_subgrid_pixels", 20)
@@ -217,9 +250,9 @@ class Toolbox(GenericToolbox):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Make all layers invisible
-            app.map.layer["modelmaker_sfincs_hmt"].set_mode("invisible")
+            app.map.layer["modelmaker_sfincs_hmt"].hide()
         if mode == "invisible":
-            app.map.layer["modelmaker_sfincs_hmt"].set_mode("invisible")
+            app.map.layer["modelmaker_sfincs_hmt"].hide()
 
     def add_layers(self):
         # Add Mapbox layers
@@ -367,6 +400,15 @@ class Toolbox(GenericToolbox):
         gdf = model.reggrid.to_vector_lines()
         app.map.layer["sfincs_hmt"].layer["grid"].set_data(gdf)
 
+        # Update grid summary
+        group = "modelmaker_sfincs_hmt"
+
+        app.gui.setvar(group, "resolution_str", "Resolution: {}{}".format(app.gui.getvar(group, "res"),app.gui.getvar(group, "unit")))
+        app.gui.setvar(group, "nr_cells_str", "Number of cells: {}".format(app.gui.getvar(group, "nr_cells")))
+        app.gui.setvar(group, "rotation_str", "Rotation amgle: {}".format(model.config.get("rotation")))
+        app.gui.setvar(group, "crs_str", "Coordinate system: {}".format(app.crs.to_string()))
+
+
         dlg.close()
 
     def generate_bathymetry(self):
@@ -383,6 +425,9 @@ class Toolbox(GenericToolbox):
 
         model.setup_dep(**setup_dep)
         self.setup_dict.update({"setup_dep": setup_dep})
+    
+        # show merged bathymetry on map
+        app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
 
         dlg.close()
 
@@ -414,8 +459,12 @@ class Toolbox(GenericToolbox):
             "mask": app.toolbox[group].mask_init_polygon
             if not app.toolbox[group].mask_init_polygon.empty
             else None,
-            "include_mask": app.toolbox[group].mask_include_polygon,
-            "exclude_mask": app.toolbox[group].mask_exclude_polygon,
+            "include_mask": app.toolbox[group].mask_include_polygon
+            if not app.toolbox[group].mask_include_polygon.empty
+            else None,
+            "exclude_mask": app.toolbox[group].mask_exclude_polygon
+            if not app.toolbox[group].mask_exclude_polygon.empty
+            else None,
             "zmin": app.gui.getvar(group, "mask_active_zmin"),
             "zmax": app.gui.getvar(group, "mask_active_zmax"),
             "drop_area": app.gui.getvar(group, "mask_active_drop_area"),
@@ -432,39 +481,45 @@ class Toolbox(GenericToolbox):
         if gdf is not None:
             app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
 
+        # update bathymetry on map
+        app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
+
         dlg.close()
 
-    def update_mask_bounds(self):
+    def update_mask_bounds(self, btype):
         model = app.model["sfincs_hmt"].domain
 
-        dlg = app.gui.window.dialog_wait("Generating mask boundaries ...")
-
         group = "modelmaker_sfincs_hmt"
-        setup_mask_bounds = {
-            "btype": "waterlevel",
-            "include_mask": app.toolbox[group].wlev_include_polygon
-            if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
-            else None,
-            "zmin": app.gui.getvar(group, "wlev_zmin"),
-            "zmax": app.gui.getvar(group, "wlev_zmax"),
-            "reset_bounds": app.gui.getvar(group, "wlev_reset"),
-        }
 
-        model.setup_mask_bounds(**setup_mask_bounds)
-        self.setup_dict.update({"setup_mask_bounds": setup_mask_bounds})
+        if btype == "waterlevel":
+            dlg = app.gui.window.dialog_wait("Generating waterlevel boundaries ...")
 
-        setup_mask_bounds2 = {
-            "btype": "outflow",
-            "include_mask": app.toolbox[group].outflow_include_polygon
-            if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
-            else None,
-            "zmin": app.gui.getvar(group, "outflow_zmin"),
-            "zmax": app.gui.getvar(group, "outflow_zmax"),
-            "reset_bounds": app.gui.getvar(group, "outflow_reset"),
-        }
+            setup_mask_bounds = {
+                "btype": "waterlevel",
+                "include_mask": app.toolbox[group].wlev_include_polygon
+                if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
+                else None,
+                "zmin": app.gui.getvar(group, "wlev_zmin"),
+                "zmax": app.gui.getvar(group, "wlev_zmax"),
+                "reset_bounds": True,
+            }
 
-        app.model["sfincs_hmt"].domain.setup_mask_bounds(**setup_mask_bounds2)
-        self.setup_dict.update({"setup_mask_bounds2": setup_mask_bounds2})
+            model.setup_mask_bounds(**setup_mask_bounds)
+            self.setup_dict.update({"setup_mask_bounds": setup_mask_bounds})
+        elif btype == "outflow":
+            dlg = app.gui.window.dialog_wait("Generating outflow boundaries ...")
+            setup_mask_bounds2 = {
+                "btype": "outflow",
+                "include_mask": app.toolbox[group].outflow_include_polygon
+                if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
+                else None,
+                "zmin": app.gui.getvar(group, "outflow_zmin"),
+                "zmax": app.gui.getvar(group, "outflow_zmax"),
+                "reset_bounds": True,
+            }
+
+            app.model["sfincs_hmt"].domain.setup_mask_bounds(**setup_mask_bounds2)
+            self.setup_dict.update({"setup_mask_bounds2": setup_mask_bounds2})
 
         mask = model.mask
 
@@ -473,25 +528,23 @@ class Toolbox(GenericToolbox):
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_data(gdf_wlev)
 
         gdf_outflow = mask2gdf(mask, option="outflow")
-        if gdf_wlev is not None:
+        if gdf_outflow is not None:
             app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_data(
                 gdf_outflow
             )
 
         dlg.close()
 
-    def reset_mask_bounds(self):
+    def reset_mask_bounds(self, btype):
         model = app.model["sfincs_hmt"].domain
 
-        group = "modelmaker_sfincs_hmt"
-        if app.gui.getvar(group, "wlev_reset"):
+        if btype == "waterlevel":
             model.setup_mask_bounds(reset_bounds=True, btype="waterlevel")
             # remove old waterlevel mask data
             app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].clear()
             # remove settings from setup_dict
             self.setup_dict.pop("setup_mask_bounds", None)
-
-        if app.gui.getvar(group, "outflow_reset"):
+        elif btype == "outflow":
             model.setup_mask_bounds(reset_bounds=True, btype="outflow")
             # remove old outflow mask data
             app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].clear()

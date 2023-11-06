@@ -11,7 +11,7 @@ from delftdashboard.operations import map
 
 def select(*args):
     map.update()
-    app.map.layer["hurrywave"].layer["observation_points_regular"].set_mode("active")
+    app.map.layer["hurrywave"].layer["observation_points_regular"].activate()
     update()
 
 def edit(*args):

@@ -1,0 +1,72 @@
+  window:
+    title: Grid properties
+    width: 320
+    height: 150
+    variable_group: modelmaker_sfincs_hmt
+    module: toolboxes.modelmaker_sfincs_hmt.domain
+    modal: True
+    cancel: True
+  element:
+  - style: edit
+    position:
+      x: 100
+      y: 120
+      width: 60
+      height: 20
+    text: Origin X-direction
+    variable: x0
+    method: edit_origin
+  - style: edit
+    position:
+      x: 250
+      y: 120
+      width: 60
+      height: 20
+    text: Origin Y-direction
+    variable: y0
+    method: edit_origin
+  - style: edit
+    position:
+      x: 100
+      y: 95
+      width: 60
+      height: 20
+    text: Nr. cells in X-direction
+    variable: mmax
+    method: edit_nmmax
+  - style: edit
+    position:
+      x: 250
+      y: 95
+      width: 60
+      height: 20
+    text: Nr. cells in Y-direction
+    variable: nmax
+    method: edit_nmmax
+  - style: edit
+    position:
+      x: 100
+      y: 70
+      width: 60
+      height: 20
+    text: Resolution X-direction
+    variable: dx
+    method: edit_dxdy
+  - style: edit
+    position:
+      x: 250
+      y: 70
+      width: 60
+      height: 20
+    text: Resolution Y-direction
+    variable: dy
+    method: edit_dxdy
+  - style: edit
+    position:
+      x: 100
+      y: 45
+      width: 60
+      height: 20
+    text: Rotation of grid
+    variable: rotation
+    method: edit_rotation

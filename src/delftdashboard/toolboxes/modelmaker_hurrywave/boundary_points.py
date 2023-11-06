@@ -9,9 +9,9 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 def select(*args):
-    # De-activate existing layers
+    # De-activate() existing layers
     map.update()
-    app.map.layer["hurrywave"].layer["grid"].set_mode("active")
+    app.map.layer["hurrywave"].layer["grid"].activate()
 
 def create_boundary_points(*args):
     app.toolbox["modelmaker_hurrywave"].create_boundary_points()

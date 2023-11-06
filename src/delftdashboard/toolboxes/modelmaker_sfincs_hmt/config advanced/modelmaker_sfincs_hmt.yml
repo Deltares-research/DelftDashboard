@@ -10,15 +10,21 @@ element:
   - string: Domain
     module: toolboxes.modelmaker_sfincs_hmt.domain
     element: domain.yml
-  - string: Bed levels
+  - string: Bathymetry
     module: toolboxes.modelmaker_sfincs_hmt.bathymetry
     element: bathymetry.yml
-  - string: Active Cells
+  - string: Roughness
+    module: toolboxes.modelmaker_sfincs_hmt.roughness
+    element: roughness.yml
+  - string: Mask Active Cells
     module: toolboxes.modelmaker_sfincs_hmt.mask_active_cells
     element: mask_active_cells.yml
-  - string: Boundary Cells
+  - string: Mask Boundary Cells
     module: toolboxes.modelmaker_sfincs_hmt.mask_boundary_cells
     element: mask_boundary_cells.yml
-  - string: Build model
+  - string: Sub Grid
     module: toolboxes.modelmaker_sfincs_hmt.subgrid
-    element: build.yml
+    element: subgrid.yml
+  - string: Infiltration
+    module: toolboxes.modelmaker_sfincs_hmt.infiltration
+    element: infiltration.yml

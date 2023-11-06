@@ -11,15 +11,15 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 def select(*args):
-    # De-activate existing layers
+    # De-activate() existing layers
     map.update()
     # Show the mask include and exclude polygons
-    app.map.layer["modelmaker_hurrywave"].layer["mask_include"].set_mode("active")
-    app.map.layer["modelmaker_hurrywave"].layer["mask_exclude"].set_mode("active")
+    app.map.layer["modelmaker_hurrywave"].layer["mask_include"].activate()
+    app.map.layer["modelmaker_hurrywave"].layer["mask_exclude"].activate()
     # Show the grid and mask
-    app.map.layer["hurrywave"].layer["grid"].set_mode("active")
-    app.map.layer["hurrywave"].layer["mask_include"].set_mode("active")
-    app.map.layer["hurrywave"].layer["mask_boundary"].set_mode("active")
+    app.map.layer["hurrywave"].layer["grid"].activate()
+    app.map.layer["hurrywave"].layer["mask_include"].activate()
+    app.map.layer["hurrywave"].layer["mask_boundary"].activate()
 
 def draw_include_polygon(*args):
     app.map.layer["modelmaker_hurrywave"].layer["mask_include"].crs = app.crs
