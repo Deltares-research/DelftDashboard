@@ -35,10 +35,17 @@ def remove_datasource(*args):
 def deselect_aggregation(name):
     current_list_string = app.gui.getvar("fiat", "loaded_aggregation_files_string")
     current_list_value = app.gui.getvar("fiat", "loaded_aggregation_files_value")
-    current_list_string.remove(name)
-    current_list_value = [i for i in current_list_value if name not in str(i)]
-    app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
-    app.gui.setvar("fiat", "loaded_aggregation_files_value", current_list_value)
+    aggregation_table = app.gui.getvar("fiat", "aggregation_table")
+    if name in aggregation_table["File"].values:
+        app.gui.window.dialog_info(
+            text="File source can't be removed when selected in the 'Selected Attributes' table.",
+            title="Source can't be removed.",
+        )
+    else:
+        current_list_string.remove(name)
+        current_list_value = [i for i in current_list_value if name not in str(i)]
+        app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
+        app.gui.setvar("fiat", "loaded_aggregation_files_value", current_list_value)
 
 def load_aggregation_file(*args):
     fn = app.gui.window.dialog_open_file(
@@ -174,3 +181,5 @@ def display_aggregation_zone(*args):
         )
     else:
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
+def remove_attribute(*args):
+    print("remove")

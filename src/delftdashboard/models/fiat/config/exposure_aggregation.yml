@@ -76,11 +76,18 @@ element:
   variable: aggregation_table_name
   option_value:
      variable: aggregation_table
-
+- style: pushbutton
+  position:
+    x: 100
+    y: 15
+    width: 50
+    height: 20
+  text: Remove
+  method: remove_attribute
 - style: checkbox
   position:
-    x: 400
-    y: 10
+    x: 620
+    y: 95
     width: 145
     height: 20
   text: Display attribute
