@@ -66,8 +66,10 @@ element:
   text_position: "above"
   selection_type: extended
   sortable: true
+  variable: aggregation_table_name
   option_value:
-    variable: aggregation_table
+     variable: aggregation_table
+
 - style: checkbox
   position:
     x: 400

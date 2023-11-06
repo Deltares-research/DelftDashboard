@@ -79,29 +79,44 @@ def open_gdf(*args):
 def write_input_to_table(*args):
     aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
     aggregation_label = [app.gui.getvar("fiat", "aggregation_label_string")]
-    file_index = app.gui.getvar("fiat", "loaded_aggregation_files")
-    file = app.gui.getvar("fiat", "loaded_aggregation_files_string")[file_index]
-    df_aggregation = pd.DataFrame(
-        {
-            "File": file,
-            "Attribute ID": aggregation_attribute,
-            "Attribute Label": aggregation_label,
-        }
-    )
-    df_all_aggregation = copy.deepcopy(app.gui.getvar("fiat", "aggregation_table"))
-
-    if len(df_all_aggregation) == 0:
-        df_all_aggregation = pd.DataFrame(
-            columns=["File", "Attribute ID", "Attribute Label"]
+    if aggregation_label[0] == None or len(aggregation_label[0]) == 0:
+        app.gui.window.dialog_info(
+            text="Please first define the Label name.",
+            title="No attribute label added",
         )
+    else:
+        file_index = app.gui.getvar("fiat", "loaded_aggregation_files")
+        file = app.gui.getvar("fiat", "loaded_aggregation_files_string")[file_index]
+        file_path = app.gui.getvar("fiat", "loaded_aggregation_files_value")[file_index]
+        df_aggregation = pd.DataFrame(
+            {
+                "File": file,
+                "Attribute ID": aggregation_attribute,
+                "Attribute Label": aggregation_label,
+                "File Path": file_path,
+            }
+         )
+        df_all_aggregation = copy.deepcopy(app.gui.getvar("fiat", "aggregation_table"))
 
-    added_aggregation = df_aggregation["File"].tolist()
-    added_aggregation_list = df_all_aggregation["File"].tolist()
+        if len(df_all_aggregation) == 0:
+            df_all_aggregation = pd.DataFrame(
+                columns=["File", "Attribute ID", "Attribute Label", "File Path"]
+            )
+        added_aggregation = df_aggregation["File"].tolist()
+        added_aggregation_list = df_all_aggregation["File"].tolist()
+
+        added_aggregation = df_aggregation["File"].tolist()
+        added_aggregation_list = df_all_aggregation["File"].tolist()
+        if added_aggregation[0] not in added_aggregation_list:
+            df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
+        df_all_aggregation.reset_index(drop=True, inplace=True)
+        app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
 
     if added_aggregation[0] not in added_aggregation_list:
         df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
     df_all_aggregation.reset_index(drop=True, inplace=True)
     app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
+
 
 def get_table_data(*args): 
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
@@ -111,14 +126,15 @@ def get_table_data(*args):
     for i in aggregation_files_values:
         if i.name in file_name:
             aggregation_fn.append(i.__str__())
-    for idx, row in aggregation_table.iterrows():
-        for name in aggregation_fn:
-            if row['File'] in name:
-                aggregation_table.at[idx, 'File'] = name
-    fn = aggregation_table["File"].tolist()
+    #for idx, row in aggregation_table.iterrows():
+    #    for name in aggregation_fn:
+    #        if row['File'] in name:
+    #            aggregation_table.at[idx, 'File'] = name
+    fn   = aggregation_table["File Path"].tolist()
     attribute   = aggregation_table["Attribute ID"].tolist()
     label = aggregation_table["Attribute Label"].tolist()
     return fn, attribute, label
+
 
 def add_aggregations(*args):
     fn, attribute, label = get_table_data()
