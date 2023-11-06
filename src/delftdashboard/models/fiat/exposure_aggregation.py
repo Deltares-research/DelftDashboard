@@ -22,20 +22,23 @@ def set_variables(*args):
     app.model["fiat"].set_input_variables()
 
 
-def deselect_aggregation(*args):
-    current_list_string = app.gui.getvar("fiat", "selected_aggregation_files_string")
-    deselected_aggregation = app.gui.getvar("fiat", "selected_aggregation_files")
+def remove_datasource(*args):
+    current_list_string = app.gui.getvar("fiat", "loaded_aggregation_files_string")
+    deselected_aggregation = app.gui.getvar("fiat", "loaded_aggregation_files")
     if deselected_aggregation > len(
         current_list_string
     ) or deselected_aggregation == len(current_list_string):
         deselected_aggregation = 0
     name = current_list_string[deselected_aggregation]
-    remove_datasource(name)
+    deselect_aggregation(name)
 
-def remove_datasource(name):
-    current_list_string = app.gui.getvar("fiat", "selected_aggregation_files_string")
+def deselect_aggregation(name):
+    current_list_string = app.gui.getvar("fiat", "loaded_aggregation_files_string")
+    current_list_value = app.gui.getvar("fiat", "loaded_aggregation_files_value")
     current_list_string.remove(name)
-    app.gui.setvar("fiat", "selected_aggregation_files_string", current_list_string)
+    current_list_value = [i for i in current_list_value if name not in str(i)]
+    app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
+    app.gui.setvar("fiat", "loaded_aggregation_files_value", current_list_value)
 
 def load_aggregation_file(*args):
     fn = app.gui.window.dialog_open_file(
