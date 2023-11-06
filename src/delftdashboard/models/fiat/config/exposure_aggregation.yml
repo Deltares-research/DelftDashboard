@@ -2,10 +2,9 @@ element:
 - style: listbox
   position:
       x: 10
-      y: 65
+      y: 45
       width: 150
       height: 50
-  text: "Loaded datasets"
   text_position: "above"
   variable: loaded_aggregation_files
   select: index
@@ -14,23 +13,31 @@ element:
 - style: pushbutton
   position:
     x: 10
-    y: 30
+    y: 105
     width: 80
     height: 20
   text: "Load source"
   method: load_aggregation_file
 - style: pushbutton
   position:
-    x: 110
-    y: 30
+    x: 15
+    y: 15
     width: 50
     height: 20
-  text: "select"
+  text: Select
   method: open_gdf
+- style: pushbutton
+  position:
+    x: 100
+    y: 15
+    width: 50
+    height: 20
+  text: Remove
+  method: remove_datasource
 - style: popupmenu
   position:
     x: 250
-    y: 95
+    y: 80
     width: 115
     height: 20
   text: "Attribute ID:"
@@ -42,7 +49,7 @@ element:
 - style: edit
   position:
     x: 250
-    y: 65
+    y: 50
     width: 50
     height: 18
   text: "Label:"
@@ -50,7 +57,7 @@ element:
 - style: pushbutton
   position:
     x: 220
-    y: 30
+    y: 15
     width: 50
     height: 20
   text: Add

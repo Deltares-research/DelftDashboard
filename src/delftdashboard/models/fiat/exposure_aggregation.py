@@ -30,14 +30,12 @@ def deselect_aggregation(*args):
     ) or deselected_aggregation == len(current_list_string):
         deselected_aggregation = 0
     name = current_list_string[deselected_aggregation]
-    deselection(name)
+    remove_datasource(name)
 
-
-def deselection(name):
+def remove_datasource(name):
     current_list_string = app.gui.getvar("fiat", "selected_aggregation_files_string")
     current_list_string.remove(name)
     app.gui.setvar("fiat", "selected_aggregation_files_string", current_list_string)
-
 
 def load_aggregation_file(*args):
     fn = app.gui.window.dialog_open_file(
@@ -66,14 +64,21 @@ def delete_loaded_file(*args):
 
 def open_gdf(*args):
     index = app.gui.getvar("fiat", "loaded_aggregation_files")
-    path = app.gui.getvar("fiat", "loaded_aggregation_files_value")[index]
-    gdf = gpd.read_file(path)
-    list_columns = list(gdf.columns)
-    app.gui.setvar("fiat", "aggregation_file_field_name_value", list_columns)
-    app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
-    aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
-    if len(aggregation_attribute) > 0:
-        app.gui.setvar("fiat", "aggregation_file_field_name", 0)
+    file_list = app.gui.getvar("fiat", "loaded_aggregation_files_value")
+    if len(file_list) == 0:
+        app.gui.window.dialog_info(
+            text="Please load a datasource.",
+            title="No datasource",
+        )
+    else:
+        path = app.gui.getvar("fiat", "loaded_aggregation_files_value")[index]
+        gdf = gpd.read_file(path)
+        list_columns = list(gdf.columns)
+        app.gui.setvar("fiat", "aggregation_file_field_name_value", list_columns)
+        app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
+        aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
+        if len(aggregation_attribute) > 0:
+            app.gui.setvar("fiat", "aggregation_file_field_name", 0)
 
 
 def write_input_to_table(*args):
