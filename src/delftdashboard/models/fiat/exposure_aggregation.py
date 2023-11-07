@@ -116,8 +116,6 @@ def write_input_to_table(*args):
         added_aggregation = df_aggregation["File"].tolist()
         added_aggregation_list = df_all_aggregation["File"].tolist()
 
-        added_aggregation = df_aggregation["File"].tolist()
-        added_aggregation_list = df_all_aggregation["File"].tolist()
         if added_aggregation[0] not in added_aggregation_list:
             df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
         df_all_aggregation.reset_index(drop=True, inplace=True)
