@@ -149,8 +149,8 @@ def add_aggregations(*args):
 def display_aggregation_zone(*args):
     fn, attribute, label = get_table_data()
     index = app.gui.getvar("fiat", "aggregation_table_name")[0]
-    attribute_to_visualize = str(attribute[index]) # Needs to be adjusted
-    data_to_visualize = Path(fn[index])# Needs to be adjusted
+    attribute_to_visualize = str(attribute[index]) 
+    data_to_visualize = Path(fn[index])
     gdf = gpd.read_file(data_to_visualize)
     paint_properties = app.model["fiat"].create_paint_properties(
         gdf, attribute_to_visualize, type="polygon", opacity=0.5
