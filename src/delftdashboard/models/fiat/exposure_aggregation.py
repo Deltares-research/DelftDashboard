@@ -123,12 +123,6 @@ def write_input_to_table(*args):
         df_all_aggregation.reset_index(drop=True, inplace=True)
         app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
 
-    if added_aggregation[0] not in added_aggregation_list:
-        df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
-    df_all_aggregation.reset_index(drop=True, inplace=True)
-    app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
-
-
 def get_table_data(*args): 
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
     aggregation_table = app.gui.getvar("fiat", "aggregation_table")
