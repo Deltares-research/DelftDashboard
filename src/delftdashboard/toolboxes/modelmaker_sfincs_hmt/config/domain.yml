@@ -1,11 +1,18 @@
 element:
 - style: panel
-  title: "Model extent"
+  title: "Model type: "
   position:
     x: 10
     y: 10
     width: 120
     height: 120
+  dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: grid_outline
+        operator: ge
+        value: 0        
   element:
   - style: popupmenu
     position:
@@ -13,7 +20,61 @@ element:
       y: 90
       width: 100
       height: 20
-    text: Select method
+    select: index
+    variable: model_type_index
+    option_string:
+      variable: model_type  
+    method: select_model_type
+  - style: text
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    text: "Are you modelling: "
+  - style: checkbox
+    position:
+      x: 10
+      y: 45
+      width: 100
+      height: 20
+    text: "Rainfall"
+    text_position: right
+    variable: include_rainfall
+    tooltip: "When you want to rainfall, we recommend to delineate your model domain with watershed boundaries."
+    method: select_model_type   
+  - style: checkbox
+    position:
+      x: 10
+      y: 25
+      width: 100
+      height: 20
+    text: "River discharge"
+    text_position: right
+    variable: include_rivers
+    tooltip: "When you want to river discharge, we recommend to delineate your model domain with watershed boundaries."
+    method: select_model_type     
+- style: panel
+  title: "Define model extent"
+  position:
+    x: 140
+    y: 10
+    width: 160
+    height: 120
+  dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: grid_outline
+        operator: ge
+        value: 0     
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 140
+      height: 20
     tooltip: Select method to determine model extent
     select: index
     method: select_method
@@ -21,12 +82,12 @@ element:
     option_string:
       variable: setup_grid_methods
   - style: pushbutton
-    text: Draw Bounding Box
+    text: Start drawing
     tooltip: Draw a bounding box around the area of interest
     position:
       x: 10
       y: 65
-      width: 100
+      width: 140
       height: 20
     method: draw_bbox
     dependency:
@@ -37,12 +98,12 @@ element:
         operator: eq
         value: 0 
   - style: pushbutton
-    text: Draw Area of Interest
+    text: Start drawing
     tooltip: Draw a polygon describing the area of interest
     position:
       x: 10
       y: 65
-      width: 100
+      width: 140
       height: 20
     method: draw_aio
     dependency:
@@ -53,12 +114,12 @@ element:
         operator: eq
         value: 1
   - style: pushbutton
-    text: Load Area of Interest
+    text: Load
     tooltip: Load a polygon describing the area of interest
     position:
       x: 10
       y: 65
-      width: 100
+      width: 140
       height: 20
     method: load_aio
     dependency:
@@ -67,131 +128,85 @@ element:
       check:
       - variable: setup_grid_methods_index
         operator: eq
-        value: 2   
-  - style: pushbutton
-    text: Fly to site
-    tooltip: Move the map to the area of interest
+        value: 2
+- style: panel
+  title: "Define model resolution: "
+  position:
+    x: 310
+    y: 10
+    width: 160
+    height: 120
+  dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: grid_outline
+        operator: eq
+        value: 1            
+  element:          
+  - style: text
     position:
       x: 10
-      y: 40
-      width: 100
+      y: 90
+      width: 70
       height: 20
-    method: fly_to_site
-    dependency:
-      - action: enable
-        checkfor: all
-        check:
-        - variable: grid_outline
-          operator: eq
-          value: 1             
+    text: "Model grid resolution: "      
+  - style: edit
+    position:
+      x: 85
+      y: 90
+      width: 45
+      height: 20
+    variable: res
+    method: edit_res
+  - style: text
+    position:
+      x: 130
+      y: 90
+      width: 20
+      height: 20
+    variable: unit      
   - style: pushbutton
     text: Generate Grid
     tooltip: Generate a grid within the area of interest
     position:
       x: 10
-      y: 15
-      width: 100
+      y: 65
+      width: 140
       height: 20
-    method: generate_grid
-    dependency:
-      - action: enable
-        checkfor: all
-        check:
-        - variable: grid_outline
-          operator: eq
-          value: 1     
-- style: panel
-  title: "Grid parameters"
+    method: generate_grid  
+- style: text
   position:
-    x: 140
-    y: 10
-    width: 230
-    height: 120
-  element:
-  - style: edit
-    position:
-      x: 60
-      y: 90
-      width: 60
-      height: 20
-    text: X0
-    variable: x0
-    method: edit_origin
-  - style: edit
-    position:
-      x: 160
-      y: 90
-      width: 60
-      height: 20
-    text: Y0
-    variable: y0
-    method: edit_origin
-  - style: edit
-    position:
-      x: 60
-      y: 65
-      width: 60
-      height: 20
-    text: MMax
-    variable: mmax
-    method: edit_nmmax
-  - style: edit
-    position:
-      x: 160
-      y: 65
-      width: 60
-      height: 20
-    text: NMax
-    variable: nmax
-    method: edit_nmmax
-  - style: edit
-    position:
-      x: 60
-      y: 40
-      width: 60
-      height: 20
-    text: dX
-    variable: dx
-    method: edit_dxdy
-  - style: edit
-    position:
-      x: 160
-      y: 40
-      width: 60
-      height: 20
-    text: dY
-    variable: dy
-    method: edit_dxdy
-  - style: edit
-    position:
-      x: 60
-      y: 15
-      width: 60
-      height: 20
-    text: Rotation
-    variable: rotation
-    method: edit_rotation
-- style: pushbutton
-  text: Read Set-up File
+    x: -10
+    y: 110
+    width: 140
+    height: 20
+  text: "Model domain summary: "
+- style: text
+  position:
+    x: -10
+    y: 80
+    width: 140
+    height: 20
+  variable: resolution_str
+- style: text
   position:
     x: -10
     y: 60
-    width: 120
+    width: 140
     height: 20
-  method: read_setup_yaml
-- style: pushbutton
-  text: Write Set-up File
+  variable: nr_cells_str
+- style: text
   position:
     x: -10
-    y: 35
-    width: 120
+    y: 40
+    width: 140
     height: 20
-  method: write_setup_yaml
-- style: pushbutton
-  text: Build Model
+  variable: rotation_str
+- style: text
   position:
     x: -10
-    y: 10
-    width: 120
+    y: 20
+    width: 140
     height: 20
-  method: build
+  variable: crs_str

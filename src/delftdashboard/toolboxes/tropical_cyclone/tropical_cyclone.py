@@ -18,7 +18,7 @@ from cht.tropical_cyclone.cyclone_track_database import CycloneTrackDatabase
 # Callbacks
 
 def select(*args):
-    # De-activate existing layers
+    # De-activate() existing layers
     app.update_map()
     # Tab selected
     app.toolbox["tropical_cyclone"].set_layer_mode("active")
@@ -50,13 +50,13 @@ class Toolbox(GenericToolbox):
 
     def set_layer_mode(self, mode):
         if mode == "active":
-            app.map.layer[self.name].layer["cyclone_track"].set_mode("active")
+            app.map.layer[self.name].layer["cyclone_track"].activate()
         elif mode == "inactive":
             # Make all layers invisible
-            app.map.layer[self.name].set_mode("invisible")
+            app.map.layer[self.name].hide()
         if mode == "invisible":
             # Make all layers invisible
-            app.map.layer[self.name].set_mode("invisible")
+            app.map.layer[self.name].hide()
 
     def add_layers(self):
         # Add Mapbox layers
@@ -92,7 +92,7 @@ class Toolbox(GenericToolbox):
     def plot_track(self):
         layer = app.map.layer[self.name].layer["cyclone_track"]
         layer.set_data(self.tc.track)
-        layer.set_mode("active")
+        layer.activate()
 
     def build_spiderweb(self):
         self.tc.spiderweb_radius = 500.0

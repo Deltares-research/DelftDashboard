@@ -6,3 +6,10 @@ position:
   y: 200
   width: 120
   height: 200
+dependency:
+- action: visible
+  checkfor: all
+  check:
+  - variable: fiat_active
+    operator: eq
+    value: True

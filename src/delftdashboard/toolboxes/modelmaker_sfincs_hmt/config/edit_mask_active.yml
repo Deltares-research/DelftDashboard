@@ -1,0 +1,61 @@
+window:
+  title: Change default settings for active domain
+  width: 400
+  height: 180
+  variable_group: modelmaker_sfincs_hmt
+  module: toolboxes.modelmaker_sfincs_hmt.mask_active_cells
+  modal: True
+  cancel: True
+element:
+- style: panel
+  title: "Active domain settings"
+  position:
+    x: 10
+    y: 40
+    width: 380
+    height: 130
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 105
+      width: 360
+      height: 20
+    text: "The default settings are based on the type of model you are making (domain tab). In case you used \n
+      watershed data to define your domain, we recommend to include the entire watersched in the active domain."
+  - style: edit
+    position:
+      x: 10
+      y: 80
+      width: 45
+      height: 20
+    text: Maximum elevation (m) to include in your active domain
+    text_position: right
+    variable: mask_active_zmax
+  - style: edit
+    position:
+      x: 10
+      y: 55
+      width: 45
+      height: 20
+    text: Minimum elevation (m) to include in your active domain
+    text_position: right
+    variable: mask_active_zmin
+  - style: edit
+    position:
+      x: 10
+      y: 30
+      width: 45
+      height: 20
+    text: Maximum area (km2) of cells surrounded by active cells to include in your active domain
+    text_position: right
+    variable: mask_active_fill_area
+  - style: edit
+    position:
+      x: 10
+      y: 5
+      width: 45
+      height: 20
+    text: Maxmium area (km2) of isolated cells to remove from your active domain
+    text_position: right
+    variable: mask_active_drop_area   

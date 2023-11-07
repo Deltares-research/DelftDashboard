@@ -3,20 +3,20 @@ from delftdashboard.operations import map
 
 from hydromt_sfincs import utils
 import geopandas as gpd
+import os
 
 def select(*args):
     # De-activate existing layers
     map.update()
     # Show the mask include and exclude polygons
-    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_init"].set_mode("active")
-    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].set_mode("active")
-    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].set_mode("active")
+    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_init"].activate()
+    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].activate()
+    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].activate()
     # Show the grid and mask
-    app.map.layer["sfincs_hmt"].layer["grid"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_active"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode("active")
-
+    app.map.layer["sfincs_hmt"].layer["grid"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask_active"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].activate()
 
 def select_mask_init_polygon_method(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_init_polygon_methods_index", args[0])
@@ -204,9 +204,22 @@ def exclude_polygon_selected(index):
     update()
 
 
+def mask_add_tick_box(*args):
+    app.gui.setvar("modelmaker_sfincs_hmt", "mask_active_add", args[0])
+
+def mask_del_tick_box(*args):
+    app.gui.setvar("modelmaker_sfincs_hmt", "mask_active_del", args[0])
+
 def tick_box(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_active_reset", args[0])
 
+def edit_mask_active(*args):
+    toolbox_name = "modelmaker_sfincs_hmt"
+    path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
+    pop_win_config_path  = os.path.join(path, "edit_mask_active.yml")
+    okay, data = app.gui.popup(pop_win_config_path , None)
+    if not okay:
+        return
 
 def update():
     nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon)

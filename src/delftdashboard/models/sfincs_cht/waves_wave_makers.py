@@ -9,9 +9,9 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 def select(*args):
-    # De-activate existing layers
+    # De-activate() existing layers
     map.update()
-    app.map.layer["sfincs_cht"].layer["wave_makers"].set_mode("active")
+    app.map.layer["sfincs_cht"].layer["wave_makers"].activate()
     update()
 
 def set_model_variables(*args):

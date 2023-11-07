@@ -100,9 +100,9 @@ class Toolbox(GenericToolbox):
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Make all layers invisible
-            app.map.layer["modelmaker_hurrywave"].set_mode("invisible")
+            app.map.layer["modelmaker_hurrywave"].hide()
         if mode == "invisible":
-            app.map.layer["modelmaker_hurrywave"].set_mode("invisible")
+            app.map.layer["modelmaker_hurrywave"].hide()
 
     def add_layers(self):
         # Add Mapbox layers

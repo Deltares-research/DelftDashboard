@@ -1,0 +1,16 @@
+  window:
+    title: Dataset properties
+    width: 320
+    height: 150
+    variable_group: modelmaker_sfincs_hmt
+    module: toolboxes.modelmaker_sfincs_hmt.bathymetry
+    modal: True
+    cancel: True
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 10
+      width: 300
+      height: 130
+    variable: selected_bathymetry_dataset_meta
