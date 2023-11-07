@@ -129,10 +129,6 @@ def get_table_data(*args):
     for i in aggregation_files_values:
         if i.name in file_name:
             aggregation_fn.append(i.__str__())
-    #for idx, row in aggregation_table.iterrows():
-    #    for name in aggregation_fn:
-    #        if row['File'] in name:
-    #            aggregation_table.at[idx, 'File'] = name
     fn   = aggregation_table["File Path"].tolist()
     attribute   = aggregation_table["Attribute ID"].tolist()
     label = aggregation_table["Attribute Label"].tolist()
