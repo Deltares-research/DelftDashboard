@@ -90,3 +90,8 @@ def select_model(model_name):
     # Called from menu
     app.active_model = app.model[model_name]
     app.model[model_name].select()
+
+    if model_name.lower() == "fiat":
+        app.gui.setvar("_main", "fiat_active", True)
+    else:
+        app.gui.setvar("_main", "fiat_active", False)
