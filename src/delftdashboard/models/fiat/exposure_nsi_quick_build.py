@@ -65,6 +65,7 @@ def build_nsi_exposure(*args):
 
         df = pd.DataFrame(columns=["Assigned"])
         df["Secondary Object Type"] = list(gdf["Secondary Object Type"].unique())
+        ## TODO: add the nr of stories and the basement
         df.fillna("", inplace=True)
         
         app.gui.setvar(model, "exposure_categories_to_link", df)
