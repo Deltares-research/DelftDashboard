@@ -21,6 +21,7 @@ def select(*args):
     app.map.layer["sfincs_cht"].layer["mask_include"].activate()
     app.map.layer["sfincs_cht"].layer["mask_open_boundary"].activate()
     app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].activate()
+    update()
 
 def draw_open_boundary_polygon(*args):
 #    app.map.layer["modelmaker_sfincs_cht"].layer["open_boundary_polygon"].crs = app.crs
@@ -30,22 +31,16 @@ def delete_open_boundary_polygon(*args):
     if len(app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon) == 0:
         return
     index = app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_polygon_index")
-    # or: iac = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon.loc[index, "id"]
     # Delete from map
-    app.map.layer["modelmaker_sfincs_cht"].layer["open_boundary_polygon"].delete_feature(feature_id)
-    # Delete from app
-    app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon = app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon.drop(index).reset_index()
-
-    # If the last polygon was deleted, set index to last available polygon
-    if index > len(app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon) - 1:
-        app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_index", len(app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon) - 1)
+    gdf = app.map.layer["modelmaker_sfincs_cht"].layer["open_boundary_polygon"].delete_feature(index)
+    app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon = gdf
     update()
 
 def load_open_boundary_polygon(*args):
-    fname = app.gui.window.dialog_open_file("Select open boundary polygon file ...", filter="*.geojson")
-    if fname[0]:
-        app.toolbox["modelmaker_sfincs_cht"].open_boundary_file_name = fname[2]
+    fname, okay = app.gui.window.dialog_open_file("Select open boundary polygon file ...", filter="*.geojson")
+    if not okay:
+        return
+    app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_file", fname[2])
     app.toolbox["modelmaker_sfincs_cht"].read_open_boundary_polygon()
     app.toolbox["modelmaker_sfincs_cht"].plot_open_boundary_polygon()
 
@@ -54,8 +49,7 @@ def save_open_boundary_polygon(*args):
 
 def select_open_boundary_polygon(*args):
     index = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_cht"].boundary_open_polygon.loc[index, "id"]
-    app.map.layer["modelmaker_sfincs_cht"].layer["open_boundary_polygon"].activate_feature(feature_id)
+    app.map.layer["modelmaker_sfincs_cht"].layer["open_boundary_polygon"].activate_feature(index)
 
 def open_boundary_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon = gdf
@@ -79,22 +73,16 @@ def delete_outflow_boundary_polygon(*args):
     if len(app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon) == 0:
         return
     index = app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_index")
-    # or: iac = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon.loc[index, "id"]
     # Delete from map
-    app.map.layer["modelmaker_sfincs_cht"].layer["outflow_boundary_polygon"].delete_feature(feature_id)
-    # Delete from app
-    app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon = app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon.drop(index).reset_index()
-
-    # If the last polygon was deleted, set index to last available polygon
-    if index > len(app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon) - 1:
-        app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_index", len(app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon) - 1)
+    gdf = app.map.layer["modelmaker_sfincs_cht"].layer["outflow_boundary_polygon"].delete_feature(index)
+    app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon = gdf
     update()
 
 def load_outflow_boundary_polygon(*args):
-    fname = app.gui.window.dialog_open_file("Select outflow boundary polygon file ...", filter="*.geojson")
-    if fname[0]:
-        app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_file_name = fname[2]
+    fname, okay = app.gui.window.dialog_open_file("Select outflow boundary polygon file ...", filter="*.geojson")
+    if not okay:
+        return
+    app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_file", fname[2])
     app.toolbox["modelmaker_sfincs_cht"].read_outflow_boundary_polygon()
     app.toolbox["modelmaker_sfincs_cht"].plot_outflow_boundary_polygon()
 
@@ -103,8 +91,7 @@ def save_outflow_boundary_polygon(*args):
 
 def select_outflow_boundary_polygon(*args):
     index = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon.loc[index, "id"]
-    app.map.layer["modelmaker_sfincs_cht"].layer["outflow_boundary_polygon"].activate_feature(feature_id)
+    app.map.layer["modelmaker_sfincs_cht"].layer["outflow_boundary_polygon"].activate_feature(index)
 
 def outflow_boundary_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon = gdf
@@ -122,7 +109,30 @@ def outflow_boundary_polygon_selected(index):
 
 
 def update():
-    app.toolbox["modelmaker_sfincs_cht"].update_polygons()
+    # Open
+    nrp = len(app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon)
+    names = []
+    for ip in range(nrp):
+        names.append(str(ip + 1))
+    app.gui.setvar("modelmaker_sfincs_cht", "nr_open_boundary_polygons", nrp)
+    app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_names", names)
+    index = app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_polygon_index")
+    if index > nrp - 1:
+        index = max(nrp - 1, 0)
+    app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_index", index)
+
+    # Outflow
+    nrp = len(app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon)
+    names = []
+    for ip in range(nrp):
+        names.append(str(ip + 1))
+    app.gui.setvar("modelmaker_sfincs_cht", "nr_outflow_boundary_polygons", nrp)
+    app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_names", names)
+    index = app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_index")
+    if index > nrp - 1:
+        index = max(nrp - 1, 0)
+    app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_index", index)
+    # Update GUI
     app.gui.window.update()
 
 def update_mask(*args):

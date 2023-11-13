@@ -6,6 +6,7 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 from delftdashboard.app import app
+import pooch
 
 if __name__ == '__main__':
 

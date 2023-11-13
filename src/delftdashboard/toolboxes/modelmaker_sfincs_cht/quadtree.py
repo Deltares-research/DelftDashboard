@@ -17,7 +17,6 @@ def select(*args):
     app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].activate()
     app.map.layer["sfincs_cht"].layer["grid"].activate()
     app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].activate()
-
     # Strings for refinement levels
     levstr = []
     for i in range(10):
@@ -28,7 +27,8 @@ def select(*args):
             sfx = str(dx/(2**(i + 1))) + " m"
 
         levstr.append("x" + str(2**(i + 1)) + " (" + sfx + ")") 
-    app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_levels", levstr)    
+    app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_levels", levstr)
+    update()
 
 def draw_refinement_polygon(*args):
     app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].crs = app.crs
@@ -54,9 +54,10 @@ def delete_refinement_polygon(*args):
     update()
 
 def load_refinement_polygon(*args):
-    fname = app.gui.window.dialog_open_file("Select refinement polygon file ...", filter="*.geojson")
-    if fname[0]:
-        app.toolbox["modelmaker_sfincs_cht"].refinement_file_name = fname[2]
+    fname, okay = app.gui.window.dialog_open_file("Select refinement polygon file ...", filter="*.geojson")
+    if not okay:
+        return
+    app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_file", fname[2])
     app.toolbox["modelmaker_sfincs_cht"].read_refinement_polygon()
     app.toolbox["modelmaker_sfincs_cht"].plot_refinement_polygon()
     update()

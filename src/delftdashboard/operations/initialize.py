@@ -136,6 +136,11 @@ def initialize():
     app.gui.setvar("menu", "show_terrain", False)
     app.gui.setvar("menu", "layer_style", app.view["layer_style"])
 
+    # Layers tab
+    app.gui.setvar("layers", "contour_elevation", 0.0)
+    app.gui.setvar("layers", "buffer_land", 5000.0)
+    app.gui.setvar("layers", "buffer_sea", 2000.0)
+    app.gui.setvar("layers", "buffer_single", True)
 
     # Now build up GUI config
     build_gui_config()

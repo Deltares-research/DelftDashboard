@@ -78,10 +78,28 @@ element:
     width: 120
     height: 20
   method: generate_grid
+- style: checkbox
+  position:
+    x: 400
+    y: 110
+    width: 120
+    height: 20
+  text: SnapWave
+  variable: use_snapwave
+  method: use_snapwave
+- style: checkbox
+  position:
+    x: 400
+    y: 85
+    width: 120
+    height: 20
+  text: Sub-Grid Bathymetry
+  variable: use_subgrid
+  method: use_subgrid
 - style: pushbutton
   text: Read Set-up File
   position:
-    x: 400
+    x: 600
     y: 110
     width: 120
     height: 20
@@ -89,7 +107,7 @@ element:
 - style: pushbutton
   text: Write Set-up File
   position:
-    x: 400
+    x: 600
     y: 85
     width: 120
     height: 20
@@ -97,7 +115,7 @@ element:
 - style: pushbutton
   text: Build Model
   position:
-    x: 400
+    x: 600
     y: 60
     width: 120
     height: 20
