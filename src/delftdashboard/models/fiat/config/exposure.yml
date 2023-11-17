@@ -6,6 +6,9 @@ element:
     width: -10
     height: 160
   tab:
+  - string: Start
+    module: models.fiat.exposure_start
+    element: exposure_start.yml
   - string: NSI Quick Build
     module: models.fiat.exposure_nsi_quick_build
     element: exposure_nsi_quick_build.yml

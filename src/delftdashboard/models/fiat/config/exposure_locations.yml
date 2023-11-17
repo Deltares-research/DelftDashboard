@@ -16,21 +16,10 @@ element:
     width: 180
     height: 85
   element:
-  - style: popupmenu
-    position:
-      x: 10
-      y: 55
-      width: 160
-      height: 20
-    variable: asset_locations
-    option_string:
-      variable: asset_locations_string
-    option_value:
-      variable: asset_locations_value
   - style: pushbutton
     position:
       x: 10
-      y: 30
+      y: 55
       width: 100
       height: 20
     text: Load source
@@ -73,8 +62,8 @@ element:
     x: 230
     y: 10
     width: 150
-    height: 110
-  text: "Selected datasets"
+    height: 40
+  text: "Selected dataset"
   text_position: "above"
   variable: selected_asset_locations
   select: index

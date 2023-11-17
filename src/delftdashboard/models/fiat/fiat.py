@@ -42,6 +42,8 @@ class Model(GenericModel):
             fill_color="orange",
             line_color="transparent",
             hover_property="Secondary Object Type",
+            # big_data=True,
+            # min_zoom=13,
         )
 
         layer = app.map.add_layer("roads")
@@ -95,7 +97,11 @@ class Model(GenericModel):
         app.gui.setvar(group, "damage_curves_table", default_curves[["Exposure Link", "Damage Type", "Source", "Description"]])
         app.gui.setvar(group, "selected_damage_curve_database", "default_vulnerability_curves")
         app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
-        
+
+        # Model type #
+        app.gui.setvar(group, "model_type", "Start with NSI")
+        app.gui.setvar(group, "include_osm_roads", False)
+
         ## DISPLAY LAYERS ##
         damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
         damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
@@ -151,13 +157,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "use_svi", True)
         app.gui.setvar(group, "use_equity", True)
 
-        app.gui.setvar(
-            group,
-            "asset_locations_string",
-            ["National Structure Inventory (NSI)", "Upload file"],
-        )
-        app.gui.setvar(group, "asset_locations_value", ["nsi", "file"])
-        app.gui.setvar(group, "asset_locations", "nsi")
         app.gui.setvar(group, "damages_source_string", ["NSI", "Hazus", "Create"])
         app.gui.setvar(group, "damages_source_value", ["nsi", "hazus", "create"])
         app.gui.setvar(group, "damages_source", "nsi")

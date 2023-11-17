@@ -1,0 +1,50 @@
+element:
+- style: panel
+  title: Model setup
+  position:
+    x: 10
+    y: 10
+    width: 170
+    height: 120
+  element:
+  - style: radiobuttongroup
+    position:
+      x: 10
+      y: 70
+      width: 150
+    variable: model_type
+    option_string: ["Start with NSI", "Start from scratch"]
+    option_value:  ["Start with NSI", "Start from scratch"]
+    method: select_model_type
+  - style: checkbox
+    position:
+      x: 10
+      y: 40
+      width: 100
+      height: 20
+    text: Include OSM roads
+    variable: include_osm_roads
+
+- style: panel
+  title: Road settings
+  position:
+    x: 190
+    y: 10
+    width: 170
+    height: 120
+  dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: include_osm_roads
+        operator: eq
+        value: True
+  element:
+  - style: edit
+  position:
+    x: 10
+    y: 50
+    width: 80
+    height: 18
+  text: "Threshold value"
+  variable: road_damage_threshold

@@ -43,7 +43,7 @@ def build_roads_exposure_osm(*args):
 
 
 def display_roads(*args):
-    """Show/hide buildings layer""" 
+    """Show/hide roads layer""" 
     app.gui.setvar("fiat", "show_roads", args[0])
     if args[0]:
         app.model["fiat"].show_exposure_roads()
