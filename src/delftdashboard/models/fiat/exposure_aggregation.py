@@ -136,9 +136,20 @@ def get_table_data(*args):
 
 
 def add_aggregations(*args):
-    fn, attribute, label = get_table_data()
-    app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
-    print("Attributes added to model")
+    if app.model["fiat"].domain:
+        fn, attribute, label = get_table_data()
+        app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
+        print("Attributes added to model")
+        app.gui.window.dialog_info(
+        text="Your additional attributes were added to the model",
+        title="Added additional attributes",
+        )
+    else:
+        print("no active model")
+        app.gui.window.dialog_info(
+        text="Please create a model first.",
+        title="No active model",
+        )
     
 def display_aggregation_zone(*args):
     fn, attribute, label = get_table_data()
