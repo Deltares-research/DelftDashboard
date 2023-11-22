@@ -63,7 +63,7 @@ class Model(GenericModel):
             "aggregation_layer",
             type="choropleth",
             legend_position="top-right",
-            legend_title="Aggregation",
+            legend_title="replace with label name",
         )
 
     def set_layer_mode(self, mode):

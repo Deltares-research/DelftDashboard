@@ -190,7 +190,7 @@ def select_additional_attribute(*args):
             "aggregation_layer",
             type="choropleth",
             legend_position="top-right",
-            legend_title="Aggregation",
+            legend_title="replace with label name",
             hoover_property=attribute_to_visualize
         )
         app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
