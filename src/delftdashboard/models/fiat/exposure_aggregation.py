@@ -138,7 +138,7 @@ def get_table_data(*args):
 def add_aggregations(*args):
     if app.model["fiat"].domain:
         fn, attribute, label = get_table_data()
-        app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
+        app.active_model.domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
         print("Attributes added to model")
         app.gui.window.dialog_info(
         text="Your additional attributes were added to the model",
@@ -152,19 +152,40 @@ def add_aggregations(*args):
         )
     
 def display_aggregation_zone(*args):
-    fn, attribute, label = get_table_data()
-    index = app.gui.getvar("fiat", "aggregation_table_name")[0]
-    attribute_to_visualize = str(attribute[index]) 
-    data_to_visualize = Path(fn[index])
-    gdf = gpd.read_file(data_to_visualize)
-    paint_properties = app.model["fiat"].create_paint_properties(
-        gdf, attribute_to_visualize, type="polygon", opacity=0.5
-    )
-    legend = []  # Still needs to be made in the mapbox code
+    if app.gui.getvar("fiat","show_aggregation_zone"): 
+        select_additional_attribute()
+    else: 
+        app.map.layer["aggregation"].layer["aggregation_layer"].hide()
 
-    # Clear previously made layers and add a new one with the right properties
-    app.map.layer["aggregation"].layer["aggregation_layer"].clear()
-    if args[0]:
+
+def deselect_attribute(*args):
+    current_aggregation = app.gui.getvar("fiat", "aggregation_table")
+    index = app.gui.getvar("fiat", "aggregation_table_name")[0]
+    if index > len(
+        current_aggregation.values
+    ) or index == len(current_aggregation.values):
+        index = 0
+    current_aggregation = current_aggregation.drop(index, axis=0)
+    app.gui.setvar("fiat", "aggregation_table", current_aggregation)
+        
+def select_additional_attribute(*args):
+    """When selecting aggregation area highlight it and if it is activated"""
+    # Get info of area selection
+    index = app.gui.getvar(
+        "fiat", "aggregation_table_name"
+    )[0]  # get index of aggregation area
+    # Highlight area in map
+    if app.gui.getvar("fiat","show_aggregation_zone"): 
+        fn, attribute, label = get_table_data()
+        attribute_to_visualize = str(attribute[index]) 
+        data_to_visualize = Path(fn[index])
+        gdf = gpd.read_file(data_to_visualize)
+        legend = [] 
+        paint_properties = app.model["fiat"].create_paint_properties(
+            gdf, attribute_to_visualize, type="polygon", opacity=0.5
+        )
+        app.map.layer["aggregation"].layer["aggregation_layer"].clear()
+            
         app.map.layer["aggregation"].add_layer(
             "aggregation_layer",
             type="choropleth",
@@ -177,14 +198,4 @@ def display_aggregation_zone(*args):
         )
     else:
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
-
-def deselect_attribute(*args):
-    current_aggregation = app.gui.getvar("fiat", "aggregation_table")
-    index = app.gui.getvar("fiat", "aggregation_table_name")[0]
-    if index > len(
-        current_aggregation.values
-    ) or index == len(current_aggregation.values):
-        index = 0
-    current_aggregation = current_aggregation.drop(index, axis=0)
-    app.gui.setvar("fiat", "aggregation_table", current_aggregation)
-        
+    

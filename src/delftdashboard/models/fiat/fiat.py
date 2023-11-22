@@ -321,7 +321,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_primary_classification", None)
         app.gui.setvar(group, "show_secondary_classification", None)
         app.gui.setvar(group, "classification_field", None)
-        app.gui.setvar(group, "show_aggregation_zone", None)
+        app.gui.setvar(group, "show_aggregation_zone", True)
         app.gui.setvar(group, "selected_crs", "EPSG:4326")
         app.gui.setvar(group, "selected_scenario", "MyScenario")
         app.gui.setvar(group, "created_nsi_assets", None)
