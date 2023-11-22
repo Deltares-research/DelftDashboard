@@ -73,6 +73,7 @@ element:
   text_position: "above"
   selection_type: extended
   sortable: true
+  method: select_additional_attribute
   variable: aggregation_table_name
   option_value:
      variable: aggregation_table

@@ -138,7 +138,7 @@ def get_table_data(*args):
 def add_aggregations(*args):
     if app.model["fiat"].domain:
         fn, attribute, label = get_table_data()
-        app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
+        app.active_mode.domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
         print("Attributes added to model")
         app.gui.window.dialog_info(
         text="Your additional attributes were added to the model",
@@ -188,3 +188,15 @@ def deselect_attribute(*args):
     current_aggregation = current_aggregation.drop(index, axis=0)
     app.gui.setvar("fiat", "aggregation_table", current_aggregation)
         
+def select_additional_attribute(*args):
+    print("select additional attribute")
+    """When selecting aggregation area highlight it and if it is activated
+    # Get info of area selection
+    index = app.gui.getvar(
+        "fiat", "aggregation_table_name"
+    )  # get index of aggregation area
+    app.gui.getvar(
+        "fiat", "active_aggregation_area_type"
+    )  # get the active aggregation type used
+    # Highlight area in map
+    app.map.layer["aggregation"].layer["aggregation_layer"].select_by_index(index)"""
