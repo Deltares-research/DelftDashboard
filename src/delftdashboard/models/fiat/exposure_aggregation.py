@@ -189,11 +189,33 @@ def deselect_attribute(*args):
     app.gui.setvar("fiat", "aggregation_table", current_aggregation)
         
 def select_additional_attribute(*args):
-    print("select additional attribute")
     """When selecting aggregation area highlight it and if it is activated"""
     # Get info of area selection
     index = app.gui.getvar(
         "fiat", "aggregation_table_name"
-    )  # get index of aggregation area
+    )[0]  # get index of aggregation area
     # Highlight area in map
-    app.map.layer["aggregation"].layer["aggregation_layer"].select_by_index(index)
+    if app.gui.getvar("fiat","show_aggregation_zone"): 
+        fn, attribute, label = get_table_data()
+        attribute_to_visualize = str(attribute[index]) 
+        data_to_visualize = Path(fn[index])
+        gdf = gpd.read_file(data_to_visualize)
+        legend = [] 
+        paint_properties = app.model["fiat"].create_paint_properties(
+            gdf, attribute_to_visualize, type="polygon", opacity=0.5
+        )
+        app.map.layer["aggregation"].layer["aggregation_layer"].clear()
+            
+        app.map.layer["aggregation"].add_layer(
+            "aggregation_layer",
+            type="choropleth",
+            legend_position="top-right",
+            legend_title="Aggregation",
+            hoover_property=attribute_to_visualize
+        )
+        app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
+        gdf, paint_properties, legend
+        )
+    else:
+        print("check checkbox")
+    #app.map.layer["aggregation"].layer["aggregation_layer"].select_by_index(index)
