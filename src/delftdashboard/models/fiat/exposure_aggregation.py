@@ -152,31 +152,11 @@ def add_aggregations(*args):
         )
     
 def display_aggregation_zone(*args):
-    fn, attribute, label = get_table_data()
-    index = app.gui.getvar("fiat", "aggregation_table_name")[0]
-    attribute_to_visualize = str(attribute[index]) 
-    data_to_visualize = Path(fn[index])
-    gdf = gpd.read_file(data_to_visualize)
-    paint_properties = app.model["fiat"].create_paint_properties(
-        gdf, attribute_to_visualize, type="polygon", opacity=0.5
-    )
-    legend = []  # Still needs to be made in the mapbox code
-
-    # Clear previously made layers and add a new one with the right properties
-    app.map.layer["aggregation"].layer["aggregation_layer"].clear()
-    if app.gui.getvar("fiat","show_aggregation_zone"):       
-        app.map.layer["aggregation"].add_layer(
-            "aggregation_layer",
-            type="choropleth",
-            legend_position="top-right",
-            legend_title="Aggregation",
-            hoover_property=attribute_to_visualize
-        )
-        app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
-        gdf, paint_properties, legend
-        )
-    else:
+    if app.gui.getvar("fiat","show_aggregation_zone"): 
+        select_additional_attribute()
+    else: 
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
+
 
 def deselect_attribute(*args):
     current_aggregation = app.gui.getvar("fiat", "aggregation_table")
@@ -217,5 +197,5 @@ def select_additional_attribute(*args):
         gdf, paint_properties, legend
         )
     else:
-        print("check checkbox")
-    #app.map.layer["aggregation"].layer["aggregation_layer"].select_by_index(index)
+        app.map.layer["aggregation"].layer["aggregation_layer"].hide()
+    
