@@ -14,9 +14,9 @@ class Toolbox(GenericToolbox):
         self.long_name = "Model boundary"
 
         # Set GUI variable
-        
+
         group = "modelmaker_fiat"
-        
+
         app.gui.setvar(group, "selected_aoi_method", "polygon")
         app.gui.setvar(
             group,
@@ -129,33 +129,41 @@ def zoom_to_boundary(*args):
         bounds = gdf.geometry.bounds
 
         # Fly to the site
-        app.map.fit_bounds(bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0])
+        app.map.fit_bounds(
+            bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0]
+        )
     else:
-        app.gui.window.dialog_info(text="Please first select a model boundary.", title="No model boundary selected")
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
 
 
 def generate_boundary(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
     if active_layer == "":
-        app.gui.window.dialog_info(text="Please first select a model boundary.", title="No model boundary selected")
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
         return
 
-    if app.model["fiat"].domain is None:
+    if app.active_model.domain is None:
         app.gui.window.dialog_warning(
             "Please first select a folder for your FIAT model",
             "No FIAT model initiated yet",
         )
-        
+
         # Initiate a new FIAT model
-        app.model["fiat"].new()
+        app.active_model.new()
 
     gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
     gdf.to_file(
-        app.model["fiat"].domain.database.drive / "aoi.geojson", driver="GeoJSON"
+        app.active_model.domain.database.drive / "aoi.geojson", driver="GeoJSON"
     )
 
-    app.model["fiat"].domain.exposure_vm.create_interest_area(
-        fpath=str(app.model["fiat"].domain.database.drive / "aoi.geojson")
+    app.active_model.domain.exposure_vm.create_interest_area(
+        fpath=str(app.active_model.domain.database.drive / "aoi.geojson")
     )
 
     app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
