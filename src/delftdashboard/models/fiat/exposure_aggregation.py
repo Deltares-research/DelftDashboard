@@ -11,6 +11,7 @@ import geopandas as gpd
 from pathlib import Path
 import pandas as pd
 import copy
+import fiona
 
 
 def select(*args):
@@ -31,6 +32,8 @@ def remove_datasource(*args):
         deselected_aggregation = 0
     name = current_list_string[deselected_aggregation]
     deselect_aggregation(name)
+
+    app.gui.setvar("fiat", "aggregation_table_name", [0])
 
 def deselect_aggregation(name):
     current_list_string = app.gui.getvar("fiat", "loaded_aggregation_files_string")
@@ -78,8 +81,12 @@ def open_gdf(*args):
         )
     else:
         path = app.gui.getvar("fiat", "loaded_aggregation_files_value")[index]
-        gdf = gpd.read_file(path)
-        list_columns = list(gdf.columns)
+        # Open the data source for reading
+        with fiona.open(path) as src:
+            # Access the schema to get the column names
+            schema = src.schema
+            list_columns = list(schema['properties'].keys())
+        
         app.gui.setvar("fiat", "aggregation_file_field_name_value", list_columns)
         app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
         aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
@@ -138,6 +145,7 @@ def get_table_data(*args):
 def add_aggregations(*args):
     if app.model["fiat"].domain:
         fn, attribute, label = get_table_data()
+        fn = [str(f) for f in fn]
         app.active_model.domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
         print("Attributes added to model")
         app.gui.window.dialog_info(
@@ -151,8 +159,11 @@ def add_aggregations(*args):
         title="No active model",
         )
     
+
 def display_aggregation_zone(*args):
-    if app.gui.getvar("fiat","show_aggregation_zone"): 
+    """Show/hide aggregation zone layer"""
+    app.gui.setvar("fiat", "show_aggregation_zone", args[0])
+    if args[0]: 
         select_additional_attribute()
     else: 
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
@@ -175,12 +186,12 @@ def select_additional_attribute(*args):
         "fiat", "aggregation_table_name"
     )[0]  # get index of aggregation area
     # Highlight area in map
-    if app.gui.getvar("fiat","show_aggregation_zone"): 
+    if app.gui.getvar("fiat", "show_aggregation_zone"): 
         fn, attribute, label = get_table_data()
-        attribute_to_visualize = str(attribute[index]) 
+        attribute_to_visualize = str(attribute[index])
         data_to_visualize = Path(fn[index])
         gdf = gpd.read_file(data_to_visualize)
-        legend = [] 
+        legend = []
         paint_properties = app.model["fiat"].create_paint_properties(
             gdf, attribute_to_visualize, type="polygon", opacity=0.5
         )
