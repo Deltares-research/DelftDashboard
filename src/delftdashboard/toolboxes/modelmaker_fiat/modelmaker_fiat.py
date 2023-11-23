@@ -353,6 +353,7 @@ def quick_build(*args):
             text="Please first select a model boundary.",
             title="No model boundary selected",
         )
+        dlg.close()
 
     ## ROADS ##
     try:
@@ -384,6 +385,7 @@ def quick_build(*args):
         dlg.close()
     except Exception:
         app.gui.window.dialog_info(text="No OSM roads found in this area, try another or a larger area.", title="No OSM roads found")
+        dlg.close()
 
 
 def display_asset_locations(*args):

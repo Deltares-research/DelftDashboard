@@ -288,7 +288,7 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "selected_asset_locations_string",
-            [],
+            ["National Structure Inventory (NSI)"],
         )
         app.gui.setvar(
             group,
