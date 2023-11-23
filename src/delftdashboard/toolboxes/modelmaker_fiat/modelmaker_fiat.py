@@ -269,6 +269,23 @@ def load_sfincs_domain(*args):
 
 
 def quick_build(*args):
+    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+    if active_layer == "":
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
+        return
+
+    if app.active_model.domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+
+        # Initiate a new FIAT model
+        app.active_model.new()
+
     ## BUILDINGS ##
     model = "fiat"
     checkbox_group = "_main"
@@ -284,13 +301,11 @@ def quick_build(*args):
             gdf,
             unique_primary_types,
             unique_secondary_types,
-        ) = app.model[
-            model
-        ].domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
+        ) = app.active_model.domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
         gdf.set_crs(crs, inplace=True)
 
         # Set the buildings attribute to gdf for easy visualization of the buildings
-        app.model["fiat"].buildings = gdf
+        app.active_model.buildings = gdf
 
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
         app.map.layer["buildings"].layer["exposure_points"].set_data(
@@ -311,6 +326,7 @@ def quick_build(*args):
         )
 
         app.gui.setvar(model, "show_asset_locations", True)
+        app.gui.setvar("modelmaker_fiat", "show_asset_locations", True)
 
         # Set the checkboxes checked
         app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
@@ -323,7 +339,7 @@ def quick_build(*args):
         selected_link_table = "default_hazus_iwr_linking"
         app.gui.setvar("fiat", "selected_damage_curve_database", selected_damage_curve_database)
         app.gui.setvar("fiat", "selected_damage_curve_linking_table", selected_link_table)
-        app.model["fiat"].domain.vulnerability_vm.add_vulnerability_curves_to_model(selected_damage_curve_database, selected_link_table)
+        app.active_model.domain.vulnerability_vm.add_vulnerability_curves_to_model(selected_damage_curve_database, selected_link_table)
 
         # Check the checkbox
         app.gui.setvar("_main", "checkbox_vulnerability", True)
@@ -343,7 +359,7 @@ def quick_build(*args):
         dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
         
         # Get the roads to show in the map
-        gdf = app.model["fiat"].domain.exposure_vm.get_osm_roads()
+        gdf = app.active_model.domain.exposure_vm.get_osm_roads()
 
         crs = app.gui.getvar("fiat", "selected_crs")
         gdf.set_crs(crs, inplace=True)
@@ -355,17 +371,18 @@ def quick_build(*args):
 
         # Set the road damage threshold
         road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-        app.model["fiat"].domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
+        app.active_model.domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
 
         # Show the roads
-        app.model["fiat"].show_exposure_roads()
+        app.active_model.show_exposure_roads()
         app.gui.setvar("_main", "checkbox_roads_(optional)", True)
 
         # Set the checkbox checked
         app.gui.setvar("fiat", "show_roads", True)
+        app.gui.setvar("modelmaker_fiat", "show_roads", True)
 
         dlg.close()
-    except KeyError:
+    except Exception:
         app.gui.window.dialog_info(text="No OSM roads found in this area, try another or a larger area.", title="No OSM roads found")
 
 
