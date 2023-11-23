@@ -31,13 +31,6 @@ def load_asset_locations(name):
     app.gui.setvar("fiat", "selected_asset_locations_string", current_list_string)
 
 
-def load_asset_locations_nsi(*args):
-    new_source_value = app.gui.getvar("fiat", "asset_locations")
-    idx = app.gui.getvar("fiat", "asset_locations_value").index(new_source_value)
-    new_source_string = app.gui.getvar("fiat", "asset_locations_string")[idx]
-    load_asset_locations(new_source_string)
-
-
 def load_asset_locations_file(*args):
     fn = app.gui.window.dialog_open_file("Select geometry",
                                           filter="Geometry (*.shp *.gpkg *.geojson)")

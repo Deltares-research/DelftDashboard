@@ -12,29 +12,14 @@ element:
   title: Select asset data source
   position:
     x: 40
-    y: 45
-    width: 180
-    height: 85
+    y: 10
+    width: 200
+    height: 120
   element:
   - style: pushbutton
     position:
       x: 10
-      y: 55
-      width: 100
-      height: 20
-    text: Load source
-    method: load_asset_locations_nsi
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: asset_locations
-        operator: eq
-        value: nsi
-  - style: pushbutton
-    position:
-      x: 10
-      y: 30
+      y: 80
       width: 100
       height: 20
     text: Load source
@@ -44,36 +29,36 @@ element:
     - action: visible
       checkfor: all
       check:
-      - variable: asset_locations
+      - variable: model_type
         operator: eq
-        value: file
-  - style: checkbox
+        value: "Start from scratch"
+  - style: listbox
     position:
       x: 10
-      y: 5
-      width: 100
-      height: 20
-    text: Display assets
-    variable: show_asset_locations
-    method: display_asset_locations
+      y: 10
+      width: 170
+      height: 40
+    text: "Selected dataset"
+    text_position: "above"
+    variable: selected_asset_locations
+    select: index
+    option_string:
+      variable: selected_asset_locations_string
 
-- style: listbox
+- style: checkbox
   position:
-    x: 230
+    x: 250
     y: 10
-    width: 150
-    height: 40
-  text: "Selected dataset"
-  text_position: "above"
-  variable: selected_asset_locations
-  select: index
-  option_string:
-    variable: selected_asset_locations_string
+    width: 100
+    height: 20
+  text: Display assets
+  variable: show_asset_locations
+  method: display_asset_locations
 
 - style: panel
   title: Extraction method
   position:
-    x: 390
+    x: 250
     y: 90
     width: 135
     height: 40

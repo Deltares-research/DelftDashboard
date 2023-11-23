@@ -102,6 +102,14 @@ class Model(GenericModel):
         app.gui.setvar(group, "model_type", "Start with NSI")
         app.gui.setvar(group, "include_osm_roads", False)
 
+        ## ROADS ##
+        app.gui.setvar(group, "include_motorways", True)
+        app.gui.setvar(group, "include_trunk", True)
+        app.gui.setvar(group, "include_primary", True)
+        app.gui.setvar(group, "include_secondary", False)
+        app.gui.setvar(group, "include_tertiary", False)
+        app.gui.setvar(group, "include_all", False)
+
         ## DISPLAY LAYERS ##
         damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
         damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]

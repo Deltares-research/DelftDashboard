@@ -56,8 +56,51 @@ element:
   - style: pushbutton
     text: Generate model boundary
     position:
-      x: 275
+      x: 130
       y: 50
       width: 125
       height: 20
     method: generate_boundary
+  
+  - style: panel
+    title: Quick build
+    position:
+      x: 275
+      y: 25
+      width: 160
+      height: 120
+    dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: titles_model_boundary_tab
+          operator: eq
+          value: 1
+    element:
+    - style: pushbutton
+      position:
+        x: 15
+        y: 60
+        width: 130
+        height: 40
+      text: "Build exposure\nwith NSI and OSM"
+      tooltip: "This button builds a complete \nexposure dataset using the NSI and\nOSM data. This button will \nacquire the asset locations, asset \nclassifications, maximum potential \nvalues, asset height above ground \nlevel and census block aggregations."
+      method: quick_build
+    - style: checkbox
+      position:
+        x: 10
+        y: 30
+        width: 100
+        height: 20
+      text: Display assets
+      variable: show_asset_locations
+      method: display_asset_locations
+    - style: checkbox
+      position:
+        x: 10
+        y: 10
+        width: 100
+        height: 20
+      text: Display roads
+      variable: show_roads
+      method: display_roads
