@@ -65,7 +65,7 @@ element:
   - style: panel
     title: Quick build
     position:
-      x: 275
+      x: 285
       y: 25
       width: 160
       height: 120
