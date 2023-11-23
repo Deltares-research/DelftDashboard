@@ -313,23 +313,22 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "selected_aggregation_files", 0)
         app.gui.setvar(group, "selected_aggregation_files_string", [])
-        app.gui.setvar(group, "aggregation_file_field_name", 0)
+        app.gui.setvar(group, "aggregation_file_field_name", "")
         app.gui.setvar(group, "aggregation_file_field_name_string",[])
         app.gui.setvar(
             group,
             "aggregation_file_field_name_value",
-            ["field1", "field2", "field3", "field4"],
+            [],
         )
-        app.gui.setvar(group, "aggregation_label_string", None )
-        app.gui.setvar(group, "aggregation_label", 0)
-        app.gui.setvar(group, "aggregation_table_name", 0)
+        app.gui.setvar(group, "aggregation_label_string", "")
+        app.gui.setvar(group, "aggregation_table_name", [0])
         app.gui.setvar(group, "aggregation_table", pd.DataFrame(columns=["File", "Attribute ID", "Attribute Label", "File Path"]))
         app.gui.setvar(group, "assign_classification_active", False)
         app.gui.setvar(group, "selected_secondary_classification_value", 0)
         app.gui.setvar(group, "show_primary_classification", None)
         app.gui.setvar(group, "show_secondary_classification", None)
         app.gui.setvar(group, "classification_field", None)
-        app.gui.setvar(group, "show_aggregation_zone", True)
+        app.gui.setvar(group, "show_aggregation_zone", False)
         app.gui.setvar(group, "selected_crs", "EPSG:4326")
         app.gui.setvar(group, "selected_scenario", "MyScenario")
         app.gui.setvar(group, "created_nsi_assets", None)
