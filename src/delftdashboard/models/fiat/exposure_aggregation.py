@@ -196,14 +196,6 @@ def select_additional_attribute(*args):
             gdf, attribute_to_visualize, type="polygon", opacity=0.5
         )
         app.map.layer["aggregation"].layer["aggregation_layer"].clear()
-            
-        app.map.layer["aggregation"].add_layer(
-            "aggregation_layer",
-            type="choropleth",
-            legend_position="top-right",
-            legend_title="replace with label name",
-            hoover_property=attribute_to_visualize
-        )
         app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
         gdf, paint_properties, legend
         )
