@@ -201,11 +201,13 @@ def select_additional_attribute(*args):
         attribute_to_visualize = str(attribute[index])
         data_to_visualize = Path(fn[index])
         gdf = gpd.read_file(data_to_visualize)
+        app.model["fiat"].aggregation = gdf
         legend = []
         paint_properties = app.model["fiat"].create_paint_properties(
             gdf, attribute_to_visualize, type="polygon", opacity=0.5
-        )
+        )    
         app.map.layer["aggregation"].layer["aggregation_layer"].clear()
+        app.map.layer["aggregation"].layer["aggregation_layer"].hover_property =attribute_to_visualize
         app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
         gdf, paint_properties, legend
         )

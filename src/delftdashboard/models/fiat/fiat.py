@@ -21,6 +21,7 @@ class Model(GenericModel):
         self.damage_function_database = pd.DataFrame()
         self.occupancy_to_description = dict()
         self.description_to_occupancy = dict()
+        self.aggregation = gpd.GeoDataFrame()
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -64,6 +65,7 @@ class Model(GenericModel):
             type="choropleth",
             legend_position="top-right",
             legend_title="Base Zone",
+            hover_property="",
         )
 
     def set_layer_mode(self, mode):
