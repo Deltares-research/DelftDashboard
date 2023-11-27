@@ -26,36 +26,6 @@ element:
       width: 160
       height: 20
     text: Load source
-    method: load_nsi_classification_source
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: classification_source
-        operator: eq
-        value: nsi_data
-  - style: pushbutton
-    position:
-      x: 10
-      y: 10
-      width: 160
-      height: 20
-    text: Load source
-    method: load_loaded_classification_source
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: classification_source
-        operator: eq
-        value: loaded_data
-  - style: pushbutton
-    position:
-      x: 10
-      y: 10
-      width: 160
-      height: 20
-    text: Load source
     method: load_upload_classification_source
     dependency:
     - action: visible
@@ -165,6 +135,13 @@ element:
     height: 20
   text: Standarize
   method: standarize_classification
+  dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: classification_source
+        operator: eq
+        value: upload_data
 
 - style: pushbutton
   position:
@@ -174,3 +151,10 @@ element:
     height: 20
   text: Add to model
   method: add_classification
+  dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: classification_source
+        operator: eq
+        value: upload_data

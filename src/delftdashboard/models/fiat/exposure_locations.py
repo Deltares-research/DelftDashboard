@@ -17,11 +17,7 @@ def select(*args):
 
 
 def set_variables(*args):
-    app.model["fiat"].set_input_variables()
-
-
-def set_asset_locations(*args):
-    print("Set asset locations")
+    app.active_model.set_input_variables()
 
 
 def load_asset_locations(name):
@@ -33,47 +29,53 @@ def load_asset_locations(name):
 
 
 def load_asset_locations_file(*args):
-    fn = app.gui.window.dialog_open_file("Select geometry",
-                                          filter="Geometry (*.shp *.gpkg *.geojson)")
+    fn = app.gui.window.dialog_open_file(
+        "Select geometry", filter="Geometry (*.shp *.gpkg *.geojson)"
+    )
     name = Path(fn[0]).name
     load_asset_locations(name)
 
 
-
 def display_roads(*args):
-    """Show/hide roads layer""" 
+    """Show/hide roads layer"""
     app.gui.setvar("fiat", "show_roads", args[0])
     if args[0]:
-        app.model["fiat"].show_exposure_roads()
+        app.active_model.show_exposure_roads()
     else:
-        app.model["fiat"].hide_exposure_roads()
+        app.active_model.hide_exposure_roads()
 
 
 def display_asset_locations(*args):
     """Show/hide buildings layer"""
     app.gui.setvar("fiat", "show_asset_locations", args[0])
     if args[0]:
-        app.model["fiat"].show_exposure_buildings()
+        app.active_model.show_exposure_buildings()
     else:
-        app.model["fiat"].hide_exposure_buildings()
+        app.active_model.hide_exposure_buildings()
 
 
 def apply_extraction_method(*args):
     # TODO: only apply to the selected dataset?
     extraction_method = app.gui.getvar("fiat", "extraction_method")
-    app.model["fiat"].domain.exposure_vm.setup_extraction_method(extraction_method)
+    app.active_model.domain.exposure_vm.setup_extraction_method(extraction_method)
 
 
 def add_exposure_locations_to_model(*args):
     selected_asset_locations = app.gui.getvar("fiat", "selected_asset_locations_string")
-    if len(selected_asset_locations) == 1 and selected_asset_locations[0] == 'National Structure Inventory (NSI)':
+    if (
+        len(selected_asset_locations) == 1
+        and selected_asset_locations[0] == "National Structure Inventory (NSI)"
+    ):
         selected_asset_locations = "NSI"
         build_nsi_exposure()
     else:
-        app.gui.window.dialog_info(text="The option to have multiple asset location sources is not implemented yet.", title="Not yet implemented")
+        app.gui.window.dialog_info(
+            text="The option to have multiple asset location sources is not implemented yet.",
+            title="Not yet implemented",
+        )
         return
-    
-    app.model["fiat"].domain.exposure_vm.set_asset_data_source(selected_asset_locations)
+
+    app.active_model.domain.exposure_vm.set_asset_data_source(selected_asset_locations)
 
 
 def build_nsi_exposure(*args):
@@ -91,19 +93,19 @@ def build_nsi_exposure(*args):
             gdf,
             unique_primary_types,
             unique_secondary_types,
-        ) = app.model[
-            model
-        ].domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
+        ) = app.active_model.domain.exposure_vm.set_asset_locations_source(
+            source="NSI", crs=crs
+        )
         gdf.set_crs(crs, inplace=True)
 
         # Set the buildings attribute to gdf for easy visualization of the buildings
-        app.model["fiat"].buildings = gdf
+        app.active_model.buildings = gdf
 
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
-        app.map.layer["buildings"].layer["exposure_points"].set_data(
-            gdf
-        )
+        app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
 
+        unique_primary_types.sort()
+        unique_secondary_types.sort()
         app.gui.setvar(
             model, "selected_primary_classification_string", unique_primary_types
         )
@@ -123,7 +125,7 @@ def build_nsi_exposure(*args):
         df["Secondary Object Type"] = list(gdf["Secondary Object Type"].unique())
         ## TODO: add the nr of stories and the basement
         df.fillna("", inplace=True)
-        
+
         app.gui.setvar(model, "exposure_categories_to_link", df)
 
         # Set the checkboxes checked

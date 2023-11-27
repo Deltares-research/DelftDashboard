@@ -15,10 +15,10 @@ element:
   - string: Classification
     module: models.fiat.exposure_classification
     element: exposure_classification.yml
-  - string: Asset Heights
+  - string: Finished Floor Heights
     module: models.fiat.exposure_asset_heights
     element: exposure_asset_heights.yml
-  - string: Damage values
+  - string: Damage Values
     module: models.fiat.exposure_damages
     element: exposure_damages.yml
   - string: Additional Attributes

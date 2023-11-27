@@ -85,14 +85,6 @@ def build_nsi_exposure(*args):
         )
 
 
-def set_asset_locations(*args):
-    print("Set asset locations")
-
-
-def set_asset_locations_field(*args):
-    app.model["fiat"].set_asset_locations_field()
-
-
 def display_asset_locations(*args):
     """Show/hide buildings layer""" 
     app.gui.setvar("fiat", "show_asset_locations", args[0])

@@ -12,7 +12,7 @@ class Toolbox(GenericToolbox):
         super().__init__()
 
         self.name = name
-        self.long_name = "Model boundary | Quick Build"
+        self.long_name = "Model Boundary | Quick Build"
 
         # Set GUI variable
 
