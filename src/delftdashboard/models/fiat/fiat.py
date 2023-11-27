@@ -43,8 +43,8 @@ class Model(GenericModel):
             fill_color="orange",
             line_color="transparent",
             hover_property="Secondary Object Type",
-            # big_data=True,
-            # min_zoom=13,
+            big_data=True,
+            min_zoom=12,
         )
 
         layer = app.map.add_layer("roads")
@@ -122,7 +122,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "hazus_iwr_occupancy_classes", default_occupancy_df)
 
         cols = ["-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
-        app.gui.setvar(group, "damage_curves_standard_curves", damage_functions_database[["ID"] + cols])
+        app.gui.setvar(group, "damage_curves_standard_curves", damage_functions_database[["ID", "Description"] + cols])
         app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
 
         app.gui.setvar(group, "properties_to_display", "Classification")
@@ -139,19 +139,14 @@ class Model(GenericModel):
         app.gui.setvar(group, "active_damage_function", [0])
         app.gui.setvar(group, "active_exposure_category", [0])
         
-        df = pd.DataFrame(columns=["Assigned", "Secondary Object Type", "Stories", "Basement"])
+        df = pd.DataFrame(columns=["Secondary Object Type", "Assigned"])
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
         ## HAZUS IWR OCCUPANCY CLASSES ##
         occupancy_types = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
         self.occupancy_to_description = occupancy_types.set_index("Occupancy Class").to_dict(orient="index")
         self.description_to_occupancy = occupancy_types.set_index("Class Description").to_dict(orient="index")
-        class_description = list(occupancy_types["Class Description"])
 
-        app.gui.setvar(group, "occupancy_types_string", class_description)
-        app.gui.setvar(group, "occupancy_types_value", class_description)
-        app.gui.setvar(group, "selected_occupancy_type", class_description[0])
-        
         app.gui.setvar(group, "dmg_functions_html_filepath", "")
         
         ## SVI ##
@@ -248,7 +243,7 @@ class Model(GenericModel):
             [],
         )
 
-        ## Finished Floor Heights tab ##
+        ## Finished Floor Elevation tab ##
         app.gui.setvar(group, "loaded_asset_heights_files", 0)
         app.gui.setvar(
             group,
@@ -442,8 +437,7 @@ class Model(GenericModel):
 
     def get_filtered_damage_function_database(self, filter: str, col: str="Occupancy"):
         df = copy.deepcopy(self.damage_function_database)
-        occupancy_class = self.description_to_occupancy[filter]["Occupancy Class"]
-        return df.loc[df[col].str.startswith(occupancy_class)]
+        return df.loc[df[col].str.startswith(filter)]
 
     @staticmethod
     def generate_random_colors(n):
