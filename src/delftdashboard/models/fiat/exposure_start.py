@@ -17,9 +17,27 @@ def select_model_type(*args):
     if model_type == "Start with NSI":
         app.gui.setvar(group, "selected_asset_locations_string", ["National Structure Inventory (NSI)"])
         app.gui.setvar(group, "selected_asset_locations", 0)
+
+        # For classification the NSI data cannot be used because it is already used, you can only update it with other data.
+        app.gui.setvar(group, "classification_source", "nsi_data")
+        app.gui.setvar(
+            group,
+            "classification_source_string",
+            ["National Structure Inventory (NSI)", "Upload data"],
+        )
+        app.gui.setvar(group, "classification_source_value", ["nsi_data", "upload_data"])
     elif model_type == "Start from scratch":
         app.gui.setvar(group, "selected_asset_locations_string", [])
         app.gui.setvar(group, "selected_asset_locations", 0)
+
+        # When starting from scratch only user-input data can be used for classification
+        app.gui.setvar(group, "classification_source", "upload_data")
+        app.gui.setvar(
+            group,
+            "classification_source_string",
+            ["Upload data"],
+        )
+        app.gui.setvar(group, "classification_source_value", ["upload_data"])
 
 
 def include_all_road_types(*args):

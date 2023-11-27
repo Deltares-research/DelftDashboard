@@ -140,7 +140,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "active_damage_function", [0])
         app.gui.setvar(group, "active_exposure_category", [0])
         
-        df = pd.DataFrame(columns=["Secondary Object Type", "Assigned"])
+        df = pd.DataFrame(columns=["Secondary Object Type", "Assigned: Structure", "Assigned: Contents"])
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
         ## HAZUS IWR OCCUPANCY CLASSES ##
