@@ -141,3 +141,74 @@ def build_nsi_exposure(*args):
             text="Please first select a model boundary.",
             title="No model boundary selected",
         )
+        dlg.close()
+
+    ## ROADS ##
+    if app.gui.getvar(model, "include_osm_roads"):
+        road_types = get_road_types()
+
+        try:
+            dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
+            
+            # Get the roads to show in the map
+            gdf = app.model["fiat"].domain.exposure_vm.get_osm_roads(road_types=road_types)
+
+            crs = app.gui.getvar("fiat", "selected_crs")
+            gdf.set_crs(crs, inplace=True)
+
+            app.map.layer["roads"].layer["exposure_lines"].crs = crs
+            app.map.layer["roads"].layer["exposure_lines"].set_data(
+                gdf
+            )
+
+            # Set the road damage threshold
+            road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
+            app.model["fiat"].domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
+
+            # Show the roads
+            app.model["fiat"].show_exposure_roads()
+            app.gui.setvar("_main", "checkbox_roads_(optional)", True)
+
+            # Set the checkbox checked
+            app.gui.setvar("fiat", "show_roads", True)
+
+            dlg.close()
+        except KeyError:
+            app.gui.window.dialog_info(text="No OSM roads found in this area, try another or a larger area.", title="No OSM roads found")
+            dlg.close()
+
+
+def get_road_types():
+    model = "fiat"
+    if app.gui.getvar(model, "include_all"):
+        return [
+            "motorway",
+            "motorway_link",
+            "primary",
+            "primary_link",
+            "secondary",
+            "secondary_link",
+            "tertiary",
+            "tertiary_link",
+            "residential",
+            "unclassified",
+        ]
+
+    list_road_types = []
+    if app.gui.getvar(model, "include_motorways"):
+        list_road_types.extend(["motorway",
+            "motorway_link"])
+    if app.gui.getvar(model, "include_trunk"):
+        list_road_types.extend(["trunk",
+            "trunk_link"])
+    if app.gui.getvar(model, "include_primary"):
+        list_road_types.extend(["primary",
+            "primary_link"])
+    if app.gui.getvar(model, "include_secondary"):
+        list_road_types.extend(["secondary",
+                "secondary_link"])
+    if app.gui.getvar(model, "include_tertiary"):
+        list_road_types.extend(["tertiary",
+                "tertiary_link"])
+    
+    return list_road_types
