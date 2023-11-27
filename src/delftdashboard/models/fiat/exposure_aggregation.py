@@ -209,8 +209,7 @@ def select_additional_attribute(*args):
         app.map.layer["aggregation"].layer["aggregation_layer"].clear()
         app.map.layer["aggregation"].layer["aggregation_layer"].hover_property =attribute_to_visualize
         app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
-        gdf, paint_properties, legend
+        gdf, paint_properties, legend, 
         )
     else:
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
-    
