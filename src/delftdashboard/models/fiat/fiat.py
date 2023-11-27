@@ -30,6 +30,7 @@ class Model(GenericModel):
         # Set GUI variables
         self.set_gui_variables()
 
+    
     def add_layers(self):
         # Add main DDB layer
         layer = app.map.add_layer("buildings")
@@ -65,9 +66,9 @@ class Model(GenericModel):
             type="choropleth",
             legend_position="top-right",
             legend_title="Base Zone",
-            hover_property="",
+            hover_property= "",
         )
-
+    
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Everything made visible
