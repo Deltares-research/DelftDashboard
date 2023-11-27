@@ -1,266 +1,66 @@
 element:
 - style: panel
-  title: Info
+  title: Add new source
   position:
     x: 10
     y: 10
-    width: 150
+    width: 270
     height: 120
   element:
-  - style: text
+  - style: listbox
     position:
-      x: 10
-      y: 10
-      width: 130
-      height: 100
-    text: "Here you can indicate the maximum \npotential damages of the different \nasset value characteristics, as well as \nassociate them to the object \ntype of your choice."
-- style: panel
-  title: Damages source
-  position:
-    x: 170
-    y: 10
-    width: 150
-    height: 120
-  element:
-  - style: popupmenu
+        x: 5
+        y: 30
+        width: 110
+        height: 50
+    text_position: "above"
+    variable: loaded_damages_files
+    select: index
+    option_string:
+      variable: loaded_damages_files_string
+  - style: pushbutton
     position:
-      x: 10
+      x: 5
       y: 90
-      width: 130
+      width: 80
       height: 20
-    text: ""
-    variable: damages_source
-    select: item
-    option_string:
-      variable: damages_source_string
-    option_value:
-      variable: damages_source_value
+    text: "Select source"
+    method: select_damages_file
   - style: pushbutton
     position:
-      x: 10
-      y: 65
-      width: 100
-      height: 20
-    text: Import NSI values
-    method: set_feedback_damage_values
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: damages_source
-        operator: eq
-        value: nsi
-  - style: pushbutton
-    position:
-      x: 10
-      y: 65
-      width: 100
-      height: 20
-    text: Import Hazus values
-    method: set_feedback_damage_values
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: damages_source
-        operator: eq
-        value: hazus
-  - style: pushbutton
-    position:
-      x: 10
-      y: 65
-      width: 100
-      height: 20
-    text: Create damage values
-    method: set_feedback_damage_values
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: damages_source
-        operator: eq
-        value: create
-  - style: panel
-    position:
-      x: 10
-      y: 35
-      width: 100
-      height: 20
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: text_feedback_damage_values
-        operator: ne
-        value: empty
-    element:
-    - style: text
-      position:
-        x: 10
-        y: 0
-        width: 80
-        height: 18
-      variable: text_feedback_damage_values
-- style: panel
-  title: Damage values
-  position:
-    x: 330
-    y: 10
-    width: 400
-    height: 120
-  element:
-  - style: popupmenu
-    position:
-      x: 50
-      y: 91
-      width: 125
-      height: 18
-    text: "Category"
-    variable: damage_category
-    method: set_damage_category
-    option_string:
-    - Structure
-    - Content
-    - Other
-    option_value:
-    - structure
-    - content
-    - other
-  - style: popupmenu
-    position:
-      x: 50
-      y: 69
-      width: 125
-      height: 18
-    text: "Join"
-    variable: join_type
-    method: set_join_type
-    option_string:
-    - Spatial
-    - By primary object type
-    - By secondary object type
-    option_value:
-    - spatial
-    - primary
-    - secondary
-  - style: popupmenu
-    position:
-      x: 50
-      y: 47
-      width: 125
-      height: 18
-    text: "Join field"
-    variable: linking_object_type
-    method: set_linking_object_type
-    option_string:
-    - Primary object type 1
-    - Primary object type 2
-    - Secondary object type 1
-    - Secondary object type 2
-    - Secondary object type 3
-    option_value:
-    - primary1
-    - primary2
-    - secondary1
-    - secondary2
-    - secondary3
-  - style: edit
-    position:
-      x: 50
-      y: 25
-      width: 50
-      height: 18
-    text: Value
-    variable: damage
-    method: add_damage
-  - style: popupmenu
-    position:
-      x: 110
-      y: 25
-      width: 45
-      height: 18
-    text: ""
-    variable: damage_unit
-    method: set_damage_unit
-    option_string:
-    - "\u20AC/m\u00B2"
-    - "$/ft\u00B2"
-    option_value:
-    - eurometer
-    - dollarfoot
-  - style: pushbutton
-    position:
-      x: 25
+      x: 5
       y: 5
-      width: 130
-      height: 17
-    text: Add
-    variable: damage_value
-    method: add_damage_value
-- style: listbox
-  position:
-    x: 520
-    y: 30
-    width: 175
-    height: 82
-  text: "Included damage values"
-  text_position: "above"
-  method: include_damage_values
-  variable: damage values
-  select: index
-  option_string:
-    variable: created_vulnerability_curves
+      width: 110
+      height: 20
+    text: Load
+    method: load_damages_file
+  - style: pushbutton
+    position:
+      x: 120
+      y: 60
+      width: 20
+      height: 20
+    text: "\u0078"
+    method: remove_datasource
+  - style: popupmenu
+    position:
+      x: 155
+      y: 60
+      width: 100
+      height: 20
+    text: "Attribute ID"
+    text_position: "above"
+    variable: damages_file_field_name
+    option_string:
+      variable: damages_file_field_name_string
+    option_value:
+      variable: damages_file_field_name_value
+
 - style: pushbutton
   position:
-    x: 700
-    y: 92
-    width: 20
-    height: 20
-  text: "\u25B2"
-  method: move_up_selected_bathymetry_dataset
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
-- style: pushbutton
-  position:
-    x: 700
-    y: 72
-    width: 20
-    height: 20
-  text: "\u25BC"
-  method: move_down_selected_bathymetry_dataset
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
-- style: pushbutton
-  position:
-    x: 700
-    y: 42
-    width: 20
-    height: 20
-  text: "\u2716"
-  method: remove_selected_bathymetry_dataset
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
-- style: checkbox
-  position:
-    x: 520
+    x: 680
     y: 10
-    width: 150
+    width: 70
     height: 20
-  text: Display damage values
-  variable: show_damage_values
-  method: display_damage_values
+  text: "Add to model"
+  method: add_to_model

@@ -168,16 +168,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "use_svi", True)
         app.gui.setvar(group, "use_equity", True)
 
-        app.gui.setvar(group, "damages_source_string", ["NSI", "Hazus", "Create"])
-        app.gui.setvar(group, "damages_source_value", ["nsi", "hazus", "create"])
-        app.gui.setvar(group, "damages_source", "nsi")
-        app.gui.setvar(
-            group,
-            "curve_join_type_string",
-            ["Primary object type", "Secondary object type"],
-        )
-        app.gui.setvar(group, "curve_join_type_value", ["primary", "secondary"])
-        app.gui.setvar(group, "curve_join_type", "Secondary object type")
         app.gui.setvar(
             group,
             "fiat_fields_string",
@@ -226,9 +216,9 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "classification_source_string",
-            ["National Structure Inventory (NSI)", "Any previously loaded data", "Upload data"],
+            ["National Structure Inventory (NSI)", "Upload data"],
         )
-        app.gui.setvar(group, "classification_source_value", ["nsi_data", "loaded_data", "upload_data"])
+        app.gui.setvar(group, "classification_source_value", ["nsi_data", "upload_data"])
         app.gui.setvar(group, "upload_classification", None)
         app.gui.setvar(
             group,
@@ -245,28 +235,21 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "classification_file_field_name_value",
-            ["field1", "field2", "field3", "field4"],
+            [],
         )
         app.gui.setvar(group, "classification_file_field_name", None)
         app.gui.setvar(
             group,
             "selected_primary_classification_string",
-            [
-                "*Residential*",
-                "*Commercial*",
-                "*Industrial*",
-            ],
+            [],
         )
         app.gui.setvar(
             group,
             "selected_primary_classification_value",
-            [
-                "residential",
-                "commercial",
-                "industrial",
-            ],
+            [],
         )
 
+        ## Finished Floor Heights tab ##
         app.gui.setvar(group, "loaded_asset_heights_files", 0)
         app.gui.setvar(
             group,
@@ -278,12 +261,32 @@ class Model(GenericModel):
             "loaded_asset_heights_files_value",
             [],
         )
-        app.gui.setvar(group, "asset_heights_file_field_name", 0)
-        app.gui.setvar(group, "asset_heights_file_field_name_string",[])
+        app.gui.setvar(group, "heights_file_field_name", 0)
+        app.gui.setvar(group, "heights_file_field_name_string",[])
         app.gui.setvar(
             group,
-            "asset_heights_file_field_name_value",
-            ["field1", "field2", "field3", "field4"],
+            "heights_file_field_name_value",
+            [],
+        )
+
+        ## Damage values tab ##
+        app.gui.setvar(group, "loaded_damages_files", 0)
+        app.gui.setvar(
+            group,
+            "loaded_damages_files_string",
+            [],
+        )
+        app.gui.setvar(
+            group,
+            "loaded_damages_files_value",
+            [],
+        )
+        app.gui.setvar(group, "damages_file_field_name", 0)
+        app.gui.setvar(group, "damages_file_field_name_string",[])
+        app.gui.setvar(
+            group,
+            "damages_file_field_name_value",
+            [],
         )
 
         app.gui.setvar(group, "selected_primary_classification_value", 0)
@@ -372,7 +375,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "selected_secondary_classification_type", "")
         app.gui.setvar(group, "text_feedback_vulnerability_source_input", "")
         app.gui.setvar(group, "show_vulnerability_curves", "")
-        app.gui.setvar(group, "text_feedback_damage_values", "empty")
         app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
         app.gui.setvar(group, "show_damage_values", 0)
         app.gui.setvar(group, "created_vulnerability_curves", 0)
@@ -475,50 +477,77 @@ class Model(GenericModel):
             }
         return paint_properties
 
-    def get_nsi_paint_properties(self):
-        circle_color = [
-            "match",
-            ["get", "Secondary Object Type"],
-            "AGR1", "#009c99",
-            "COM1", "#6590bb",
-            "COM10", "#5b6d47",
-            "COM2", "#b63f1d",
-            "COM3", "#70d073",
-            "COM4", "#f2facd",
-            "COM5", "#f4428d",
-            "COM6", "#2f5770",
-            "COM7", "#472d9c",
-            "COM8", "#816035",
-            "COM9", "#f9917f",
-            "EDU1", "#7665b1",
-            "EDU2", "#c85dcf",
-            "GOV1", "#710b60",
-            "GOV2", "#fd32f1",
-            "IND1", "#10f276",
-            "IND2", "#bc2db1",
-            "IND3", "#09459b",
-            "IND4", "#2c3d14",
-            "IND5", "#90f27d",
-            "IND6", "#388bb3",
-            "REL1", "#4cf6ce",
-            "RES1-1SNB", "#f55243",
-            "RES1-1SWB", "#1f520d",
-            "RES1-2SNB", "#143523",
-            "RES1-2SWB", "#301eb1",
-            "RES1-3SNB", "#80f304",
-            "RES1-3SWB", "#4aab4e",
-            "RES2", "#7e0309",
-            "RES3A", "#c6a083",
-            "RES3B", "#919900",
-            "RES3C", "#337adc",
-            "RES3D", "#571950",
-            "RES3E", "#a2863a",
-            "RES3F", "#330b34",
-            "RES4", "#37d6c8",
-            "RES5", "#939b8f",
-            "RES6", "#665435",
-            "#000000",
-        ]
+    def get_nsi_paint_properties(self, type="secondary") -> dict:
+        """Get's NSI-specific paint properties to visualize NSI data
+
+        Parameters
+        ----------
+        type : str, optional
+            Type of occupancy, "primary" or "secondary", by default "secondary"
+
+        Returns
+        -------
+        dict
+            The paint properties for mapbox
+        """
+        if type == "primary":
+            circle_color = [
+                "match",
+                ["get", "Primary Object Type"],
+                "AGR", "#009c99",
+                "COM", "#6590bb",
+                "EDU", "#7665b1",
+                "GOV", "#710b60",
+                "IND", "#10f276",
+                "REL", "#4cf6ce",
+                "RES", "#f55243",
+                "#000000",
+            ]
+        
+        if type == "secondary":
+            circle_color = [
+                "match",
+                ["get", "Secondary Object Type"],
+                "AGR1", "#009c99",
+                "COM1", "#6590bb",
+                "COM10", "#5b6d47",
+                "COM2", "#b63f1d",
+                "COM3", "#70d073",
+                "COM4", "#f2facd",
+                "COM5", "#f4428d",
+                "COM6", "#2f5770",
+                "COM7", "#472d9c",
+                "COM8", "#816035",
+                "COM9", "#f9917f",
+                "EDU1", "#7665b1",
+                "EDU2", "#c85dcf",
+                "GOV1", "#710b60",
+                "GOV2", "#fd32f1",
+                "IND1", "#10f276",
+                "IND2", "#bc2db1",
+                "IND3", "#09459b",
+                "IND4", "#2c3d14",
+                "IND5", "#90f27d",
+                "IND6", "#388bb3",
+                "REL1", "#4cf6ce",
+                "RES1-1SNB", "#f55243",
+                "RES1-1SWB", "#1f520d",
+                "RES1-2SNB", "#143523",
+                "RES1-2SWB", "#301eb1",
+                "RES1-3SNB", "#80f304",
+                "RES1-3SWB", "#4aab4e",
+                "RES2", "#7e0309",
+                "RES3A", "#c6a083",
+                "RES3B", "#919900",
+                "RES3C", "#337adc",
+                "RES3D", "#571950",
+                "RES3E", "#a2863a",
+                "RES3F", "#330b34",
+                "RES4", "#37d6c8",
+                "RES5", "#939b8f",
+                "RES6", "#665435",
+                "#000000",
+            ]
 
         paint_properties = {
             "circle-color": circle_color,
@@ -530,10 +559,10 @@ class Model(GenericModel):
         }
         return paint_properties
 
-    def show_classification(self):
+    def show_classification(self, type="secondary"):
         """Show exposure layer(s)"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties()
+            paint_properties = self.get_nsi_paint_properties(type=type)
             legend = []
 
             app.map.layer["buildings"].layer["exposure_points"].set_data(
@@ -552,22 +581,6 @@ class Model(GenericModel):
 
     def hide_exposure_roads(self):
         app.map.layer["roads"].layer["exposure_lines"].hide()
-
-    def set_asset_locations_field(self):
-        # get window config yaml path
-        pop_win_config_path = str(
-            Path(
-                app.gui.config_path
-            ).parent  # TODO: replace with a variables config_path for the fiat model
-            / "models"
-            / self.name
-            / "config"
-            / "exposure_asset_locations_fields.yml"
-        )
-        # Create pop-up and only continue if user presses ok
-        okay, data = app.gui.popup(pop_win_config_path, None)
-        if not okay:
-            return
 
     def damage_curves_specify(self):
         # get window config yaml path

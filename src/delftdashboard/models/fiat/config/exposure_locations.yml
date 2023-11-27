@@ -1,17 +1,8 @@
 element:
-- style: pushbutton
-  position:
-    x: 10
-    y: 110
-    width: 20
-    height: 20
-  text: "\u2139"
-  tooltip: "After selecting your area of interest, \nin this tab you can specify the \nlocation of the assets to evaluate by \nimporting them from existing \ndatasets or uploading your own, \nas well as choosing their flood \nextraction method."
-
 - style: panel
   title: Select asset data source
   position:
-    x: 40
+    x: 10
     y: 10
     width: 200
     height: 120
@@ -36,7 +27,7 @@ element:
     position:
       x: 10
       y: 10
-      width: 170
+      width: 180
       height: 40
     text: "Selected dataset"
     text_position: "above"
@@ -44,21 +35,39 @@ element:
     select: index
     option_string:
       variable: selected_asset_locations_string
+  - style: pushbutton
+    position:
+      x: 170
+      y: 90
+      width: 20
+      height: 20
+    text: "\u2139"
+    tooltip: "After selecting your area of interest, \nin this tab you can specify the \nlocation of the assets to evaluate by \nimporting them from existing \ndatasets or uploading your own, \nas well as choosing their flood \nextraction method."
 
 - style: checkbox
   position:
-    x: 250
-    y: 10
+    x: 220
+    y: 30
     width: 100
     height: 20
   text: Display assets
   variable: show_asset_locations
   method: display_asset_locations
+- style: checkbox
+  position:
+    x: 220
+    y: 10
+    width: 100
+    height: 20
+  text: Display roads
+  variable: show_roads
+  method: display_roads
+
 
 - style: panel
   title: Extraction method
   position:
-    x: 250
+    x: 220
     y: 90
     width: 135
     height: 40

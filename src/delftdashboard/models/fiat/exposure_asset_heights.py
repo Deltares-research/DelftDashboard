@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
-
-@author: ormondt
-"""
-
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from pathlib import Path
+import fiona
+
 
 def select(*args):
     # De-activate existing layers
@@ -14,18 +11,10 @@ def select(*args):
 
 
 def set_variables(*args):
-    app.model["fiat"].set_input_variables()
+    app.active_model.set_input_variables()
 
 
-def select_loaded_dataset(*args):
-    print("Select loaded dataset")
-
-
-def deselect_selected_dataset(*args):
-    print("Deselect selected dataset")
-
-
-def load_asset_heights_file(*args):
+def select_asset_heights_file(*args):
     fn = app.gui.window.dialog_open_file(
         "Select geometry", filter="Geometry (*.shp *.gpkg *.geojson)"
     )
@@ -35,9 +24,6 @@ def load_asset_heights_file(*args):
         fn_value.append(Path(fn))
     app.gui.setvar("fiat", "loaded_asset_heights_files_value", fn_value)
     name = Path(fn).name
-    load_asset_heights(name)
-
-def load_asset_heights(name):
     current_list_string = app.gui.getvar("fiat", "loaded_asset_heights_files_string")
     if name not in current_list_string:
         current_list_string.append(name)
@@ -45,20 +31,40 @@ def load_asset_heights(name):
     app.gui.setvar("fiat", "loaded_asset_heights_files_string", current_list_string)
 
 
-def move_up_selected_dataset(*args):
-    print("Move up selected dataset")
+def load_asset_heights_file(*args):
+    index = app.gui.getvar("fiat", "loaded_asset_heights_files")
+    file_list = app.gui.getvar("fiat", "loaded_asset_heights_files_value")
+    if len(file_list) == 0:
+        app.gui.window.dialog_info(
+            text="Please load a data source.",
+            title="No datasource",
+        )
+    else:
+        path = app.gui.getvar("fiat", "loaded_asset_heights_files_value")[index]
+        # Open the data source for reading
+        with fiona.open(path) as src:
+            # Access the schema to get the column names
+            schema = src.schema
+            list_columns = list(schema['properties'].keys())
+        
+        app.gui.setvar("fiat", "heights_file_field_name_value", list_columns)
+        app.gui.setvar("fiat", "heights_file_field_name_string", list_columns)
 
 
-def move_down_selected_dataset(*args):
-    print("Move down selected dataset")
-
-
-def merge_data(*args):
-    print("Merge data")
-
-
-def display_asset_heights(*args):
-    print("Display asset heights")
+def remove_datasource(*args):
+    current_list_string = app.gui.getvar("fiat", "loaded_asset_heights_files_string")
+    deselected_aggregation = app.gui.getvar("fiat", "loaded_asset_heights_files")
+    if deselected_aggregation > len(
+        current_list_string
+    ) or deselected_aggregation == len(current_list_string):
+        deselected_aggregation = 0
+    name = current_list_string[deselected_aggregation]
+    current_list_string = app.gui.getvar("fiat", "loaded_asset_heights_files_string")
+    current_list_value = app.gui.getvar("fiat", "loaded_asset_heights_files_value")
+    current_list_string.remove(name)
+    current_list_value = [i for i in current_list_value if name not in str(i)]
+    app.gui.setvar("fiat", "loaded_asset_heights_files_string", current_list_string)
+    app.gui.setvar("fiat", "loaded_asset_heights_files_value", current_list_value)
 
 
 def add_to_model(*args):
