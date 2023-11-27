@@ -242,26 +242,18 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "classification_file_field_name_value",
-            ["field1", "field2", "field3", "field4"],
+            [],
         )
         app.gui.setvar(group, "classification_file_field_name", None)
         app.gui.setvar(
             group,
             "selected_primary_classification_string",
-            [
-                "*Residential*",
-                "*Commercial*",
-                "*Industrial*",
-            ],
+            [],
         )
         app.gui.setvar(
             group,
             "selected_primary_classification_value",
-            [
-                "residential",
-                "commercial",
-                "industrial",
-            ],
+            [],
         )
 
         app.gui.setvar(group, "loaded_asset_heights_files", 0)
