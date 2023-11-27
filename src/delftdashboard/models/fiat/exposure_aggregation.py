@@ -146,12 +146,22 @@ def add_aggregations(*args):
     if app.model["fiat"].domain:
         fn, attribute, label = get_table_data()
         fn = [str(f) for f in fn]
-        app.active_model.domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
-        print("Attributes added to model")
-        app.gui.window.dialog_info(
-        text="Your additional attributes were added to the model",
-        title="Added additional attributes",
-        )
+        area_of_interest = app.active_model.domain.data_catalog.get_geodataframe("area_of_interest")
+        for i in fn:
+            additional_attr = gpd.read_file(i)
+            additional_attr_total_area = additional_attr.unary_union
+            if area_of_interest.overlaps(additional_attr_total_area, align=True).all():
+                app.active_model.domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
+                print("Attributes added to model")
+                app.gui.window.dialog_info(
+                text="Your additional attributes were added to the model",
+                title="Added additional attributes",
+                )
+            else:
+                app.gui.window.dialog_info(
+                text="Your additional attributes are not within your model boundaries. Make sure to set the crs to EPSG:4326 in all your data.",
+                title="Additional attribute outside model boundaries. ",
+                )
     else:
         print("no active model")
         app.gui.window.dialog_info(
@@ -191,11 +201,13 @@ def select_additional_attribute(*args):
         attribute_to_visualize = str(attribute[index])
         data_to_visualize = Path(fn[index])
         gdf = gpd.read_file(data_to_visualize)
+        app.model["fiat"].aggregation = gdf
         legend = []
         paint_properties = app.model["fiat"].create_paint_properties(
             gdf, attribute_to_visualize, type="polygon", opacity=0.5
-        )
+        )    
         app.map.layer["aggregation"].layer["aggregation_layer"].clear()
+        app.map.layer["aggregation"].layer["aggregation_layer"].hover_property =attribute_to_visualize
         app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
         gdf, paint_properties, legend
         )

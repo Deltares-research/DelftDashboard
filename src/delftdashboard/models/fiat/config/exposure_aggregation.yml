@@ -4,15 +4,15 @@ element:
   position:
     x: 10
     y: 10
-    width: 230
+    width: 140
     height: 120
   element:
   - style: listbox
     position:
         x: 5
-        y: 5
-        width: 150
-        height: 70
+        y: 30
+        width: 110
+        height: 50
     text_position: "above"
     variable: loaded_aggregation_files
     select: index
@@ -21,31 +21,31 @@ element:
   - style: pushbutton
     position:
       x: 5
-      y: 85
+      y: 90
       width: 80
       height: 20
     text: "Select source"
     method: load_aggregation_file
   - style: pushbutton
     position:
-      x: 165
-      y: 55
-      width: 60
-      height: 20
+      x: 5
+      y: 10
+      width: 110
+      height: 15
     text: Load
     method: open_gdf
   - style: pushbutton
     position:
-      x: 165
-      y: 30
-      width: 60
-      height: 20
-    text: Remove
+      x: 120
+      y: 65
+      width: 15
+      height: 15
+    text: "\u0078"
     method: remove_datasource
 - style: panel
   title: Select attributes
   position:
-    x: 250
+    x: 170
     y: 10
     width: 160
     height: 120
@@ -66,31 +66,31 @@ element:
     position:
       x: 55
       y: 50
-      width: 50
-      height: 18
+      width: 100
+      height: 20
     text: "Label:"
     variable: aggregation_label_string
   - style: pushbutton
     position:
-      x: 55
+      x: 115
       y: 15
-      width: 70
+      width: 40
       height: 20
-    text: Add attribute
+    text: Add 
     method: write_input_to_table
 - style: panel
   title: Overview attributes
   position:
-    x: 430
+    x: 350
     y: 10
-    width: 300
+    width: 320
     height: 120
   element:
   - style: tableview
     position:
       x: 10
       y: 30
-      width: 200
+      width: 270
       height: 80
     tooltip: Selected aggregation zones
     text_position: "above"
@@ -102,11 +102,11 @@ element:
       variable: aggregation_table
   - style: pushbutton
     position:
-      x: 220
-      y: 65
-      width: 60
-      height: 20
-    text: Remove
+      x: 285
+      y: 95
+      width: 15
+      height: 15
+    text: "\u0078"
     method: deselect_attribute
   - style: checkbox
     position:
@@ -117,13 +117,13 @@ element:
     text: Display attribute
     variable: show_aggregation_zone
     method: display_aggregation_zone
-  - style: pushbutton
-    position:
-      x: 220
-      y: 5
-      width: 75
-      height: 20
-    text: "Add to model"
-    variable: selected_aggregation_files_value
-    select: item
-    method: add_aggregations
+- style: pushbutton
+  position:
+    x: 680
+    y: 10
+    width: 70
+    height: 20
+  text: "Add to model"
+  variable: selected_aggregation_files_value
+  select: item
+  method: add_aggregations
