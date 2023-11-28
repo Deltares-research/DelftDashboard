@@ -22,11 +22,17 @@ def display_properties(*args):
     model = "fiat"
     properties_to_display = app.gui.getvar("fiat", "properties_to_display")
     if properties_to_display == "Classification":
+        app.map.layer["buildings"].clear()
         app.model[model].show_classification()
     elif properties_to_display == "Asset heights":
         NotImplemented
-    elif properties_to_display == "Max potential damages":
-        NotImplemented
+    elif properties_to_display == "Max potential damages: Structure":
+        app.map.layer["buildings"].clear()
+        app.model[model].show_max_potential_damage_struct()
+
+    elif properties_to_display == "Max potential damages: Content":
+        app.map.layer["buildings"].clear()
+        app.model[model].show_max_potential_damage_cont()
 
 
 def display_roads(*args):

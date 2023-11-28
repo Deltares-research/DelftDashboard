@@ -2,12 +2,12 @@ element:
 - style: radiobuttongroup
   position:
     x: 30
-    y: 10
-    width: 100
+    y: 50
+    width: 200
   text: "Display properties"
   variable: properties_to_display
-  option_string: ["Classification", "Asset heights", "Max potential damages"]
-  option_value: ["Classification", "Asset heights", "Max potential damages"]
+  option_string: ["Classification", "Asset heights", "Max potential damages: Structure", "Max potential damages: Content"]
+  option_value: ["Classification", "Asset heights", "Max potential damages: Structure", "Max potential damages: Content"]
   method: display_properties
 - style: checkbox
   position:
@@ -18,3 +18,12 @@ element:
   text: Display roads
   variable: show_roads
   method: display_roads
+- style: checkbox
+  position:
+    x: 200
+    y: 50
+    width: 200
+    height: 20
+  text: Display attributes
+  variable: show_aggregation_zone
+  method: display_aggregation_zone

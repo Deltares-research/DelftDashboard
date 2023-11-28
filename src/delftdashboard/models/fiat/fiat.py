@@ -48,6 +48,32 @@ class Model(GenericModel):
             min_zoom=12,
         )
 
+        layer.add_layer(
+            "max_potential_damage_struct",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Max. potential damage: Structure",
+            fill_color="red",
+            line_color="transparent",
+            hover_property="Max Potential Damage: Structure",
+            big_data=True,
+            min_zoom=12,
+        )
+
+        layer.add_layer(
+            "max_potential_damage_cont",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Max. potential damage: Content",
+            fill_color="purple",
+            line_color="transparent",
+            hover_property="Max Potential Damage: Content",
+            big_data=True,
+            min_zoom=12,
+        )
+
         layer = app.map.add_layer("roads")
         layer.add_layer(
             "exposure_lines",
@@ -560,6 +586,28 @@ class Model(GenericModel):
             legend = []
 
             app.map.layer["buildings"].layer["exposure_points"].set_data(
+                self.buildings, paint_properties, legend
+            )
+            self.show_exposure_buildings()
+    
+    def show_max_potential_damage_struct(self, type="secondary"):
+        """Show maximum potential damage: structure layer(s)"""
+        if not self.buildings.empty:
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            legend = []
+
+            app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
+                self.buildings, paint_properties, legend
+            )
+            self.show_exposure_buildings()
+    
+    def show_max_potential_damage_cont(self, type="secondary"):
+        """Show maximum potential damage: content layer(s)"""
+        if not self.buildings.empty:
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            legend = []
+
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
                 self.buildings, paint_properties, legend
             )
             self.show_exposure_buildings()
