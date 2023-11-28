@@ -39,20 +39,26 @@ def load_upload_classification_source(*args):
 
 def display_primary_classification(*args):
     """Show/hide buildings layer"""
-    app.gui.setvar("fiat", "show_asset_locations", args[0])
+    app.gui.setvar("fiat", "show_primary_classification", args[0])
     if args[0]:
         app.active_model.show_classification(type="primary")
+        app.gui.setvar("fiat", "show_secondary_classification", False)
+        map.update()
     else:
-        app.active_model.hide_exposure_buildings()
+        if not app.gui.getvar("fiat", "show_secondary_classification"):
+            app.active_model.hide_exposure_buildings()
 
 
 def display_secondary_classification(*args):
     """Show/hide buildings layer"""
-    app.gui.setvar("fiat", "show_asset_locations", args[0])
+    app.gui.setvar("fiat", "show_secondary_classification", args[0])
     if args[0]:
         app.active_model.show_classification(type="secondary")
+        app.gui.setvar("fiat", "show_primary_classification", False)
+        map.update()
     else:
-        app.active_model.hide_exposure_buildings()
+        if not app.gui.getvar("fiat", "show_primary_classification"):
+            app.active_model.hide_exposure_buildings()
 
 
 def standarize_classification(*args):
