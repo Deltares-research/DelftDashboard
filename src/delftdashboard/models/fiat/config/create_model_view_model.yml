@@ -25,5 +25,5 @@ element:
     width: 200
     height: 20
   text: Display attributes
-  variable: show_aggregation_zone
-  method: display_aggregation_zone
+  variable: show_attributes
+  method: display_attribute

@@ -160,6 +160,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_aggregation", False)
         app.gui.setvar(group, "show_damage_curves", False)
         app.gui.setvar(group, "show_roads", False)
+        app.gui.setvar(group, "show_attributes", False)
         app.gui.setvar(group, "show_extraction_method", False)
 
         ## SELECTING VULNERABILITY CURVES ##        
