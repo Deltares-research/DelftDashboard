@@ -49,6 +49,18 @@ class Model(GenericModel):
         )
 
         layer.add_layer(
+            "asset_height",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Ground Floor Height",
+            line_color="transparent",
+            hover_property="Ground Floor Height",
+            big_data=True,
+            min_zoom=12,
+        )
+
+        layer.add_layer(
             "max_potential_damage_struct",
             type="circle",
             circle_radius=3,
@@ -574,7 +586,18 @@ class Model(GenericModel):
                 "RES6", "#665435",
                 "#000000",
             ]      
-        # Example usage
+        if type == "asset_height":
+             circle_color = [
+                "step",
+                ["get", "Ground Floor Height"],"#000000",
+                0.00001, "#FFFFFF",      
+                0.5, "#D6E1F8",      
+                1.0, "#A4C4F2",     
+                1.5, "#6C95E1",    
+                2.0, "#3750B2",    
+                2.5, "#1A237E",                                    
+                ]
+            
         if type == "damage_struct":
              circle_color = [
                 "step",
@@ -618,6 +641,15 @@ class Model(GenericModel):
             )
             self.show_exposure_buildings()
     
+    def show_asset_height(self,type="asset_height"):
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            legend = []
+            app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["asset_height"].set_data(
+                self.buildings, legend
+            )
+            self.show_asset_heights()
+
     def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
@@ -642,7 +674,10 @@ class Model(GenericModel):
 
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
-    
+
+    def show_asset_heights(self):
+        app.map.layer["buildings"].layer["asset_height"].show()
+
     def show_max_potential_damage_content(self):
         app.map.layer["buildings"].layer["max_potential_damage_cont"].show()
 
