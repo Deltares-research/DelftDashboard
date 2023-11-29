@@ -675,7 +675,7 @@ class Model(GenericModel):
         app.map.layer["buildings"].layer["max_potential_damage_struct"].show()
 
     def show_ground_elevations(self):
-        app.map.layer["buildings"].layer["ground_elevation"].show()
+        app.map.layer["buildings"].layer["Ground_elevation"].show()
 
     def hide_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].hide()
