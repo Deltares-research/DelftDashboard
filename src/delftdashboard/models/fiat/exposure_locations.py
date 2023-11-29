@@ -68,9 +68,18 @@ def add_exposure_locations_to_model(*args):
     ):
         selected_asset_locations = "NSI"
         build_nsi_exposure()
+    elif (
+        len(selected_asset_locations) == 1
+        and selected_asset_locations[0] != "National Structure Inventory (NSI)"
+    ):
+        app.gui.window.dialog_info(
+            text="Coming soon!",
+            title="Not yet implemented",
+        )
+        return
     else:
         app.gui.window.dialog_info(
-            text="The option to have multiple asset location sources is not implemented yet.",
+            text="The option to have multiple asset location sources is not yet implemented.",
             title="Not yet implemented",
         )
         return
@@ -133,6 +142,12 @@ def build_nsi_exposure(*args):
         app.gui.setvar(checkbox_group, "checkbox_classification", True)
         app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
         app.gui.setvar(checkbox_group, "checkbox_elevation", True)
+
+        # Set the sources
+        app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
+        app.gui.setvar(model, "source_classification", "National Structure Inventory")
+        app.gui.setvar(model, "source_finished_floor_elevation", "National Structure Inventory")
+        app.gui.setvar(model, "source_max_potential_damage", "National Structure Inventory")
 
         dlg.close()
 

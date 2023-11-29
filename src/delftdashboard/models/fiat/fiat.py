@@ -127,6 +127,12 @@ class Model(GenericModel):
         app.gui.setvar(group, "selected_damage_curve_database", "default_vulnerability_curves")
         app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
 
+        # Source names #
+        app.gui.setvar(group, "source_asset_locations", "")
+        app.gui.setvar(group, "source_classification", "")
+        app.gui.setvar(group, "source_finished_floor_elevation", "")
+        app.gui.setvar(group, "source_max_potential_damage", "")
+
         # Model type #
         app.gui.setvar(group, "model_type", "Start with NSI")
         app.gui.setvar(group, "include_osm_roads", False)
@@ -143,6 +149,7 @@ class Model(GenericModel):
         damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
         damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
         self.damage_function_database = damage_functions_database_info
+        app.gui.setvar(group, "damage_curves_standard_info_static", damage_functions_database_info)
         app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
 
         default_occupancy_df = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")

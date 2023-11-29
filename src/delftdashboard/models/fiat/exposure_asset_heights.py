@@ -69,3 +69,8 @@ def remove_datasource(*args):
 
 def add_to_model(*args):
     print("Add to model")
+
+    # Set the source
+    idx = app.gui.getvar("fiat", "loaded_asset_heights_files")
+    current_list_string = app.gui.getvar("fiat", "loaded_asset_heights_files_string")
+    app.gui.setvar("fiat", "source_finished_floor_elevation", current_list_string[idx])

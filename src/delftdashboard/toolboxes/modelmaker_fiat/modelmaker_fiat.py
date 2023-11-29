@@ -337,14 +337,20 @@ def quick_build(*args):
         # Set the damage curves
         selected_damage_curve_database = "default_vulnerability_curves"
         selected_link_table = "default_hazus_iwr_linking"
-        app.gui.setvar("fiat", "selected_damage_curve_database", selected_damage_curve_database)
-        app.gui.setvar("fiat", "selected_damage_curve_linking_table", selected_link_table)
+        app.gui.setvar(model, "selected_damage_curve_database", selected_damage_curve_database)
+        app.gui.setvar(model, "selected_damage_curve_linking_table", selected_link_table)
         app.active_model.domain.vulnerability_vm.add_vulnerability_curves_to_model(selected_damage_curve_database, selected_link_table)
 
         # Check the checkbox
         app.gui.setvar("_main", "checkbox_vulnerability", True)
 
         # TODO: set SVI and equity
+
+        # Set the sources
+        app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
+        app.gui.setvar(model, "source_classification", "National Structure Inventory")
+        app.gui.setvar(model, "source_finished_floor_elevation", "National Structure Inventory")
+        app.gui.setvar(model, "source_max_potential_damage", "National Structure Inventory")
 
         dlg.close()
 

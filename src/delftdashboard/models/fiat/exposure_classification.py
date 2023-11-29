@@ -67,3 +67,5 @@ def standarize_classification(*args):
 
 def add_classification(*args):
     print("Add classification to model")
+    # Set the sources
+    app.gui.setvar("fiat", "source_classification", "add loaded source")
