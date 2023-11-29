@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: Add new source
+  title: Add new damage source
   position:
     x: 10
     y: 10
@@ -55,6 +55,14 @@ element:
       variable: damages_file_field_name_string
     option_value:
       variable: damages_file_field_name_value
+  - style: pushbutton
+    position:
+      x: 155
+      y: 5
+      width: 100
+      height: 20
+    text: "Settings"
+    method: adjust_ffe_settings
 
 - style: pushbutton
   position:

@@ -2,6 +2,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 import geopandas as gpd
+import pandas as pd
 import fiona
 
 
@@ -18,10 +19,17 @@ def add_classification_field(*args):
     model = "fiat"
     dlg = app.gui.window.dialog_wait("\nReading classification data...")
     path = app.gui.getvar(model, "classification_source_path")
+    object_type = app.gui.getvar(model, "object_type")
     attribute_name = app.gui.getvar(model, "classification_file_field_name")
-    gdf = gpd.read_file(path)
-    list(gdf[attribute_name].unique())
 
+    # Read the vector file and update the table for standardization
+    gdf = gpd.read_file(path)
+    df = app.gui.getvar(model, "exposure_categories_to_standardize")
+    df[object_type] = list(gdf[attribute_name].unique())
+    df = df[["Primary Object Type", "Secondary Object Type", "Assigned"]]
+    df.fillna("", inplace=True)
+    df.sort_values(object_type, inplace=True)
+    app.gui.setvar(model, "exposure_categories_to_standardize", df)
     dlg.close()
 
 

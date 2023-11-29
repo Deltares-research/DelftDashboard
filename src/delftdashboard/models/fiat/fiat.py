@@ -187,6 +187,11 @@ class Model(GenericModel):
         df = pd.DataFrame(columns=["Secondary Object Type", "Assigned: Structure", "Assigned: Content"])
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
+        ## STANDARDIZING EXPOSURE CATEGORIES ##
+        df = pd.DataFrame(columns=["Primary Object Type", "Secondary Object Type", "Assigned"])
+        app.gui.setvar(group, "exposure_categories_to_standardize", df)
+        app.gui.setvar(group, "active_exposure_category_standardize", [0])
+
         ## HAZUS IWR OCCUPANCY CLASSES ##
         occupancy_types = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
         self.occupancy_to_description = occupancy_types.set_index("Occupancy Class").to_dict(orient="index")
@@ -207,37 +212,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "use_svi", True)
         app.gui.setvar(group, "use_equity", True)
 
-        app.gui.setvar(
-            group,
-            "fiat_fields_string",
-            [
-                "Object ID",
-                "Object Name",
-                "Primary Object Type",
-                "Secondary Object Type",
-            ],
-        )
-        app.gui.setvar(
-            group,
-            "fiat_fields_value",
-            ["objectid", "objectname", "primaryobject", "secondaryobject"],
-        )
-        app.gui.setvar(group, "fiat_field_name_1", None)
-        app.gui.setvar(group, "fiat_field_name_2", None)
-        app.gui.setvar(group, "fiat_field_name_3", None)
-        app.gui.setvar(group, "fiat_field_name_4", None)
-        app.gui.setvar(
-            group,
-            "data_fields_string",
-            ["data field 1", "data field 2", "data field 3"],
-        )
-        app.gui.setvar(
-            group, "data_fields_value", ["data_field_1", "data_field_2", "data_field_3"]
-        )
-        app.gui.setvar(group, "data_field_name_1", None)
-        app.gui.setvar(group, "data_field_name_2", None)
-        app.gui.setvar(group, "data_field_name_3", None)
-        app.gui.setvar(group, "data_field_name_4", None)
         app.gui.setvar(group, "extraction_method_string", ["Area", "Centroid"])
         app.gui.setvar(group, "extraction_method_value", ["area", "centroid"])
         app.gui.setvar(group, "extraction_method", "centroid")
@@ -262,10 +236,10 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "object_type_string",
-            ["Primary object type", "Secondary object type"],
+            ["Primary Object Type", "Secondary Object Type"], # Make sure these are capitalized
         )
-        app.gui.setvar(group, "object_type_value", ["Primary object type", "Secondary object type"])
-        app.gui.setvar(group, "object_type", "Primary object type")
+        app.gui.setvar(group, "object_type_value", ["Primary Object Type", "Secondary Object Type"]) # Make sure these are capitalized
+        app.gui.setvar(group, "object_type", "Primary Object Type") # Make sure this is capitalized
         app.gui.setvar(
             group,
             "classification_file_field_name_string",

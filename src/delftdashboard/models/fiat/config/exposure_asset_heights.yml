@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: Add new source
+  title: Add new FFE source
   position:
     x: 10
     y: 10
