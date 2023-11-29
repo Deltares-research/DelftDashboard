@@ -41,7 +41,7 @@ class Model(GenericModel):
             circle_radius=3,
             legend_position="top-right",
             legend_title="Buildings",
-            fill_color="orange",
+            #fill_color="orange",
             line_color="transparent",
             hover_property="Secondary Object Type",
             big_data=True,
@@ -600,21 +600,27 @@ class Model(GenericModel):
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
                 self.buildings, paint_properties, legend
             )
-            self.show_exposure_buildings()
+            self.show_max_potential_damage_structure()
     
     def show_max_potential_damage_cont(self, type="secondary"):
         """Show maximum potential damage: content layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
             legend = []
-
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"]   
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
-                self.buildings, paint_properties, legend
+                self.buildings, legend
             )
-            self.show_exposure_buildings()
+            self.show_max_potential_damage_content()
 
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
+    
+    def show_max_potential_damage_content(self):
+        app.map.layer["buildings"].layer["max_potential_damage_cont"].show()
+
+    def show_max_potential_damage_structure(self):
+        app.map.layer["buildings"].layer["max_potential_damage_struct"].show()
 
     def hide_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].hide()
