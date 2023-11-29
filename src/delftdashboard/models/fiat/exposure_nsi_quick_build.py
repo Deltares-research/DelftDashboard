@@ -63,8 +63,9 @@ def build_nsi_exposure(*args):
 
         app.gui.setvar(model, "show_asset_locations", True)
 
-        df = pd.DataFrame(columns=["Assigned"])
+        df = pd.DataFrame(columns=["Assigned: Structure", "Assigned: Content"])
         df["Secondary Object Type"] = list(gdf["Secondary Object Type"].unique())
+        ## TODO: add the nr of stories and the basement
         df.fillna("", inplace=True)
         
         app.gui.setvar(model, "exposure_categories_to_link", df)
@@ -82,14 +83,6 @@ def build_nsi_exposure(*args):
             text="Please first select a model boundary.",
             title="No model boundary selected",
         )
-
-
-def set_asset_locations(*args):
-    print("Set asset locations")
-
-
-def set_asset_locations_field(*args):
-    app.model["fiat"].set_asset_locations_field()
 
 
 def display_asset_locations(*args):

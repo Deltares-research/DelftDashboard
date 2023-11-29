@@ -1,96 +1,127 @@
 element:
-- style: listbox
-  position:
-      x: 10
-      y: 45
-      width: 150
-      height: 50
-  text_position: "above"
-  variable: loaded_aggregation_files
-  select: index
-  option_string:
-    variable: loaded_aggregation_files_string
-- style: pushbutton
+- style: panel
+  title: Add new source
   position:
     x: 10
-    y: 105
-    width: 80
-    height: 20
-  text: "Load source"
-  method: load_aggregation_file
-- style: pushbutton
-  position:
-    x: 15
-    y: 15
-    width: 50
-    height: 20
-  text: Select
-  method: open_gdf
-- style: pushbutton
-  position:
-    x: 100
-    y: 15
-    width: 50
-    height: 20
-  text: Remove
-  method: remove_datasource
-- style: popupmenu
-  position:
-    x: 250
-    y: 80
-    width: 115
-    height: 20
-  text: "Attribute ID:"
-  variable: aggregation_file_field_name
-  option_string:
-    variable: aggregation_file_field_name_string
-  option_value:
-    variable: aggregation_file_field_name_value
-- style: edit
-  position:
-    x: 250
-    y: 50
-    width: 50
-    height: 18
-  text: "Label:"
-  variable: aggregation_label_string
-- style: pushbutton
-  position:
-    x: 220
-    y: 15
-    width: 50
-    height: 20
-  text: Add
-  method: write_input_to_table
-- style: tableview
-  position:
-    x: 400
-    y: 30
-    width: 200
-    height: 85
-  tooltip: Selected aggregation zones
-  title: Selected Attributes
-  text_position: "above"
-  selection_type: extended
-  sortable: true
-  variable: aggregation_table_name
-  option_value:
-     variable: aggregation_table
-
-- style: checkbox
-  position:
-    x: 400
     y: 10
-    width: 145
-    height: 20
-  text: Display attribute
-  variable: show_aggregation_zone
-  method: display_aggregation_zone
+    width: 140
+    height: 120
+  element:
+  - style: listbox
+    position:
+        x: 5
+        y: 30
+        width: 110
+        height: 50
+    text_position: "above"
+    variable: loaded_aggregation_files
+    select: index
+    option_string:
+      variable: loaded_aggregation_files_string
+  - style: pushbutton
+    position:
+      x: 5
+      y: 90
+      width: 80
+      height: 20
+    text: "Select source"
+    method: load_aggregation_file
+  - style: pushbutton
+    position:
+      x: 5
+      y: 10
+      width: 110
+      height: 15
+    text: Load
+    method: open_gdf
+  - style: pushbutton
+    position:
+      x: 120
+      y: 65
+      width: 15
+      height: 15
+    text: "\u0078"
+    method: remove_datasource
+- style: panel
+  title: Select attributes
+  position:
+    x: 170
+    y: 10
+    width: 160
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 55
+      y: 80
+      width: 100
+      height: 20
+    text: "Attribute ID:"
+    variable: aggregation_file_field_name
+    option_string:
+      variable: aggregation_file_field_name_string
+    option_value:
+      variable: aggregation_file_field_name_value
+  - style: edit
+    position:
+      x: 55
+      y: 50
+      width: 100
+      height: 20
+    text: "Label:"
+    variable: aggregation_label_string
+  - style: pushbutton
+    position:
+      x: 115
+      y: 15
+      width: 40
+      height: 20
+    text: Add 
+    method: write_input_to_table
+- style: panel
+  title: Overview attributes
+  position:
+    x: 350
+    y: 10
+    width: 320
+    height: 120
+  element:
+  - style: tableview
+    position:
+      x: 10
+      y: 30
+      width: 270
+      height: 80
+    tooltip: Selected aggregation zones
+    text_position: "above"
+    selection_type: extended
+    sortable: true
+    method: select_additional_attribute
+    variable: aggregation_table_name
+    option_value:
+      variable: aggregation_table
+  - style: pushbutton
+    position:
+      x: 285
+      y: 95
+      width: 15
+      height: 15
+    text: "\u0078"
+    method: deselect_attribute
+  - style: checkbox
+    position:
+      x: 10  
+      y: 5 
+      width: 145
+      height: 20
+    text: Display attribute
+    variable: show_aggregation_zone
+    method: display_aggregation_zone
 - style: pushbutton
   position:
-    x: 655
-    y: 15
-    width: 95
+    x: 680
+    y: 10
+    width: 70
     height: 20
   text: "Add to model"
   variable: selected_aggregation_files_value

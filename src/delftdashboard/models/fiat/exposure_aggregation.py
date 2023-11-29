@@ -11,6 +11,7 @@ import geopandas as gpd
 from pathlib import Path
 import pandas as pd
 import copy
+import fiona
 
 
 def select(*args):
@@ -32,13 +33,22 @@ def remove_datasource(*args):
     name = current_list_string[deselected_aggregation]
     deselect_aggregation(name)
 
+    app.gui.setvar("fiat", "aggregation_table_name", [0])
+
 def deselect_aggregation(name):
     current_list_string = app.gui.getvar("fiat", "loaded_aggregation_files_string")
     current_list_value = app.gui.getvar("fiat", "loaded_aggregation_files_value")
-    current_list_string.remove(name)
-    current_list_value = [i for i in current_list_value if name not in str(i)]
-    app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
-    app.gui.setvar("fiat", "loaded_aggregation_files_value", current_list_value)
+    aggregation_table = app.gui.getvar("fiat", "aggregation_table")
+    if name in aggregation_table["File"].values:
+        app.gui.window.dialog_info(
+            text="File source can't be removed when selected in the 'Selected Attributes' table.",
+            title="Source can't be removed.",
+        )
+    else:
+        current_list_string.remove(name)
+        current_list_value = [i for i in current_list_value if name not in str(i)]
+        app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
+        app.gui.setvar("fiat", "loaded_aggregation_files_value", current_list_value)
 
 def load_aggregation_file(*args):
     fn = app.gui.window.dialog_open_file(
@@ -61,10 +71,6 @@ def load_aggregation(name):
     app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
 
 
-def delete_loaded_file(*args):
-    print("remove")
-
-
 def open_gdf(*args):
     index = app.gui.getvar("fiat", "loaded_aggregation_files")
     file_list = app.gui.getvar("fiat", "loaded_aggregation_files_value")
@@ -75,8 +81,12 @@ def open_gdf(*args):
         )
     else:
         path = app.gui.getvar("fiat", "loaded_aggregation_files_value")[index]
-        gdf = gpd.read_file(path)
-        list_columns = list(gdf.columns)
+        # Open the data source for reading
+        with fiona.open(path) as src:
+            # Access the schema to get the column names
+            schema = src.schema
+            list_columns = list(schema['properties'].keys())
+        
         app.gui.setvar("fiat", "aggregation_file_field_name_value", list_columns)
         app.gui.setvar("fiat", "aggregation_file_field_name_string", list_columns)
         aggregation_attribute = [app.gui.getvar("fiat", "aggregation_file_field_name")]
@@ -113,18 +123,10 @@ def write_input_to_table(*args):
         added_aggregation = df_aggregation["File"].tolist()
         added_aggregation_list = df_all_aggregation["File"].tolist()
 
-        added_aggregation = df_aggregation["File"].tolist()
-        added_aggregation_list = df_all_aggregation["File"].tolist()
         if added_aggregation[0] not in added_aggregation_list:
             df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
         df_all_aggregation.reset_index(drop=True, inplace=True)
         app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
-
-    if added_aggregation[0] not in added_aggregation_list:
-        df_all_aggregation = pd.concat([df_all_aggregation,df_aggregation])
-    df_all_aggregation.reset_index(drop=True, inplace=True)
-    app.gui.setvar("fiat", "aggregation_table", df_all_aggregation)
-
 
 def get_table_data(*args): 
     aggregation_files_values = app.gui.getvar("fiat", "loaded_aggregation_files_value")
@@ -134,10 +136,6 @@ def get_table_data(*args):
     for i in aggregation_files_values:
         if i.name in file_name:
             aggregation_fn.append(i.__str__())
-    #for idx, row in aggregation_table.iterrows():
-    #    for name in aggregation_fn:
-    #        if row['File'] in name:
-    #            aggregation_table.at[idx, 'File'] = name
     fn   = aggregation_table["File Path"].tolist()
     attribute   = aggregation_table["Attribute ID"].tolist()
     label = aggregation_table["Attribute Label"].tolist()
@@ -145,32 +143,73 @@ def get_table_data(*args):
 
 
 def add_aggregations(*args):
-    fn, attribute, label = get_table_data()
-    app.model["fiat"].domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
-    print("Attributes added to model")
-    
-def display_aggregation_zone(*args):
-    fn, attribute, label = get_table_data()
-    attribute_to_visualize = str(attribute[0]) # Needs to be adjusted
-    data_to_visualize = Path(fn[0])# Needs to be adjusted
-    gdf = gpd.read_file(data_to_visualize)
-    paint_properties = app.model["fiat"].create_paint_properties(
-        gdf, attribute_to_visualize, type="polygon", opacity=0.5
-    )
-    legend = []  # Still needs to be made in the mapbox code
-
-    # Clear previously made layers and add a new one with the right properties
-    app.map.layer["aggregation"].layer["aggregation_layer"].clear()
-    if args[0]:
-        app.map.layer["aggregation"].add_layer(
-            "aggregation_layer",
-            type="choropleth",
-            legend_position="top-right",
-            legend_title="Aggregation",
-            hoover_property=attribute_to_visualize
+    if app.model["fiat"].domain:
+        fn, attribute, label = get_table_data()
+        fn = [str(f) for f in fn]
+        area_of_interest = app.active_model.domain.data_catalog.get_geodataframe("area_of_interest")
+        for i in fn:
+            additional_attr = gpd.read_file(i)
+            additional_attr_total_area = additional_attr.unary_union
+            if area_of_interest.overlaps(additional_attr_total_area, align=True).all():
+                app.active_model.domain.exposure_vm.set_aggregation_areas_config(fn, attribute, label)
+                print("Attributes added to model")
+                app.gui.window.dialog_info(
+                text="Your additional attributes were added to the model",
+                title="Added additional attributes",
+                )
+            else:
+                app.gui.window.dialog_info(
+                text="Your additional attributes are not within your model boundaries. Make sure to set the crs to EPSG:4326 in all your data.",
+                title="Additional attribute outside model boundaries. ",
+                )
+    else:
+        print("no active model")
+        app.gui.window.dialog_info(
+        text="Please create a model first.",
+        title="No active model",
         )
+    
+
+def display_aggregation_zone(*args):
+    """Show/hide aggregation zone layer"""
+    app.gui.setvar("fiat", "show_aggregation_zone", args[0])
+    if args[0]: 
+        select_additional_attribute()
+    else: 
+        app.map.layer["aggregation"].layer["aggregation_layer"].hide()
+
+
+def deselect_attribute(*args):
+    current_aggregation = app.gui.getvar("fiat", "aggregation_table")
+    index = app.gui.getvar("fiat", "aggregation_table_name")[0]
+    if index > len(
+        current_aggregation.values
+    ) or index == len(current_aggregation.values):
+        index = 0
+    current_aggregation = current_aggregation.drop(index, axis=0)
+    app.gui.setvar("fiat", "aggregation_table", current_aggregation)
+        
+def select_additional_attribute(*args):
+    """When selecting aggregation area highlight it and if it is activated"""
+    # Get info of area selection
+    index = app.gui.getvar(
+        "fiat", "aggregation_table_name"
+    )[0]  # get index of aggregation area
+    # Highlight area in map
+    if app.gui.getvar("fiat", "show_aggregation_zone"): 
+        fn, attribute, label = get_table_data()
+        attribute_to_visualize = str(attribute[index])
+        data_to_visualize = Path(fn[index])
+        gdf = gpd.read_file(data_to_visualize)
+        app.model["fiat"].aggregation = gdf
+        
+        paint_properties = app.model["fiat"].create_paint_properties(
+            gdf, attribute_to_visualize, type="polygon", opacity=0.5
+        )   
+        app.map.layer["aggregation"].layer["aggregation_layer"].clear()
+        app.map.layer["aggregation"].layer["aggregation_layer"].hover_property =attribute_to_visualize
         app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
-        gdf, paint_properties, legend
+        gdf, paint_properties,
         )
     else:
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()

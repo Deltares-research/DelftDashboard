@@ -32,13 +32,24 @@ class GenericModel:
                 if element.id == self.name:
                     element.widget.setVisible(True)
                     element.visible = True
+            
+            # The checklist for FIAT
+            if element.id == "checklist" and self.name == "fiat":
+                element.widget.setVisible(True)
+                element.visible = True
+        
         # And the others to invisible
         for element in elements:
             if element.style == "tabpanel":
                 if element.id != self.name:
                     element.widget.setVisible(False)
                     element.visible = False
-
+            
+            # The checklist for FIAT
+            if element.id == "checklist" and self.name != "fiat":
+                element.widget.setVisible(False)
+                element.visible = False
+        
         app.active_model = self
         app.gui.setvar("menu", "active_model_name", app.active_model.name)
 
@@ -87,11 +98,11 @@ class GenericModel:
         pass
 
 def select_model(model_name):
-    # Called from menu
-    app.active_model = app.model[model_name]
-    app.model[model_name].select()
-
     if model_name.lower() == "fiat":
         app.gui.setvar("_main", "fiat_active", True)
     else:
         app.gui.setvar("_main", "fiat_active", False)
+
+    # Called from menu
+    app.active_model = app.model[model_name]
+    app.model[model_name].select()

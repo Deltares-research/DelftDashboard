@@ -22,10 +22,6 @@ def load_nsi_classification_source(*args):
     app.gui.setvar("fiat", "assign_classification_active", False)
 
 
-def load_loaded_classification_source(*args):
-    print("Load loaded classification source")
-
-
 def load_upload_classification_source(*args):
     print("Load upload classification source")
     fn = app.gui.window.dialog_open_file(
@@ -42,15 +38,31 @@ def load_upload_classification_source(*args):
 
 
 def display_primary_classification(*args):
-    print("Display primary classification fields")
+    """Show/hide buildings layer"""
+    app.gui.setvar("fiat", "show_primary_classification", args[0])
+    if args[0]:
+        app.active_model.show_classification(type="primary")
+        app.gui.setvar("fiat", "show_secondary_classification", False)
+        map.update()
+    else:
+        if not app.gui.getvar("fiat", "show_secondary_classification"):
+            app.active_model.hide_exposure_buildings()
 
 
 def display_secondary_classification(*args):
-    print("Display secondary classification fields")
+    """Show/hide buildings layer"""
+    app.gui.setvar("fiat", "show_secondary_classification", args[0])
+    if args[0]:
+        app.active_model.show_classification(type="secondary")
+        app.gui.setvar("fiat", "show_primary_classification", False)
+        map.update()
+    else:
+        if not app.gui.getvar("fiat", "show_primary_classification"):
+            app.active_model.hide_exposure_buildings()
 
 
 def standarize_classification(*args):
-    app.model["fiat"].classification_standarize()
+    app.active_model.classification_standarize()
 
 
 def add_classification(*args):

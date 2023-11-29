@@ -1,4 +1,5 @@
 import geopandas as gpd
+import pandas as pd
 import time
 
 from delftdashboard.operations.toolbox import GenericToolbox
@@ -11,12 +12,12 @@ class Toolbox(GenericToolbox):
         super().__init__()
 
         self.name = name
-        self.long_name = "Model boundary"
+        self.long_name = "Model Boundary | Quick Build"
 
         # Set GUI variable
-        
+
         group = "modelmaker_fiat"
-        
+
         app.gui.setvar(group, "selected_aoi_method", "polygon")
         app.gui.setvar(
             group,
@@ -31,6 +32,10 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "active_area_of_interest", "")
         app.gui.setvar(group, "area_of_interest", 0)
         app.gui.setvar(group, "selected_crs", "EPSG:4326")
+
+        # To display the quick build
+        app.gui.setvar(group, "show_asset_locations", False)
+        app.gui.setvar(group, "show_roads", False)
 
         ## DEPENDENDY FOR THE TITLES IN THE MODEL BOUNDARY TAB
         app.gui.setvar(group, "titles_model_boundary_tab", 1)
@@ -129,33 +134,41 @@ def zoom_to_boundary(*args):
         bounds = gdf.geometry.bounds
 
         # Fly to the site
-        app.map.fit_bounds(bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0])
+        app.map.fit_bounds(
+            bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0]
+        )
     else:
-        app.gui.window.dialog_info(text="Please first select a model boundary.", title="No model boundary selected")
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
 
 
 def generate_boundary(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
     if active_layer == "":
-        app.gui.window.dialog_info(text="Please first select a model boundary.", title="No model boundary selected")
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
         return
 
-    if app.model["fiat"].domain is None:
+    if app.active_model.domain is None:
         app.gui.window.dialog_warning(
             "Please first select a folder for your FIAT model",
             "No FIAT model initiated yet",
         )
-        
+
         # Initiate a new FIAT model
-        app.model["fiat"].new()
+        app.active_model.new()
 
     gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
     gdf.to_file(
-        app.model["fiat"].domain.database.drive / "aoi.geojson", driver="GeoJSON"
+        app.active_model.domain.database.drive / "aoi.geojson", driver="GeoJSON"
     )
 
-    app.model["fiat"].domain.exposure_vm.create_interest_area(
-        fpath=str(app.model["fiat"].domain.database.drive / "aoi.geojson")
+    app.active_model.domain.exposure_vm.create_interest_area(
+        fpath=str(app.active_model.domain.database.drive / "aoi.geojson")
     )
 
     app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
@@ -253,3 +266,141 @@ def load_sfincs_domain(*args):
     app.gui.setvar(
         "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_sfincs"
     )
+
+
+def quick_build(*args):
+    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+    if active_layer == "":
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
+        return
+
+    if app.active_model.domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+
+        # Initiate a new FIAT model
+        app.active_model.new()
+
+    ## BUILDINGS ##
+    model = "fiat"
+    checkbox_group = "_main"
+    try:
+        dlg = app.gui.window.dialog_wait("\nDownloading NSI data...")
+        app.gui.setvar(model, "created_nsi_assets", "nsi")
+        app.gui.setvar(
+            model, "text_feedback_create_asset_locations", "NSI assets created"
+        )
+
+        crs = app.gui.getvar(model, "selected_crs")
+        (
+            gdf,
+            unique_primary_types,
+            unique_secondary_types,
+        ) = app.active_model.domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
+        gdf.set_crs(crs, inplace=True)
+
+        # Set the buildings attribute to gdf for easy visualization of the buildings
+        app.active_model.buildings = gdf
+
+        app.map.layer["buildings"].layer["exposure_points"].crs = crs
+        app.map.layer["buildings"].layer["exposure_points"].set_data(
+            gdf
+        )
+
+        app.gui.setvar(
+            model, "selected_primary_classification_string", unique_primary_types
+        )
+        app.gui.setvar(
+            model, "selected_secondary_classification_string", unique_secondary_types
+        )
+        app.gui.setvar(
+            model, "selected_primary_classification_value", unique_primary_types
+        )
+        app.gui.setvar(
+            model, "selected_secondary_classification_value", unique_secondary_types
+        )
+
+        app.gui.setvar(model, "show_asset_locations", True)
+        app.gui.setvar("modelmaker_fiat", "show_asset_locations", True)
+
+        # Set the checkboxes checked
+        app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
+        app.gui.setvar(checkbox_group, "checkbox_classification", True)
+        app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
+        app.gui.setvar(checkbox_group, "checkbox_elevation", True)
+
+        # Set the damage curves
+        selected_damage_curve_database = "default_vulnerability_curves"
+        selected_link_table = "default_hazus_iwr_linking"
+        app.gui.setvar("fiat", "selected_damage_curve_database", selected_damage_curve_database)
+        app.gui.setvar("fiat", "selected_damage_curve_linking_table", selected_link_table)
+        app.active_model.domain.vulnerability_vm.add_vulnerability_curves_to_model(selected_damage_curve_database, selected_link_table)
+
+        # Check the checkbox
+        app.gui.setvar("_main", "checkbox_vulnerability", True)
+
+        # TODO: set SVI and equity
+
+        dlg.close()
+
+    except FileNotFoundError:
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
+        dlg.close()
+
+    ## ROADS ##
+    try:
+        dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
+        
+        # Get the roads to show in the map
+        gdf = app.active_model.domain.exposure_vm.get_osm_roads()
+
+        crs = app.gui.getvar("fiat", "selected_crs")
+        gdf.set_crs(crs, inplace=True)
+
+        app.map.layer["roads"].layer["exposure_lines"].crs = crs
+        app.map.layer["roads"].layer["exposure_lines"].set_data(
+            gdf
+        )
+
+        # Set the road damage threshold
+        road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
+        app.active_model.domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
+
+        # Show the roads
+        app.active_model.show_exposure_roads()
+        app.gui.setvar("_main", "checkbox_roads_(optional)", True)
+
+        # Set the checkbox checked
+        app.gui.setvar("fiat", "show_roads", True)
+        app.gui.setvar("modelmaker_fiat", "show_roads", True)
+
+        dlg.close()
+    except Exception:
+        app.gui.window.dialog_info(text="No OSM roads found in this area, try another or a larger area.", title="No OSM roads found")
+        dlg.close()
+
+
+def display_asset_locations(*args):
+    """Show/hide buildings layer"""
+    app.gui.setvar("fiat", "show_asset_locations", args[0])
+    if args[0]:
+        app.model["fiat"].show_exposure_buildings()
+    else:
+        app.model["fiat"].hide_exposure_buildings()
+
+
+def display_roads(*args):
+    """Show/hide roads layer""" 
+    app.gui.setvar("fiat", "show_roads", args[0])
+    if args[0]:
+        app.model["fiat"].show_exposure_roads()
+    else:
+        app.model["fiat"].hide_exposure_roads()

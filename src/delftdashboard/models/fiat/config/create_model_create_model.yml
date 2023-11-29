@@ -48,16 +48,6 @@ element:
     width: 100
     height: 20
   text: "<u>Damage curves</u>:"
-- style: radiobuttongroup
-  position:
-    x: 160
-    y: 10
-    width: 100
-  text: "Display properties"
-  variable: properties_to_display
-  option_string: ["Classification", "Asset heights", "Max potential damages", "Aggregation", "Damage curves", "Roads"]
-  option_value: ["Classification", "Asset heights", "Max potential damages", "Aggregation", "Damage curves", "Roads"]
-  method: display_properties
 - style: pushbutton
   position:
     x: 300

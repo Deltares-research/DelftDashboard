@@ -33,8 +33,10 @@ def new(option):
         app.toolbox[toolbox].add_layers()
     for model in app.model:
         app.model[model].add_layers()
-    app.active_model = app.model[list(app.model)[0]]
-    app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
+
+    ## FREDERIQUE: commented out below because it changes the active model
+    # app.active_model = app.model[list(app.model)[0]]
+    # app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
 
     # Create a new model
     app.active_model.new()

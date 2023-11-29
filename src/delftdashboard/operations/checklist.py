@@ -33,7 +33,7 @@ def initialize_checklist():
         item["position"] = {}
         item["position"]["x"] = 25
         item["position"]["y"] = space
-        item["position"]["width"] = 80
+        item["position"]["width"] = 100
         item["position"]["height"] = 20
         item["text"] = i
         config_dict["element"].append(item)
