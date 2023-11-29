@@ -11,7 +11,7 @@ element:
 - style: text
   position:
     x: 15
-    y: 417
+    y: 290
     width: 250
     height: 20
   text: "<b>Table</b>: Exposure categories to standardize"
@@ -30,7 +30,7 @@ element:
 - style: text
   position:
     x: 372
-    y: 417
+    y: 290
     width: 250
     height: 20
   text: "<b>Table</b>: Standard occupancy types"

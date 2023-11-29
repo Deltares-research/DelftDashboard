@@ -67,6 +67,10 @@ def remove_datasource(*args):
     app.gui.setvar("fiat", "loaded_damages_files_value", current_list_value)
 
 
+def adjust_damage_settings(*args):
+    print("Adjust settings")
+
+
 def add_to_model(*args):
     print("Add to model")
 
