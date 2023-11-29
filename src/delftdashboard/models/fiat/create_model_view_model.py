@@ -32,10 +32,12 @@ def display_properties(*args):
     elif properties_to_display == "Max potential damages: Structure":
         app.map.layer["buildings"].clear()
         app.model[model].show_max_potential_damage_struct()
-
     elif properties_to_display == "Max potential damages: Content":
         app.map.layer["buildings"].clear()
         app.model[model].show_max_potential_damage_cont()
+    elif properties_to_display == "Ground Elevation":
+        app.map.layer["buildings"].clear()
+        app.model[model].show_ground_elevation()
 
 
 def display_roads(*args):

@@ -45,7 +45,7 @@ element:
 - style: panel
   title: Select attributes
   position:
-    x: 170
+    x: 160
     y: 10
     width: 160
     height: 120
@@ -81,7 +81,7 @@ element:
 - style: panel
   title: Overview attributes
   position:
-    x: 350
+    x: 330
     y: 10
     width: 320
     height: 120

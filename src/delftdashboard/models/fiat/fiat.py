@@ -671,6 +671,22 @@ class Model(GenericModel):
                 self.buildings, legend
             )
             self.show_max_potential_damage_content()
+    
+    def show_ground_elevation(self):
+        if not self.buildings.empty:
+            def add_heatmap(assets, var_name):
+                """Adds a heatmap of the building footprint centroids"""
+                app.map.layer["buildings"].add_layer("Ground_elevation", type="heatmap", max_zoom=24)
+                centroids = assets.copy()
+                centroids["geometry"] = centroids["geometry"].centroid
+                centroids = centroids[centroids[var_name] > 0]
+                app.map.layer["buildings"].layer["Ground_elevation"].set_data(
+                    data=centroids,
+                    density_property=var_name,
+                )
+            asset = app.active_model.buildings
+            add_heatmap(asset, "Ground Elevation")
+            self.show_ground_elevations()
 
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
@@ -683,6 +699,9 @@ class Model(GenericModel):
 
     def show_max_potential_damage_structure(self):
         app.map.layer["buildings"].layer["max_potential_damage_struct"].show()
+
+    def show_ground_elevations(self):
+        app.map.layer["buildings"].layer["ground_elevation"].show()
 
     def hide_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].hide()
@@ -724,3 +743,4 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, None)
         if not okay:
             return
+    
