@@ -1,6 +1,7 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+import geopandas as gpd
 import fiona
 
 
@@ -14,27 +15,31 @@ def set_variables(*args):
 
 
 def add_classification_field(*args):
-    print("Add classification field")
+    model = "fiat"
+    dlg = app.gui.window.dialog_wait("\nReading classification data...")
+    path = app.gui.getvar(model, "classification_source_path")
+    attribute_name = app.gui.getvar(model, "classification_file_field_name")
+    gdf = gpd.read_file(path)
+    list(gdf[attribute_name].unique())
 
-
-def load_nsi_classification_source(*args):
-    print("Load NSI classification source")
-    app.gui.setvar("fiat", "assign_classification_active", False)
+    dlg.close()
 
 
 def load_upload_classification_source(*args):
-    print("Load upload classification source")
+    model = "fiat"
     fn = app.gui.window.dialog_open_file(
         "Select geometry", filter="Geometry (*.shp *.gpkg *.geojson)"
     )
+    app.gui.setvar(model, "classification_source_path", str(fn[0]))
     # Open the data source for reading
     with fiona.open(fn[0]) as src:
         # Access the schema to get the column names
         schema = src.schema
         list_columns = list(schema['properties'].keys())
     
-    app.gui.setvar("fiat", "classification_file_field_name_string", list_columns)
-    app.gui.setvar("fiat", "assign_classification_active", True)
+    app.gui.setvar(model, "classification_file_field_name_string", list_columns)
+    app.gui.setvar(model, "classification_file_field_name_value", list_columns)
+    app.gui.setvar(model, "assign_classification_active", True)  # This variable needs to be set to False when NSI is used
 
 
 def display_primary_classification(*args):

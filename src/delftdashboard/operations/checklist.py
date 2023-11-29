@@ -1,6 +1,8 @@
 from pathlib import Path
 import yaml
 
+from delftdashboard.app import app
+
 
 def initialize_checklist():
     checklist_items = [
@@ -86,4 +88,36 @@ def initialize_checklist():
 
         config_dict["element"].append(item)
     
+        if i == 'Model boundary':
+            # Add the zoom to boundary button
+            item = {}
+            item["style"] = "pushbutton"
+            item["position"] = {}
+            item["position"]["x"] = 90
+            item["position"]["y"] = space
+            item["position"]["width"] = 16
+            item["position"]["height"] = 16
+            item["text"] = "\u233E"
+            item["method"] = "zoom_to_boundary"
+            config_dict["element"].append(item)
+
     return config_dict
+
+
+def zoom_to_boundary(*args):
+    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+    if active_layer:
+        gdf = app.active_toolbox.area_of_interest
+
+        # get the aoi bounds
+        bounds = gdf.geometry.bounds
+
+        # Fly to the site
+        app.map.fit_bounds(
+            bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0]
+        )
+    else:
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )

@@ -44,23 +44,42 @@ element:
         width: 105
         height: 20
       method: draw_boundary
+      dependency: 
+      - action: visible
+        checkfor: any
+        check:
+        - variable: selected_aoi_method
+          operator: eq
+          value: polygon
+        - variable: selected_aoi_method
+          operator: eq
+          value: box
     - style: pushbutton
-      text: Zoom to boundary
+      text: Load
+      position:
+        x: 140
+        y: 35
+        width: 105
+        height: 20
+      method: draw_boundary
+      dependency:
+      - action: visible
+        checkfor: any
+        check:
+        - variable: selected_aoi_method
+          operator: eq
+          value: sfincs
+        - variable: selected_aoi_method
+          operator: eq
+          value: file
+    - style: pushbutton
+      text: Generate boundary
       position:
         x: 140
         y: 10
         width: 105
         height: 20
-      method: zoom_to_boundary
-
-  - style: pushbutton
-    text: Generate model boundary
-    position:
-      x: 130
-      y: 50
-      width: 125
-      height: 20
-    method: generate_boundary
+      method: generate_boundary
   
   - style: panel
     title: Quick build

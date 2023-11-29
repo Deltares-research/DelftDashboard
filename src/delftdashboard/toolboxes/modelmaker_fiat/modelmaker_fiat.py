@@ -1,10 +1,10 @@
 import geopandas as gpd
-import pandas as pd
 import time
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.operations.checklist import zoom_to_boundary
 
 
 class Toolbox(GenericToolbox):
@@ -125,25 +125,6 @@ def draw_boundary(*args):
         load_aoi_file()
 
 
-def zoom_to_boundary(*args):
-    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
-    if active_layer:
-        gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
-
-        # get the aoi bounds
-        bounds = gdf.geometry.bounds
-
-        # Fly to the site
-        app.map.fit_bounds(
-            bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0]
-        )
-    else:
-        app.gui.window.dialog_info(
-            text="Please first select a model boundary.",
-            title="No model boundary selected",
-        )
-
-
 def generate_boundary(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
     if active_layer == "":
@@ -163,6 +144,7 @@ def generate_boundary(*args):
         app.active_model.new()
 
     gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
+    app.active_toolbox.area_of_interest = gdf
     gdf.to_file(
         app.active_model.domain.database.drive / "aoi.geojson", driver="GeoJSON"
     )
@@ -195,8 +177,8 @@ def clear_aoi_layers():
         "area_of_interest_from_sfincs",
     ]
     if app.gui.getvar("modelmaker_fiat", "area_of_interest") == 1:
-        for l in aoi_layers:
-            layer = app.map.layer["modelmaker_fiat"].layer[l]
+        for lyr in aoi_layers:
+            layer = app.map.layer["modelmaker_fiat"].layer[lyr]
             layer.clear()
 
 
@@ -240,6 +222,8 @@ def load_aoi_file():
         app.gui.setvar(
             "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file"
         )
+
+        app.active_toolbox.area_of_interest = gdf
 
         # Fly to the site
         zoom_to_boundary()

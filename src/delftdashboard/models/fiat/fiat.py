@@ -246,14 +246,14 @@ class Model(GenericModel):
             ["National Structure Inventory (NSI)", "Upload data"],
         )
         app.gui.setvar(group, "classification_source_value", ["nsi_data", "upload_data"])
-        app.gui.setvar(group, "upload_classification", None)
+        app.gui.setvar(group, "classification_source_path", "")
         app.gui.setvar(
             group,
             "object_type_string",
             ["Primary object type", "Secondary object type"],
         )
-        app.gui.setvar(group, "object_type_value", ["pot", "sot"])
-        app.gui.setvar(group, "object_type", None)
+        app.gui.setvar(group, "object_type_value", ["Primary object type", "Secondary object type"])
+        app.gui.setvar(group, "object_type", "Primary object type")
         app.gui.setvar(
             group,
             "classification_file_field_name_string",
@@ -264,7 +264,7 @@ class Model(GenericModel):
             "classification_file_field_name_value",
             [],
         )
-        app.gui.setvar(group, "classification_file_field_name", None)
+        app.gui.setvar(group, "classification_file_field_name", 0)
         app.gui.setvar(
             group,
             "selected_primary_classification_string",
