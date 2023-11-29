@@ -54,7 +54,6 @@ class Model(GenericModel):
             circle_radius=3,
             legend_position="top-right",
             legend_title="Max. potential damage: Structure",
-            fill_color="red",
             line_color="transparent",
             hover_property="Max Potential Damage: Structure",
             big_data=True,
@@ -67,7 +66,6 @@ class Model(GenericModel):
             circle_radius=3,
             legend_position="top-right",
             legend_title="Max. potential damage: Content",
-            fill_color="purple",
             line_color="transparent",
             hover_property="Max Potential Damage: Content",
             big_data=True,
@@ -575,8 +573,30 @@ class Model(GenericModel):
                 "RES5", "#939b8f",
                 "RES6", "#665435",
                 "#000000",
-            ]
-
+            ]      
+        # Example usage
+        if type == "damage_struct":
+             circle_color = [
+                "step",
+                ["get", "Max Potential Damage: Structure"],"#FFFFFF",
+                0.00001, "#FFFFFF",      
+                15000.0, "#FEE9CE",      
+                50000.0, "#FDBB84",     
+                100000.0, "#FC844E",    
+                250000.0, "#E03720",    
+                500000.0, "#860000",                                    
+                ]
+        if type == "damage_cont":
+             circle_color = [
+                "step",
+                ["get", "Max Potential Damage: Content"],"#FFFFFF",
+                0.00001, "#FFFFFF",      
+                15000.0, "#FEE9CE",      
+                50000.0, "#FDBB84",     
+                100000.0, "#FC844E",    
+                250000.0, "#E03720",    
+                500000.0, "#860000",                                    
+                ]
         paint_properties = {
             "circle-color": circle_color,
             "circle-stroke-width": 2,
@@ -598,30 +618,36 @@ class Model(GenericModel):
             )
             self.show_exposure_buildings()
     
-    def show_max_potential_damage_struct(self, type="secondary"):
+    def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
             legend = []
-
+            app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
-                self.buildings, paint_properties, legend
+                self.buildings, legend
             )
-            self.show_exposure_buildings()
+            self.show_max_potential_damage_structure()
     
-    def show_max_potential_damage_cont(self, type="secondary"):
+    def show_max_potential_damage_cont(self, type="damage_cont"):
         """Show maximum potential damage: content layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
             legend = []
-
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"]   
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
-                self.buildings, paint_properties, legend
+                self.buildings, legend
             )
-            self.show_exposure_buildings()
+            self.show_max_potential_damage_content()
 
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
+    
+    def show_max_potential_damage_content(self):
+        app.map.layer["buildings"].layer["max_potential_damage_cont"].show()
+
+    def show_max_potential_damage_structure(self):
+        app.map.layer["buildings"].layer["max_potential_damage_struct"].show()
 
     def hide_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].hide()
