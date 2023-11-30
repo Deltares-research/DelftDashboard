@@ -8,30 +8,32 @@ def select(*args):
 
 
 def edit(*args):
-    app.model["fiat"].set_model_variables()
+    app.active_model.set_model_variables()
 
 
 def add_svi(*args):
     group = "fiat"
 
     # Get the variables
-    census_key = ""
-    state_abbreviation = app.gui.getvar(
-        group, "selected_state"
-    )  # Change to state identifier instead of name
-    year_data = int(app.gui.getvar(group, "selected_year"))
-    county = app.gui.getvar(group, "selected_county")
+    census_key = "495a349ce22bdb1294b378fb199e4f27e57471a9"  ## TODO: CHANGE TO INPUT
+    state_abbreviation = "SC"  ## TODO: CHANGE TO INPUT
+    year_data = 2021  ## TODO: CHANGE TO INPUT
+    county = "019"  ## TODO: CHANGE TO INPUT
 
     if app.gui.getvar(group, "use_svi"):
-        app.model["fiat"].domain.svi_vm.set_svi_settings(
+        app.active_model.domain.svi_vm.set_svi_settings(
             census_key, state_abbreviation, year_data, county
         )
     
     if app.gui.getvar(group, "use_equity"):
-        app.model["fiat"].domain.svi_vm.set_equity_settings(
+        app.active_model.domain.svi_vm.set_equity_settings(
             census_key, state_abbreviation, year_data, county
         )
     
     if app.gui.getvar(group, "use_svi") or app.gui.getvar(group, "use_equity"):
         app.gui.setvar("group", "checkbox_svi_(optional)", True)
 
+    app.gui.window.dialog_info(
+        text="SVI and/or equity information were added to the model",
+        title="Added SVI and/or equity",
+    )
