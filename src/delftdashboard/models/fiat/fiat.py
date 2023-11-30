@@ -401,6 +401,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "max_potential_damage_string",[])
         app.gui.setvar(group, "max_potential_damage_value",[])
         
+        
 
     def set_input_variables(self):
         # Update all model input variables

@@ -91,4 +91,11 @@ def toggle_attr_map(*args):
     else:
         app.gui.setvar("fiat", "aggregation_label_display_string", [])
         app.gui.setvar("fiat", "aggregation_label_display_value", [])
-        
+
+def display_asset_locations(*args):
+    """Show/hide buildings layer"""
+    app.gui.setvar("fiat", "show_asset_locations", args[0])
+    if args[0]:
+        app.active_model.show_exposure_buildings()
+    else:
+        app.active_model.hide_exposure_buildings()

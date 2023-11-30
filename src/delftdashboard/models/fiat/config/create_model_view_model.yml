@@ -32,6 +32,15 @@ element:
 - style: checkbox
   position:
     x: 310
+    y: 50
+    width: 100
+    height: 20
+  text: Display assets
+  variable: show_asset_locations
+  method: display_asset_locations
+- style: checkbox
+  position:
+    x: 310
     y: 30
     width: 100
     height: 20
