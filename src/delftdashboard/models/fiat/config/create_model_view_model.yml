@@ -22,8 +22,21 @@ element:
   position:
     x: 200
     y: 50
-    width: 200
+    width: 100
     height: 20
   text: Display attributes
   variable: show_attributes
+  method: toggle_attr_map  
+- style: popupmenu
+  position:
+    x: 350
+    y: 50
+    width: 100
+    height: 20
+  text: Attribute
+  variable: aggregation_label_display_name
+  option_string:
+    variable: aggregation_label_display_string
+  option_value:
+    variable: aggregation_label_display_value
   method: display_attribute

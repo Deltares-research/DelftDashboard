@@ -340,6 +340,9 @@ class Model(GenericModel):
             [],
         )
         app.gui.setvar(group, "aggregation_label_string", "")
+        app.gui.setvar(group, "aggregation_label_display_name", "")
+        app.gui.setvar(group, "aggregation_label_display_string",[])
+        app.gui.setvar(group, "aggregation_label_display_value",[])
         app.gui.setvar(group, "aggregation_table_name", [0])
         app.gui.setvar(group, "aggregation_table", pd.DataFrame(columns=["File", "Attribute ID", "Attribute Label", "File Path"]))
         app.gui.setvar(group, "assign_classification_active", False)
