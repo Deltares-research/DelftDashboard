@@ -29,17 +29,21 @@ def display_properties(*args):
     elif properties_to_display == "Asset heights":
         app.map.layer["buildings"].clear()
         app.model[model].show_asset_height()
-    elif properties_to_display == "Max potential damages: Structure":
+    elif properties_to_display == "Max potential damages":
         app.map.layer["buildings"].clear()
-        app.model[model].show_max_potential_damage_struct()
-    elif properties_to_display == "Max potential damages: Content":
-        app.map.layer["buildings"].clear()
-        app.model[model].show_max_potential_damage_cont()
+        app.gui.setvar("fiat", "max_potential_damage_string", ["Structure", "Content"])
+        app.gui.setvar("fiat", "max_potential_damage_value", ["Structure", "Content"])
     elif properties_to_display == "Ground Elevation":
         app.map.layer["buildings"].clear()
         app.model[model].show_ground_elevation()
 
-
+def display_damage(*args):
+    app.map.layer["buildings"].clear()
+    if app.gui.getvar("fiat", "max_potential_damage_name") == "Structure":
+        app.model["fiat"].show_max_potential_damage_struct()
+    else:
+        app.model["fiat"].show_max_potential_damage_cont()
+    
 def display_roads(*args):
     """Show/hide roads layer""" 
     app.gui.setvar("fiat", "show_roads", args[0])
@@ -76,6 +80,7 @@ def toggle_attr_map(*args):
                 text="There are no additional attributes in your model. Please add attributes when you set up the exposure data.",
                 title="Additional attributes not found."
                 )
+                app.gui.setvar("fiat", "show_attributes", False)
             else:
                 app.gui.setvar("fiat", "aggregation_label_display_string", label)
                 app.gui.setvar("fiat", "aggregation_label_display_value", label)
