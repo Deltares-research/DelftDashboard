@@ -175,6 +175,7 @@ def display_aggregation_zone(*args):
     app.gui.setvar("fiat", "show_aggregation_zone", args[0])
     if args[0]: 
         select_additional_attribute()
+        app.gui.setvar("fiat", "show_attributes", False)
     else: 
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
 

@@ -49,24 +49,41 @@ def display_roads(*args):
         app.model["fiat"].hide_exposure_roads()
 
 def display_attribute(*args):
-    app.gui.setvar("fiat", "show_attributes", args[0])
-    if args[0]:
-        index = app.gui.getvar("fiat", "aggregation_table_name")[0]
-        fn, attribute, label = get_table_data()
-        if len(fn) == 0:
-            app.gui.window.dialog_info(
-            text="There are no additional attributes in your model.Please add attributes when you set up the exposure data.",
-            title="Additional attributes not found."
+        label_to_visualize = app.gui.getvar("fiat", "aggregation_label_display_name")
+        table = app.gui.getvar("fiat", "aggregation_table")
+        row_index = table.index[table["Attribute Label"] == label_to_visualize].tolist()[0]
+        attribute_id = table["Attribute ID"].iloc[row_index]
+        data_to_visualize = Path(table["File Path"].iloc[row_index])
+        gdf = gpd.read_file(data_to_visualize)
+        app.model["fiat"].aggregation = gdf
+        paint_properties = app.model["fiat"].create_paint_properties(
+            gdf, attribute_id, type="polygon", opacity=0.3
+        )   
+        app.map.layer["aggregation"].layer["aggregation_layer"].clear()
+        app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
+        gdf, paint_properties,
         )
-        else:
-            attribute_to_visualize = str(attribute[index])
-            data_to_visualize = Path(fn[index])
-            gdf = gpd.read_file(data_to_visualize)
-            app.model["fiat"].aggregation = gdf
-            paint_properties = app.model["fiat"].create_paint_properties(
-                gdf, attribute_to_visualize, type="polygon", opacity=0.3
-            )   
-            app.map.layer["aggregation"].layer["aggregation_layer"].clear()
-            app.map.layer["aggregation"].layer["aggregation_layer"].set_data(
-            gdf, paint_properties,
-            )
+
+def toggle_attr_map(*args):
+    """Show/hide aggregation areas layer if it is already there, or add it in
+    mapbox if it is the first time it is called."""
+    app.gui.setvar("fiat", "show_attributes", args[0])
+    app.map.layer["aggregation"].layer["aggregation_layer"].clear()
+    if args[0]:
+            fn, attribute, label = get_table_data()
+            if len(fn) == 0:
+                app.gui.window.dialog_info(
+                text="There are no additional attributes in your model. Please add attributes when you set up the exposure data.",
+                title="Additional attributes not found."
+                )
+            else:
+                app.gui.setvar("fiat", "aggregation_label_display_string", label)
+                app.gui.setvar("fiat", "aggregation_label_display_value", label)
+                attributes = [app.gui.getvar("fiat", "aggregation_label_display_name")]
+                if len(attributes) > 0:
+                    app.gui.setvar("fiat", "aggregation_label_display_name", 0)
+                app.gui.setvar("fiat", "show_aggregation_zone", False)
+    else:
+        app.gui.setvar("fiat", "aggregation_label_display_string", [])
+        app.gui.setvar("fiat", "aggregation_label_display_value", [])
+        
