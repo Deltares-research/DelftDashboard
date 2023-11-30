@@ -1,4 +1,5 @@
 import geopandas as gpd
+import pandas as pd
 import time
 
 from delftdashboard.operations.toolbox import GenericToolbox
@@ -290,6 +291,13 @@ def quick_build(*args):
 
         # Set the buildings attribute to gdf for easy visualization of the buildings
         app.active_model.buildings = gdf
+
+        list_types = list(gdf["Secondary Object Type"].unique())
+        list_types.sort()
+        df = pd.DataFrame(data={"Secondary Object Type": list_types, "Assigned: Structure": "", "Assigned: Content": ""})
+        ## TODO: add the nr of stories and the basement
+
+        app.gui.setvar(model, "exposure_categories_to_link", df)
 
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
         app.map.layer["buildings"].layer["exposure_points"].set_data(
