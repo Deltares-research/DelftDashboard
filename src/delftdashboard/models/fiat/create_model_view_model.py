@@ -36,6 +36,9 @@ def display_properties(*args):
     elif properties_to_display == "Ground Elevation":
         app.map.layer["buildings"].clear()
         app.model[model].show_ground_elevation()
+    elif properties_to_display == "Social Vulnerability Index (SVI)":
+        app.map.layer["buildings"].clear()
+        print("not implemented yet")
 
 def display_damage(*args):
     app.map.layer["buildings"].clear()
