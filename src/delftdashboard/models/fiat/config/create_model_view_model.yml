@@ -1,18 +1,47 @@
 element:
-- style: radiobuttongroup
+- style: panel
+  title: Display model ouput
   position:
-    x: 30
-    y: 30
-    width: 200
-  text: "Display properties"
-  variable: properties_to_display
-  option_string: ["Classification", "Asset heights", "Max potential damages: Structure", "Max potential damages: Content", "Ground Elevation"]
-  option_value: ["Classification", "Asset heights", "Max potential damages: Structure", "Max potential damages: Content", "Ground Elevation"]
-  method: display_properties
+    x: 10
+    y: 10
+    width: 290
+    height: 120
+  element:
+  - style: radiobuttongroup
+    position:
+      x: 30
+      y: 20
+      width: 200
+    text: "Display properties"
+    variable: properties_to_display
+    option_string: ["Classification", "Asset heights", "Max potential damages", "Ground Elevation"]
+    option_value: ["Classification", "Asset heights", "Max potential damages", "Ground Elevation"]
+    method: display_properties
+  - style: popupmenu
+    position:
+      x: 150
+      y: 40
+      width: 100
+      height: 20
+    variable: max_potential_damage_name
+    option_string:
+      variable: max_potential_damage_string
+    option_value:
+      variable: max_potential_damage_value
+    method: display_damage 
 - style: checkbox
   position:
-    x: 200
-    y: 80
+    x: 310
+    y: 50
+    width: 100
+    height: 20
+  text: Display assets
+  variable: show_asset_locations
+  method: display_asset_locations
+- style: checkbox
+  position:
+    x: 310
+    y: 30
     width: 100
     height: 20
   text: Display roads
@@ -20,8 +49,8 @@ element:
   method: display_roads
 - style: checkbox
   position:
-    x: 200
-    y: 50
+    x: 310
+    y: 10
     width: 100
     height: 20
   text: Display attributes
@@ -29,11 +58,11 @@ element:
   method: toggle_attr_map  
 - style: popupmenu
   position:
-    x: 350
-    y: 50
+    x: 430
+    y: 10
     width: 100
     height: 20
-  text: Attribute
+  text: ""
   variable: aggregation_label_display_name
   option_string:
     variable: aggregation_label_display_string

@@ -390,6 +390,11 @@ class Model(GenericModel):
         app.gui.setvar(group, "created_vulnerability_curves", 0)
         app.gui.setvar(group, "linking_object_type", 0)
         app.gui.setvar(group, "road_damage_threshold", 1)
+
+        app.gui.setvar(group, "max_potential_damage_name", "")
+        app.gui.setvar(group, "max_potential_damage_string",[])
+        app.gui.setvar(group, "max_potential_damage_value",[])
+        
         
 
     def set_input_variables(self):
