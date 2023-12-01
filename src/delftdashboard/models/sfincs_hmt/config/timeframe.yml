@@ -7,20 +7,20 @@ element:
     width: -10
     height: 140
   element:
+  # - style: datetimeedit
+  #   position:
+  #     x: 80
+  #     y: 110
+  #     width: 110
+  #     height: 20
+  #   text: Reference Time
+  #   variable_group: sfincs_hmt
+  #   variable: tref
+  #   method: set_variables
   - style: datetimeedit
     position:
       x: 80
       y: 110
-      width: 110
-      height: 20
-    text: Reference Time
-    variable_group: sfincs_hmt
-    variable: tref
-    method: set_variables
-  - style: datetimeedit
-    position:
-      x: 80
-      y: 85
       width: 110
       height: 20
     text: Start Time
@@ -30,20 +30,20 @@ element:
   - style: datetimeedit
     position:
       x: 80
-      y: 60
+      y: 85
       width: 110
       height: 20
     text: Stop Time
     variable_group: sfincs_hmt
     variable: tstop
     method: set_variables
-  - style: edit
-    position:
-      x: 80
-      y: 35
-      width: 110
-      height: 20
-    text: Spin-up Time (s)
-    variable_group: sfincs_hmt
-    variable: tspinup
-    method: set_variables
+  # - style: edit
+  #   position:
+  #     x: 80
+  #     y: 35
+  #     width: 110
+  #     height: 20
+  #   text: Spin-up Time (s)
+  #   variable_group: sfincs_hmt
+  #   variable: tspinup
+  #   method: set_variables

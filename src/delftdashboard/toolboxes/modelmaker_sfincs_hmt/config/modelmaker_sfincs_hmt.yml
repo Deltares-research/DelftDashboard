@@ -10,7 +10,7 @@ element:
   - string: Domain
     module: toolboxes.modelmaker_sfincs_hmt.domain
     element: domain.yml
-  - string: Bed levels
+  - string: TopoBathy
     module: toolboxes.modelmaker_sfincs_hmt.bathymetry
     element: bathymetry.yml
   - string: Active Cells

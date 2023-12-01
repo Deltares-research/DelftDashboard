@@ -66,7 +66,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(
             group,
             "setup_grid_methods",
-            ["Draw Bounding Box", "Draw polygon", "Load Area of Interest"],
+            ["Draw Bounding Box", "Draw Polygon", "Load watershed", "Load shapefile"],
         )
         app.gui.setvar(group, "setup_grid_methods_index", 0)
 
@@ -89,6 +89,7 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "res", 500)
             app.gui.setvar(group, "unit", " (in m)")
         app.gui.setvar(group, "rotation", 0.0)
+        app.gui.setvar(group, "auto_rotate", False)
         app.gui.setvar(group, "lenx", 0.0)
         app.gui.setvar(group, "leny", 0.0)
 
@@ -405,7 +406,7 @@ class Toolbox(GenericToolbox):
 
         app.gui.setvar(group, "resolution_str", "Resolution: {}{}".format(app.gui.getvar(group, "res"),app.gui.getvar(group, "unit")))
         app.gui.setvar(group, "nr_cells_str", "Number of cells: {}".format(app.gui.getvar(group, "nr_cells")))
-        app.gui.setvar(group, "rotation_str", "Rotation amgle: {}".format(model.config.get("rotation")))
+        app.gui.setvar(group, "rotation_str", "Rotation angle: {}".format(model.config.get("rotation")))
         app.gui.setvar(group, "crs_str", "Coordinate system: {}".format(app.crs.to_string()))
 
 

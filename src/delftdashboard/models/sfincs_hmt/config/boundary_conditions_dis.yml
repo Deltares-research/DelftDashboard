@@ -1,235 +1,134 @@
 element:
 - style: panel
+  title: Select method
   position:
     x: 10
     y: 10
-    width: 250
+    width: 150
     height: 120
   element:
-  - style: pushbutton
+  - style: popupmenu
     position:
       x: 10
       y: 90
       width: 130
       height: 20
-    text: Draw Boundary Spline
-    method: draw_boundary_spline
-    tooltipstring: Draw boundary spline
-  - style: pushbutton
-    position:
-      x: 10
-      y: 65
-      width: 130
-      height: 20
-    text: Delete Boundary Spline
-    method: boundary_conditions
-    tooltipstring: Delete boundary spline
-  - style: pushselectfile
-    position:
-      x: 10
-      y: 40
-      width: 130
-      height: 20
-    text: Load Boundary Spline
-    variable: boundaryspline_filename
-    showfilename: False
-    extension: "*.pol"
-    selectiontext: Select boundary spline file
-    tooltipstring: Select boundary spline file
-  - style: pushsavefile
-    position:
-      x: 10
-      y: 15
-      width: 130
-      height: 20
-    text: Save Boundary Spline
-    variable: boundaryspline_filename
-    showfilename: False
-    extension: "*.pol"
-    selectiontext: Select boundary spline file
-    tooltipstring: Select boundary spline file
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: boundaryspline_length
-        operator: gt
-        value: 0
-  - style: edit
-    position:
-      x: 190
-      y: 90
-      width: 50
-      height: 20
-    text: Contour
-    variable: depthcontour_value
-  - style: pushbutton
-    position:
-      x: 190
-      y: 60
-      width: 50
-      height: 20
-    text: Update
-    method: boundary_conditions
-    tooltipstring: Re-plot depth contour
-  - style: pushbutton
-    position:
-      x: 190
-      y: 35
-      width: 50
-      height: 20
-    text: Snap
-    tooltipstring: Snap boundary spline to depth contour
+    select: index
+    tooltip: Select how you want to add discharge points
+    variable: bc_dis_methods_index
+    option_string: 
+      variable: bc_dis_methods
 - style: panel
+  title: Manually add points
   position:
-    x: 270
+    x: 170
     y: 10
-    width: 270
+    width: 200
     height: 120
-  element:
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: bc_dis_methods_index
+      operator: eq
+      value: 0
+  element:    
   - style: pushbutton
+    text: Add Point
     position:
-      x: 280
+      x: 10
       y: 90
-      width: 100
+      width: 180
       height: 20
-    text: Create points
-    tooltipstring: Create boundary points
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: boundaryspline_length
-        operator: gt
-        value: 0
+    method: add_discharge_point_on_map
+    tooltip: Add discharge point on map
   - style: pushbutton
+    text: Delete Point
     position:
-      x: 280
+      x: 10
       y: 65
-      width: 100
+      width: 180
       height: 20
-    text: Delete points
-    tooltipstring: Delete boundary points
+    method: delete_point_from_list
+    tooltip: Delete discharge point from list
     dependency:
     - action: enable
       checkfor: all
       check:
-      - variable: flowboundarypoints_length
-        operator: gt
-        value: 0
-  - style: edit
-    position:
-      x: 330
-      y: 40
-      width: 50
-      height: 20
-    text: Distance
-    variable: boundaryspline_flowdx
-    tooltipstring: Edit distance between boundary points
-  - style: pushbutton
-    position:
-      x: 400
-      y: 40
-      width: 50
-      height: 20
-    text: Snap
-    tooltipstring: Snap boundary points to depth contour
-  - style: pushselectfile
-    position:
-      x: 400
-      y: 90
-      width: 130
-      height: 20
-    text: Load Boundary Points
-    variable: bndfile
-    showfilename: False
-    extension: "*.bnd"
-    selectiontext: Select boundary points file
-    tooltipstring: Select boundary points file
-  - style: pushsavefile
-    position:
-      x: 400
-      y: 65
-      width: 130
-      height: 20
-    text: Save Boundary Points
-    variable: bndfile
-    showfilename: False
-    extension: "*.bnd"
-    selectiontext: Select boundary points file
-    tooltipstring: Select boundary points file
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: flowboundarypoints_length
-        operator: gt
-        value: 0
-  - style: edit
-    position:
-      x: 480
-      y: 20
-      width: 50
-      height: 20
-    text: water level
-    variable: boundaryconditions_zs
-    tooltipstring: Edit water level
-  - style: pushbutton
-    position:
-      x: 280
-      y: 20
-      width: 120
-      height: 20
-    text: Generate Tides
-    method: boundary_conditions
-    tooltipstring: Generate tidal boundary conditions
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: flowboundarypoints_length
+      - variable: nr_discharge_points
         operator: gt
         value: 0
 - style: panel
+  title: Load from file
   position:
-    x: 550
+    x: 170
     y: 10
-    width: 220
+    width: 200
     height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: bc_dis_methods_index
+      operator: eq
+      value: 1
+  element:
+  - style: pushbutton
+    text: Load from file
+    position:
+      x: -10
+      y: 90
+      width: 180
+      height: 20
+    method: load_discharge_points_from_file
+    tooltip: Load discharge points from file
+- style: panel
+  title: Add timeseries
+  position:
+    x: 380
+    y: 10
+    width: 200
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: nr_discharge_points
+      operator: ge
+      value: 1
   element:
   - style: edit
+    text: Constant discharge (m3/s)
     position:
-      x: 890
+      x: -10
       y: 90
-      width: 150
+      width: 45
       height: 20
-    text: BZS file
-    variable: bzsfile
-    tooltipstring: Edit bzs file name
-  - style: edit
-    position:
-      x: 890
-      y: 65
-      width: 150
-      height: 20
-    text: BHS file
-    variable: bhsfile
-    tooltipstring: Edit bzs file name
-  - style: edit
-    position:
-      x: 890
-      y: 40
-      width: 150
-      height: 20
-    text: BTP file
-    variable: btpfile
-    tooltipstring: Edit bzs file name
-  - style: edit
-    position:
-      x: 890
-      y: 15
-      width: 150
-      height: 20
-    text: BWD file
-    variable: bwdfile
-    tooltipstring: Edit bzs file name
+    tooltip: Add constant discharge
+- style: text
+  text: "discharge points: "
+  position:
+    x: -10
+    y: 125
+    width: 120
+    height: 10
+- style: listbox
+  position:
+    x: -10
+    y: 40
+    width: 120
+    height: 80
+  method: select_discharge_point_from_list
+  variable: active_discharge_point
+  select: index
+  option_string:
+    variable: discharge_point_names
+  tooltip: Select discharge point
+- style: pushbutton
+  text: Delete all
+  position:
+    x: -10
+    y: 10
+    width: 120
+    height: 20
+  method: delete_all_points_from_list

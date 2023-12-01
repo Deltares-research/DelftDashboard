@@ -1,19 +1,19 @@
 element:
 - style: panel
-  title: Specify output parameters
+  title: Specify intervals and format
   position:
     x: 10
     y: 10
-    width: -10
-    height: 140
+    width: 240
+    height: 120
   element:
   - style: edit
     position:
-      x: 120
-      y: 110
+      x: 150
+      y: 90
       width: 80
       height: 20
-    tooltipstring: Edit map output interval (in seconds)
+    tooltipstring: Edit map output interval (in seconds). At this interval, gridded instantaneous values will be written to the mapfile.
     text: Map output interval (s)
     textposition: left
     variable_group: sfincs_hmt
@@ -21,43 +21,43 @@ element:
     method: set_variables
   - style: edit
     position:
-      x: 120
-      y: 85
+      x: 150
+      y: 65
       width: 80
       height: 20
-    tooltipstring: Edit max output interval (in seconds)
-    text: Max output interval (s)
+    tooltipstring: Edit maximum output interval (in seconds). Maximum values (gridded) over the interval will be written to the mapfile.
+    text: Maximum output interval (s)
     textposition: left
     variable_group: sfincs_hmt
     variable: dtmaxout
     method: set_variables
   - style: edit
     position:
-      x: 120
-      y: 60
+      x: 150
+      y: 40
       width: 80
       height: 20
-    tooltipstring: Edit history output interval (in seconds)
-    text: His output interval (s)
+    tooltipstring: Edit timeseries output interval (in seconds). At this frequency, values in the observation points/lines will be written to the hisfile.
+    text: Timeseries output interval (s)
     textposition: left
     variable_group: sfincs_hmt
     variable: dthisout
     method: set_variables
-  - style: edit
-    position:
-      x: 120
-      y: 35
-      width: 80
-      height: 20
-    tooltipstring: Edit restart output interval (in seconds)
-    text: Restart output interval (s)
-    textposition: left
-    variable_group: sfincs_hmt
-    variable: dtrstout
-    method: set_variables
+  # - style: edit
+  #   position:
+  #     x: 120
+  #     y: 35
+  #     width: 80
+  #     height: 20
+  #   tooltipstring: Edit restart output interval (in seconds)
+  #   text: Restart output interval (s)
+  #   textposition: left
+  #   variable_group: sfincs_hmt
+  #   variable: dtrstout
+  #   method: set_variables
   - style: popupmenu
     position:
-      x: 120
+      x: 150
       y: 10
       width: 80
       height: 20
@@ -73,3 +73,56 @@ element:
     - net
     - bin
     - asc
+- style: panel
+  title: Additional outputs
+  position:
+    x: 260
+    y: 10
+    width: 240
+    height: 120
+  element:
+  - style: checkbox
+    position:
+      x: 10
+      y: 90
+      width: 120
+      height: 20
+    text: Flood duration
+    variable_group: sfincs_hmt
+    variable: storetwet
+    method: set_variables
+    tooltipstring: Flag to turn on writing away duration that a cell was wet during simulation.
+  - style: checkbox
+    position:
+      x: 10
+      y: 65
+      width: 120
+      height: 20
+    text: Max. flow velocities
+    variable_group: sfincs_hmt
+    variable: storevelmax
+    method: set_variables
+    tooltipstring: "Flag to turn on writing away maximum velocities on ‘dtmaxout’ interval during simulation"
+  - style: checkbox
+    position:
+      x: 10
+      y: 40
+      width: 120
+      height: 20
+    text: Cumulative precipitation
+    variable_group: sfincs_hmt
+    variable: storecumprcp
+    method: set_variables
+    tooltipstring: "Flag to turn on writing away cumulative precipitation on ‘dtmaxout’ interval during simulation."
+  - style: checkbox
+    position:
+      x: 10
+      y: 15
+      width: 120
+      height: 20
+    text: Max. wind speed
+    variable_group: sfincs_hmt
+    variable: storemaxwind
+    method: set_variables
+    tooltipstring: Flag to turn on writing away maximum wind speed during simulation.
+ 

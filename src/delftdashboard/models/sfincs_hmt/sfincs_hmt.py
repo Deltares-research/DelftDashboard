@@ -72,7 +72,7 @@ class Model(GenericModel):
 
         bed_levels = layer.add_layer(
             "bed_levels", 
-            type="raster"
+            type="raster",
         )
 
         # Set update method for topography layer
@@ -190,7 +190,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
 
         # Boundary conditions
-        bc_wlev_methods = ["Click points", "Generate along boundary", "Load from file"]
+        bc_wlev_methods = ["Click Points", "Generate along boundary", "Select from database", "Load from file"]
         app.gui.setvar(group, "bc_wlev_methods", bc_wlev_methods)
         app.gui.setvar(group, "bc_wlev_methods_index", 0)
         app.gui.setvar(group, "bc_dist_along_msk", 5e3)
@@ -199,10 +199,28 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_boundary_points", 0)
         app.gui.setvar(group, "active_boundary_point", 0)
 
+        bc_dis_methods = ["Click Points", "Load from file"]
+        app.gui.setvar(group, "bc_dis_methods", bc_dis_methods)
+        app.gui.setvar(group, "bc_dis_methods_index", 0)
+        app.gui.setvar(group, "merge_bc_dis", True)
+        app.gui.setvar(group, "discharge_point_names", [])
+        app.gui.setvar(group, "nr_discharge_points", 0)
+        app.gui.setvar(group, "active_discharge_point", 0)
+
         # Observation points 
+        obs_methods = ["Click Points", "Select from database", "Load from file"]
+        app.gui.setvar(group, "obs_methods", obs_methods)
+        app.gui.setvar(group, "obs_methods_index", 0)
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
+
+        crs_methods = ["Draw LineString", "Load from file"]
+        app.gui.setvar(group, "crs_methods", crs_methods)
+        app.gui.setvar(group, "crs_methods_index", 0)
+        app.gui.setvar(group, "cross_section_names", [])
+        app.gui.setvar(group, "nr_cross_sections", 0)
+        app.gui.setvar(group, "active_cross_section", 0)
 
         app.gui.setvar(group, "depthcontour_value", 0.0)
         app.gui.setvar(group, "flowboundarypoints_length", 0)
@@ -212,6 +230,17 @@ class Model(GenericModel):
         app.gui.setvar(group, "boundaryconditions_zs", 0.0)
         app.gui.setvar(group, "wind", True)
         app.gui.setvar(group, "rain", True)
+
+        # Physics
+        app.gui.setvar(group, "advection", False)
+        app.gui.setvar(group, "coriolis", False)
+
+        # Output
+        app.gui.setvar(group, "storetwet", False)
+        app.gui.setvar(group, "storevelmax", False)
+        app.gui.setvar(group, "storecumprcp", False)
+        app.gui.setvar(group, "storemaxwind", False)
+
 
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input
