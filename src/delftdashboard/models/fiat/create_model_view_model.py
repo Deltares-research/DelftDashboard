@@ -26,7 +26,7 @@ def display_properties(*args):
     if properties_to_display == "Classification":
         app.map.layer["buildings"].clear()
         app.model[model].show_classification()
-    elif properties_to_display == "Asset heights":
+    elif properties_to_display == "Finished floor height":
         app.map.layer["buildings"].clear()
         app.model[model].show_asset_height()
     elif properties_to_display == "Max potential damages":
