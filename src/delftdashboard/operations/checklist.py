@@ -10,9 +10,9 @@ def initialize_checklist():
         "Asset locations",
         "Classification",
         "Damage values",
-        "Elevation",
-        "Attributes (optional)",
+        "Finished floor height",
         "Vulnerability",
+        "Attributes (optional)",
         "SVI (optional)",
         "Roads (optional)"
     ]

@@ -1,6 +1,7 @@
 import geopandas as gpd
 import pandas as pd
 import time
+from pathlib import Path
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
@@ -320,12 +321,6 @@ def quick_build(*args):
         app.gui.setvar(model, "show_asset_locations", True)
         app.gui.setvar("modelmaker_fiat", "show_asset_locations", True)
 
-        # Set the checkboxes checked
-        app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
-        app.gui.setvar(checkbox_group, "checkbox_classification", True)
-        app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
-        app.gui.setvar(checkbox_group, "checkbox_elevation", True)
-
         # Set the damage curves
         selected_damage_curve_database = "default_vulnerability_curves"
         selected_link_table = "default_hazus_iwr_linking"
@@ -336,7 +331,29 @@ def quick_build(*args):
         # Check the checkbox
         app.gui.setvar("_main", "checkbox_vulnerability", True)
 
-        # TODO: set SVI and equity
+        # Set SVI and equity
+        census_key_path = Path(app.config_path) / "census_key.txt"
+        if census_key_path.exists():
+            fid = open(census_key_path, "r")
+            census_key = fid.readlines()
+            fid.close()
+        
+        census_key = census_key[0]
+        year_data = 2021  ## default
+    
+        app.active_model.domain.svi_vm.set_svi_settings(
+            census_key, year_data
+        )
+        app.active_model.domain.svi_vm.set_equity_settings(
+            census_key, year_data
+        )
+
+        # Set the checkboxes checked
+        app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
+        app.gui.setvar(checkbox_group, "checkbox_classification", True)
+        app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
+        app.gui.setvar(checkbox_group, "checkbox_finished_floor_height", True)
+        app.gui.setvar(checkbox_group, "checkbox_svi_(optional)", True)
 
         # Set the sources
         app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")

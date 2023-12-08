@@ -1,6 +1,8 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+from pathlib import Path
+
 
 def select(*args):
     # De-activate existing layers
@@ -15,8 +17,14 @@ def add_svi(*args):
     group = "fiat"
 
     # Get the variables
-    census_key = "495a349ce22bdb1294b378fb199e4f27e57471a9"  ## TODO: CHANGE TO INPUT
-    year_data = 2021  ## TODO: CHANGE TO INPUT
+    census_key_path = Path(app.config_path) / "census_key.txt"
+    if census_key_path.exists():
+        fid = open(census_key_path, "r")
+        census_key = fid.readlines()
+        fid.close()
+    
+    census_key = census_key[0]
+    year_data = app.gui.getvar(group, "selected_year")
 
     if app.gui.getvar(group, "use_svi"):
         app.active_model.domain.svi_vm.set_svi_settings(

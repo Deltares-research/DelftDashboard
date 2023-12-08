@@ -16,3 +16,4 @@ temp_database
 fiat_database
 /src/delftdashboard/config/delftdashboard.ini
 cache
+src/delftdashboard/config/census_key.txt

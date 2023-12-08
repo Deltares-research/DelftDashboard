@@ -30,7 +30,6 @@ class Model(GenericModel):
         # Set GUI variables
         self.set_gui_variables()
 
-    
     def add_layers(self):
         # Add main DDB layer
         layer = app.map.add_layer("buildings")
@@ -122,7 +121,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "checkbox_asset_locations", False)
         app.gui.setvar(group, "checkbox_classification", False)
         app.gui.setvar(group, "checkbox_damage_values", False)
-        app.gui.setvar(group, "checkbox_elevation", False)
+        app.gui.setvar(group, "checkbox_finished_floor_height", False)
         app.gui.setvar(group, "checkbox_attributes_(optional)", False)
         app.gui.setvar(group, "checkbox_vulnerability", False)
         app.gui.setvar(group, "checkbox_svi_(optional)", False)
@@ -256,7 +255,7 @@ class Model(GenericModel):
             [],
         )
 
-        ## Finished Floor Elevation tab ##
+        ## Finished Floor Height tab ##
         app.gui.setvar(group, "loaded_asset_heights_files", 0)
         app.gui.setvar(
             group,
