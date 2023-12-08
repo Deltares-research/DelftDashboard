@@ -15,7 +15,7 @@ element:
   - string: Classification
     module: models.fiat.exposure_classification
     element: exposure_classification.yml
-  - string: Finished Floor Elevation
+  - string: Finished Floor Height
     module: models.fiat.exposure_asset_heights
     element: exposure_asset_heights.yml
   - string: Damage Values

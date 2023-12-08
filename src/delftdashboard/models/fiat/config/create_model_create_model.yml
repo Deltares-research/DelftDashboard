@@ -42,7 +42,7 @@ element:
     y: 50
     width: 100
     height: 20
-  text: "<u>Finished Floor Elevation</u>:"
+  text: "<u>Finished Floor Height</u>:"
 - style: edit
   position:
     x: 130
