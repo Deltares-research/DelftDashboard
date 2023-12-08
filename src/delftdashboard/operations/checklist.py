@@ -13,7 +13,7 @@ def initialize_checklist():
         "Finished floor height",
         "Vulnerability",
         "SVI (optional)",
-        "Roads (optional)"
+        "Roads (optional)",
         "Attributes (optional)",
     ]
     checklist_items.reverse()  # Reverse because guitares places items from the bottom
