@@ -14,27 +14,13 @@ def select(*args):
     map.update()
 
 def create_model(*args):
-    app.model["fiat"].domain.run_hydromt_fiat()
+    dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
+    app.active_model.domain.run_hydromt_fiat()
+    dlg.close()
     app.gui.window.dialog_info(
-            f"A FIAT model is created in:\n{app.model['fiat'].domain.fiat_model.root}",
+            f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",
             "FIAT model created",
         )
 
 def edit(*args):
-    app.model["fiat"].set_model_variables()
-
-def display_properties(*args):
-    model = "fiat"
-    properties_to_display = app.gui.getvar("fiat", "properties_to_display")
-    if properties_to_display == "Classification":
-        app.model[model].show_classification()
-    elif properties_to_display == "Asset heights":
-        NotImplemented
-    elif properties_to_display == "Max potential damages":
-        NotImplemented
-    elif properties_to_display == "Aggregation":
-        NotImplemented
-    elif properties_to_display == "Damage curves":
-        NotImplemented
-    elif properties_to_display == "Roads":
-        app.model[model].show_exposure_roads()
+    app.active_model.set_model_variables()
