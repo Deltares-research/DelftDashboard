@@ -68,13 +68,42 @@ def remove_datasource(*args):
 
 
 def adjust_damage_settings(*args):
-    print("Adjust settings")
+    if app.active_model.domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+        return
+    app.active_model.specify_max_potential_damage()
 
 
 def add_to_model(*args):
-    print("Add to model")
+    model = "fiat"
 
-    # Set the source
+    # Get the file path
     idx = app.gui.getvar("fiat", "loaded_damages_files")
     current_list_string = app.gui.getvar("fiat", "loaded_damages_files_string")
-    app.gui.setvar("fiat", "source_max_potential_damage", current_list_string[idx])
+    current_list_value = app.gui.getvar(model, "loaded_damages_files_value")
+    source_name = current_list_string[idx]
+    source_path = str(current_list_value[idx])
+
+    # Get the attribute name
+    idx = app.gui.getvar(model, "damages_file_field_name")
+    list_attr_names = app.gui.getvar(model, "damages_file_field_name_string")
+    attribute_name_gfh = list_attr_names[idx]
+
+    # Get the method
+    method_gfh = app.gui.getvar("fiat", "method_damages")
+
+    # Get the max distance
+    max_dist_gfh = app.gui.getvar("fiat", "max_dist_damages")
+
+    app.active_model.domain.exposure_vm.set_damages(
+        source_path,
+        attribute_name_gfh=attribute_name_gfh,
+        method_gfh=method_gfh,
+        max_dist_gfh=max_dist_gfh,
+        )
+
+    # Set the source
+    app.gui.setvar(model, "source_max_potential_damage", source_name)

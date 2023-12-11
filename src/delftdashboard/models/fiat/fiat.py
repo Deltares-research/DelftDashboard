@@ -276,6 +276,12 @@ class Model(GenericModel):
             [],
         )
 
+        # Finished floor height settings popup #
+        app.gui.setvar(group, "max_dist_gfh", 10)
+        app.gui.setvar(group, "method_gfh", "nearest")
+        app.gui.setvar(group, "method_gfh_string", ["nearest", "intersection"])
+        app.gui.setvar(group, "method_gfh_value", ["nearest", "intersection"])
+
         ## Ground Elevation tab ##
         app.gui.setvar(group, "loaded_ground_elevation_files", 0)
         app.gui.setvar(
@@ -315,6 +321,12 @@ class Model(GenericModel):
             "damages_file_field_name_value",
             [],
         )
+
+        # Damages settings popup #
+        app.gui.setvar(group, "max_dist_damages", 10)
+        app.gui.setvar(group, "method_damages", "nearest")
+        app.gui.setvar(group, "method_damages_string", ["nearest", "intersection"])
+        app.gui.setvar(group, "method_damages_value", ["nearest", "intersection"])
 
         app.gui.setvar(group, "selected_primary_classification_value", 0)
         app.gui.setvar(group, "selected_asset_locations", 0)
@@ -731,3 +743,34 @@ class Model(GenericModel):
         if not okay:
             return
     
+    def specify_finished_floor_height(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "exposure_finished_floor_height_settings.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            return
+        
+    def specify_max_potential_damage(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "exposure_damages_settings.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            return

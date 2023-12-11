@@ -103,7 +103,7 @@ def build_nsi_exposure(*args):
             unique_primary_types,
             unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source(
-            source="NSI", crs=crs
+            source="NSI", ground_floor_height="NSI", crs=crs
         )
         gdf.set_crs(crs, inplace=True)
 

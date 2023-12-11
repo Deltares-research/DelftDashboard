@@ -68,13 +68,42 @@ def remove_datasource(*args):
 
 
 def adjust_ffe_settings(*args):
-    print("Adjust settings")
+    if app.active_model.domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+        return
+    app.active_model.specify_finished_floor_height()
 
 
 def add_to_model(*args):
-    print("Add to model")
+    model = "fiat"
+
+    # Get the file path
+    idx = app.gui.getvar(model, "loaded_asset_heights_files")
+    current_list_string = app.gui.getvar(model, "loaded_asset_heights_files_string")
+    current_list_value = app.gui.getvar(model, "loaded_asset_heights_files_value")
+    source_name = current_list_string[idx]
+    source_path = str(current_list_value[idx])
+
+    # Get the attribute name
+    idx = app.gui.getvar(model, "heights_file_field_name")
+    list_attr_names = app.gui.getvar(model, "heights_file_field_name_string")
+    attribute_name_gfh = list_attr_names[idx]
+
+    # Get the method
+    method_gfh = app.gui.getvar("fiat", "method_gfh")
+
+    # Get the max distance
+    max_dist_gfh = app.gui.getvar("fiat", "max_dist_gfh")
+
+    app.active_model.domain.exposure_vm.set_ground_floor_height(
+        source_path,
+        attribute_name_gfh=attribute_name_gfh,
+        method_gfh=method_gfh,
+        max_dist_gfh=max_dist_gfh,
+        )
 
     # Set the source
-    idx = app.gui.getvar("fiat", "loaded_asset_heights_files")
-    current_list_string = app.gui.getvar("fiat", "loaded_asset_heights_files_string")
-    app.gui.setvar("fiat", "source_finished_floor_elevation", current_list_string[idx])
+    app.gui.setvar(model, "source_finished_floor_elevation", source_name)
