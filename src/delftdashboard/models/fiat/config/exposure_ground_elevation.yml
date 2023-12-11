@@ -1,0 +1,74 @@
+element:
+- style: panel
+  title: Add new ground elevation source
+  position:
+    x: 10
+    y: 10
+    width: 270
+    height: 120
+  element:
+  - style: listbox
+    position:
+        x: 5
+        y: 30
+        width: 110
+        height: 50
+    text_position: "above"
+    variable: loaded_ground_elevation_files
+    select: index
+    option_string:
+      variable: loaded_ground_elevation_files_string
+  - style: pushbutton
+    position:
+      x: 5
+      y: 90
+      width: 80
+      height: 20
+    text: "Select source"
+    method: select_ground_elevation_file
+  - style: pushbutton
+    position:
+      x: 5
+      y: 5
+      width: 110
+      height: 20
+    text: Load
+    method: load_ground_elevation_file
+  - style: pushbutton
+    position:
+      x: 120
+      y: 60
+      width: 20
+      height: 20
+    text: "\u0078"
+    method: remove_datasource
+  - style: popupmenu
+    position:
+      x: 155
+      y: 60
+      width: 100
+      height: 20
+    text: "Attribute ID"
+    text_position: "above"
+    variable: ground_elevation_file_field_name
+    option_string:
+      variable: ground_elevation_file_field_name_string
+    option_value:
+      variable: ground_elevation_file_field_name_value
+  - style: pushbutton
+    position:
+      x: 155
+      y: 5
+      width: 100
+      height: 20
+    text: "Settings"
+    method: adjust_ground_elevation_settings
+
+- style: pushbutton
+  position:
+    x: 680
+    y: 10
+    width: 70
+    height: 20
+  text: "Add to model"
+  method: add_to_model

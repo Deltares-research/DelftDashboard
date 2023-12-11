@@ -66,6 +66,21 @@ element:
     height: 20
   variable: source_max_potential_damage
   enable: False
+- style: text
+  position:
+    x: 10
+    y: 6
+    width: 120
+    height: 20
+  text: "<u>Ground elevation</u>:"
+- style: edit
+  position:
+    x: 130
+    y: 6
+    width: 150
+    height: 20
+  variable: source_ground_elevation
+  enable: False
 - style: pushbutton
   position:
     x: 350

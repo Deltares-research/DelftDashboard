@@ -18,6 +18,9 @@ element:
   - string: Finished Floor Height
     module: models.fiat.exposure_asset_heights
     element: exposure_asset_heights.yml
+  - string: Ground Elevation
+    module: models.fiat.exposure_ground_elevation
+    element: exposure_ground_elevation.yml
   - string: Damage Values
     module: models.fiat.exposure_damages
     element: exposure_damages.yml

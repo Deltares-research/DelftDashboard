@@ -141,6 +141,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "source_classification", "")
         app.gui.setvar(group, "source_finished_floor_elevation", "")
         app.gui.setvar(group, "source_max_potential_damage", "")
+        app.gui.setvar(group, "source_ground_elevation", "")
 
         # Model type #
         app.gui.setvar(group, "model_type", "Start with NSI")
@@ -272,6 +273,26 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "heights_file_field_name_value",
+            [],
+        )
+
+        ## Ground Elevation tab ##
+        app.gui.setvar(group, "loaded_ground_elevation_files", 0)
+        app.gui.setvar(
+            group,
+            "loaded_ground_elevation_files_string",
+            [],
+        )
+        app.gui.setvar(
+            group,
+            "loaded_ground_elevation_files_value",
+            [],
+        )
+        app.gui.setvar(group, "ground_elevation_file_field_name", 0)
+        app.gui.setvar(group, "ground_elevation_file_field_name_string",[])
+        app.gui.setvar(
+            group,
+            "ground_elevation_file_field_name_value",
             [],
         )
 
