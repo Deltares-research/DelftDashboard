@@ -16,8 +16,8 @@ element:
     module: models.fiat.exposure_classification
     element: exposure_classification.yml
   - string: Finished Floor Height
-    module: models.fiat.exposure_asset_heights
-    element: exposure_asset_heights.yml
+    module: models.fiat.exposure_finished_floor_height
+    element: exposure_finished_floor_height.yml
   - string: Ground Elevation
     module: models.fiat.exposure_ground_elevation
     element: exposure_ground_elevation.yml
