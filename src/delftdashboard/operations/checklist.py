@@ -37,7 +37,7 @@ def initialize_checklist():
     item["position"]["y"] = max(spacing) + 23
     item["position"]["width"] = 100
     item["position"]["height"] = 15
-    item["text"] = "<u><b>Checklist</b></u>"
+    item["text"] = "<u><b>Model parameters</b></u>"
     config_dict["element"].append(item)
 
     for i, space in zip(checklist_items, spacing):
