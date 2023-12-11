@@ -17,7 +17,7 @@ def initialize_checklist():
         "Attributes (optional)",
     ]
     checklist_items.reverse()  # Reverse because guitares places items from the bottom
-    spacing = [10 + (y*20) for y in range(len(checklist_items))]
+    spacing = [5 + (y*20) for y in range(len(checklist_items))]
 
     # get window config yaml path
     config_path_panel = str(
@@ -28,7 +28,18 @@ def initialize_checklist():
         # use safe_load instead load
         config_dict = yaml.safe_load(f)
 
+    # Add a header
     config_dict["element"] = []
+    item = {}
+    item["style"] = "text"
+    item["position"] = {}
+    item["position"]["x"] = 10
+    item["position"]["y"] = max(spacing) + 23
+    item["position"]["width"] = 100
+    item["position"]["height"] = 15
+    item["text"] = "<u><b>Checklist</b></u>"
+    config_dict["element"].append(item)
+
     for i, space in zip(checklist_items, spacing):
         item = {}
         item["style"] = "text"
@@ -37,7 +48,11 @@ def initialize_checklist():
         item["position"]["y"] = space
         item["position"]["width"] = 100
         item["position"]["height"] = 20
-        item["text"] = i
+        if i.endswith("(optional)"):
+            text = "<i>" + i + "</i>"
+        else:
+            text = i
+        item["text"] = text
         config_dict["element"].append(item)
 
         # The empty ballot box

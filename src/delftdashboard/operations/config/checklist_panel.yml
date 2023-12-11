@@ -5,7 +5,7 @@ position:
   x: -30
   y: 200
   width: 140
-  height: 200
+  height: 210
 dependency:
 - action: visible
   checkfor: all
