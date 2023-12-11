@@ -1,0 +1,47 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 80
+    height: 120
+  method: select_thin_dam
+  variable: thin_dam_index
+  select: index
+  option_string:
+    variable: thin_dam_names
+- style: pushbutton
+  text: Draw Thin Dam
+  position:
+    x: 100
+    y: 110
+    width: 80
+    height: 20
+  method: draw_thin_dam
+- style: pushbutton
+  text: Delete Thin Dam
+  position:
+    x: 100
+    y: 85
+    width: 80
+    height: 20
+  method: delete_thin_dam
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_thin_dams
+      operator: gt
+      value: 0
+- style: pushselectfile
+  position:
+    x: 500
+    y: 80
+    width: 130
+    height: 20
+  text: Thin Dam File
+  variable: thdfile
+  showfilename: True
+  extension: "*.thd"
+  selectiontext: Select thin dam file
+  tooltipstring: Select thin dam file

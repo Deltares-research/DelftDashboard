@@ -292,16 +292,24 @@ class Toolbox(GenericToolbox):
         app.gui.setvar("sfincs_cht", "qtrfile", model.input.variables.qtrfile)
 
         if len(self.refinement_polygon) == 0:
-            refpol = None
-            reflev = None
+            # Need to set grid data in sfincs.inp
+            model.input.variables.x0 = x0
+            model.input.variables.y0 = y0
+            model.input.variables.dx = dx
+            model.input.variables.dy = dy
+            model.input.variables.nmax = nmax
+            model.input.variables.mmax = mmax
+            model.input.variables.rotation = rotation
+            model.grid_type = "regular"
         else:
             # Make list of separate gdfs for each polygon
-            refpol = gdf2list(self.refinement_polygon)
-            reflev = []
+            self.refinement_polygon["refinement_level"] = self.refinement_levels
             for ipol in range(app.gui.getvar(group, "nr_refinement_polygons")):
-                reflev.append(self.refinement_levels[ipol] + 1) 
+                self.refinement_polygon.loc[ipol,"refinement_level"] = self.refinement_polygon.loc[ipol,"refinement_level"] + 1
+            model.grid_type = "quadtree"
+            model.input.variables.qtrfile = "sfincs.nc"
 
-        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation, refinement_polygons=refpol, refinement_levels=reflev)
+        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation, refinement_polygons=self.refinement_polygon)
         model.grid.write()
 
         # Replot everything
@@ -343,7 +351,12 @@ class Toolbox(GenericToolbox):
         app.map.layer["sfincs_cht"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
         app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_data(mask.to_gdf(option="open"))
         app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_data(mask.to_gdf(option="outflow"))
-        grid.write() # Write new qtr file
+
+        if app.model["sfincs_cht"].domain.grid_type == "quadtree":
+            grid.write() # Write new qtr file
+        else:
+            mask.write() # Write mask, index and depth files    
+
         dlg.close()
 
     def update_mask_snapwave(self):

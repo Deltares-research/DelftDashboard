@@ -79,6 +79,26 @@ class Model(GenericModel):
                         fill_color_inactive="lightgrey"
                        )
 
+        from .structures_thin_dams import thin_dam_created
+        from .structures_thin_dams import thin_dam_selected
+        from .structures_thin_dams import thin_dam_modified
+        thd_layer = layer.add_layer("thin_dams") # Container layer for thin dams and snapped thin dams
+        thd_layer.add_layer("polylines",
+                            type="draw",
+                            shape="polyline",
+                            create=thin_dam_created,
+                            modify=thin_dam_modified,
+                            select=thin_dam_selected,
+                            polyline_line_color="yellow",
+                            polyline_line_width=2.0,
+                            polyline_line_opacity=1.0)
+        thd_layer.add_layer("snapped",
+                            type="line",
+                            line_color="white",
+                            line_opacity=1.0,
+                            circle_radius=0,
+                            line_color_inactive="lightgrey")
+
         from .observation_points import select_observation_point_from_map
         layer.add_layer("observation_points",
                         type="circle_selector",
@@ -91,6 +111,7 @@ class Model(GenericModel):
                         circle_radius_selected=4,
                         line_color_selected="white",
                         fill_color_selected="red")
+
 
         # Snapwave Boundary Enclosure
         from .waves_snapwave import boundary_enclosure_created
@@ -130,6 +151,9 @@ class Model(GenericModel):
             layer.layer["boundary_points"].deactivate()
             # Observation points are made grey
             layer.layer["observation_points"].deactivate()
+            # Thin dams are made grey
+            layer.layer["thin_dams"].layer["polylines"].deactivate()
+            layer.layer["thin_dams"].layer["snapped"].hide()
             # SnapWave boundary enclosure is made invisible
             layer.layer["snapwave_boundary_enclosure"].hide()
             # Wave makers are made invisible
@@ -151,6 +175,7 @@ class Model(GenericModel):
         fname = fname[0]
         if fname:
             dlg = app.gui.window.dialog_wait("Loading SFINCS model ...")
+            self.initialize_domain()
             path = os.path.dirname(fname)
             self.domain.path = path
             self.domain.read()
@@ -166,16 +191,14 @@ class Model(GenericModel):
                 app.map.fly_to(-80.0, 30.0, 6)
             dlg.close()
 
-
     def save(self):
         # Write sfincs.inp
-        self.domain.path = os.getcwd()
+        self.domain.path = os.getcwd()        
+        self.domain.input.variables.epsg = app.crs.to_epsg()
+        self.domain.exe_path = self.exe_path
         self.domain.input.write()
         self.domain.write_batch_file()
         app.model["sfincs_cht"].domain.input.write()
-
-    def load(self):
-        pass
 
     def plot(self):
         # Plot everything
@@ -240,6 +263,11 @@ class Model(GenericModel):
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
+
+        # Thin dams
+        app.gui.setvar(group, "thin_dam_names", [])
+        app.gui.setvar(group, "nr_thin_dams", 0)
+        app.gui.setvar(group, "thin_dam_index", 0)
 
         # Wave makers  
         app.gui.setvar(group, "wave_maker_names", [])
