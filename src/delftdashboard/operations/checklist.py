@@ -110,7 +110,7 @@ def initialize_checklist():
             item["position"] = {}
             item["position"]["x"] = 90
             item["position"]["y"] = space
-            item["position"]["width"] = 28
+            item["position"]["width"] = 30
             item["position"]["height"] = 16
             item["text"] = 'zoom'
             item["method"] = "zoom_to_boundary"
