@@ -12,7 +12,7 @@ def select(*args):
 
 
 def set_variables(*args):
-    app.model["fiat"].set_input_variables()
+    app.active_model.set_input_variables()
 
 
 def add_classification_field(*args):

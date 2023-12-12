@@ -17,7 +17,7 @@ def select(*args):
 
 
 def edit(*args):
-    app.model["fiat"].set_model_variables()
+    app.active_model.set_model_variables()
 
 
 def display_properties(*args):
@@ -43,17 +43,17 @@ def display_properties(*args):
 def display_damage(*args):
     app.map.layer["buildings"].clear()
     if app.gui.getvar("fiat", "max_potential_damage_name") == "Structure":
-        app.model["fiat"].show_max_potential_damage_struct()
+        app.active_model.show_max_potential_damage_struct()
     else:
-        app.model["fiat"].show_max_potential_damage_cont()
+        app.active_model.show_max_potential_damage_cont()
     
 def display_roads(*args):
     """Show/hide roads layer""" 
     app.gui.setvar("fiat", "show_roads", args[0])
     if args[0]:
-        app.model["fiat"].show_exposure_roads()
+        app.active_model.show_exposure_roads()
     else:
-        app.model["fiat"].hide_exposure_roads()
+        app.active_model.hide_exposure_roads()
 
 def display_attribute(*args):
         label_to_visualize = app.gui.getvar("fiat", "aggregation_label_display_name")
@@ -62,8 +62,8 @@ def display_attribute(*args):
         attribute_id = table["Attribute ID"].iloc[row_index]
         data_to_visualize = Path(table["File Path"].iloc[row_index])
         gdf = gpd.read_file(data_to_visualize)
-        app.model["fiat"].aggregation = gdf
-        paint_properties = app.model["fiat"].create_paint_properties(
+        app.active_model.aggregation = gdf
+        paint_properties = app.active_model.create_paint_properties(
             gdf, attribute_id, type="polygon", opacity=0.3
         )   
         app.map.layer["aggregation"].layer["aggregation_layer"].clear()

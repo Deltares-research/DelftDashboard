@@ -167,7 +167,7 @@ def build_nsi_exposure(*args):
             dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
             
             # Get the roads to show in the map
-            gdf = app.model["fiat"].domain.exposure_vm.get_osm_roads(road_types=road_types)
+            gdf = app.active_model.domain.exposure_vm.get_osm_roads(road_types=road_types)
 
             crs = app.gui.getvar("fiat", "selected_crs")
             gdf.set_crs(crs, inplace=True)
@@ -179,10 +179,10 @@ def build_nsi_exposure(*args):
 
             # Set the road damage threshold
             road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-            app.model["fiat"].domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
+            app.active_model.domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
 
             # Show the roads
-            app.model["fiat"].show_exposure_roads()
+            app.active_model.show_exposure_roads()
             app.gui.setvar("_main", "checkbox_roads_(optional)", True)
 
             # Set the checkbox checked

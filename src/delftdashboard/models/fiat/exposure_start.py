@@ -8,7 +8,7 @@ def select(*args):
 
 
 def edit(*args):
-    app.model["fiat"].set_model_variables()
+    app.active_model.set_model_variables()
 
 
 def select_model_type(*args):
