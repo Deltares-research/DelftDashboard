@@ -99,11 +99,16 @@ def add_to_model(*args):
     max_dist_gfh = app.gui.getvar("fiat", "max_dist_gfh")
 
     app.active_model.domain.exposure_vm.set_ground_floor_height(
-        source_path,
-        attribute_name_gfh=attribute_name_gfh,
-        method_gfh=method_gfh,
-        max_dist_gfh=max_dist_gfh,
+        source=source_path,
+        attribute_name=attribute_name_gfh,
+        method=method_gfh,
+        max_dist=max_dist_gfh,
         )
 
     # Set the source
     app.gui.setvar(model, "source_finished_floor_elevation", source_name)
+
+    app.gui.window.dialog_info(
+        text="Finished floor elevation data was added to your model",
+        title="Added finished floor elevation data",
+    )

@@ -45,8 +45,8 @@ def load_damages_file(*args):
         with fiona.open(path) as src:
             # Access the schema to get the column names
             schema = src.schema
-            list_columns = list(schema['properties'].keys())
-        
+            list_columns = list(schema["properties"].keys())
+
         app.gui.setvar("fiat", "damages_file_field_name_value", list_columns)
         app.gui.setvar("fiat", "damages_file_field_name_string", list_columns)
 
@@ -93,17 +93,22 @@ def add_to_model(*args):
     attribute_name_gfh = list_attr_names[idx]
 
     # Get the method
-    method_gfh = app.gui.getvar("fiat", "method_damages")
+    method_damages = app.gui.getvar("fiat", "method_damages")
 
     # Get the max distance
-    max_dist_gfh = app.gui.getvar("fiat", "max_dist_damages")
+    max_dist_damages = app.gui.getvar("fiat", "max_dist_damages")
 
     app.active_model.domain.exposure_vm.set_damages(
-        source_path,
-        attribute_name_gfh=attribute_name_gfh,
-        method_gfh=method_gfh,
-        max_dist_gfh=max_dist_gfh,
-        )
+        source=source_path,
+        attribute_name=attribute_name_gfh,
+        method=method_damages,
+        max_dist=max_dist_damages,
+    )
 
     # Set the source
     app.gui.setvar(model, "source_max_potential_damage", source_name)
+
+    app.gui.window.dialog_info(
+        text="Maximum potential damage data was added to your model",
+        title="Added maximum potential damage data",
+    )

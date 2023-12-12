@@ -63,6 +63,13 @@ element:
       height: 20
     text: "Settings"
     method: adjust_damage_settings
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: damages_file_field_name_string
+        operator: ne
+        value: []
 
 - style: pushbutton
   position:

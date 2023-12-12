@@ -294,13 +294,6 @@ class Model(GenericModel):
             "loaded_ground_elevation_files_value",
             [],
         )
-        app.gui.setvar(group, "ground_elevation_file_field_name", 0)
-        app.gui.setvar(group, "ground_elevation_file_field_name_string",[])
-        app.gui.setvar(
-            group,
-            "ground_elevation_file_field_name_value",
-            [],
-        )
 
         ## Damage values tab ##
         app.gui.setvar(group, "loaded_damages_files", 0)

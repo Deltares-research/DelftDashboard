@@ -31,26 +31,6 @@ def select_ground_elevation_file(*args):
     app.gui.setvar("fiat", "loaded_ground_elevation_files_string", current_list_string)
 
 
-def load_ground_elevation_file(*args):
-    index = app.gui.getvar("fiat", "loaded_ground_elevation_files")
-    file_list = app.gui.getvar("fiat", "loaded_ground_elevation_files_value")
-    if len(file_list) == 0:
-        app.gui.window.dialog_info(
-            text="Please load a data source.",
-            title="No datasource",
-        )
-    else:
-        path = app.gui.getvar("fiat", "loaded_ground_elevation_files_value")[index]
-        # Open the data source for reading
-        with fiona.open(path) as src:
-            # Access the schema to get the column names
-            schema = src.schema
-            list_columns = list(schema['properties'].keys())
-        
-        app.gui.setvar("fiat", "ground_elevation_file_field_name_value", list_columns)
-        app.gui.setvar("fiat", "ground_elevation_file_field_name_string", list_columns)
-
-
 def remove_datasource(*args):
     current_list_string = app.gui.getvar("fiat", "loaded_ground_elevation_files_string")
     deselected_aggregation = app.gui.getvar("fiat", "loaded_ground_elevation_files")
@@ -78,3 +58,8 @@ def add_to_model(*args):
     idx = app.gui.getvar("fiat", "loaded_ground_elevation_files")
     current_list_string = app.gui.getvar("fiat", "loaded_ground_elevation_files_string")
     app.gui.setvar("fiat", "source_ground_elevation", current_list_string[idx])
+
+    app.gui.window.dialog_info(
+        text="Ground elevation data was added to your model",
+        title="Added ground elevation data",
+    )

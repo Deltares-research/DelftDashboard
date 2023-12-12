@@ -110,14 +110,13 @@ def initialize_checklist():
             item["position"] = {}
             item["position"]["x"] = 90
             item["position"]["y"] = space
-            item["position"]["width"] = 16
+            item["position"]["width"] = 28
             item["position"]["height"] = 16
-            item["text"] = "\u233E"
+            item["text"] = 'zoom'
             item["method"] = "zoom_to_boundary"
             config_dict["element"].append(item)
 
     return config_dict
-
 
 def zoom_to_boundary(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
