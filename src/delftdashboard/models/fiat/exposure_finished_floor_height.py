@@ -109,6 +109,6 @@ def add_to_model(*args):
     app.gui.setvar(model, "source_finished_floor_elevation", source_name)
 
     app.gui.window.dialog_info(
-        text="Finished floor elevation data was added to your model",
-        title="Added finished floor elevation data",
+        text="Finished floor height data was added to your model",
+        title="Added finished floor height data",
     )
