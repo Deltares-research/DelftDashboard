@@ -388,6 +388,16 @@ def quick_build(*args):
         dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
 
         # Get the roads to show in the map
+        # By default it is taking the following road types:
+        # "motorway",
+        # "motorway_link",
+        # "trunk",
+        # "trunk_link",
+        # "primary",
+        # "primary_link",
+        # "secondary",
+        # "secondary_link",
+
         gdf = app.active_model.domain.exposure_vm.get_osm_roads()
 
         crs = app.gui.getvar("fiat", "selected_crs")

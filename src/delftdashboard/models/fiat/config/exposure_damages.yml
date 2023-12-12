@@ -4,7 +4,7 @@ element:
   position:
     x: 10
     y: 10
-    width: 270
+    width: 375
     height: 120
   element:
   - style: listbox
@@ -55,6 +55,19 @@ element:
       variable: damages_file_field_name_string
     option_value:
       variable: damages_file_field_name_value
+  - style: popupmenu
+    position:
+      x: 265
+      y: 60
+      width: 100
+      height: 20
+    text: "Damage type"
+    text_position: "above"
+    variable: damage_type
+    option_string:
+      variable: damage_type_string
+    option_value:
+      variable: damage_type_value
   - style: pushbutton
     position:
       x: 155
