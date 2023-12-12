@@ -159,7 +159,10 @@ class Model(GenericModel):
         damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
         damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
         self.damage_function_database = damage_functions_database_info
-        app.gui.setvar(group, "damage_curves_standard_info_static", damage_functions_database_info)
+        default_curves_table = default_curves[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
+        default_curves_table.sort_values("Occupancy", inplace=True)
+
+        app.gui.setvar(group, "damage_curves_standard_info_static", default_curves_table)
         app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
 
         default_occupancy_df = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
@@ -314,6 +317,9 @@ class Model(GenericModel):
             "damages_file_field_name_value",
             [],
         )
+        app.gui.setvar(group, "damage_type", "structure")
+        app.gui.setvar(group, "damage_type_string", ["structure", "content"])
+        app.gui.setvar(group, "damage_type_value", ["structure", "content"])
 
         # Damages settings popup #
         app.gui.setvar(group, "max_dist_damages", 10)
