@@ -37,7 +37,7 @@ def initialize():
     app.config["toolbox"] = []
     app.config["window_icon"] = os.path.join(app.config_path, "images", "deltares.ico")
     app.config["splash_file"] = os.path.join(
-        app.config_path, "images", "DelftDashBoard.jpg"
+        app.config_path, "images", "FloodAdaptModelBuilders.png"
     )
     app.config["bathymetry_database"] = None
     app.config["data_libs"] = None
