@@ -16,7 +16,7 @@ element:
     text: Select method
     tooltip: Select method to determine model extent
     select: index
-    method: select_method
+    method: SfincsHmtDomainAdvanced.select_method
     variable: setup_grid_methods_index
     option_string:
       variable: setup_grid_methods
@@ -28,7 +28,7 @@ element:
       y: 65
       width: 100
       height: 20
-    method: draw_bbox
+    method: SfincsHmtDomainAdvanced.draw_bbox
     dependency:
     - action: visible
       checkfor: any
@@ -44,7 +44,7 @@ element:
       y: 65
       width: 100
       height: 20
-    method: draw_aio
+    method: SfincsHmtDomainAdvanced.draw_aio
     dependency:
     - action: visible
       checkfor: any
@@ -60,7 +60,7 @@ element:
       y: 65
       width: 100
       height: 20
-    method: load_aio
+    method: SfincsHmtDomainAdvanced.load_aio
     dependency:
     - action: visible
       checkfor: any
@@ -76,7 +76,7 @@ element:
       y: 40
       width: 100
       height: 20
-    method: fly_to_site
+    method: SfincsHmtDomainAdvanced.fly_to_site
     dependency:
       - action: enable
         checkfor: all
@@ -92,7 +92,7 @@ element:
       y: 15
       width: 100
       height: 20
-    method: generate_grid
+    method: SfincsHmtDomainAdvanced.generate_grid
     dependency:
       - action: enable
         checkfor: all
@@ -116,7 +116,7 @@ element:
       height: 20
     text: X0
     variable: x0
-    method: edit_origin
+    method: SfincsHmtDomainAdvanced.edit_origin
   - style: edit
     position:
       x: 160
@@ -125,7 +125,7 @@ element:
       height: 20
     text: Y0
     variable: y0
-    method: edit_origin
+    method: SfincsHmtDomainAdvanced.edit_origin
   - style: edit
     position:
       x: 60
@@ -134,7 +134,7 @@ element:
       height: 20
     text: MMax
     variable: mmax
-    method: edit_nmmax
+    method: SfincsHmtDomainAdvanced.edit_nmmax
   - style: edit
     position:
       x: 160
@@ -143,7 +143,7 @@ element:
       height: 20
     text: NMax
     variable: nmax
-    method: edit_nmmax
+    method: SfincsHmtDomainAdvanced.edit_nmmax
   - style: edit
     position:
       x: 60
@@ -152,7 +152,7 @@ element:
       height: 20
     text: dX
     variable: dx
-    method: edit_dxdy
+    method: SfincsHmtDomainAdvanced.edit_dxdy
   - style: edit
     position:
       x: 160
@@ -161,7 +161,7 @@ element:
       height: 20
     text: dY
     variable: dy
-    method: edit_dxdy
+    method: SfincsHmtDomainAdvanced.edit_dxdy
   - style: edit
     position:
       x: 60
@@ -170,7 +170,7 @@ element:
       height: 20
     text: Rotation
     variable: rotation
-    method: edit_rotation
+    method: SfincsHmtDomainAdvanced.edit_rotation
 - style: pushbutton
   text: Read Set-up File
   position:
@@ -178,7 +178,7 @@ element:
     y: 60
     width: 120
     height: 20
-  method: read_setup_yaml
+  method: SfincsHmtDomainAdvanced.read_setup_yaml
 - style: pushbutton
   text: Write Set-up File
   position:
@@ -186,7 +186,7 @@ element:
     y: 35
     width: 120
     height: 20
-  method: write_setup_yaml
+  method: SfincsHmtDomainAdvanced.write_setup_yaml
 - style: pushbutton
   text: Build Model
   position:
@@ -194,4 +194,4 @@ element:
     y: 10
     width: 120
     height: 20
-  method: build
+  method: SfincsHmtDomainAdvanced.build

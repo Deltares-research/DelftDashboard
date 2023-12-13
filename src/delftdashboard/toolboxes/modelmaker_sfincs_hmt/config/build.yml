@@ -56,7 +56,7 @@ element:
     width: 90
     height: 20
   text: "Build model"
-  method: generate_subgrid
+  method: SfincsHmtSubgrid.generate_subgrid
   dependency:
   - action: enable
     checkfor: all

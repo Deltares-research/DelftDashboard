@@ -15,7 +15,7 @@ element:
       height: 20
     select: index
     tooltip: "Select a method to define the Manning's n roughness in your model domain"
-    method: select_roughness_method
+    method: SfincsHmtRoughnessAdvanced.select_roughness_method
     variable: roughness_methods_index
     option_string:
       variable: roughness_methods
@@ -27,7 +27,7 @@ element:
       height: 20
     text: Add method
     tooltip: "Add selected method to the list of selected Manning's n datasets"
-    method: add_selected_manning_dataset
+    method: SfincsHmtRoughnessAdvanced.add_selected_manning_dataset
     dependency:
     - action: enable
       checkfor: all
@@ -43,7 +43,7 @@ element:
       height: 20
     text: Remove method
     tooltip: "Remove selected method from the list of selected Manning's n datasets"
-    method: remove_selected_manning_dataset
+    method: SfincsHmtRoughnessAdvanced.remove_selected_manning_dataset
     dependency:
     - action: enable
       checkfor: all
@@ -137,7 +137,7 @@ element:
       height: 20
     select: index
     tooltip: "Select a landuse/landcover dataset to determine Manning's n roughness values in your model domain"
-    method: select_lulc_dataset
+    method: SfincsHmtRoughnessAdvanced.select_lulc_dataset
     variable: lulc_dataset_index
     option_string:
       variable: lulc_dataset_names
@@ -150,7 +150,7 @@ element:
       y: 35
       width: 220
       height: 20
-    method: select_reclass_table
+    method: SfincsHmtRoughnessAdvanced.select_reclass_table
   - style: edit
     position:
       x: 10
@@ -188,7 +188,7 @@ element:
       height: 20
     select: index
     tooltip: "Select a Manning's n dataset to derive roughness values in your model domain"
-    method: select_manning_dataset
+    method: SfincsHmtRoughnessAdvanced.select_manning_dataset
     variable: manning_dataset_index
     option_string:
       variable: manning_dataset_names
@@ -216,7 +216,7 @@ element:
   text_position: "above"
   tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
     they appear in this list, unless specified otherwise.
-  method: select_selected_manning_dataset
+  method: SfincsHmtRoughnessAdvanced.select_selected_manning_dataset
   variable: selected_manning_dataset_index
   select: index
   option_string:
@@ -228,7 +228,7 @@ element:
     width: 75
     height: 20
   text: "Move Up"
-  method: move_up_selected_manning_dataset
+  method: SfincsHmtRoughnessAdvanced.move_up_selected_manning_dataset
   dependency:
   - action: enable
     checkfor: all
@@ -243,7 +243,7 @@ element:
     width: 75
     height: 20
   text: "Move Down"
-  method: move_down_selected_manning_dataset
+  method: SfincsHmtRoughnessAdvanced.move_down_selected_manning_dataset
   dependency:
   - action: enable
     checkfor: all
@@ -258,4 +258,4 @@ element:
     width: 180
     height: 20
   text: "Generate Manning"
-  method: generate_manning
+  method: SfincsHmtRoughnessAdvanced.generate_manning

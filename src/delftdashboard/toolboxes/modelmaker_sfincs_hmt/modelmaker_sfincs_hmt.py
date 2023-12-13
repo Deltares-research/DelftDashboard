@@ -7,6 +7,10 @@ import json
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 
+from delftdashboard.toolboxes.modelmaker_sfincs_hmt.domain import SfincsHmtDomain
+from delftdashboard.toolboxes.modelmaker_sfincs_hmt.mask_active_cells import SfincsHmtCellMask
+from delftdashboard.toolboxes.modelmaker_sfincs_hmt.mask_boundary_cells import SfincsHmtBoundaryMask
+
 from cht.bathymetry.bathymetry_database import bathymetry_database
 
 from hydromt.config import configread, configwrite
@@ -14,12 +18,19 @@ from hydromt_sfincs.utils import mask2gdf
 
 
 class Toolbox(GenericToolbox):
+    long_name = "Model Maker"
+    group = "modelmaker_sfincs_hmt"
+
     def __init__(self, name):
         super().__init__()
-
         self.name = name
-        self.long_name = "Model Maker"
+        self._set_init_variables()
+        self.domain = SfincsHmtDomain()
+        self.cell_mask = SfincsHmtCellMask()
+        self.boundary_mask = SfincsHmtBoundaryMask()
 
+
+    def _set_init_variables(self):
         # Set variables
         # Area of interest and grid outline
         self.area_of_interest = gpd.GeoDataFrame()
@@ -62,21 +73,21 @@ class Toolbox(GenericToolbox):
         # app.gui.setvar(group, "include_waves", False)
 
         # Model extent determination
-        app.gui.setvar(group, "grid_outline", 0)
+        app.gui.setvar(self.group, "grid_outline", 0)
         app.gui.setvar(
-            group,
+            self.group,
             "setup_grid_methods",
             ["Draw Bounding Box", "Draw Polygon", "Load watershed", "Load shapefile"],
         )
-        app.gui.setvar(group, "setup_grid_methods_index", 0)
+        app.gui.setvar(self.group, "setup_grid_methods_index", 0)
 
         # Domain
-        app.gui.setvar(group, "x0", 0.0)
-        app.gui.setvar(group, "y0", 0.0)
-        app.gui.setvar(group, "nmax", 0)
-        app.gui.setvar(group, "mmax", 0)
+        app.gui.setvar(self.group, "x0", 0.0)
+        app.gui.setvar(self.group, "y0", 0.0)
+        app.gui.setvar(self.group, "nmax", 0)
+        app.gui.setvar(self.group, "mmax", 0)
         app.gui.setvar(
-            group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
+            self.group, "nr_cells", app.gui.getvar(self.group, "mmax") * app.gui.getvar(self.group, "nmax")
             )
         if app.crs.is_geographic:
             app.gui.setvar(group, "dx", 0.1)
@@ -123,22 +134,22 @@ class Toolbox(GenericToolbox):
                         if app.data_catalog[key].meta["source"] == source_names[0]:
                             dataset_names.append(key)
 
-        app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
-        app.gui.setvar(group, "bathymetry_dataset_index", 0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
-        app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_meta", "")
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_offset", 0)
-        app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
-        app.gui.setvar(group, "bathymetry_dataset_buffer_cells", 0)
-        app.gui.setvar(group, "bathymetry_dataset_interp_method", "linear")
+        app.gui.setvar(self.group, "bathymetry_dataset_names", dataset_names)
+        app.gui.setvar(self.group, "bathymetry_dataset_index", 0)
+        app.gui.setvar(self.group, "selected_bathymetry_dataset_names", [])
+        app.gui.setvar(self.group, "selected_bathymetry_dataset_index", 0)
+        app.gui.setvar(self.group, "selected_bathymetry_dataset_meta", "")
+        app.gui.setvar(self.group, "selected_bathymetry_dataset_zmin", -99999.0)
+        app.gui.setvar(self.group, "selected_bathymetry_dataset_zmax", 99999.0)
+        app.gui.setvar(self.group, "selected_bathymetry_dataset_offset", 0)
+        app.gui.setvar(self.group, "nr_selected_bathymetry_datasets", 0)
+        app.gui.setvar(self.group, "bathymetry_dataset_buffer_cells", 0)
+        app.gui.setvar(self.group, "bathymetry_dataset_interp_method", "linear")
 
         # Roughness
-        app.gui.setvar(group, "manning_land", 0.06)
-        app.gui.setvar(group, "manning_sea", 0.02)
-        app.gui.setvar(group, "rgh_lev_land", 0.0)
+        app.gui.setvar(self.group, "manning_land", 0.06)
+        app.gui.setvar(self.group, "manning_sea", 0.02)
+        app.gui.setvar(self.group, "rgh_lev_land", 0.0)
 
         roughness_methods = [
             "Constant values",
@@ -146,8 +157,8 @@ class Toolbox(GenericToolbox):
             "Manning dataset",
             "Manning shapes",
         ]
-        app.gui.setvar(group, "roughness_methods", roughness_methods)
-        app.gui.setvar(group, "roughness_methods_index", 0)
+        app.gui.setvar(self.group, "roughness_methods", roughness_methods)
+        app.gui.setvar(self.group, "roughness_methods_index", 0)
 
         manning_dataset_names = []
         lulc_dataset_names = []
@@ -165,28 +176,28 @@ class Toolbox(GenericToolbox):
                     elif app.data_catalog[key].meta["category"] == "infiltration":
                         qinf_dataset_names.append(key)
 
-        app.gui.setvar(group, "lulc_dataset_names", lulc_dataset_names)
-        app.gui.setvar(group, "lulc_dataset_index", 0)
-        app.gui.setvar(group, "lulc_reclass_table", "")
-        app.gui.setvar(group, "manning_dataset_names", manning_dataset_names)
-        app.gui.setvar(group, "manning_dataset_index", 0)
-        app.gui.setvar(group, "manning_polygon_names", [])
-        app.gui.setvar(group, "manning_polygon_values", [])
-        app.gui.setvar(group, "manning_polygon_index", 0)
-        app.gui.setvar(group, "nr_manning_polygons", 0)
-        app.gui.setvar(group, "selected_manning_dataset_names", ["Constant values"])
-        app.gui.setvar(group, "selected_manning_dataset_index", 0)
-        app.gui.setvar(group, "nr_selected_manning_datasets", 0)
+        app.gui.setvar(self.group, "lulc_dataset_names", lulc_dataset_names)
+        app.gui.setvar(self.group, "lulc_dataset_index", 0)
+        app.gui.setvar(self.group, "lulc_reclass_table", "")
+        app.gui.setvar(self.group, "manning_dataset_names", manning_dataset_names)
+        app.gui.setvar(self.group, "manning_dataset_index", 0)
+        app.gui.setvar(self.group, "manning_polygon_names", [])
+        app.gui.setvar(self.group, "manning_polygon_values", [])
+        app.gui.setvar(self.group, "manning_polygon_index", 0)
+        app.gui.setvar(self.group, "nr_manning_polygons", 0)
+        app.gui.setvar(self.group, "selected_manning_dataset_names", ["Constant values"])
+        app.gui.setvar(self.group, "selected_manning_dataset_index", 0)
+        app.gui.setvar(self.group, "nr_selected_manning_datasets", 0)
 
         infiltration_methods = ["Constant value", "CN dataset", "Qinf dataset"]
-        app.gui.setvar(group, "infiltration_methods", infiltration_methods)
-        app.gui.setvar(group, "infiltration_methods_index", 0)
+        app.gui.setvar(self.group, "infiltration_methods", infiltration_methods)
+        app.gui.setvar(self.group, "infiltration_methods_index", 0)
 
-        app.gui.setvar(group, "cn_dataset_names", cn_dataset_names)
-        app.gui.setvar(group, "cn_dataset_index", 0)
-        app.gui.setvar(group, "cn_antecedent_moisture", "avg")
-        app.gui.setvar(group, "qinf_dataset_names", qinf_dataset_names)
-        app.gui.setvar(group, "qinf_dataset_index", 0)        
+        app.gui.setvar(self.group, "cn_dataset_names", cn_dataset_names)
+        app.gui.setvar(self.group, "cn_dataset_index", 0)
+        app.gui.setvar(self.group, "cn_antecedent_moisture", "avg")
+        app.gui.setvar(self.group, "qinf_dataset_names", qinf_dataset_names)
+        app.gui.setvar(self.group, "qinf_dataset_index", 0)        
 
         # Mask active
         mask_polygon_methods = [
@@ -234,135 +245,111 @@ class Toolbox(GenericToolbox):
         # app.gui.setvar(group, "outflow_reset", True)
 
         # subgrid
-        app.gui.setvar(group, "nr_subgrid_pixels", 20)
-        app.gui.setvar(group, "nbins", 10)
-        app.gui.setvar(group, "max_gradient", 5.0)
-        app.gui.setvar(group, "nrmax", 2000)
-        app.gui.setvar(group, "z_minimum", -99999.0)
-        app.gui.setvar(group, "write_dep_tif", True)
-        app.gui.setvar(group, "write_man_tif", True)
-        app.gui.setvar(group, "extrapolate_values", False)
+        app.gui.setvar(self.group, "nr_subgrid_pixels", 20)
+        app.gui.setvar(self.group, "nbins", 10)
+        app.gui.setvar(self.group, "max_gradient", 5.0)
+        app.gui.setvar(self.group, "nrmax", 2000)
+        app.gui.setvar(self.group, "z_minimum", -99999.0)
+        app.gui.setvar(self.group, "write_dep_tif", True)
+        app.gui.setvar(self.group, "write_man_tif", True)
+        app.gui.setvar(self.group, "extrapolate_values", False)
 
         subgrid_buffer_cells = app.gui.getvar(
-            group, "nr_subgrid_pixels"
-        ) * app.gui.getvar(group, "bathymetry_dataset_buffer_cells")
-        app.gui.setvar(group, "subgrid_buffer_cells", subgrid_buffer_cells)
+            self.group, "nr_subgrid_pixels"
+        ) * app.gui.getvar(self.group, "bathymetry_dataset_buffer_cells")
+        app.gui.setvar(self.group, "subgrid_buffer_cells", subgrid_buffer_cells)
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Make all layers invisible
-            app.map.layer["modelmaker_sfincs_hmt"].hide()
+            app.map.layer[self.group].hide()
         if mode == "invisible":
-            app.map.layer["modelmaker_sfincs_hmt"].hide()
+            app.map.layer[self.group].hide()
 
     def add_layers(self):
         # Add Mapbox layers
-        layer = app.map.add_layer("modelmaker_sfincs_hmt")
+        layer = app.map.add_layer(self.group)
 
         # Area of interest
-        from .domain import aio_created
-        from .domain import aio_modified
 
         layer.add_layer(
             "area_of_interest",
             type="draw",
             shape="polygon",
-            create=aio_created,
-            modify=aio_modified,
+            create=self.domain.aio_created,
+            modify=self.domain.aio_modified,
             polygon_line_color="grey",
             polygon_fill_opacity=0.3,
         )
-
-        # Grid outline
-        from .domain import grid_outline_created
-        from .domain import grid_outline_modified
 
         layer.add_layer(
             "grid_outline",
             type="draw",
             shape="rectangle",
-            create=grid_outline_created,
-            modify=grid_outline_modified,
+            create=self.domain.grid_outline_created,
+            modify=self.domain.grid_outline_modified,
             polygon_line_color="mediumblue",
             polygon_fill_opacity=0.3,
         )
 
         ### Mask
-        # Region
-        from .mask_active_cells import mask_init_polygon_created
-        from .mask_active_cells import mask_init_polygon_modified
-
         layer.add_layer(
             "mask_init",
             type="draw",
             shape="polygon",
-            create=mask_init_polygon_created,
-            modify=mask_init_polygon_modified,
+            create=self.cell_mask.mask_init_polygon_created,
+            modify=self.cell_mask.mask_init_polygon_modified,
             polygon_line_color="grey",
             polygon_fill_color="grey",
             polygon_fill_opacity=0.3,
         )
 
         # Include
-        from .mask_active_cells import include_polygon_created
-        from .mask_active_cells import include_polygon_modified
-        from .mask_active_cells import include_polygon_selected
-
         layer.add_layer(
             "mask_include",
             type="draw",
             shape="polygon",
-            create=include_polygon_created,
-            modify=include_polygon_modified,
-            select=include_polygon_selected,
+            create=self.cell_mask.include_polygon_created,
+            modify=self.cell_mask.include_polygon_modified,
+            select=self.cell_mask.include_polygon_selected,
             polygon_line_color="limegreen",
             polygon_fill_color="limegreen",
             polygon_fill_opacity=0.3,
         )
-        # Exclude
-        from .mask_active_cells import exclude_polygon_created
-        from .mask_active_cells import exclude_polygon_modified
-        from .mask_active_cells import exclude_polygon_selected
 
+        # Exclude
         layer.add_layer(
             "mask_exclude",
             type="draw",
             shape="polygon",
-            create=exclude_polygon_created,
-            modify=exclude_polygon_modified,
-            select=exclude_polygon_selected,
+            create=self.cell_mask.exclude_polygon_created,
+            modify=self.cell_mask.exclude_polygon_modified,
+            select=self.cell_mask.exclude_polygon_selected,
             polygon_line_color="orangered",
             polygon_fill_color="orangered",
             polygon_fill_opacity=0.3,
         )
-        # Boundary
-        from .mask_boundary_cells import wlev_polygon_created
-        from .mask_boundary_cells import wlev_polygon_modified
-        from .mask_boundary_cells import wlev_polygon_selected
 
+        # Boundary
         layer.add_layer(
             "mask_wlev",
             type="draw",
             shape="polygon",
-            create=wlev_polygon_created,
-            modify=wlev_polygon_modified,
-            select=wlev_polygon_selected,
+            create=self.boundary_mask.wlev_polygon_created,
+            modify=self.boundary_mask.wlev_polygon_modified,
+            select=self.boundary_mask.wlev_polygon_selected,
             polygon_line_color="deepskyblue",
             polygon_fill_color="deepskyblue",
             polygon_fill_opacity=0.3,
         )
 
-        from .mask_boundary_cells import outflow_polygon_created
-        from .mask_boundary_cells import outflow_polygon_modified
-        from .mask_boundary_cells import outflow_polygon_selected
-
         layer.add_layer(
             "mask_outflow",
             type="draw",
             shape="polygon",
-            create=outflow_polygon_created,
-            modify=outflow_polygon_modified,
-            select=outflow_polygon_selected,
+            create=self.boundary_mask.outflow_polygon_created,
+            modify=self.boundary_mask.outflow_polygon_modified,
+            select=self.boundary_mask.outflow_polygon_selected,
             polygon_line_color="indianred",
             polygon_fill_color="indianred",
             polygon_fill_opacity=0.3,
@@ -373,7 +360,7 @@ class Toolbox(GenericToolbox):
 
         dlg = app.gui.window.dialog_wait("Generating grid ...")
 
-        group = "modelmaker_sfincs_hmt"
+        group = self.group
         setup_grid = {
             "x0": float(app.gui.getvar(group, "x0")),
             "y0": float(app.gui.getvar(group, "y0")),
@@ -417,7 +404,7 @@ class Toolbox(GenericToolbox):
 
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
 
-        group = "modelmaker_sfincs_hmt"
+        group = self.group
         setup_dep = {
             "datasets_dep": app.toolbox[group].selected_bathymetry_datasets,
             "buffer_cells": app.gui.getvar(group, "bathymetry_dataset_buffer_cells"),
@@ -437,7 +424,7 @@ class Toolbox(GenericToolbox):
 
         dlg = app.gui.window.dialog_wait("Generating manning roughness ...")
 
-        group = "modelmaker_sfincs_hmt"
+        group = self.group
         setup_manning_roughness = {
             "datasets_rgh": app.toolbox[group].selected_manning_datasets,
             "manning_land": app.gui.getvar(group, "manning_land"),
@@ -455,7 +442,7 @@ class Toolbox(GenericToolbox):
         model = app.model["sfincs_hmt"].domain
 
         dlg = app.gui.window.dialog_wait("Generating active mask  ...")
-        group = "modelmaker_sfincs_hmt"
+        group = self.group
         setup_mask_active = {
             "mask": app.toolbox[group].mask_init_polygon
             if not app.toolbox[group].mask_init_polygon.empty
@@ -563,7 +550,7 @@ class Toolbox(GenericToolbox):
 
         dlg = app.gui.window.dialog_wait("Generating subgrid ...")
 
-        group = "modelmaker_sfincs_hmt"
+        group = self.group
         setup_subgrid = {
             "datasets_dep": app.toolbox[group].selected_bathymetry_datasets,
             "datasets_rgh": app.toolbox[group].selected_manning_datasets,
@@ -592,7 +579,7 @@ class Toolbox(GenericToolbox):
 
     def generate_infiltration(self):
         model = app.model["sfincs_hmt"].domain
-        index = app.gui.getvar("modelmaker_sfincs_hmt", "infiltration_methods_index")
+        index = app.gui.getvar(self.group, "infiltration_methods_index")
 
         dlg = app.gui.window.dialog_wait("Generating infiltration ...")
 
@@ -607,8 +594,8 @@ class Toolbox(GenericToolbox):
 
             # generate CN infiltration
             model.setup_cn_infiltration(
-                cn = app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_names")[app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_index")],
-                antecedent_moisture = app.gui.getvar("modelmaker_sfincs_hmt", "cn_antecedent_moisture"),
+                cn = app.gui.getvar(self.group, "cn_dataset_names")[app.gui.getvar(self.group, "cn_dataset_index")],
+                antecedent_moisture = app.gui.getvar(self.group, "cn_antecedent_moisture"),
             )
         elif index == 2:
             # drop other methods
@@ -617,7 +604,7 @@ class Toolbox(GenericToolbox):
 
             # generate Qinf infiltration
             model.setup_constant_infiltration(
-                qinf = app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_names")[app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_index")],
+                qinf = app.gui.getvar(self.group, "qinf_dataset_names")[app.gui.getvar(self.group, "qinf_dataset_index")],
             ) 
         dlg.close()
 

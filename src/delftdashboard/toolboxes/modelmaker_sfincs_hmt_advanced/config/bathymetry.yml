@@ -8,7 +8,7 @@ element:
   text: "Available Datasets"
   text_position: "above"
   tooltip: List of all available bathymetry datasets
-  method: select_bathymetry_dataset
+  method: SfincsHmtBathymetryAdvanced.select_bathymetry_dataset
   variable: bathymetry_dataset_index
   select: index
   option_string:
@@ -19,7 +19,7 @@ element:
     y: 10
     width: 180
     height: 20
-  method: select_bathymetry_source
+  method: SfincsHmtBathymetryAdvanced.select_bathymetry_source
   variable: active_bathymetry_source
   select: item
   option_string:
@@ -33,7 +33,7 @@ element:
     width: 80
     height: 20
   text: "Use Dataset ->"
-  method: use_dataset
+  method: SfincsHmtBathymetryAdvanced.use_dataset
 - style: pushbutton
   position:
     x: 200
@@ -41,7 +41,7 @@ element:
     width: 80
     height: 20
   text: "<- Remove"
-  method: remove_selected_bathymetry_dataset
+  method: SfincsHmtBathymetryAdvanced.remove_selected_bathymetry_dataset
   dependency:
   - action: enable
     checkfor: all
@@ -56,7 +56,7 @@ element:
     width: 80
     height: 20
   text: "Info"
-  method: info
+  method: SfincsHmtBathymetryAdvanced.info
   enable: False
 - style: listbox
   position:
@@ -68,7 +68,7 @@ element:
   text_position: "above"
   tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
     they appear in this list, unless specified otherwise.
-  method: select_selected_bathymetry_dataset
+  method: SfincsHmtBathymetryAdvanced.select_selected_bathymetry_dataset
   variable: selected_bathymetry_dataset_index
   select: index
   option_string:
@@ -80,7 +80,7 @@ element:
     width: 75
     height: 20
   text: "Move Up"
-  method: move_up_selected_bathymetry_dataset
+  method: SfincsHmtBathymetryAdvanced.move_up_selected_bathymetry_dataset
   dependency:
   - action: enable
     checkfor: all
@@ -95,7 +95,7 @@ element:
     width: 75
     height: 20
   text: "Move Down"
-  method: move_down_selected_bathymetry_dataset
+  method: SfincsHmtBathymetryAdvanced.move_down_selected_bathymetry_dataset
   dependency:
   - action: enable
     checkfor: all
@@ -129,7 +129,7 @@ element:
     text: "Zmax"
     tooltip: "Maximum valid elevation of the dataset. Values above this elevation
       will be set to NaN."
-    method: edit_zmax_bathymetry_dataset
+    method: SfincsHmtBathymetryAdvanced.edit_zmax_bathymetry_dataset
     variable: selected_bathymetry_dataset_zmax
   - style: edit
     position:
@@ -140,7 +140,7 @@ element:
     text: "Zmin"
     tooltip: "Minimum valid elevation of the dataset. Values below this elevation
       will be set to NaN."
-    method: edit_zmin_bathymetry_dataset
+    method: SfincsHmtBathymetryAdvanced.edit_zmin_bathymetry_dataset
     variable: selected_bathymetry_dataset_zmin
   - style: edit
     position:
@@ -151,7 +151,7 @@ element:
     text: "Offset"
     tooltip: "Offset to be added to the dataset. This is useful to correct for
       the mean sea level."
-    method: edit_offset_bathymetry_dataset
+    method: SfincsHmtBathymetryAdvanced.edit_offset_bathymetry_dataset
     variable: selected_bathymetry_dataset_offset
   - style: pushbutton
     position:
@@ -160,7 +160,7 @@ element:
       width: 100
       height: 20
     text: "Advanced options"
-    method: advanced_merge_options_bathymetry_dataset
+    method: SfincsHmtBathymetryAdvanced.advanced_merge_options_bathymetry_dataset
     dependency:
     - action: enable
       checkfor: all
@@ -194,7 +194,7 @@ element:
     text: "Buffer cells"
     text_position: above
     tooltip: "Number of buffer cells between datasets to ensure smooth transitions"
-    method: edit_buffer_cells_bathymetry_dataset
+    method: SfincsHmtBathymetryAdvanced.edit_buffer_cells_bathymetry_dataset
     variable: bathymetry_dataset_buffer_cells
     dependency:
     - action: enable
@@ -212,7 +212,7 @@ element:
     text: "Interp method"
     text_position: above
     tooltip: "Method used to interpolate the buffer cells"
-    method: select_interp_method
+    method: SfincsHmtBathymetryAdvanced.select_interp_method
     variable: bathymetry_dataset_interp_method
     select: item
     option_string: ["Linear", "Nearest", "Cubic"]     
@@ -233,4 +233,4 @@ element:
     text: "Generate Bathymetry"
     tooltip: "Generate bathymetry from the selected datasets. \n Note that you have
       to specify at least one dataset in the list of selected datasets."
-    method: generate_bathymetry
+    method: SfincsHmtBathymetryAdvanced.generate_bathymetry

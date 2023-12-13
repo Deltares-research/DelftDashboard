@@ -24,7 +24,7 @@ element:
       y: 35
       width: 100
       height: 20
-    method: update_mask_bounds
+    method: SfincsHmtBoundaryMask.update_mask_bounds
   - style: pushbutton
     text: Reset bounds
     position:
@@ -32,7 +32,7 @@ element:
       y: 10
       width: 100
       height: 20
-    method: reset_mask_bounds 
+    method: SfincsHmtBoundaryMask.reset_mask_bounds 
 - style: panel
   title: "Waterlevel boundaries: "
   position:
@@ -56,7 +56,7 @@ element:
       height: 70
     text: "Restrict area with polygons: "
     text_position: left
-    method: select_wlev_polygon
+    method: SfincsHmtBoundaryMask.select_wlev_polygon
     variable: wlev_include_polygon_index
     select: index
     option_string:
@@ -68,7 +68,7 @@ element:
       y: 60
       width: 40
       height: 20
-    method: draw_wlev_polygon
+    method: SfincsHmtBoundaryMask.draw_wlev_polygon
   - style: pushbutton
     text: Delete
     position:
@@ -76,7 +76,7 @@ element:
       y: 35
       width: 40
       height: 20
-    method: delete_wlev_polygon
+    method: SfincsHmtBoundaryMask.delete_wlev_polygon
     dependency:
     - action: enable
       checkfor: all
@@ -91,7 +91,7 @@ element:
       y: 10
       width: 40
       height: 20
-    method: load_wlev_polygon
+    method: SfincsHmtBoundaryMask.load_wlev_polygon
   - style: edit
     position:
       x: 215
@@ -124,7 +124,7 @@ element:
       height: 70
     text: "Restrict area with polygons: "
     text_position: left      
-    method: select_outflow_polygon
+    method: SfincsHmtBoundaryMask.select_outflow_polygon
     variable: outflow_include_polygon_index
     select: index
     option_string:
@@ -136,7 +136,7 @@ element:
       y: 60
       width: 40
       height: 20
-    method: draw_outflow_polygon
+    method: SfincsHmtBoundaryMask.draw_outflow_polygon
   - style: pushbutton
     text: Delete
     position:
@@ -144,7 +144,7 @@ element:
       y: 35
       width: 40
       height: 20
-    method: delete_outflow_polygon
+    method: SfincsHmtBoundaryMask.delete_outflow_polygon
     dependency:
     - action: enable
       checkfor: all
@@ -159,7 +159,7 @@ element:
       y: 10
       width: 40
       height: 20
-    method: load_outflow_polygon
+    method: SfincsHmtBoundaryMask.load_outflow_polygon
   - style: edit
     position:
       x: 215
@@ -169,5 +169,4 @@ element:
     text:  "Restrict to cells with a minimum elevation of (in m+MSL): "
     text_position: left
     variable: outflow_zmin        
-
 

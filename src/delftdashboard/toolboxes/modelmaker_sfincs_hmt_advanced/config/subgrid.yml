@@ -15,7 +15,7 @@ element:
       height: 15
     text: Nr of pixels
     variable: nr_subgrid_pixels
-    method: edit_nr_subgrid_pixels
+    method: SfincsHmtSubgridAdvanced.edit_nr_subgrid_pixels
   - style: edit
     position:
       x: 60
@@ -114,7 +114,7 @@ element:
     width: 90
     height: 20
   text: "Generate Subgrid"
-  method: generate_subgrid
+  method: SfincsHmtSubgridAdvanced.generate_subgrid
   dependency:
   - action: enable
     checkfor: all

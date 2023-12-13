@@ -22,7 +22,7 @@ element:
       height: 20
     select: index
     tooltip: "Initialize the active mask with a polygon"
-    method: select_mask_init_polygon_method
+    method: SfincsHmtCellMaskAdvanced.select_mask_init_polygon_method
     variable: mask_init_polygon_methods_index
     option_string:
       variable: mask_init_polygon_methods
@@ -33,7 +33,7 @@ element:
       y: 75
       width: 85
       height: 20
-    method: load_mask_init_polygon
+    method: SfincsHmtCellMaskAdvanced.load_mask_init_polygon
     dependency:
     - action: visible
       checkfor: any
@@ -48,7 +48,7 @@ element:
       y: 75
       width: 85
       height: 20
-    method: draw_mask_init_polygon
+    method: SfincsHmtCellMaskAdvanced.draw_mask_init_polygon
     dependency:
     - action: visible
       checkfor: any
@@ -63,7 +63,7 @@ element:
       y: 75
       width: 85
       height: 20
-    method: delete_mask_init_polygon
+    method: SfincsHmtCellMaskAdvanced.delete_mask_init_polygon
     dependency:
     - action: visible
       checkfor: any
@@ -78,7 +78,7 @@ element:
       y: 75
       width: 85
       height: 20
-    method: save_mask_init_polygon
+    method: SfincsHmtCellMaskAdvanced.save_mask_init_polygon
     dependency:
     - action: visible
       checkfor: any
@@ -160,7 +160,7 @@ element:
       y: 10
       width: 80
       height: 100
-    method: select_include_polygon
+    method: SfincsHmtCellMaskAdvanced.select_include_polygon
     variable: mask_include_polygon_index
     select: index
     option_string:
@@ -173,7 +173,7 @@ element:
       y: 90
       width: 80
       height: 20
-    method: draw_include_polygon
+    method: SfincsHmtCellMaskAdvanced.draw_include_polygon
   - style: pushbutton
     text: Delete Polygon
     position:
@@ -181,7 +181,7 @@ element:
       y: 65
       width: 80
       height: 20
-    method: delete_include_polygon
+    method: SfincsHmtCellMaskAdvanced.delete_include_polygon
     dependency:
     - action: enable
       checkfor: all
@@ -196,7 +196,7 @@ element:
       y: 40
       width: 80
       height: 20
-    method: load_include_polygon
+    method: SfincsHmtCellMaskAdvanced.load_include_polygon
   - style: pushbutton
     text: Save Polygon
     position:
@@ -204,7 +204,7 @@ element:
       y: 15
       width: 80
       height: 20
-    method: save_include_polygon
+    method: SfincsHmtCellMaskAdvanced.save_include_polygon
     dependency:
     - action: enable
       checkfor: all
@@ -226,7 +226,7 @@ element:
       y: 10
       width: 80
       height: 100
-    method: select_exclude_polygon
+    method: SfincsHmtCellMaskAdvanced.select_exclude_polygon
     variable: mask_exclude_polygon_index
     select: index
     option_string:
@@ -239,7 +239,7 @@ element:
       y: 90
       width: 80
       height: 20
-    method: draw_exclude_polygon
+    method: SfincsHmtCellMaskAdvanced.draw_exclude_polygon
   - style: pushbutton
     text: Delete Polygon
     position:
@@ -247,7 +247,7 @@ element:
       y: 65
       width: 80
       height: 20
-    method: delete_exclude_polygon
+    method: SfincsHmtCellMaskAdvanced.delete_exclude_polygon
     dependency:
     - action: enable
       checkfor: all
@@ -262,7 +262,7 @@ element:
       y: 40
       width: 80
       height: 20
-    method: load_exclude_polygon
+    method: SfincsHmtCellMaskAdvanced.load_exclude_polygon
   - style: pushbutton
     text: Save Polygon
     position:
@@ -270,7 +270,7 @@ element:
       y: 15
       width: 80
       height: 20
-    method: save_exclude_polygon
+    method: SfincsHmtCellMaskAdvanced.save_exclude_polygon
     dependency:
     - action: enable
       checkfor: all
@@ -285,7 +285,7 @@ element:
 #     width: 80
 #     height: 20
 #   text: Reset Mask
-#   method: tick_box
+#   method: SfincsHmtCellMaskAdvanced.tick_box
 #   variable: mask_active_reset       
 - style: pushbutton
   text: Update Mask
@@ -294,5 +294,5 @@ element:
     y: 10
     width: 80
     height: 20
-  method: update_mask_active
+  method: SfincsHmtCellMaskAdvanced.update_mask_active
 

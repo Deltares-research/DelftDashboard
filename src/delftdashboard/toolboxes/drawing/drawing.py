@@ -240,40 +240,41 @@ class Toolbox(GenericToolbox):
 
 # Methods that are called from the GUI
 
-def select(*args):
-    # De-activate existing layers
-    map.update()
+class Drawing():
+    def select(*args):
+        # De-activate existing layers
+        map.update()
 
-def draw_polygon(*args):
-    app.toolbox["drawing"].draw_polygon()
-
-
-def select_polygon(*args):
-    app.toolbox["drawing"].select_polygon()
+    def draw_polygon(*args):
+        app.toolbox["drawing"].draw_polygon()
 
 
-def delete_polygon(*args):
-    app.toolbox["drawing"].delete_polygon()
+    def select_polygon(*args):
+        app.toolbox["drawing"].select_polygon()
 
 
-def draw_rectangle(*args):
-    app.toolbox["drawing"].draw_rectangle()
+    def delete_polygon(*args):
+        app.toolbox["drawing"].delete_polygon()
 
 
-def select_rectangle(*args):
-    app.toolbox["drawing"].select_rectangle()
+    def draw_rectangle(*args):
+        app.toolbox["drawing"].draw_rectangle()
 
 
-def delete_rectangle(*args):
-    app.toolbox["drawing"].delete_rectangle()
-
-def draw_polyline(*args):
-    app.toolbox["drawing"].draw_polyline()
+    def select_rectangle(*args):
+        app.toolbox["drawing"].select_rectangle()
 
 
-def select_polyline(*args):
-    app.toolbox["drawing"].select_polyline()
+    def delete_rectangle(*args):
+        app.toolbox["drawing"].delete_rectangle()
+
+    def draw_polyline(*args):
+        app.toolbox["drawing"].draw_polyline()
 
 
-def delete_polyline(*args):
-    app.toolbox["drawing"].delete_polyline()
+    def select_polyline(*args):
+        app.toolbox["drawing"].select_polyline()
+
+
+    def delete_polyline(*args):
+        app.toolbox["drawing"].delete_polyline()

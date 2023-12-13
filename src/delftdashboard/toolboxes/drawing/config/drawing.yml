@@ -13,7 +13,7 @@ element:
       width: 100
       height: 140
     text: Polygons
-    method: select_polygon
+    method: Drawing.select_polygon
     variable: active_polygon
     select: index
     option_string:
@@ -25,7 +25,7 @@ element:
       y: 130
       width: 120
       height: 20
-    method: draw_polygon
+    method: Drawing.draw_polygon
   - style: pushbutton
     text: Delete Polygon
     position:
@@ -33,7 +33,7 @@ element:
       y: 105
       width: 120
       height: 20
-    method: delete_polygon
+    method: Drawing.delete_polygon
   - style: listbox
     position:
       x: 300
@@ -41,7 +41,7 @@ element:
       width: 100
       height: 140
     text: Rectangles
-    method: select_rectangle
+    method: Drawing.select_rectangle
     variable: active_rectangle
     select: index
     option_string:
@@ -53,7 +53,7 @@ element:
       y: 130
       width: 120
       height: 20
-    method: draw_rectangle
+    method: Drawing.draw_rectangle
   - style: pushbutton
     text: Delete Rectangle
     position:
@@ -61,7 +61,7 @@ element:
       y: 105
       width: 120
       height: 20
-    method: delete_rectangle
+    method: Drawing.delete_rectangle
   - style: listbox
     position:
       x: 600
@@ -69,7 +69,7 @@ element:
       width: 100
       height: 140
     text: Polylines
-    method: select_polyline
+    method: Drawing.select_polyline
     variable: active_polyline
     select: index
     option_string:
@@ -81,7 +81,7 @@ element:
       y: 130
       width: 120
       height: 20
-    method: draw_polyline
+    method: Drawing.draw_polyline
   - style: pushbutton
     text: Delete Polyline
     position:
@@ -89,4 +89,4 @@ element:
       y: 105
       width: 120
       height: 20
-    method: delete_polyline
+    method: Drawing.delete_polyline

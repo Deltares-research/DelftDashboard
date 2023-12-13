@@ -24,7 +24,7 @@ element:
     variable: model_type_index
     option_string:
       variable: model_type  
-    method: select_model_type
+    method: SfincsHmtDomain.select_model_type
   - style: text
     position:
       x: 10
@@ -42,7 +42,7 @@ element:
     text_position: right
     variable: include_rainfall
     tooltip: "When you want to rainfall, we recommend to delineate your model domain with watershed boundaries."
-    method: select_model_type   
+    method: SfincsHmtDomain.select_model_type   
   # - style: checkbox
   #   position:
   #     x: 10
@@ -77,7 +77,7 @@ element:
       height: 20
     tooltip: Select method to determine model extent
     select: index
-    method: select_method
+    method: SfincsHmtDomain.select_method
     variable: setup_grid_methods_index
     option_string:
       variable: setup_grid_methods
@@ -89,7 +89,7 @@ element:
       y: 65
       width: 140
       height: 20
-    method: draw_bbox
+    method: SfincsHmtDomain.draw_bbox
     dependency:
     - action: visible
       checkfor: any
@@ -105,7 +105,7 @@ element:
       y: 65
       width: 140
       height: 20
-    method: draw_aio
+    method: SfincsHmtDomain.draw_aio
     dependency:
     - action: visible
       checkfor: any
@@ -121,7 +121,7 @@ element:
       y: 65
       width: 140
       height: 20
-    method: load_aio
+    method: SfincsHmtDomain.load_aio
     dependency:
     - action: visible
       checkfor: any

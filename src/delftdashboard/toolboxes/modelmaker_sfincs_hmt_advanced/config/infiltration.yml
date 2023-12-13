@@ -15,7 +15,7 @@ element:
       height: 20
     select: index
     tooltip: "Select a method to define the infiltration in your model domain"
-    method: select_infiltration_method
+    method: SfincsHmtInfiltrationAdvanced.select_infiltration_method
     variable: infiltration_methods_index
     option_string:
       variable: infiltration_methods
@@ -145,4 +145,4 @@ element:
   text: "Add infiltration"
   tooltip: "Add infiltration to the model domain
   \nNote that this will overwrite any infiltration already defined in the model domain"
-  method: generate_infiltration
+  method: SfincsHmtInfiltrationAdvanced.generate_infiltration

@@ -14,7 +14,7 @@ element:
       width: 150
       height: 20
     tooltip: Select the data source
-    method: select_bathymetry_source
+    method: SfincsHmtBathymetry.select_bathymetry_source
     variable: active_bathymetry_source
     select: item
     option_string:
@@ -28,7 +28,7 @@ element:
       width: 150
       height: 80
     tooltip: List of all available bathymetry datasets provided by selected source
-    method: select_bathymetry_dataset
+    method: SfincsHmtBathymetry.select_bathymetry_dataset
     variable: bathymetry_dataset_index
     select: index
     option_string:
@@ -41,7 +41,7 @@ element:
       height: 20
     text: "\u2139"
     tooltip: "Show dataset properties"
-    method: info_selected_dataset     
+    method: SfincsHmtBathymetry.info_selected_dataset     
 - style: pushbutton
   position:
     x: 220
@@ -49,7 +49,7 @@ element:
     width: 20
     height: 20
   text: "\u25B6"
-  method: use_dataset
+  method: SfincsHmtBathymetry.use_dataset
 - style: pushbutton
   position:
     x: 220
@@ -57,7 +57,7 @@ element:
     width: 20
     height: 20
   text: "\u25C0"
-  method: remove_selected_bathymetry_dataset
+  method: SfincsHmtBathymetry.remove_selected_bathymetry_dataset
   dependency:
   - action: enable
     checkfor: all
@@ -75,7 +75,7 @@ element:
   text_position: "above"
   tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
     they appear in this list, unless specified otherwise.
-  method: select_selected_bathymetry_dataset
+  method: SfincsHmtBathymetry.select_selected_bathymetry_dataset
   variable: selected_bathymetry_dataset_index
   select: index
   option_string:
@@ -87,7 +87,7 @@ element:
     width: 20
     height: 20
   text: "\u25B2"
-  method: move_up_selected_bathymetry_dataset
+  method: SfincsHmtBathymetry.move_up_selected_bathymetry_dataset
   dependency:
   - action: enable
     checkfor: all
@@ -102,7 +102,7 @@ element:
     width: 20
     height: 20
   text: "\u25BC"
-  method: move_down_selected_bathymetry_dataset
+  method: SfincsHmtBathymetry.move_down_selected_bathymetry_dataset
   dependency:
   - action: enable
     checkfor: all
@@ -117,7 +117,7 @@ element:
     width: 180
     height: 20
   text: "Advanced options"
-  method: advanced_merge_options_bathymetry_dataset
+  method: SfincsHmtBathymetry.advanced_merge_options_bathymetry_dataset
   tooltip: "Specify the validity range and offset for the selected dataset. \n and how the different datasets are merged."
   dependency:
   - action: enable
@@ -135,4 +135,4 @@ element:
   text: "Generate Bathymetry"
   tooltip: "Generate bathymetry from the selected datasets. \n Note that you have
     to specify at least one dataset in the list of selected datasets."
-  method: generate_bathymetry
+  method: SfincsHmtBathymetry.generate_bathymetry

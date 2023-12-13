@@ -15,7 +15,7 @@
       height: 20
     text: Origin X-direction
     variable: x0
-    method: edit_origin
+    method: SfincsHmtDomain.edit_origin
   - style: edit
     position:
       x: 250
@@ -24,7 +24,7 @@
       height: 20
     text: Origin Y-direction
     variable: y0
-    method: edit_origin
+    method: SfincsHmtDomain.edit_origin
   - style: edit
     position:
       x: 100
@@ -33,7 +33,7 @@
       height: 20
     text: Nr. cells in X-direction
     variable: mmax
-    method: edit_nmmax
+    method: SfincsHmtDomain.edit_nmmax
   - style: edit
     position:
       x: 250
@@ -42,7 +42,7 @@
       height: 20
     text: Nr. cells in Y-direction
     variable: nmax
-    method: edit_nmmax
+    method: SfincsHmtDomain.edit_nmmax
   - style: edit
     position:
       x: 100
@@ -51,7 +51,7 @@
       height: 20
     text: Resolution X-direction
     variable: dx
-    method: edit_dxdy
+    method: SfincsHmtDomain.edit_dxdy
   - style: edit
     position:
       x: 250
@@ -60,7 +60,7 @@
       height: 20
     text: Resolution Y-direction
     variable: dy
-    method: edit_dxdy
+    method: SfincsHmtDomain.edit_dxdy
   - style: edit
     position:
       x: 100
@@ -69,4 +69,4 @@
       height: 20
     text: Rotation of grid
     variable: rotation
-    method: edit_rotation
+    method: SfincsHmtDomain.edit_rotation
