@@ -6,7 +6,7 @@ import pandas as pd
 
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
-from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
+from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel   
 import copy
 
 
@@ -22,6 +22,7 @@ class Model(GenericModel):
         self.occupancy_to_description = dict()
         self.description_to_occupancy = dict()
         self.aggregation = gpd.GeoDataFrame()
+        self.svi = gpd.GeoDataFrame()
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -79,6 +80,30 @@ class Model(GenericModel):
             legend_title="Max. potential damage: Content",
             line_color="transparent",
             hover_property="Max Potential Damage: Content",
+            big_data=True,
+            min_zoom=12,
+        )
+        layer.add_layer(
+            "ground_elevation",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Ground elevation",
+            line_color="transparent",
+            hover_property="Ground Elevation",
+            big_data=True,
+            min_zoom=12,
+        )
+        layer = app.map.add_layer("svi")
+        layer.add_layer(
+            "SVI",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Social Vulnerability Index",
+            fill_color="purple",
+            line_color="transparent",
+            hover_property="SVI_key_domain",
             big_data=True,
             min_zoom=12,
         )
@@ -618,6 +643,30 @@ class Model(GenericModel):
                 250000.0, "#E03720",    
                 500000.0, "#860000",                                    
                 ]
+        if type == "ground_elevation":
+             circle_color = [
+                "step",
+                ["get", "Ground Elevation"],"#FFFFFF",
+                0, "#F7FFF6",      
+                500, "#E1FCE4",      
+                1000, "#CDEA88",     
+                1500, "#A8E496",    
+                2000, "#74CC9C",    
+                2500, "#4BAF7A", 
+                3000, "#3F9E6F", 
+                3500, "#359364", 
+                4000, "#2C7B5A", 
+                4500, "#236B50", 
+                5000, "#1A5A45", 
+                5500, "#124A3A", 
+                6000, "#093931", 
+                6500, "#032C27", 
+                7000, "#00211D", 
+                7500, "#001615",                                    
+                ]
+        if type == "SVI":
+             circle_color = "purple"
+            
         paint_properties = {
             "circle-color": circle_color,
             "circle-stroke-width": 2,
@@ -670,21 +719,27 @@ class Model(GenericModel):
             )
             self.show_max_potential_damage_content()
     
-    def show_ground_elevation(self):
+    def show_ground_elevation(self, type="ground_elevation"):
+        """Show ground elevation"""
         if not self.buildings.empty:
-            def add_heatmap(assets, var_name):
-                """Adds a heatmap of the building footprint centroids"""
-                app.map.layer["buildings"].add_layer("Ground_elevation", type="heatmap", max_zoom=24)
-                centroids = assets.copy()
-                centroids["geometry"] = centroids["geometry"].centroid
-                centroids = centroids[centroids[var_name] > 0]
-                app.map.layer["buildings"].layer["Ground_elevation"].set_data(
-                    data=centroids,
-                    density_property=var_name,
-                )
-            asset = app.active_model.buildings
-            add_heatmap(asset, "Ground Elevation")
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            legend = []
+            app.map.layer["buildings"].layer["ground_elevation"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["ground_elevation"].set_data(
+                self.buildings, legend
+            )
             self.show_ground_elevations()
+    
+    def show_svi(self, type = "SVI"):
+        """Show SVI Index"""  # str(Path(self.root) / "exposure" / "SVI")
+        if not self.svi.empty:
+            legend = []
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            svi_gdf = self.buildings.merge(self.svi, on='Object ID')
+            app.map.layer["svi"].layer["SVI"].set_data(
+                svi_gdf, paint_properties, legend
+            )
+            self.show_SVI_index()
 
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
@@ -699,7 +754,10 @@ class Model(GenericModel):
         app.map.layer["buildings"].layer["max_potential_damage_struct"].show()
 
     def show_ground_elevations(self):
-        app.map.layer["buildings"].layer["Ground_elevation"].show()
+        app.map.layer["buildings"].layer["ground_elevation"].show()
+    
+    def show_SVI_index(self):
+        app.map.layer["svi"].layer["SVI"].show()
 
     def hide_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].hide()
