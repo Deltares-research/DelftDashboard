@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: Add new FFE source
+  title: Add new finished floor height source
   position:
     x: 10
     y: 10

@@ -272,161 +272,148 @@ def quick_build(*args):
         # Initiate a new FIAT model
         app.active_model.new()
 
-    ## BUILDINGS ##
     model = "fiat"
     checkbox_group = "_main"
-    try:
-        dlg = app.gui.window.dialog_wait("\nDownloading NSI data...")
-        app.gui.setvar(model, "created_nsi_assets", "nsi")
-        app.gui.setvar(
-            model, "text_feedback_create_asset_locations", "NSI assets created"
-        )
+    # try:
+    dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
+    app.gui.setvar(model, "created_nsi_assets", "nsi")
+    app.gui.setvar(
+        model, "text_feedback_create_asset_locations", "NSI assets created"
+    )
 
-        crs = app.gui.getvar(model, "selected_crs")
-        (
-            gdf,
-            unique_primary_types,
-            unique_secondary_types,
-        ) = app.active_model.domain.exposure_vm.set_asset_locations_source(
-            source="NSI", ground_floor_height="NSI", crs=crs
-        )
-        gdf.set_crs(crs, inplace=True)
+    crs = app.gui.getvar(model, "selected_crs")
+    
+    # BUILDINGS with default settings
+    app.active_model.domain.exposure_vm.set_asset_locations_source(
+        source="NSI", ground_floor_height="NSI", crs=crs
+    )
 
-        # Set the buildings attribute to gdf for easy visualization of the buildings
-        app.active_model.buildings = gdf
+    # Set the damage curves
+    selected_damage_curve_database = "default_vulnerability_curves"
+    selected_link_table = "default_hazus_iwr_linking"
+    app.gui.setvar(
+        model, "selected_damage_curve_database", selected_damage_curve_database
+    )
+    app.gui.setvar(
+        model, "selected_damage_curve_linking_table", selected_link_table
+    )
+    app.active_model.domain.vulnerability_vm.add_vulnerability_curves_to_model(
+        selected_damage_curve_database, selected_link_table
+    )
 
-        list_types = list(gdf["Secondary Object Type"].unique())
-        list_types.sort()
-        df = pd.DataFrame(
-            data={
-                "Secondary Object Type": list_types,
-                "Assigned: Structure": "",
-                "Assigned: Content": "",
-            }
-        )
-        ## TODO: add the nr of stories and the basement
+    # ROADS with default settings
+    # By default it is taking the following road types:
+    # "motorway",
+    # "motorway_link",
+    # "trunk",
+    # "trunk_link",
+    # "primary",
+    # "primary_link",
+    # "secondary",
+    # "secondary_link",
+    app.active_model.domain.exposure_vm.set_roads_settings()
 
-        app.gui.setvar(model, "exposure_categories_to_link", df)
+    # Set the road damage threshold
+    road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
+    app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
+        road_damage_threshold
+    )
 
-        app.map.layer["buildings"].layer["exposure_points"].crs = crs
-        app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
+    # Set SVI and equity
+    census_key_path = Path(app.config_path) / "census_key.txt"
+    if census_key_path.exists():
+        fid = open(census_key_path, "r")
+        census_key = fid.readlines()
+        fid.close()
 
-        app.gui.setvar(
-            model, "selected_primary_classification_string", unique_primary_types
-        )
-        app.gui.setvar(
-            model, "selected_secondary_classification_string", unique_secondary_types
-        )
-        app.gui.setvar(
-            model, "selected_primary_classification_value", unique_primary_types
-        )
-        app.gui.setvar(
-            model, "selected_secondary_classification_value", unique_secondary_types
-        )
+    census_key = census_key[0]
+    year_data = 2021  ## default
 
-        app.gui.setvar(model, "show_asset_locations", True)
-        app.gui.setvar("modelmaker_fiat", "show_asset_locations", True)
+    app.active_model.domain.svi_vm.set_svi_settings(census_key, year_data)
+    app.active_model.domain.svi_vm.set_equity_settings(census_key, year_data)
 
-        # Set the damage curves
-        selected_damage_curve_database = "default_vulnerability_curves"
-        selected_link_table = "default_hazus_iwr_linking"
-        app.gui.setvar(
-            model, "selected_damage_curve_database", selected_damage_curve_database
-        )
-        app.gui.setvar(
-            model, "selected_damage_curve_linking_table", selected_link_table
-        )
-        app.active_model.domain.vulnerability_vm.add_vulnerability_curves_to_model(
-            selected_damage_curve_database, selected_link_table
-        )
+    # Set the checkboxes checked
+    app.gui.setvar("fiat", "show_roads", True)
+    app.gui.setvar("modelmaker_fiat", "show_roads", True)
+    app.gui.setvar(model, "show_asset_locations", True)
+    app.gui.setvar("modelmaker_fiat", "show_asset_locations", True)
+    app.gui.setvar("_main", "checkbox_vulnerability", True)
 
-        # Check the checkbox
-        app.gui.setvar("_main", "checkbox_vulnerability", True)
+    app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
+    app.gui.setvar(checkbox_group, "checkbox_classification", True)
+    app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
+    app.gui.setvar(checkbox_group, "checkbox_finished_floor_height", True)
+    app.gui.setvar(checkbox_group, "checkbox_svi_(optional)", True)
+    app.gui.setvar("_main", "checkbox_roads_(optional)", True)
 
-        # Set SVI and equity
-        census_key_path = Path(app.config_path) / "census_key.txt"
-        if census_key_path.exists():
-            fid = open(census_key_path, "r")
-            census_key = fid.readlines()
-            fid.close()
+    # Set the sources
+    app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
+    app.gui.setvar(model, "source_classification", "National Structure Inventory")
+    app.gui.setvar(
+        model, "source_finished_floor_elevation", "National Structure Inventory"
+    )
+    app.gui.setvar(
+        model, "source_max_potential_damage", "National Structure Inventory"
+    )
+    app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
 
-        census_key = census_key[0]
-        year_data = 2021  ## default
+    # Run HydroMT-FIAT
 
-        app.active_model.domain.svi_vm.set_svi_settings(census_key, year_data)
-        app.active_model.domain.svi_vm.set_equity_settings(census_key, year_data)
+    # Show the model and set the GUI variables
+    buildings, roads = app.active_model.domain.run_hydromt_fiat()
 
-        # Set the checkboxes checked
-        app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
-        app.gui.setvar(checkbox_group, "checkbox_classification", True)
-        app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
-        app.gui.setvar(checkbox_group, "checkbox_finished_floor_height", True)
-        app.gui.setvar(checkbox_group, "checkbox_svi_(optional)", True)
+    # Set the buildings and roads attribute to gdf for easy visualization
+    if buildings is not None:
+        app.active_model.buildings = buildings
+        app.active_model.buildings.set_crs(crs, inplace=True)
+    if roads is not None:
+        app.active_model.roads = roads
+        app.active_model.roads.set_crs(crs, inplace=True)
+    
+    list_types_primary = list(app.active_model.buildings["Primary Object Type"].unique())
+    list_types_secondary = list(app.active_model.buildings["Secondary Object Type"].unique())
+    list_types_primary.sort()
+    list_types_secondary.sort()
+    df = pd.DataFrame(
+        data={
+            "Secondary Object Type": list_types_secondary,
+            "Assigned: Structure": "",
+            "Assigned: Content": "",
+        }
+    )
+    ## TODO: add the nr of stories and the basement
 
-        # Set the sources
-        app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
-        app.gui.setvar(model, "source_classification", "National Structure Inventory")
-        app.gui.setvar(
-            model, "source_finished_floor_elevation", "National Structure Inventory"
-        )
-        app.gui.setvar(
-            model, "source_max_potential_damage", "National Structure Inventory"
-        )
-        app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
+    app.gui.setvar(model, "exposure_categories_to_link", df)
 
-        dlg.close()
+    app.map.layer["buildings"].layer["exposure_points"].crs = crs
+    app.map.layer["buildings"].layer["exposure_points"].set_data(app.active_model.buildings)
 
-    except FileNotFoundError:
-        app.gui.window.dialog_info(
-            text="Please first select a model boundary.",
-            title="No model boundary selected",
-        )
-        dlg.close()
+    app.gui.setvar(
+        model, "selected_primary_classification_string", list_types_primary
+    )
+    app.gui.setvar(
+        model, "selected_secondary_classification_string", list_types_secondary
+    )
+    app.gui.setvar(
+        model, "selected_primary_classification_value", list_types_primary
+    )
+    app.gui.setvar(
+        model, "selected_secondary_classification_value", list_types_secondary
+    )
 
-    ## ROADS ##
-    try:
-        dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
+    # Show the roads
+    app.map.layer["roads"].layer["exposure_lines"].crs = crs
+    app.map.layer["roads"].layer["exposure_lines"].set_data(app.active_model.roads)
+    app.active_model.show_exposure_roads()
 
-        # Get the roads to show in the map
-        # By default it is taking the following road types:
-        # "motorway",
-        # "motorway_link",
-        # "trunk",
-        # "trunk_link",
-        # "primary",
-        # "primary_link",
-        # "secondary",
-        # "secondary_link",
+    dlg.close()
 
-        gdf = app.active_model.domain.exposure_vm.get_osm_roads()
-
-        crs = app.gui.getvar("fiat", "selected_crs")
-        gdf.set_crs(crs, inplace=True)
-
-        app.map.layer["roads"].layer["exposure_lines"].crs = crs
-        app.map.layer["roads"].layer["exposure_lines"].set_data(gdf)
-
-        # Set the road damage threshold
-        road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-        app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
-            road_damage_threshold
-        )
-
-        # Show the roads
-        app.active_model.show_exposure_roads()
-        app.gui.setvar("_main", "checkbox_roads_(optional)", True)
-
-        # Set the checkbox checked
-        app.gui.setvar("fiat", "show_roads", True)
-        app.gui.setvar("modelmaker_fiat", "show_roads", True)
-
-        dlg.close()
-    except Exception:
-        app.gui.window.dialog_info(
-            text="No OSM roads found in this area, try another or a larger area.",
-            title="No OSM roads found",
-        )
-        dlg.close()
+    # except FileNotFoundError:
+    #     app.gui.window.dialog_info(
+    #         text="Please first select a model boundary.",
+    #         title="No model boundary selected",
+    #     )
+    #     dlg.close()
 
 
 def display_asset_locations(*args):

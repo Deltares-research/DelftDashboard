@@ -6,12 +6,12 @@ element:
     width: -10
     height: 160
   tab:
-  - string: Start
+  - string: Asset Locations
     module: models.fiat.exposure_start
     element: exposure_start.yml
-  - string: Asset Locations
-    module: models.fiat.exposure_locations
-    element: exposure_locations.yml
+  # - string: Asset Locations  # NOTE: this tab can be activated again when we use the 'start from scratch' option 
+    # module: models.fiat.exposure_locations
+    # element: exposure_locations.yml
   - string: Classification
     module: models.fiat.exposure_classification
     element: exposure_classification.yml

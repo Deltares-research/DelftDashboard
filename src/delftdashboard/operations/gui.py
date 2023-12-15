@@ -125,13 +125,14 @@ def build_gui_config():
         )
     app.gui.config["menu"].append(menu)
 
-    # Toolbox
-    menu = {}
-    menu["text"] = "Toolbox"
-    menu["module"] = "delftdashboard.menu.toolbox"
-    menu["menu"] = []
-    menu["menu"].append({"text": "toolbox"})
-    app.gui.config["menu"].append(menu)
+    # NOTE: switched off for the FloodAdapt model builder purpose with only SFINCS and FIAT models inside that do not share toolboxes
+    # # Toolbox
+    # menu = {}
+    # menu["text"] = "Toolbox"
+    # menu["module"] = "delftdashboard.menu.toolbox"
+    # menu["menu"] = []
+    # menu["menu"].append({"text": "toolbox"})
+    # app.gui.config["menu"].append(menu)
 
     # Topography
     menu = {}

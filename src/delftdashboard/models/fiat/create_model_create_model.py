@@ -15,8 +15,12 @@ def select(*args):
 
 def create_model(*args):
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
-    updated_exposure_output = app.active_model.domain.run_hydromt_fiat()
-    app.active_model.buildings = updated_exposure_output
+    buildings, roads = app.active_model.domain.run_hydromt_fiat()
+    if buildings is not None:
+        app.active_model.buildings = buildings
+    if roads is not None:
+        app.active_model.roads = roads
+    
     dlg.close()
     app.gui.window.dialog_info(
             f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",

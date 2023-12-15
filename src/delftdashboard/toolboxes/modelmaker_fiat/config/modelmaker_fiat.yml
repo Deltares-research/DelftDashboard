@@ -102,7 +102,7 @@ element:
         y: 60
         width: 130
         height: 40
-      text: "Build exposure\nwith NSI and OSM"
+      text: "Create model\nwith NSI and OSM"
       tooltip: "This button builds a complete \nexposure dataset using the NSI and\nOSM data. This button will \nacquire the asset locations, asset \nclassifications, maximum potential \nvalues, asset height above ground \nlevel and census block aggregations."
       method: quick_build
     - style: checkbox
