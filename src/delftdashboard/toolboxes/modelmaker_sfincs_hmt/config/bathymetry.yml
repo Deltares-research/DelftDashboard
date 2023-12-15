@@ -116,7 +116,7 @@ element:
     y: 10
     width: 180
     height: 20
-  text: "Advanced merge options"
+  text: "Advanced options"
   method: advanced_merge_options_bathymetry_dataset
   tooltip: "Specify the validity range and offset for the selected dataset. \n and how the different datasets are merged."
   dependency:

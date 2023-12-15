@@ -45,6 +45,13 @@ class Toolbox(GenericToolbox):
         app.map.layer["observation_stations"].layer["stations"].hover_property = opt
         index = app.gui.getvar("observation_stations", "active_station_index")
         app.map.layer["observation_stations"].layer["stations"].set_data(self.gdf, index)
+
+        # show active model extent
+        active_model = app.active_model
+
+        app.map.layer[active_model].layer["bed_levels"].show()
+        app.map.layer[active_model].layer["bed_levels"].activate()
+
         self.update()
 
     def select_source(self, index):

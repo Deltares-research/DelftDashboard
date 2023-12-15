@@ -38,11 +38,11 @@ def select_model_type(*args):
         app.gui.setvar(group, "mask_active_fill_area", 100.0)
 
     include_precip =  app.gui.getvar(group, "include_rainfall")
-    include_rivers = app.gui.getvar(group, "include_rivers")
+    # include_rivers = app.gui.getvar(group, "include_rivers")
     # include_waves = app.gui.setvar(group, "include_waves", False)    
 
     watershed = False
-    if include_rivers or include_precip:
+    if include_precip: #or include_rivers:
         watershed = True
 
     if model_type == 0 and watershed:

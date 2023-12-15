@@ -143,3 +143,15 @@ def update_list():
     app.gui.setvar("sfincs_hmt", "boundary_point_names", boundary_point_names)
     app.gui.setvar("sfincs_hmt", "nr_boundary_points", index)
     app.gui.window.update()
+
+    
+def go_to_observation_stations(*args):
+
+    toolbox_name = "observation_stations"
+
+    # switch to observation stations toolbox
+    app.active_toolbox = app.toolbox[toolbox_name]
+    app.active_toolbox.select()
+
+    #TODO back to observations model-tab
+    # app.active_toolbox.select_tab("observations")

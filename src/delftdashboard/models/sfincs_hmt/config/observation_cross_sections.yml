@@ -14,10 +14,10 @@ element:
       width: 130
       height: 20
     select: index
-    tooltip: Select how you want to add observation points
-    variable: obs_methods_index
+    tooltip: Select how you want to add observation cross sections
+    variable: crs_methods_index
     option_string: 
-      variable: obs_methods
+      variable: crs_methods
   - style: pushbutton
     text: Add point on map
     position:
@@ -25,31 +25,15 @@ element:
       y: 60
       width: 130
       height: 20
-    method: add_observation_point_on_map
-    tooltip: Add observation point on map
+    method: add_crs_on_map
+    tooltip: Add cross-section point on map
     dependency:
     - action: visible
       checkfor: all
       check:
-      - variable: obs_methods_index
+      - variable: crs_methods_index
         operator: eq
         value: 0
-  - style: pushbutton
-    text: Select from database
-    position:
-      x: 10
-      y: 60
-      width: 130
-      height: 20
-    method: go_to_observation_stations
-    tooltip: Select observation points from database
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: obs_methods_index
-        operator: eq
-        value: 1
   - style: pushbutton
     text: Load from file
     position:
@@ -57,43 +41,43 @@ element:
       y: 60
       width: 130
       height: 20
-    method: load_observation_points_from_file
-    tooltip: Load observation points from file
+    method: load_crs_from_file
+    tooltip: Load cross-sections from file
     dependency:
     - action: visible
       checkfor: all
       check:
-      - variable: obs_methods_index
+      - variable: crs_methods_index
         operator: eq
-        value: 2
+        value: 1
 - style: listbox
   position:
     x: 170
     y: 10
     width: 300
     height: 110
-  method: select_observation_point_from_list
-  variable: active_observation_point
+  method: select_crs_from_list
+  variable: active_crs_point
   select: index
-  text: Observation points
+  text: Cross-sections
   text_position: above
   option_string:
-    variable: observation_point_names
-  tooltip: Select observation point
+    variable: cross_section_names
+  tooltip: Select cross-section
 - style: pushbutton
-  text: Delete Point
+  text: Delete
   position:
     x: 480
     y: 100
     width: 80
     height: 20
-  method: delete_point_from_list
+  method: delete_crs_from_list
   tooltip: Delete observation point from list
   dependency:
   - action: enable
     checkfor: all
     check:
-    - variable: nr_observation_points
+    - variable: nr_cross_sections
       operator: gt
       value: 0
 - style: pushbutton
@@ -103,12 +87,12 @@ element:
     y: 75
     width: 80
     height: 20
-  method: delete_all_points_from_list
+  method: delete_all_crs_from_list
   tooltip: Delete all observation points from list
   dependency:
   - action: enable
     checkfor: all
     check:
-    - variable: nr_observation_points
+    - variable: nr_cross_sections
       operator: gt
       value: 0
