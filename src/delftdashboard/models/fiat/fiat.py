@@ -662,7 +662,25 @@ class Model(GenericModel):
                 7500, "#001615",                                    
                 ]
         if type == "SVI":
-             circle_color = "purple"
+            circle_color = [
+                "match",
+                ["get", "SVI_key_domain"],
+                "Age", "#009c99",
+                "Dependence", "#6590bb",
+                "Education", "#5b6d47",
+                "Employment", "#b63f1d",
+                "Ethnicity", "#70d073",
+                "Family structure", "#00211D",
+                "Gender", "#7665b1",
+                "Health", "#c85dcf",
+                "Housing", "#710b60",
+                "Income", "#fd32f1",
+                "Language", "#10f276",
+                "Mobility", "#bc2db1",
+                "Race", "#09459b",
+                "Wealth", "#4cf6ce",
+                "#000000",
+                ]
             
         paint_properties = {
             "circle-color": circle_color,
