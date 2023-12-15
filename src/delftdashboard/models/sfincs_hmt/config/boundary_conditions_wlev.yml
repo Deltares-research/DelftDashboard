@@ -4,14 +4,14 @@ element:
   position:
     x: 10
     y: 10
-    width: 120
+    width: 150
     height: 120
   element:
   - style: popupmenu
     position:
       x: 10
       y: 90
-      width: 100
+      width: 130
       height: 20
     select: index
     tooltip: Select how you want to generate the water level boundary points
@@ -21,7 +21,7 @@ element:
 - style: panel
   title: Manually add points
   position:
-    x: 140
+    x: 170
     y: 10
     width: 200
     height: 120
@@ -61,7 +61,7 @@ element:
 - style: panel
   title: Generate along boundary
   position:
-    x: 140
+    x: 170
     y: 10
     width: 200
     height: 120
@@ -108,9 +108,9 @@ element:
     method: generate_boundary_points_from_msk
     tooltip: Generate boundary points
 - style: panel
-  title: Load from file
+  title: Select from database
   position:
-    x: 140
+    x: 170
     y: 10
     width: 200
     height: 120
@@ -121,6 +121,30 @@ element:
     - variable: bc_wlev_methods_index
       operator: eq
       value: 2
+  element:
+  - style: pushbutton
+    text: Select from database
+    position:
+      x: 10
+      y: 90
+      width: 180
+      height: 20
+    method: go_to_observation_stations
+    tooltip: Select boundary points from database
+- style: panel
+  title: Load from file
+  position:
+    x: 170
+    y: 10
+    width: 200
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: bc_wlev_methods_index
+      operator: eq
+      value: 3
   element:
   - style: pushbutton
     text: Load from file
@@ -134,10 +158,17 @@ element:
 - style: panel
   title: Add timeseries
   position:
-    x: 350
+    x: 380
     y: 10
     width: 200
     height: 120
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: nr_boundary_points
+      operator: ge
+      value: 1
   element:
   - style: edit
     text: Constant water level

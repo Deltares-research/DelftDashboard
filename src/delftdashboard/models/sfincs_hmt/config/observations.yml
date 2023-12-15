@@ -10,5 +10,5 @@ element:
     module: models.sfincs_hmt.observation_points
     element: observation_points.yml
   - string: Cross Sections
-    module: models.sfincs_hmt.cross_sections
-    element: cross_sections.yml
+    module: models.sfincs_hmt.observation_cross_sections
+    element: observation_cross_sections.yml

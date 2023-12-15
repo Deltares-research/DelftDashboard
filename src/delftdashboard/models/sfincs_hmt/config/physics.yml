@@ -1,17 +1,88 @@
 element:
-- style: tabpanel
+- style: panel
+  text: "Change constants: "
   position:
     x: 10
     y: 10
-    width: -10
-    height: 160
-  tab:
-  - string: Constants
-    module: models.sfincs.physics_constants
-    element: physics_constants.yml
-  - string: Advection
-    module: models.sfincs.physics_advection
-    element: physics_advection.yml
-  - string: Meteo
-    module: models.sfincs.physics_meteo
-    element: physics_meteo.yml
+    width: 170
+    height: 120
+  element:
+  - style: edit
+    position:
+      x: 110
+      y: 90
+      width: 50
+      height: 20
+    text: Air Density (kg/m3)
+    variable: rhoa
+    method: set_variables
+    tooltipstring: Edit air density
+  - style: edit
+    position:
+      x: 110
+      y: 65
+      width: 50
+      height: 20
+    text: Water Density (kg/m3)
+    variable: rhow
+    method: set_variables
+    tooltipstring: Edit water density
+  - style: edit
+    position:
+      x: 110
+      y: 40
+      width: 50
+      height: 20
+    text: Ambient Pressure (Pa)
+    variable: gapres
+    method: set_variables
+    tooltipstring: Edit background air pressure
+- style: panel
+  text: "Include processes: "
+  position:
+    x: 190
+    y: 10
+    width: 200
+    height: 120
+  element:
+  - style: checkbox
+    position:
+      x: 10
+      y: 90
+      width: 120
+      height: 20
+    text: Advection
+    variable: advection
+    tooltipstring: Turn on advection. Generally this is recommended when modelling waves or super-critical flow.
+  - style: checkbox
+    position:
+      x: 10
+      y: 65
+      width: 120
+      height: 20
+    text: Coriolis
+    variable: coriolis
+    tooltipstring: Turn on Coriolis force. Generally this is recommended when modelling very large scales.
+# - style: panel
+#   text: Wind
+#   position:
+#     x: 430
+#     y: 10
+#     width: 200
+#     height: 120
+#   element:
+#   - style: popupmenu
+#     text: Number of breakpoints
+#     position:
+#       x: 110
+#       y: 90
+#       width: 30
+#       height: 20
+#     variable: cdnrb
+#     method: set_variables
+#     option_string:
+#     - '2'
+#     - '3'
+#     option_value:
+#     - 2
+#     - 3

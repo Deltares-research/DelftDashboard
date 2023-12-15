@@ -118,6 +118,13 @@ def delete_point_from_list(*args):
         app.gui.setvar("sfincs_hmt", "active_boundary_point", index)        
     update()
 
+def delete_all_points_from_list(*args):
+    model = app.model["sfincs_hmt"].domain
+    model.geoms.pop("obs")
+    app.map.layer["sfincs_hmt"].layer["observation_points"].clear()
+    update()
+
+
 def update():
     # get observation points
     gdf = app.map.layer["sfincs_hmt"].layer["observation_points"].data
@@ -131,3 +138,14 @@ def update():
     app.gui.setvar("sfincs_hmt", "observation_point_names", names)
     app.gui.setvar("sfincs_hmt", "nr_observation_points", len(gdf.index))
     app.gui.window.update()
+
+def go_to_observation_stations(*args):
+
+    toolbox_name = "observation_stations"
+
+    # switch to observation stations toolbox
+    app.active_toolbox = app.toolbox[toolbox_name]
+    app.active_toolbox.select()
+
+    #TODO back to observations model-tab
+    # app.active_toolbox.select_tab("observations")    
