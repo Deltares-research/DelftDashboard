@@ -146,7 +146,7 @@ def build_nsi_exposure(*args):
         # Set the sources
         app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
         app.gui.setvar(model, "source_classification", "National Structure Inventory")
-        app.gui.setvar(model, "source_finished_floor_elevation", "National Structure Inventory")
+        app.gui.setvar(model, "source_finished_floor_height", "National Structure Inventory")
         app.gui.setvar(model, "source_max_potential_damage", "National Structure Inventory")
         app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
 

@@ -350,16 +350,14 @@ def quick_build(*args):
     app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
     app.gui.setvar(model, "source_classification", "National Structure Inventory")
     app.gui.setvar(
-        model, "source_finished_floor_elevation", "National Structure Inventory"
+        model, "source_finished_floor_height", "National Structure Inventory"
     )
     app.gui.setvar(
         model, "source_max_potential_damage", "National Structure Inventory"
     )
     app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
 
-    # Run HydroMT-FIAT
-
-    # Show the model and set the GUI variables
+    # Run HydroMT-FIAT and show the model and set the GUI variables
     buildings, roads = app.active_model.domain.run_hydromt_fiat()
 
     # Set the buildings and roads attribute to gdf for easy visualization

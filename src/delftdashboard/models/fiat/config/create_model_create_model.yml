@@ -49,7 +49,7 @@ element:
     y: 50
     width: 150
     height: 20
-  variable: source_finished_floor_elevation
+  variable: source_finished_floor_height
   enable: False
 - style: text
   position:
