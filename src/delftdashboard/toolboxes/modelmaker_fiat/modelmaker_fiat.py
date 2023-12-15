@@ -2,6 +2,7 @@ import geopandas as gpd
 import pandas as pd
 import time
 from pathlib import Path
+from shapely.geometry import Polygon
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
@@ -121,8 +122,7 @@ def draw_boundary(*args):
     elif selected_method == "box":
         draw_bbox()
     elif selected_method == "sfincs":
-        print("Not yet implemented")
-        pass
+        load_sfincs_domain()
     elif selected_method == "file":
         load_aoi_file()
 
@@ -145,9 +145,7 @@ def generate_boundary(*args):
         # Initiate a new FIAT model
         app.active_model.new()
 
-    gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
-    app.active_toolbox.area_of_interest = gdf
-    gdf.to_file(
+    app.active_toolbox.area_of_interest.to_file(
         app.active_model.domain.database.drive / "aoi.geojson", driver="GeoJSON"
     )
 
@@ -190,6 +188,10 @@ def draw_bbox():
     # Clear grid outline layer
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_bbox"].crs = app.crs
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_bbox"].draw()
+
+    gdf = app.map.layer["modelmaker_fiat"].layer["area_of_interest_bbox"].get_gdf()
+    app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
+
     app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
     app.gui.setvar(
         "modelmaker_fiat", "active_area_of_interest", "area_of_interest_bbox"
@@ -202,6 +204,10 @@ def draw_polygon():
     # Set the crs of the polygon layer and draw it
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_polygon"].crs = app.crs
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_polygon"].draw()
+
+    gdf = app.map.layer["modelmaker_fiat"].layer["area_of_interest_polygon"].get_gdf()
+    app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
+
     app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
     app.gui.setvar(
         "modelmaker_fiat", "active_area_of_interest", "area_of_interest_polygon"
@@ -216,6 +222,7 @@ def load_aoi_file():
     )
     if fname[0]:
         gdf = gpd.read_file(fname[0])
+        gdf.to_crs(app.crs, inplace=True)
 
         # Add the polygon to the map
         layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
@@ -234,24 +241,51 @@ def load_aoi_file():
 def load_sfincs_domain(*args):
     clear_aoi_layers()
 
-    group = "sfincs_hmt"
-    lenx = app.gui.getvar(group, "dx") * app.gui.getvar(group, "mmax")
-    leny = app.gui.getvar(group, "dy") * app.gui.getvar(group, "nmax")
+    fname = app.gui.window.dialog_select_path("Select the SFINCS model folder")
+    if fname:
+        path_to_sfincs_domain = Path(fname) / "gis" / "region.geojson"
+        if path_to_sfincs_domain.exists():
+            gdf = gpd.read_file(path_to_sfincs_domain)
+            gdf.to_crs(app.crs, inplace=True)
+            bounds = gdf.total_bounds
+            gdf = gpd.GeoDataFrame(
+                data={
+                    "geometry": [
+                        Polygon(
+                            (
+                                (bounds[0], bounds[3]),
+                                (bounds[2], bounds[3]),
+                                (bounds[2], bounds[1]),
+                                (bounds[0], bounds[1]),
+                                (bounds[0], bounds[3]),
+                            )
+                        )
+                    ]
+                },
+                crs=app.crs,
+            )
 
-    app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_sfincs"].crs = app.crs
-    app.map.layer["modelmaker_fiat"].layer[
-        "area_of_interest_from_sfincs"
-    ].add_rectangle(
-        app.gui.getvar(group, "x0"),
-        app.gui.getvar(group, "y0"),
-        lenx,
-        leny,
-        app.gui.getvar(group, "rotation"),
-    )
-    app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
-    app.gui.setvar(
-        "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_sfincs"
-    )
+            # Add the polygon to the map
+            layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
+            layer.set_data(gdf)
+
+            app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
+            app.gui.setvar(
+                "modelmaker_fiat",
+                "active_area_of_interest",
+                "area_of_interest_from_sfincs",
+            )
+
+            app.active_toolbox.area_of_interest = gdf
+
+            # Fly to the site
+            zoom_to_boundary()
+        else:
+            app.gui.window.dialog_warning(
+                f"The region.geojson file cannot be found in folder {str(Path(fname) / 'gis')}",
+                "No region.geojson file found.",
+            )
+            return
 
 
 def quick_build(*args):
@@ -277,12 +311,10 @@ def quick_build(*args):
     # try:
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
     app.gui.setvar(model, "created_nsi_assets", "nsi")
-    app.gui.setvar(
-        model, "text_feedback_create_asset_locations", "NSI assets created"
-    )
+    app.gui.setvar(model, "text_feedback_create_asset_locations", "NSI assets created")
 
     crs = app.gui.getvar(model, "selected_crs")
-    
+
     # BUILDINGS with default settings
     app.active_model.domain.exposure_vm.set_asset_locations_source(
         source="NSI", ground_floor_height="NSI", crs=crs
@@ -294,9 +326,7 @@ def quick_build(*args):
     app.gui.setvar(
         model, "selected_damage_curve_database", selected_damage_curve_database
     )
-    app.gui.setvar(
-        model, "selected_damage_curve_linking_table", selected_link_table
-    )
+    app.gui.setvar(model, "selected_damage_curve_linking_table", selected_link_table)
     app.active_model.domain.vulnerability_vm.add_vulnerability_curves_to_model(
         selected_damage_curve_database, selected_link_table
     )
@@ -352,9 +382,7 @@ def quick_build(*args):
     app.gui.setvar(
         model, "source_finished_floor_height", "National Structure Inventory"
     )
-    app.gui.setvar(
-        model, "source_max_potential_damage", "National Structure Inventory"
-    )
+    app.gui.setvar(model, "source_max_potential_damage", "National Structure Inventory")
     app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
 
     # Run HydroMT-FIAT and show the model and set the GUI variables
@@ -367,9 +395,13 @@ def quick_build(*args):
     if roads is not None:
         app.active_model.roads = roads
         app.active_model.roads.set_crs(crs, inplace=True)
-    
-    list_types_primary = list(app.active_model.buildings["Primary Object Type"].unique())
-    list_types_secondary = list(app.active_model.buildings["Secondary Object Type"].unique())
+
+    list_types_primary = list(
+        app.active_model.buildings["Primary Object Type"].unique()
+    )
+    list_types_secondary = list(
+        app.active_model.buildings["Secondary Object Type"].unique()
+    )
     list_types_primary.sort()
     list_types_secondary.sort()
     df = pd.DataFrame(
@@ -384,17 +416,15 @@ def quick_build(*args):
     app.gui.setvar(model, "exposure_categories_to_link", df)
 
     app.map.layer["buildings"].layer["exposure_points"].crs = crs
-    app.map.layer["buildings"].layer["exposure_points"].set_data(app.active_model.buildings)
-
-    app.gui.setvar(
-        model, "selected_primary_classification_string", list_types_primary
+    app.map.layer["buildings"].layer["exposure_points"].set_data(
+        app.active_model.buildings
     )
+
+    app.gui.setvar(model, "selected_primary_classification_string", list_types_primary)
     app.gui.setvar(
         model, "selected_secondary_classification_string", list_types_secondary
     )
-    app.gui.setvar(
-        model, "selected_primary_classification_value", list_types_primary
-    )
+    app.gui.setvar(model, "selected_primary_classification_value", list_types_primary)
     app.gui.setvar(
         model, "selected_secondary_classification_value", list_types_secondary
     )
