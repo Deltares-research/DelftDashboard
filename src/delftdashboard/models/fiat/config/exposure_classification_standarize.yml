@@ -8,12 +8,38 @@ window:
   cancel: True
 
 element:
+- style: text
+  position:
+    x: 15
+    y: 285
+    width: 250
+    height: 20
+  text: "<b>Table</b>: Exposure categories to standardize"
 - style: tableview
   position:
-    x: 347
+    x: 10
     y: 60
-    width: 373
-    height: 240
+    width: 347
+    height: 225
+  tooltip: Exposure categories to standardize
+  variable: active_exposure_category_standardize
+  selection_type: extended
+  sortable: true
+  option_value:
+    variable: exposure_categories_to_standardize
+- style: text
+  position:
+    x: 372
+    y: 285
+    width: 250
+    height: 20
+  text: "<b>Table</b>: Standard occupancy types"
+- style: tableview
+  position:
+    x: 367
+    y: 60
+    width: 353
+    height: 225
   tooltip: Standard IWR classifications
   selection_type: extended
   sortable: true
@@ -21,34 +47,9 @@ element:
     variable: hazus_iwr_occupancy_classes
 - style: pushbutton
   position:
-    x: 347
+    x: 367
     y: 35
     width: 100
     height: 20
   text: Select occupancy type
   method: select_occupancy_type
-- style: popupmenu
-  position:
-    x: 80
-    y: 280
-    width: 120
-    height: 20
-  text: "Occupancy type"
-  method: filter_damage_curve_table
-  variable: selected_occupancy_type
-  option_string:
-    variable: occupancy_types_string
-  option_value:
-    variable: occupancy_types_value
-- style: tableview
-  position:
-    x: 10
-    y: 60
-    width: 287
-    height: 210
-  tooltip: Exposure categories to link
-  variable: active_exposure_category
-  selection_type: extended
-  sortable: true
-  option_value:
-    variable: exposure_categories_to_link

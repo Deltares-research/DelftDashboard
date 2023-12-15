@@ -1,6 +1,8 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+import geopandas as gpd
+import pandas as pd
 import fiona
 
 
@@ -10,31 +12,42 @@ def select(*args):
 
 
 def set_variables(*args):
-    app.model["fiat"].set_input_variables()
+    app.active_model.set_input_variables()
 
 
 def add_classification_field(*args):
-    print("Add classification field")
+    model = "fiat"
+    dlg = app.gui.window.dialog_wait("\nReading classification data...")
+    path = app.gui.getvar(model, "classification_source_path")
+    object_type = app.gui.getvar(model, "object_type")
+    attribute_name = app.gui.getvar(model, "classification_file_field_name")
 
-
-def load_nsi_classification_source(*args):
-    print("Load NSI classification source")
-    app.gui.setvar("fiat", "assign_classification_active", False)
+    # Read the vector file and update the table for standardization
+    gdf = gpd.read_file(path)
+    df = app.gui.getvar(model, "exposure_categories_to_standardize")
+    df[object_type] = list(gdf[attribute_name].unique())
+    df = df[["Primary Object Type", "Secondary Object Type", "Assigned"]]
+    df.fillna("", inplace=True)
+    df.sort_values(object_type, inplace=True)
+    app.gui.setvar(model, "exposure_categories_to_standardize", df)
+    dlg.close()
 
 
 def load_upload_classification_source(*args):
-    print("Load upload classification source")
+    model = "fiat"
     fn = app.gui.window.dialog_open_file(
         "Select geometry", filter="Geometry (*.shp *.gpkg *.geojson)"
     )
+    app.gui.setvar(model, "classification_source_path", str(fn[0]))
     # Open the data source for reading
     with fiona.open(fn[0]) as src:
         # Access the schema to get the column names
         schema = src.schema
         list_columns = list(schema['properties'].keys())
     
-    app.gui.setvar("fiat", "classification_file_field_name_string", list_columns)
-    app.gui.setvar("fiat", "assign_classification_active", True)
+    app.gui.setvar(model, "classification_file_field_name_string", list_columns)
+    app.gui.setvar(model, "classification_file_field_name_value", list_columns)
+    app.gui.setvar(model, "assign_classification_active", True)  # This variable needs to be set to False when NSI is used
 
 
 def display_primary_classification(*args):
@@ -67,3 +80,5 @@ def standarize_classification(*args):
 
 def add_classification(*args):
     print("Add classification to model")
+    # Set the sources
+    app.gui.setvar("fiat", "source_classification", "add loaded source")

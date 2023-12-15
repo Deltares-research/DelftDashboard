@@ -20,7 +20,7 @@ def select(*args):
 
 
 def set_variables(*args):
-    app.model["fiat"].set_input_variables()
+    app.active_model.set_input_variables()
 
 
 def remove_datasource(*args):
@@ -143,7 +143,7 @@ def get_table_data(*args):
 
 
 def add_aggregations(*args):
-    if app.model["fiat"].domain:
+    if app.active_model.domain:
         fn, attribute, label = get_table_data()
         fn = [str(f) for f in fn]
         area_of_interest = app.active_model.domain.data_catalog.get_geodataframe("area_of_interest")
@@ -175,6 +175,7 @@ def display_aggregation_zone(*args):
     app.gui.setvar("fiat", "show_aggregation_zone", args[0])
     if args[0]: 
         select_additional_attribute()
+        app.gui.setvar("fiat", "show_attributes", False)
     else: 
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
 
@@ -201,9 +202,9 @@ def select_additional_attribute(*args):
         attribute_to_visualize = str(attribute[index])
         data_to_visualize = Path(fn[index])
         gdf = gpd.read_file(data_to_visualize)
-        app.model["fiat"].aggregation = gdf
+        app.active_model.aggregation = gdf
         
-        paint_properties = app.model["fiat"].create_paint_properties(
+        paint_properties = app.active_model.create_paint_properties(
             gdf, attribute_to_visualize, type="polygon", opacity=0.5
         )   
         app.map.layer["aggregation"].layer["aggregation_layer"].clear()

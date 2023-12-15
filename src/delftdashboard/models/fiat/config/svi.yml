@@ -12,37 +12,13 @@ element:
     position:
       x: 10
       y: 10
-      width: 350
+      width: 240
       height: 120
     element:
     - style: popupmenu
       position:
         x: 80
         y: 80
-        width: 110
-        height: 20
-      text: Specify state
-      variable: selected_state
-      option_string:
-        variable: list_of_states
-      option_value:
-        variable: list_of_states
-    - style: popupmenu
-      position:
-        x: 80
-        y: 50
-        width: 110
-        height: 20
-      text: Specify county
-      variable: selected_county
-      option_string:
-        variable: list_of_counties
-      option_value:
-        variable: list_of_counties
-    - style: popupmenu
-      position:
-        x: 80
-        y: 20
         width: 110
         height: 20
       text: Specify year
@@ -53,18 +29,18 @@ element:
         variable: list_of_census_years
     - style: checkbox
       position:
-        x: 220
-        y: 80
-        width: 110
+        x: 40
+        y: 45
+        width: 120
         height: 20
       text: Social Vulnerability Index
       tooltip: Toggle to save the SVI score in the exposure data
       variable: use_svi
     - style: checkbox
       position:
-        x: 220
-        y: 50
-        width: 110
+        x: 40
+        y: 20
+        width: 120
         height: 20
       text: Equity
       tooltip: Toggle to save the equity data in the exposure data

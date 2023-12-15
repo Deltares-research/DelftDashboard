@@ -68,9 +68,18 @@ def add_exposure_locations_to_model(*args):
     ):
         selected_asset_locations = "NSI"
         build_nsi_exposure()
+    elif (
+        len(selected_asset_locations) == 1
+        and selected_asset_locations[0] != "National Structure Inventory (NSI)"
+    ):
+        app.gui.window.dialog_info(
+            text="Coming soon!",
+            title="Not yet implemented",
+        )
+        return
     else:
         app.gui.window.dialog_info(
-            text="The option to have multiple asset location sources is not implemented yet.",
+            text="The option to have multiple asset location sources is not yet implemented.",
             title="Not yet implemented",
         )
         return
@@ -94,7 +103,7 @@ def build_nsi_exposure(*args):
             unique_primary_types,
             unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source(
-            source="NSI", crs=crs
+            source="NSI", ground_floor_height="NSI", crs=crs
         )
         gdf.set_crs(crs, inplace=True)
 
@@ -134,6 +143,13 @@ def build_nsi_exposure(*args):
         app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
         app.gui.setvar(checkbox_group, "checkbox_elevation", True)
 
+        # Set the sources
+        app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
+        app.gui.setvar(model, "source_classification", "National Structure Inventory")
+        app.gui.setvar(model, "source_finished_floor_elevation", "National Structure Inventory")
+        app.gui.setvar(model, "source_max_potential_damage", "National Structure Inventory")
+        app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
+
         dlg.close()
 
     except FileNotFoundError:
@@ -151,7 +167,7 @@ def build_nsi_exposure(*args):
             dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
             
             # Get the roads to show in the map
-            gdf = app.model["fiat"].domain.exposure_vm.get_osm_roads(road_types=road_types)
+            gdf = app.active_model.domain.exposure_vm.get_osm_roads(road_types=road_types)
 
             crs = app.gui.getvar("fiat", "selected_crs")
             gdf.set_crs(crs, inplace=True)
@@ -163,10 +179,10 @@ def build_nsi_exposure(*args):
 
             # Set the road damage threshold
             road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-            app.model["fiat"].domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
+            app.active_model.domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
 
             # Show the roads
-            app.model["fiat"].show_exposure_roads()
+            app.active_model.show_exposure_roads()
             app.gui.setvar("_main", "checkbox_roads_(optional)", True)
 
             # Set the checkbox checked

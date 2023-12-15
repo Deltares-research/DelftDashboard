@@ -27,5 +27,5 @@ dependencies:
   - pip:
     - NDBC
     - git+https://github.com/Deltares/hydromt_fiat.git
-    - git+https://github.com/Deltares/Guitares.git@env_fix
+    - git+https://github.com/Deltares/Guitares.git@env_fix_custom_coloring_points
     - git+https://github.com/Deltares/CoastalHazardsToolkit.git@mvo

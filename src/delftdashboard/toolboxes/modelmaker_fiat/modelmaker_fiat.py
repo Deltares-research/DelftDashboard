@@ -1,10 +1,12 @@
 import geopandas as gpd
 import pandas as pd
 import time
+from pathlib import Path
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.operations.checklist import zoom_to_boundary
 
 
 class Toolbox(GenericToolbox):
@@ -125,25 +127,6 @@ def draw_boundary(*args):
         load_aoi_file()
 
 
-def zoom_to_boundary(*args):
-    active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
-    if active_layer:
-        gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
-
-        # get the aoi bounds
-        bounds = gdf.geometry.bounds
-
-        # Fly to the site
-        app.map.fit_bounds(
-            bounds.minx[0], bounds.miny[0], bounds.maxx[0], bounds.maxy[0]
-        )
-    else:
-        app.gui.window.dialog_info(
-            text="Please first select a model boundary.",
-            title="No model boundary selected",
-        )
-
-
 def generate_boundary(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
     if active_layer == "":
@@ -163,6 +146,7 @@ def generate_boundary(*args):
         app.active_model.new()
 
     gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
+    app.active_toolbox.area_of_interest = gdf
     gdf.to_file(
         app.active_model.domain.database.drive / "aoi.geojson", driver="GeoJSON"
     )
@@ -195,8 +179,8 @@ def clear_aoi_layers():
         "area_of_interest_from_sfincs",
     ]
     if app.gui.getvar("modelmaker_fiat", "area_of_interest") == 1:
-        for l in aoi_layers:
-            layer = app.map.layer["modelmaker_fiat"].layer[l]
+        for lyr in aoi_layers:
+            layer = app.map.layer["modelmaker_fiat"].layer[lyr]
             layer.clear()
 
 
@@ -240,6 +224,8 @@ def load_aoi_file():
         app.gui.setvar(
             "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file"
         )
+
+        app.active_toolbox.area_of_interest = gdf
 
         # Fly to the site
         zoom_to_boundary()
@@ -301,16 +287,29 @@ def quick_build(*args):
             gdf,
             unique_primary_types,
             unique_secondary_types,
-        ) = app.active_model.domain.exposure_vm.set_asset_locations_source(source="NSI", crs=crs)
+        ) = app.active_model.domain.exposure_vm.set_asset_locations_source(
+            source="NSI", ground_floor_height="NSI", crs=crs
+        )
         gdf.set_crs(crs, inplace=True)
 
         # Set the buildings attribute to gdf for easy visualization of the buildings
         app.active_model.buildings = gdf
 
-        app.map.layer["buildings"].layer["exposure_points"].crs = crs
-        app.map.layer["buildings"].layer["exposure_points"].set_data(
-            gdf
+        list_types = list(gdf["Secondary Object Type"].unique())
+        list_types.sort()
+        df = pd.DataFrame(
+            data={
+                "Secondary Object Type": list_types,
+                "Assigned: Structure": "",
+                "Assigned: Content": "",
+            }
         )
+        ## TODO: add the nr of stories and the basement
+
+        app.gui.setvar(model, "exposure_categories_to_link", df)
+
+        app.map.layer["buildings"].layer["exposure_points"].crs = crs
+        app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
 
         app.gui.setvar(
             model, "selected_primary_classification_string", unique_primary_types
@@ -328,23 +327,52 @@ def quick_build(*args):
         app.gui.setvar(model, "show_asset_locations", True)
         app.gui.setvar("modelmaker_fiat", "show_asset_locations", True)
 
-        # Set the checkboxes checked
-        app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
-        app.gui.setvar(checkbox_group, "checkbox_classification", True)
-        app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
-        app.gui.setvar(checkbox_group, "checkbox_elevation", True)
-
         # Set the damage curves
         selected_damage_curve_database = "default_vulnerability_curves"
         selected_link_table = "default_hazus_iwr_linking"
-        app.gui.setvar("fiat", "selected_damage_curve_database", selected_damage_curve_database)
-        app.gui.setvar("fiat", "selected_damage_curve_linking_table", selected_link_table)
-        app.active_model.domain.vulnerability_vm.add_vulnerability_curves_to_model(selected_damage_curve_database, selected_link_table)
+        app.gui.setvar(
+            model, "selected_damage_curve_database", selected_damage_curve_database
+        )
+        app.gui.setvar(
+            model, "selected_damage_curve_linking_table", selected_link_table
+        )
+        app.active_model.domain.vulnerability_vm.add_vulnerability_curves_to_model(
+            selected_damage_curve_database, selected_link_table
+        )
 
         # Check the checkbox
         app.gui.setvar("_main", "checkbox_vulnerability", True)
 
-        # TODO: set SVI and equity
+        # Set SVI and equity
+        census_key_path = Path(app.config_path) / "census_key.txt"
+        if census_key_path.exists():
+            fid = open(census_key_path, "r")
+            census_key = fid.readlines()
+            fid.close()
+
+        census_key = census_key[0]
+        year_data = 2021  ## default
+
+        app.active_model.domain.svi_vm.set_svi_settings(census_key, year_data)
+        app.active_model.domain.svi_vm.set_equity_settings(census_key, year_data)
+
+        # Set the checkboxes checked
+        app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
+        app.gui.setvar(checkbox_group, "checkbox_classification", True)
+        app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
+        app.gui.setvar(checkbox_group, "checkbox_finished_floor_height", True)
+        app.gui.setvar(checkbox_group, "checkbox_svi_(optional)", True)
+
+        # Set the sources
+        app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
+        app.gui.setvar(model, "source_classification", "National Structure Inventory")
+        app.gui.setvar(
+            model, "source_finished_floor_elevation", "National Structure Inventory"
+        )
+        app.gui.setvar(
+            model, "source_max_potential_damage", "National Structure Inventory"
+        )
+        app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
 
         dlg.close()
 
@@ -358,21 +386,31 @@ def quick_build(*args):
     ## ROADS ##
     try:
         dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
-        
+
         # Get the roads to show in the map
+        # By default it is taking the following road types:
+        # "motorway",
+        # "motorway_link",
+        # "trunk",
+        # "trunk_link",
+        # "primary",
+        # "primary_link",
+        # "secondary",
+        # "secondary_link",
+
         gdf = app.active_model.domain.exposure_vm.get_osm_roads()
 
         crs = app.gui.getvar("fiat", "selected_crs")
         gdf.set_crs(crs, inplace=True)
 
         app.map.layer["roads"].layer["exposure_lines"].crs = crs
-        app.map.layer["roads"].layer["exposure_lines"].set_data(
-            gdf
-        )
+        app.map.layer["roads"].layer["exposure_lines"].set_data(gdf)
 
         # Set the road damage threshold
         road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-        app.active_model.domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
+        app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
+            road_damage_threshold
+        )
 
         # Show the roads
         app.active_model.show_exposure_roads()
@@ -384,7 +422,10 @@ def quick_build(*args):
 
         dlg.close()
     except Exception:
-        app.gui.window.dialog_info(text="No OSM roads found in this area, try another or a larger area.", title="No OSM roads found")
+        app.gui.window.dialog_info(
+            text="No OSM roads found in this area, try another or a larger area.",
+            title="No OSM roads found",
+        )
         dlg.close()
 
 
@@ -392,15 +433,15 @@ def display_asset_locations(*args):
     """Show/hide buildings layer"""
     app.gui.setvar("fiat", "show_asset_locations", args[0])
     if args[0]:
-        app.model["fiat"].show_exposure_buildings()
+        app.active_model.show_exposure_buildings()
     else:
-        app.model["fiat"].hide_exposure_buildings()
+        app.active_model.hide_exposure_buildings()
 
 
 def display_roads(*args):
-    """Show/hide roads layer""" 
+    """Show/hide roads layer"""
     app.gui.setvar("fiat", "show_roads", args[0])
     if args[0]:
-        app.model["fiat"].show_exposure_roads()
+        app.active_model.show_exposure_roads()
     else:
-        app.model["fiat"].hide_exposure_roads()
+        app.active_model.hide_exposure_roads()

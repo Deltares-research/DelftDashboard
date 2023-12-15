@@ -6,7 +6,7 @@ import pandas as pd
 
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
-from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
+from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel   
 import copy
 
 
@@ -22,6 +22,7 @@ class Model(GenericModel):
         self.occupancy_to_description = dict()
         self.description_to_occupancy = dict()
         self.aggregation = gpd.GeoDataFrame()
+        self.updated_exposure = gpd.GeoDataFrame()
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -30,7 +31,6 @@ class Model(GenericModel):
         # Set GUI variables
         self.set_gui_variables()
 
-    
     def add_layers(self):
         # Add main DDB layer
         layer = app.map.add_layer("buildings")
@@ -44,6 +44,18 @@ class Model(GenericModel):
             fill_color="orange",
             line_color="transparent",
             hover_property="Secondary Object Type",
+            big_data=True,
+            min_zoom=12,
+        )
+
+        layer.add_layer(
+            "asset_height",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Ground Floor Height",
+            line_color="transparent",
+            hover_property="Ground Floor Height",
             big_data=True,
             min_zoom=12,
         )
@@ -71,7 +83,30 @@ class Model(GenericModel):
             big_data=True,
             min_zoom=12,
         )
-
+        layer.add_layer(
+            "ground_elevation",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Ground elevation",
+            line_color="transparent",
+            hover_property="Ground Elevation",
+            big_data=True,
+            min_zoom=12,
+        )
+        layer = app.map.add_layer("updated_exposure")
+        layer.add_layer(
+            "SVI",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Social Vulnerability Index",
+            fill_color="purple",
+            line_color="transparent",
+            hover_property="SVI_key_domain",
+            big_data=True,
+            min_zoom=12,
+        )
         layer = app.map.add_layer("roads")
         layer.add_layer(
             "exposure_lines",
@@ -110,7 +145,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "checkbox_asset_locations", False)
         app.gui.setvar(group, "checkbox_classification", False)
         app.gui.setvar(group, "checkbox_damage_values", False)
-        app.gui.setvar(group, "checkbox_elevation", False)
+        app.gui.setvar(group, "checkbox_finished_floor_height", False)
         app.gui.setvar(group, "checkbox_attributes_(optional)", False)
         app.gui.setvar(group, "checkbox_vulnerability", False)
         app.gui.setvar(group, "checkbox_svi_(optional)", False)
@@ -124,6 +159,13 @@ class Model(GenericModel):
         app.gui.setvar(group, "damage_curves_table", default_curves[["Exposure Link", "Damage Type", "Source", "Description"]])
         app.gui.setvar(group, "selected_damage_curve_database", "default_vulnerability_curves")
         app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
+
+        # Source names #
+        app.gui.setvar(group, "source_asset_locations", "")
+        app.gui.setvar(group, "source_classification", "")
+        app.gui.setvar(group, "source_finished_floor_elevation", "")
+        app.gui.setvar(group, "source_max_potential_damage", "")
+        app.gui.setvar(group, "source_ground_elevation", "")
 
         # Model type #
         app.gui.setvar(group, "model_type", "Start with NSI")
@@ -141,6 +183,10 @@ class Model(GenericModel):
         damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
         damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
         self.damage_function_database = damage_functions_database_info
+        default_curves_table = default_curves[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
+        default_curves_table.sort_values("Occupancy", inplace=True)
+
+        app.gui.setvar(group, "damage_curves_standard_info_static", default_curves_table)
         app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
 
         default_occupancy_df = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
@@ -168,6 +214,11 @@ class Model(GenericModel):
         df = pd.DataFrame(columns=["Secondary Object Type", "Assigned: Structure", "Assigned: Content"])
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
+        ## STANDARDIZING EXPOSURE CATEGORIES ##
+        df = pd.DataFrame(columns=["Primary Object Type", "Secondary Object Type", "Assigned"])
+        app.gui.setvar(group, "exposure_categories_to_standardize", df)
+        app.gui.setvar(group, "active_exposure_category_standardize", [0])
+
         ## HAZUS IWR OCCUPANCY CLASSES ##
         occupancy_types = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
         self.occupancy_to_description = occupancy_types.set_index("Occupancy Class").to_dict(orient="index")
@@ -176,49 +227,12 @@ class Model(GenericModel):
         app.gui.setvar(group, "dmg_functions_html_filepath", "")
         
         ## SVI ##
-        app.gui.setvar(group, "list_of_states", [])
-        app.gui.setvar(group, "selected_state", "")
-
-        app.gui.setvar(group, "list_of_counties", [])
-        app.gui.setvar(group, "selected_county", "")
-
         app.gui.setvar(group, "list_of_census_years", ["2020", "2021"])
         app.gui.setvar(group, "selected_year", "2020")
 
         app.gui.setvar(group, "use_svi", True)
         app.gui.setvar(group, "use_equity", True)
 
-        app.gui.setvar(
-            group,
-            "fiat_fields_string",
-            [
-                "Object ID",
-                "Object Name",
-                "Primary Object Type",
-                "Secondary Object Type",
-            ],
-        )
-        app.gui.setvar(
-            group,
-            "fiat_fields_value",
-            ["objectid", "objectname", "primaryobject", "secondaryobject"],
-        )
-        app.gui.setvar(group, "fiat_field_name_1", None)
-        app.gui.setvar(group, "fiat_field_name_2", None)
-        app.gui.setvar(group, "fiat_field_name_3", None)
-        app.gui.setvar(group, "fiat_field_name_4", None)
-        app.gui.setvar(
-            group,
-            "data_fields_string",
-            ["data field 1", "data field 2", "data field 3"],
-        )
-        app.gui.setvar(
-            group, "data_fields_value", ["data_field_1", "data_field_2", "data_field_3"]
-        )
-        app.gui.setvar(group, "data_field_name_1", None)
-        app.gui.setvar(group, "data_field_name_2", None)
-        app.gui.setvar(group, "data_field_name_3", None)
-        app.gui.setvar(group, "data_field_name_4", None)
         app.gui.setvar(group, "extraction_method_string", ["Area", "Centroid"])
         app.gui.setvar(group, "extraction_method_value", ["area", "centroid"])
         app.gui.setvar(group, "extraction_method", "centroid")
@@ -239,14 +253,14 @@ class Model(GenericModel):
             ["National Structure Inventory (NSI)", "Upload data"],
         )
         app.gui.setvar(group, "classification_source_value", ["nsi_data", "upload_data"])
-        app.gui.setvar(group, "upload_classification", None)
+        app.gui.setvar(group, "classification_source_path", "")
         app.gui.setvar(
             group,
             "object_type_string",
-            ["Primary object type", "Secondary object type"],
+            ["Primary Object Type", "Secondary Object Type"], # Make sure these are capitalized
         )
-        app.gui.setvar(group, "object_type_value", ["pot", "sot"])
-        app.gui.setvar(group, "object_type", None)
+        app.gui.setvar(group, "object_type_value", ["Primary Object Type", "Secondary Object Type"]) # Make sure these are capitalized
+        app.gui.setvar(group, "object_type", "Primary Object Type") # Make sure this is capitalized
         app.gui.setvar(
             group,
             "classification_file_field_name_string",
@@ -257,7 +271,7 @@ class Model(GenericModel):
             "classification_file_field_name_value",
             [],
         )
-        app.gui.setvar(group, "classification_file_field_name", None)
+        app.gui.setvar(group, "classification_file_field_name", 0)
         app.gui.setvar(
             group,
             "selected_primary_classification_string",
@@ -269,7 +283,7 @@ class Model(GenericModel):
             [],
         )
 
-        ## Finished Floor Elevation tab ##
+        ## Finished Floor Height tab ##
         app.gui.setvar(group, "loaded_asset_heights_files", 0)
         app.gui.setvar(
             group,
@@ -286,6 +300,25 @@ class Model(GenericModel):
         app.gui.setvar(
             group,
             "heights_file_field_name_value",
+            [],
+        )
+
+        # Finished floor height settings popup #
+        app.gui.setvar(group, "max_dist_gfh", 10)
+        app.gui.setvar(group, "method_gfh", "nearest")
+        app.gui.setvar(group, "method_gfh_string", ["nearest", "intersection"])
+        app.gui.setvar(group, "method_gfh_value", ["nearest", "intersection"])
+
+        ## Ground Elevation tab ##
+        app.gui.setvar(group, "loaded_ground_elevation_files", 0)
+        app.gui.setvar(
+            group,
+            "loaded_ground_elevation_files_string",
+            [],
+        )
+        app.gui.setvar(
+            group,
+            "loaded_ground_elevation_files_value",
             [],
         )
 
@@ -308,6 +341,15 @@ class Model(GenericModel):
             "damages_file_field_name_value",
             [],
         )
+        app.gui.setvar(group, "damage_type", "structure")
+        app.gui.setvar(group, "damage_type_string", ["structure", "content"])
+        app.gui.setvar(group, "damage_type_value", ["structure", "content"])
+
+        # Damages settings popup #
+        app.gui.setvar(group, "max_dist_damages", 10)
+        app.gui.setvar(group, "method_damages", "nearest")
+        app.gui.setvar(group, "method_damages_string", ["nearest", "intersection"])
+        app.gui.setvar(group, "method_damages_value", ["nearest", "intersection"])
 
         app.gui.setvar(group, "selected_primary_classification_value", 0)
         app.gui.setvar(group, "selected_asset_locations", 0)
@@ -347,6 +389,9 @@ class Model(GenericModel):
             [],
         )
         app.gui.setvar(group, "aggregation_label_string", "")
+        app.gui.setvar(group, "aggregation_label_display_name", "")
+        app.gui.setvar(group, "aggregation_label_display_string",[])
+        app.gui.setvar(group, "aggregation_label_display_value",[])
         app.gui.setvar(group, "aggregation_table_name", [0])
         app.gui.setvar(group, "aggregation_table", pd.DataFrame(columns=["File", "Attribute ID", "Attribute Label", "File Path"]))
         app.gui.setvar(group, "assign_classification_active", False)
@@ -400,6 +445,11 @@ class Model(GenericModel):
         app.gui.setvar(group, "created_vulnerability_curves", 0)
         app.gui.setvar(group, "linking_object_type", 0)
         app.gui.setvar(group, "road_damage_threshold", 1)
+
+        app.gui.setvar(group, "max_potential_damage_name", "")
+        app.gui.setvar(group, "max_potential_damage_string",[])
+        app.gui.setvar(group, "max_potential_damage_value",[])
+        
         
 
     def set_input_variables(self):
@@ -422,8 +472,6 @@ class Model(GenericModel):
                 fname,
             )
 
-            self.fill_us_states()
-
     def open(self):
         # Open input file, and change working directory
         fname = app.gui.window.dialog_select_path(
@@ -437,7 +485,6 @@ class Model(GenericModel):
                 fname,
             )
             self.domain.read()
-            self.fill_us_states()
             self.set_gui_variables()
             # Change working directory
             os.chdir(fname)
@@ -454,12 +501,6 @@ class Model(GenericModel):
 
     def set_crs(self, crs):
         self.domain.crs = crs
-
-    def fill_us_states(self):
-        # Fill the states
-        states = self.domain.svi_vm.get_state_names()
-        app.gui.setvar("fiat", "list_of_states", states)
-        app.gui.setvar("fiat", "selected_state", states[0])
 
     def get_filtered_damage_function_database(self, filter: str, col: str="Occupancy"):
         df = copy.deepcopy(self.damage_function_database)
@@ -567,7 +608,18 @@ class Model(GenericModel):
                 "RES6", "#665435",
                 "#000000",
             ]      
-        # Example usage
+        if type == "asset_height":
+             circle_color = [
+                "step",
+                ["get", "Ground Floor Height"],"#000000",
+                0.00001, "#FFFFFF",      
+                0.5, "#D6E1F8",      
+                1.0, "#A4C4F2",     
+                1.5, "#6C95E1",    
+                2.0, "#3750B2",    
+                2.5, "#1A237E",                                    
+                ]
+            
         if type == "damage_struct":
              circle_color = [
                 "step",
@@ -590,6 +642,30 @@ class Model(GenericModel):
                 250000.0, "#E03720",    
                 500000.0, "#860000",                                    
                 ]
+        if type == "ground_elevation":
+             circle_color = [
+                "step",
+                ["get", "Ground Elevation"],"#FFFFFF",
+                0, "#F7FFF6",      
+                500, "#E1FCE4",      
+                1000, "#CDEA88",     
+                1500, "#A8E496",    
+                2000, "#74CC9C",    
+                2500, "#4BAF7A", 
+                3000, "#3F9E6F", 
+                3500, "#359364", 
+                4000, "#2C7B5A", 
+                4500, "#236B50", 
+                5000, "#1A5A45", 
+                5500, "#124A3A", 
+                6000, "#093931", 
+                6500, "#032C27", 
+                7000, "#00211D", 
+                7500, "#001615",                                    
+                ]
+        if type == "SVI":
+             circle_color = "purple"
+            
         paint_properties = {
             "circle-color": circle_color,
             "circle-stroke-width": 2,
@@ -611,6 +687,15 @@ class Model(GenericModel):
             )
             self.show_exposure_buildings()
     
+    def show_asset_height(self,type="asset_height"):
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            legend = []
+            app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["asset_height"].set_data(
+                self.buildings, legend
+            )
+            self.show_asset_heights()
+
     def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
@@ -632,16 +717,47 @@ class Model(GenericModel):
                 self.buildings, legend
             )
             self.show_max_potential_damage_content()
+    
+    def show_ground_elevation(self, type="ground_elevation"):
+        """Show ground elevation"""
+        if not self.buildings.empty:
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            legend = []
+            app.map.layer["buildings"].layer["ground_elevation"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["ground_elevation"].set_data(
+                self.buildings, legend
+            )
+            self.show_ground_elevations()
+    
+    def show_svi(self, type = "SVI"):
+        """Show SVI Index"""  # str(Path(self.root) / "exposure" / "SVI")
+        if not self.updated_exposure.empty and "SVI_key_domain" in self.updated_exposure.columns:
+            legend = []
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            svi_gdf = self.buildings.merge(self.updated_exposure, on='Object ID')
+            app.map.layer["updated_exposure"].layer["SVI"].set_data(
+                svi_gdf, paint_properties, legend
+            )
+            self.show_SVI_index()
 
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
-    
+
+    def show_asset_heights(self):
+        app.map.layer["buildings"].layer["asset_height"].show()
+
     def show_max_potential_damage_content(self):
         app.map.layer["buildings"].layer["max_potential_damage_cont"].show()
 
     def show_max_potential_damage_structure(self):
         app.map.layer["buildings"].layer["max_potential_damage_struct"].show()
 
+    def show_ground_elevations(self):
+        app.map.layer["buildings"].layer["ground_elevation"].show()
+    
+    def show_SVI_index(self):
+        app.map.layer["updated_exposure"].layer["SVI"].show()
+    
     def hide_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].hide()
 
@@ -680,5 +796,37 @@ class Model(GenericModel):
         )
         # Create pop-up and only continue if user presses ok
         okay, data = app.gui.popup(pop_win_config_path, None)
+        if not okay:
+            return
+    
+    def specify_finished_floor_height(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "exposure_finished_floor_height_settings.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            return
+        
+    def specify_max_potential_damage(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "exposure_damages_settings.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
         if not okay:
             return

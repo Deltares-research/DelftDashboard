@@ -9,49 +9,82 @@ element:
 - style: text
   position:
     x: 10
-    y: 95
+    y: 94
     width: 100
     height: 20
   text: "<u>Asset locations</u>:"
+- style: edit
+  position:
+    x: 130
+    y: 94
+    width: 150
+    height: 20
+  variable: source_asset_locations
+  enable: False
 - style: text
   position:
     x: 10
-    y: 80
+    y: 72
     width: 100
     height: 20
   text: "<u>Classification</u>:"
-- style: text
+- style: edit
   position:
-    x: 10
-    y: 65
-    width: 100
+    x: 130
+    y: 72
+    width: 150
     height: 20
-  text: "<u>Asset heights</u>:"
+  variable: source_classification
+  enable: False
 - style: text
   position:
     x: 10
     y: 50
     width: 100
     height: 20
-  text: "<u>Max potential values</u>:"
+  text: "<u>Finished Floor Height</u>:"
+- style: edit
+  position:
+    x: 130
+    y: 50
+    width: 150
+    height: 20
+  variable: source_finished_floor_elevation
+  enable: False
 - style: text
   position:
     x: 10
-    y: 35
-    width: 100
+    y: 28
+    width: 120
     height: 20
-  text: "<u>Aggregation</u>:"
+  text: "<u>Max potential damage values</u>:"
+- style: edit
+  position:
+    x: 130
+    y: 28
+    width: 150
+    height: 20
+  variable: source_max_potential_damage
+  enable: False
 - style: text
   position:
     x: 10
-    y: 20
-    width: 100
+    y: 6
+    width: 120
     height: 20
-  text: "<u>Damage curves</u>:"
+  text: "<u>Ground elevation</u>:"
+- style: edit
+  position:
+    x: 130
+    y: 6
+    width: 150
+    height: 20
+  variable: source_ground_elevation
+  enable: False
 - style: pushbutton
   position:
-    x: 300
-    y: 20
+    x: 350
+    y: 6
     width: 130
     height: 20
   text: Create Delft-FIAT model

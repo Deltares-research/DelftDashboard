@@ -45,8 +45,8 @@ def load_damages_file(*args):
         with fiona.open(path) as src:
             # Access the schema to get the column names
             schema = src.schema
-            list_columns = list(schema['properties'].keys())
-        
+            list_columns = list(schema["properties"].keys())
+
         app.gui.setvar("fiat", "damages_file_field_name_value", list_columns)
         app.gui.setvar("fiat", "damages_file_field_name_string", list_columns)
 
@@ -67,5 +67,48 @@ def remove_datasource(*args):
     app.gui.setvar("fiat", "loaded_damages_files_value", current_list_value)
 
 
+def adjust_damage_settings(*args):
+    if app.active_model.domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+        return
+    app.active_model.specify_max_potential_damage()
+
+
 def add_to_model(*args):
-    print("Add to model")
+    model = "fiat"
+
+    # Get the file path
+    idx = app.gui.getvar("fiat", "loaded_damages_files")
+    current_list_string = app.gui.getvar("fiat", "loaded_damages_files_string")
+    current_list_value = app.gui.getvar(model, "loaded_damages_files_value")
+    source_name = current_list_string[idx]
+    source_path = str(current_list_value[idx])
+
+    # Get the attribute name
+    idx = app.gui.getvar(model, "damages_file_field_name")
+    list_attr_names = app.gui.getvar(model, "damages_file_field_name_string")
+    attribute_name_gfh = list_attr_names[idx]
+
+    # Get the method
+    method_damages = app.gui.getvar("fiat", "method_damages")
+
+    # Get the max distance
+    max_dist_damages = app.gui.getvar("fiat", "max_dist_damages")
+
+    app.active_model.domain.exposure_vm.set_damages(
+        source=source_path,
+        attribute_name=attribute_name_gfh,
+        method=method_damages,
+        max_dist=max_dist_damages,
+    )
+
+    # Set the source
+    app.gui.setvar(model, "source_max_potential_damage", source_name)
+
+    app.gui.window.dialog_info(
+        text="Maximum potential damage data was added to your model",
+        title="Added maximum potential damage data",
+    )
