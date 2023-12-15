@@ -8,3 +8,12 @@ mapbox_token.txt
 /src/delftdashboard.egg-info/dependency_links.txt
 /src/delftdashboard.egg-info/requires.txt
 /src/delftdashboard.egg-info/top_level.txt
+/src/delftdashboard/env/ddb_fiat
+/data
+/hydromt.log
+/src/delftdashboard/config/data_catalog_USA.yml
+temp_database
+fiat_database
+/src/delftdashboard/config/delftdashboard.ini
+cache
+src/delftdashboard/config/census_key.txt

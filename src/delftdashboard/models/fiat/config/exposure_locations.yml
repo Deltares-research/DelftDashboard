@@ -1,192 +1,102 @@
 element:
 - style: panel
-  title: Info
+  title: Select asset data source
   position:
     x: 10
     y: 10
-    width: 150
+    width: 200
     height: 120
   element:
-  - style: text
+  - style: pushbutton
     position:
       x: 10
       y: 10
-      width: 130
-      height: 100
-    text: "Best\ndescription\never"
-- style: panel
-  title: Area of interest
-  position:
-    x: 170
-    y: 10
-    width: 120
-    height: 120
-  element:
-  - style: pushbutton
-    text: Draw area
-    position:
-      x: 10
-      y: 90
       width: 100
       height: 20
-    method: draw_area
-  - style: pushselectfile
-    position:
-      x: 10
-      y: 65
-      width: 100
-      height: 20
-    text: Upload geometry
-    variable: area_geometry
-    showfilename: True
-    filter: "Geometry (*.shp *.gpkg *.geojson)"
-    title: Select geometry
+    text: Load source
     tooltipstring: Select geometry
-  - style: checkbox
+    method: load_asset_locations_file
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: model_type
+        operator: eq
+        value: "Start from scratch"
+  - style: listbox
     position:
       x: 10
-      y: 5
-      width: 100
-      height: 20
-    text: Display area
-    variable: show_area_geometry
-    method: display_area_geometry
-- style: panel
-  title: Asset locations
-  position:
-    x: 300
-    y: 10
-    width: 170
-    height: 120
-  element:
-  - style: popupmenu
-    position:
-      x: 10
-      y: 90
-      width: 150
-      height: 20
-    text: ""
-    variable: asset_locations
-    method: set_asset_locations
+      y: 40
+      width: 180
+      height: 40
+    text: "Selected dataset"
+    text_position: "above"
+    variable: selected_asset_locations
+    select: index
     option_string:
-      variable: asset_locations_string
-    option_value:
-      variable: asset_locations_value
+      variable: selected_asset_locations_string
   - style: pushbutton
     position:
-      x: 10
-      y: 65
-      width: 100
+      x: 170
+      y: 90
+      width: 20
       height: 20
-    text: Create asset location
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: asset_locations
-        operator: eq
-        value: nsi
-  - style: pushselectfile
-    position:
-      x: 10
-      y: 65
-      width: 100
-      height: 20
-    text: Upload asset location
-    variable: asset_locations
-    showfilename: True
-    filter: "Geometry (*.shp *.gpkg *.geojson)"
-    title: Select geometry
-    tooltipstring: Select geometry
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: asset_locations
-        operator: eq
-        value: file
-  - style: checkbox
-    position:
-      x: 10
-      y: 5
-      width: 100
-      height: 20
-    text: Display assets
-    variable: show_asset_locations
-    method: display_asset_locations
+    text: "\u2139"
+    tooltip: "After selecting your area of interest, \nin this tab you can specify the \nlocation of the assets to evaluate by \nimporting them from existing \ndatasets or uploading your own, \nas well as choosing their flood \nextraction method."
+
+- style: checkbox
+  position:
+    x: 220
+    y: 30
+    width: 100
+    height: 20
+  text: Display assets
+  variable: show_asset_locations
+  method: display_asset_locations
+- style: checkbox
+  position:
+    x: 220
+    y: 10
+    width: 100
+    height: 20
+  text: Display roads
+  variable: show_roads
+  method: display_roads
+
+
 - style: panel
   title: Extraction method
   position:
-    x: 480
-    y: 10
-    width: 170
-    height: 120
+    x: 220
+    y: 90
+    width: 135
+    height: 40
   element:
   - style: popupmenu
     position:
-      x: -10
-      y: 90
-      width: 100
+      x: 10
+      y: 10
+      width: 60
       height: 20
-    text: Default
     variable: extraction_method
-    method: set_variables
     option_string:
-    - Area
-    - Centroid
+      variable: extraction_method_string
     option_value:
-    - area
-    - centroid
-  - style: panel
-    title: Exceptions
+      variable: extraction_method_value
+  - style: pushbutton
     position:
-      x: 10
-      y: 25
-      width: 150
-      height: 55
-    element:
-    - style: popupmenu
-      position:
-        x: 10
-        y: 28
-        width: 70
-        height: 18
-      text: ""
-      variable: extraction_method
-      method: edit_variables
-      option_string:
-      - Centroid
-      - Area
-      option_value:
-      - exceptioncentroid
-      - exceptionarea
-    - style: pushbutton
-      position:
-        x: 10
-        y: 5
-        width: 50
-        height: 18
-      text: Draw
-      variable: extraction_method
-      method: edit_variables
-    - style: pushselectfile
-      position:
-        x: 70
-        y: 5
-        width: 50
-        height: 18
-      text: Upload
-      variable: extraction_method
-      showfilename: True
-      filter: "Geometry (*.shp *.gpkg *.geojson)"
-      title: Select geometry
-      tooltipstring: Select geometry
-  - style: checkbox
-    position:
-      x: 10
-      y: 5
-      width: 100
+      x: 75
+      y: 10
+      width: 50
       height: 20
-    text: Display method
-    variable: show_extraction_method
-    method: display_extraction_method
+    text: Apply
+    method: apply_extraction_method
+
+- style: pushbutton
+  position:
+    x: 390
+    y: 10
+    width: 95
+    height: 20
+  text: Add to model
+  method: add_exposure_locations_to_model

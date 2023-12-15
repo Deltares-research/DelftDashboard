@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: SVI
+  title: Social vulnerability and equity
   position:
     x: 10
     y: 10
@@ -8,9 +8,49 @@ element:
     height: 160
   element:
   - style: panel
-    text: TBD
-    position:    
+    title: Input
+    position:
       x: 10
       y: 10
-      width: 200
+      width: 240
       height: 120
+    element:
+    - style: popupmenu
+      position:
+        x: 80
+        y: 80
+        width: 110
+        height: 20
+      text: Specify year
+      variable: selected_year
+      option_string:
+        variable: list_of_census_years
+      option_value:
+        variable: list_of_census_years
+    - style: checkbox
+      position:
+        x: 40
+        y: 45
+        width: 120
+        height: 20
+      text: Social Vulnerability Index
+      tooltip: Toggle to save the SVI score in the exposure data
+      variable: use_svi
+    - style: checkbox
+      position:
+        x: 40
+        y: 20
+        width: 120
+        height: 20
+      text: Equity
+      tooltip: Toggle to save the equity data in the exposure data
+      variable: use_equity
+
+  - style: pushbutton
+    position:
+      x: 380
+      y: 10
+      width: 95
+      height: 20
+    text: Add to model
+    method: add_svi

@@ -1,0 +1,15 @@
+module: delftdashboard.operations.checklist
+style: panel
+id: checklist
+position:
+  x: -30
+  y: 200
+  width: 140
+  height: 210
+dependency:
+- action: visible
+  checkfor: all
+  check:
+  - variable: fiat_active
+    operator: eq
+    value: True

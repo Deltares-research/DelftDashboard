@@ -186,7 +186,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "cn_dataset_index", 0)
         app.gui.setvar(group, "cn_antecedent_moisture", "avg")
         app.gui.setvar(group, "qinf_dataset_names", qinf_dataset_names)
-        app.gui.setvar(group, "qinf_dataset_index", 0)        
+        app.gui.setvar(group, "qinf_dataset_index", 0)
 
         # Mask active
         mask_polygon_methods = [
@@ -596,7 +596,7 @@ class Toolbox(GenericToolbox):
 
         dlg = app.gui.window.dialog_wait("Generating infiltration ...")
 
-        if index == 0: # constant infiltration
+        if index == 0:  # constant infiltration
             # drop other methods
             model.config.pop("scsfile", None)
             model.config.pop("qinffile", None)
@@ -607,8 +607,12 @@ class Toolbox(GenericToolbox):
 
             # generate CN infiltration
             model.setup_cn_infiltration(
-                cn = app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_names")[app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_index")],
-                antecedent_moisture = app.gui.getvar("modelmaker_sfincs_hmt", "cn_antecedent_moisture"),
+                cn=app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_names")[
+                    app.gui.getvar("modelmaker_sfincs_hmt", "cn_dataset_index")
+                ],
+                antecedent_moisture=app.gui.getvar(
+                    "modelmaker_sfincs_hmt", "cn_antecedent_moisture"
+                ),
             )
         elif index == 2:
             # drop other methods
@@ -617,8 +621,10 @@ class Toolbox(GenericToolbox):
 
             # generate Qinf infiltration
             model.setup_constant_infiltration(
-                qinf = app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_names")[app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_index")],
-            ) 
+                qinf=app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_names")[
+                    app.gui.getvar("modelmaker_sfincs_hmt", "qinf_dataset_index")
+                ],
+            )
         dlg.close()
 
     def read_setup_yaml(self):
@@ -660,4 +666,3 @@ def _parse_setup_dict(dictionary):
 
     for key in keys_to_remove:
         dictionary.pop(key)
-

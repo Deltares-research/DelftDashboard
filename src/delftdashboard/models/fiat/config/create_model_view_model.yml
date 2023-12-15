@@ -1,0 +1,71 @@
+element:
+- style: panel
+  title: Display model ouput
+  position:
+    x: 10
+    y: 10
+    width: 290
+    height: 120
+  element:
+  - style: radiobuttongroup
+    position:
+      x: 30
+      y: 10
+      width: 200
+    text: "Display properties"
+    variable: properties_to_display
+    option_string: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation", "Social Vulnerability Index (SVI)"]
+    option_value: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation", "Social Vulnerability Index (SVI)"]
+    method: display_properties
+  - style: popupmenu
+    position:
+      x: 150
+      y: 50
+      width: 100
+      height: 20
+    variable: max_potential_damage_name
+    option_string:
+      variable: max_potential_damage_string
+    option_value:
+      variable: max_potential_damage_value
+    method: display_damage 
+- style: checkbox
+  position:
+    x: 310
+    y: 50
+    width: 100
+    height: 20
+  text: Display assets
+  variable: show_asset_locations
+  method: display_asset_locations
+- style: checkbox
+  position:
+    x: 310
+    y: 30
+    width: 100
+    height: 20
+  text: Display roads
+  variable: show_roads
+  method: display_roads
+- style: checkbox
+  position:
+    x: 310
+    y: 10
+    width: 100
+    height: 20
+  text: Display attributes
+  variable: show_attributes
+  method: toggle_attr_map  
+- style: popupmenu
+  position:
+    x: 430
+    y: 10
+    width: 100
+    height: 20
+  text: ""
+  variable: aggregation_label_display_name
+  option_string:
+    variable: aggregation_label_display_string
+  option_value:
+    variable: aggregation_label_display_value
+  method: display_attribute

@@ -37,10 +37,11 @@ def initialize():
     app.config["toolbox"] = []
     app.config["window_icon"] = os.path.join(app.config_path, "images", "deltares.ico")
     app.config["splash_file"] = os.path.join(
-        app.config_path, "images", "DelftDashBoard.jpg"
+        app.config_path, "images", "FloodAdaptModelBuilders.png"
     )
     app.config["bathymetry_database"] = None
     app.config["data_libs"] = None
+    app.config["working_directory"] = os.getcwd()
 
     # Read ini file and override stuff in default config dict
     inifile = open(os.path.join(app.config_path, "delftdashboard.ini"), "r")
@@ -74,7 +75,7 @@ def initialize():
     # Define some other variables
     app.crs = CRS(4326)
     app.auto_update_topography = True
-    app.background_topography  = "gebco22"
+    app.background_topography = "gebco22"
     if app.config["bathymetry_database"] is not None:
         app.bathymetry_database_path = app.config["bathymetry_database"]
         bathymetry_database.initialize(app.bathymetry_database_path)
@@ -107,10 +108,6 @@ def initialize():
     # Set active toolbox and model
     app.active_model = app.model[list(app.model)[0]]
     app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
-
-    # Read bathymetry database
-
-    # Read tide database
 
     # Read color maps
     rgb = read_colormap(os.path.join(app.config_path, "colormaps", "earth.txt"))

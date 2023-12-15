@@ -1,10 +1,10 @@
 element:
 - style: panel
-  title: Add new damage source
+  title: Add new FFE source
   position:
     x: 10
     y: 10
-    width: 375
+    width: 270
     height: 120
   element:
   - style: listbox
@@ -14,10 +14,10 @@ element:
         width: 110
         height: 50
     text_position: "above"
-    variable: loaded_damages_files
+    variable: loaded_asset_heights_files
     select: index
     option_string:
-      variable: loaded_damages_files_string
+      variable: loaded_asset_heights_files_string
   - style: pushbutton
     position:
       x: 5
@@ -25,7 +25,7 @@ element:
       width: 80
       height: 20
     text: "Select source"
-    method: select_damages_file
+    method: select_asset_heights_file
   - style: pushbutton
     position:
       x: 5
@@ -33,7 +33,7 @@ element:
       width: 110
       height: 20
     text: Load
-    method: load_damages_file
+    method: load_asset_heights_file
   - style: pushbutton
     position:
       x: 120
@@ -50,24 +50,11 @@ element:
       height: 20
     text: "Attribute ID"
     text_position: "above"
-    variable: damages_file_field_name
+    variable: heights_file_field_name
     option_string:
-      variable: damages_file_field_name_string
+      variable: heights_file_field_name_string
     option_value:
-      variable: damages_file_field_name_value
-  - style: popupmenu
-    position:
-      x: 265
-      y: 60
-      width: 100
-      height: 20
-    text: "Damage type"
-    text_position: "above"
-    variable: damage_type
-    option_string:
-      variable: damage_type_string
-    option_value:
-      variable: damage_type_value
+      variable: heights_file_field_name_value
   - style: pushbutton
     position:
       x: 155
@@ -75,12 +62,12 @@ element:
       width: 100
       height: 20
     text: "Settings"
-    method: adjust_damage_settings
+    method: adjust_ffe_settings
     dependency:
     - action: visible
       checkfor: all
       check:
-      - variable: damages_file_field_name_string
+      - variable: heights_file_field_name_string
         operator: ne
         value: []
 

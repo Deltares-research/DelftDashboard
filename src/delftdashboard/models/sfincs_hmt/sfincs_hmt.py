@@ -132,7 +132,6 @@ class Model(GenericModel):
             fill_color_selected="red",
         )
 
-
         layer.add_layer(
             "cross_sections",
             type="line_selector",

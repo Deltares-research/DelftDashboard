@@ -1,0 +1,37 @@
+window:
+  title: Data merge settings
+  width: 200
+  height: 120
+  variable_group: fiat
+  module: models.fiat.exposure_damages_settings
+  modal: True
+  cancel: True
+
+element:
+- style: edit
+  position:
+    x: 80
+    y: 50
+    width: 100
+    height: 20
+  text: Max distance (m)
+  variable: max_dist_damages
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: method_damages
+      operator: eq
+      value: "nearest"
+- style: popupmenu
+  position:
+    x: 80
+    y: 80
+    width: 100
+    height: 20
+  text: Method
+  variable: method_damages
+  option_string:
+    variable: method_damages_string
+  option_value:
+    variable: method_damages_value

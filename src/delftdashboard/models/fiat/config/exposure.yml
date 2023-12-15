@@ -6,18 +6,24 @@ element:
     width: -10
     height: 160
   tab:
+  - string: Start
+    module: models.fiat.exposure_start
+    element: exposure_start.yml
   - string: Asset Locations
     module: models.fiat.exposure_locations
     element: exposure_locations.yml
   - string: Classification
     module: models.fiat.exposure_classification
     element: exposure_classification.yml
-  - string: Damage values
+  - string: Finished Floor Height
+    module: models.fiat.exposure_finished_floor_height
+    element: exposure_finished_floor_height.yml
+  - string: Ground Elevation
+    module: models.fiat.exposure_ground_elevation
+    element: exposure_ground_elevation.yml
+  - string: Damage Values
     module: models.fiat.exposure_damages
     element: exposure_damages.yml
-  - string: Elevation
-    module: models.fiat.exposure_elevation
-    element: exposure_elevation.yml
-  - string: Aggregation
+  - string: Additional Attributes
     module: models.fiat.exposure_aggregation
     element: exposure_aggregation.yml
