@@ -22,7 +22,6 @@ class Model(GenericModel):
         self.occupancy_to_description = dict()
         self.description_to_occupancy = dict()
         self.aggregation = gpd.GeoDataFrame()
-        self.updated_exposure = gpd.GeoDataFrame()
 
         print("Model " + self.name + " added!")
         self.active_domain = 0
@@ -94,7 +93,6 @@ class Model(GenericModel):
             big_data=True,
             min_zoom=12,
         )
-        layer = app.map.add_layer("updated_exposure")
         layer.add_layer(
             "SVI",
             type="circle",
@@ -731,14 +729,18 @@ class Model(GenericModel):
     
     def show_svi(self, type = "SVI"):
         """Show SVI Index"""  # str(Path(self.root) / "exposure" / "SVI")
-        if not self.updated_exposure.empty and "SVI_key_domain" in self.updated_exposure.columns:
+        if not self.buildings.empty and "SVI_key_domain" in self.buildings.columns:
             legend = []
             paint_properties = self.get_nsi_paint_properties(type=type)
-            svi_gdf = self.buildings.merge(self.updated_exposure, on='Object ID')
-            app.map.layer["updated_exposure"].layer["SVI"].set_data(
-                svi_gdf, paint_properties, legend
+            app.map.layer["buildings"].layer["SVI"].set_data(
+                self.buildings, paint_properties, legend
             )
             self.show_SVI_index()
+        else: 
+            app.gui.window.dialog_info(
+                text="There are no SVI data in your model. Please add SVI data when you set up your model.",
+                title="Additional attributes not found."
+                )
 
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
@@ -756,7 +758,7 @@ class Model(GenericModel):
         app.map.layer["buildings"].layer["ground_elevation"].show()
     
     def show_SVI_index(self):
-        app.map.layer["updated_exposure"].layer["SVI"].show()
+        app.map.layer["buildings"].layer["SVI"].show()
     
     def hide_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].hide()
