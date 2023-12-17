@@ -88,9 +88,7 @@ def add_to_model(*args):
     source_path = str(current_list_value[idx])
 
     # Get the attribute name
-    idx = app.gui.getvar(model, "damages_file_field_name")
-    list_attr_names = app.gui.getvar(model, "damages_file_field_name_string")
-    attribute_name_gfh = list_attr_names[idx]
+    attribute_name_gfh = app.gui.getvar(model, "damages_file_field_name")
 
     # Get the method
     method_damages = app.gui.getvar("fiat", "method_damages")
