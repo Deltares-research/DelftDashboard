@@ -93,7 +93,7 @@ class Toolbox(GenericToolbox):
         layer.add_layer(
             "area_of_interest_from_sfincs",
             type="draw",
-            shape="rectangle",
+            shape="polygon",
             polygon_line_color="orange",
             polygon_fill_color="#fcc203",
             polygon_fill_opacity=0.3,
@@ -145,6 +145,9 @@ def generate_boundary(*args):
         # Initiate a new FIAT model
         app.active_model.new()
 
+    gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
+    app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
+
     app.active_toolbox.area_of_interest.to_file(
         app.active_model.domain.database.drive / "aoi.geojson", driver="GeoJSON"
     )
@@ -189,9 +192,6 @@ def draw_bbox():
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_bbox"].crs = app.crs
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_bbox"].draw()
 
-    gdf = app.map.layer["modelmaker_fiat"].layer["area_of_interest_bbox"].get_gdf()
-    app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
-
     app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
     app.gui.setvar(
         "modelmaker_fiat", "active_area_of_interest", "area_of_interest_bbox"
@@ -204,9 +204,6 @@ def draw_polygon():
     # Set the crs of the polygon layer and draw it
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_polygon"].crs = app.crs
     app.map.layer["modelmaker_fiat"].layer["area_of_interest_polygon"].draw()
-
-    gdf = app.map.layer["modelmaker_fiat"].layer["area_of_interest_polygon"].get_gdf()
-    app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
 
     app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
     app.gui.setvar(
@@ -231,8 +228,6 @@ def load_aoi_file():
         app.gui.setvar(
             "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file"
         )
-
-        app.active_toolbox.area_of_interest = gdf
 
         # Fly to the site
         zoom_to_boundary()
@@ -266,7 +261,7 @@ def load_sfincs_domain(*args):
             )
 
             # Add the polygon to the map
-            layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
+            layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_sfincs"]
             layer.set_data(gdf)
 
             app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
@@ -275,8 +270,6 @@ def load_sfincs_domain(*args):
                 "active_area_of_interest",
                 "area_of_interest_from_sfincs",
             )
-
-            app.active_toolbox.area_of_interest = gdf
 
             # Fly to the site
             zoom_to_boundary()
