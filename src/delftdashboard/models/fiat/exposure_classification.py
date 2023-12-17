@@ -26,7 +26,7 @@ def add_classification_field(*args):
     gdf = gpd.read_file(path)
     df = app.gui.getvar(model, "exposure_categories_to_standardize")
     df[object_type] = list(gdf[attribute_name].unique())
-    df = df[["Primary Object Type", "Secondary Object Type", "Assigned"]]
+    df = df[[object_type, "Assigned"]]
     df.fillna("", inplace=True)
     df.sort_values(object_type, inplace=True)
     app.gui.setvar(model, "exposure_categories_to_standardize", df)
