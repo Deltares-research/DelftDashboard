@@ -46,7 +46,13 @@ def load_damages_file(*args):
             # Access the schema to get the column names
             schema = src.schema
             list_columns = list(schema["properties"].keys())
+            geometry_type = schema["geometry"].lower()
 
+        if geometry_type == "point":
+            app.gui.setvar("fiat", "method_damages", "nearest")
+        elif geometry_type == "polygon":
+            app.gui.setvar("fiat", "method_damages", "intersection")
+        
         app.gui.setvar("fiat", "damages_file_field_name_value", list_columns)
         app.gui.setvar("fiat", "damages_file_field_name_string", list_columns)
 
