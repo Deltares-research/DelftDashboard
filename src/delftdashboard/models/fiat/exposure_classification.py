@@ -2,7 +2,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 import geopandas as gpd
-import pandas as pd
+from pathlib import Path
 import fiona
 
 
@@ -28,7 +28,7 @@ def add_classification_field(*args):
     df[object_type] = list(gdf[attribute_name].unique())
     df = df[[object_type, "Assigned"]]
     df.fillna("", inplace=True)
-    df.sort_values(object_type, inplace=True)
+    df.sort_values(object_type, inplace=True, ignore_index=True)
     app.gui.setvar(model, "exposure_categories_to_standardize", df)
     dlg.close()
 
@@ -79,6 +79,12 @@ def standarize_classification(*args):
 
 
 def add_classification(*args):
-    print("Add classification to model")
-    # Set the sources
-    app.gui.setvar("fiat", "source_classification", "add loaded source")
+    model = "fiat"
+
+    # TODO: remove the exposure objects that are not linked to any 
+    # occupancy class
+
+    # Set the source
+    source = app.gui.getvar(model, "classification_source_path")
+    source_name = Path(source).name
+    app.gui.setvar(model, "source_classification", source_name)

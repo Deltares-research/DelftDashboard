@@ -10,9 +10,20 @@ def set_variables(*args):
     app.active_model.set_input_variables()
 
 def select_occupancy_type(*args):
-    print("Select occupancy type")
+    model = "fiat"
 
-def filter_damage_curve_table(*args):
-    selected_occupancy_type = app.gui.getvar("fiat", "selected_occupancy_type")
-    df = app.active_model.get_filtered_damage_function_database(selected_occupancy_type)
-    app.gui.setvar("fiat", "damage_curves_standard_info", df)
+    # Get the exposure category
+    object_type = app.gui.getvar(model, "object_type")
+    active_exposure_category_standardize = app.gui.getvar(model, "active_exposure_category_standardize")
+    exposure_categories_to_standardize = app.gui.getvar(model, "exposure_categories_to_standardize")
+    exposure_category = exposure_categories_to_standardize[object_type].iloc[active_exposure_category_standardize].values[0]
+    
+    # Get the hazus/iwr occupancy class
+    active_related_occupancy_type = app.gui.getvar(model, "active_related_occupancy_type")
+    hazus_iwr_occupancy_classes = app.gui.getvar(model, "hazus_iwr_occupancy_classes")
+    hazus_iwr_occupancy_class = hazus_iwr_occupancy_classes["Occupancy Class"].iloc[active_related_occupancy_type].values[0]
+    
+    # Assign the selected hazus/iwr occupancy class to the selected exposure category table and dictionary
+    exposure_categories_to_standardize.loc[exposure_categories_to_standardize[object_type] == exposure_category, "Assigned"] = hazus_iwr_occupancy_class
+    app.gui.setvar(model, "exposure_categories_to_standardize", exposure_categories_to_standardize)
+    app.active_model.default_dict_categories[hazus_iwr_occupancy_class] = exposure_category

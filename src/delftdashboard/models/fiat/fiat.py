@@ -21,6 +21,7 @@ class Model(GenericModel):
         self.damage_function_database = pd.DataFrame()
         self.occupancy_to_description = dict()
         self.description_to_occupancy = dict()
+        self.default_dict_categories = dict()
         self.aggregation = gpd.GeoDataFrame()
 
         print("Model " + self.name + " added!")
@@ -152,11 +153,32 @@ class Model(GenericModel):
 
         group = "fiat"
         
-        ## TO BE DESCRIBED ##
+        ## Damage curve tables ##
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         app.gui.setvar(group, "damage_curves_table", default_curves[["Exposure Link", "Damage Type", "Source", "Description"]])
         app.gui.setvar(group, "selected_damage_curve_database", "default_vulnerability_curves")
         app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
+
+        damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
+        damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
+        self.damage_function_database = damage_functions_database_info
+        default_curves_table = default_curves[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
+        default_curves_table.sort_values("Occupancy", inplace=True, ignore_index=True)
+
+        app.gui.setvar(group, "damage_curves_standard_info_static", default_curves_table)
+        app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
+
+        default_occupancy_df = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
+        default_occupancy_df.sort_values("Occupancy Class", inplace=True, ignore_index=True)
+        default_occupancy_df.fillna("", inplace=True)
+        app.gui.setvar(group, "hazus_iwr_occupancy_classes", default_occupancy_df)
+
+        cols = ["-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
+        app.gui.setvar(group, "damage_curves_standard_curves", damage_functions_database[["ID", "Description"] + cols])
+        app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
+
+        ## Standardizing of occupancy categories ##
+        self.default_dict_categories = {x: x for x in list(default_curves["Occupancy"])}
 
         # Source names #
         app.gui.setvar(group, "source_asset_locations", "")
@@ -178,22 +200,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "include_all", False)
 
         ## DISPLAY LAYERS ##
-        damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
-        damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
-        self.damage_function_database = damage_functions_database_info
-        default_curves_table = default_curves[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
-        default_curves_table.sort_values("Occupancy", inplace=True)
-
-        app.gui.setvar(group, "damage_curves_standard_info_static", default_curves_table)
-        app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
-
-        default_occupancy_df = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
-        app.gui.setvar(group, "hazus_iwr_occupancy_classes", default_occupancy_df)
-
-        cols = ["-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
-        app.gui.setvar(group, "damage_curves_standard_curves", damage_functions_database[["ID", "Description"] + cols])
-        app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
-
         app.gui.setvar(group, "properties_to_display", "Classification")
         app.gui.setvar(group, "show_asset_locations", False)
         app.gui.setvar(group, "show_classification", False)
@@ -213,14 +219,14 @@ class Model(GenericModel):
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
         ## STANDARDIZING EXPOSURE CATEGORIES ##
-        df = pd.DataFrame(columns=["Primary Object Type", "Secondary Object Type", "Assigned"])
+        df = pd.DataFrame(columns=["Primary Object Type", "Assigned"])
         app.gui.setvar(group, "exposure_categories_to_standardize", df)
         app.gui.setvar(group, "active_exposure_category_standardize", [0])
+        app.gui.setvar(group, "active_related_occupancy_type", [0])
 
         ## HAZUS IWR OCCUPANCY CLASSES ##
-        occupancy_types = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
-        self.occupancy_to_description = occupancy_types.set_index("Occupancy Class").to_dict(orient="index")
-        self.description_to_occupancy = occupancy_types.set_index("Class Description").to_dict(orient="index")
+        self.occupancy_to_description = default_occupancy_df.set_index("Occupancy Class").to_dict(orient="index")
+        self.description_to_occupancy = default_occupancy_df.set_index("Class Description").to_dict(orient="index")
 
         app.gui.setvar(group, "dmg_functions_html_filepath", "")
         
@@ -447,8 +453,10 @@ class Model(GenericModel):
         app.gui.setvar(group, "max_potential_damage_name", "")
         app.gui.setvar(group, "max_potential_damage_string",[])
         app.gui.setvar(group, "max_potential_damage_value",[])
-        
-        
+    
+    @staticmethod
+    def set_dict_inverted(dictionary):
+        return {value: key for key, value in dictionary.items()}
 
     def set_input_variables(self):
         # Update all model input variables

@@ -14,7 +14,7 @@ element:
     y: 285
     width: 250
     height: 20
-  text: "<b>Table</b>: Exposure categories to standardize"
+  text: "<b>Table</b>: Exposure categories to standardize (not assigning an occupancy type removes the exposure object)"
 - style: tableview
   position:
     x: 10
@@ -23,7 +23,7 @@ element:
     height: 225
   tooltip: Exposure categories to standardize
   variable: active_exposure_category_standardize
-  selection_type: extended
+  selection_type: single
   sortable: true
   option_value:
     variable: exposure_categories_to_standardize
@@ -41,7 +41,8 @@ element:
     width: 353
     height: 225
   tooltip: Standard IWR classifications
-  selection_type: extended
+  selection_type: single
+  variable: active_related_occupancy_type
   sortable: true
   option_value:
     variable: hazus_iwr_occupancy_classes

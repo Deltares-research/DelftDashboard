@@ -15,7 +15,16 @@ def select(*args):
 
 def create_model(*args):
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
-    buildings, roads = app.active_model.domain.run_hydromt_fiat()
+
+    try:
+        buildings, roads = app.active_model.domain.run_hydromt_fiat()
+    except Exception as e:
+        app.gui.window.dialog_warning(
+            e,
+            "Not ready to build a FIAT model",
+        )
+        return
+
     if buildings is not None:
         app.active_model.buildings = buildings
     if roads is not None:
