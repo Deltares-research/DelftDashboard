@@ -22,6 +22,7 @@ class Model(GenericModel):
         self.occupancy_to_description = dict()
         self.description_to_occupancy = dict()
         self.default_dict_categories = dict()
+        self.updated_dict_categories = dict()
         self.aggregation = gpd.GeoDataFrame()
 
         print("Model " + self.name + " added!")
@@ -179,6 +180,7 @@ class Model(GenericModel):
 
         ## Standardizing of occupancy categories ##
         self.default_dict_categories = {x: x for x in list(default_curves["Occupancy"])}
+        self.updated_dict_categories = self.default_dict_categories
 
         # Source names #
         app.gui.setvar(group, "source_asset_locations", "")
@@ -510,7 +512,8 @@ class Model(GenericModel):
 
     def get_filtered_damage_function_database(self, filter: str, col: str="Occupancy"):
         df = copy.deepcopy(self.damage_function_database)
-        return df.loc[df[col].str.startswith(filter)]
+        filter_occtype = self.updated_dict_categories[filter]
+        return df.loc[df[col].str.startswith(filter_occtype)]
 
     @staticmethod
     def generate_random_colors(n):
@@ -858,3 +861,20 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, data=None)
         if not okay:
             return
+
+    def set_object_types(self, unique_primary_types, unique_secondary_types):
+        model = 'fiat'
+        unique_primary_types.sort()
+        unique_secondary_types.sort()
+        app.gui.setvar(
+            model, "selected_primary_classification_string", unique_primary_types
+        )
+        app.gui.setvar(
+            model, "selected_secondary_classification_string", unique_secondary_types
+        )
+        app.gui.setvar(
+            model, "selected_primary_classification_value", unique_primary_types
+        )
+        app.gui.setvar(
+            model, "selected_secondary_classification_value", unique_secondary_types
+        )

@@ -415,14 +415,8 @@ def quick_build(*args):
         app.active_model.buildings
     )
 
-    app.gui.setvar(model, "selected_primary_classification_string", list_types_primary)
-    app.gui.setvar(
-        model, "selected_secondary_classification_string", list_types_secondary
-    )
-    app.gui.setvar(model, "selected_primary_classification_value", list_types_primary)
-    app.gui.setvar(
-        model, "selected_secondary_classification_value", list_types_secondary
-    )
+    # Set the primary and secondary object type lists
+    app.active_model.set_object_types(list_types_primary, list_types_secondary)
 
     # Show the roads
     app.map.layer["roads"].layer["exposure_lines"].crs = crs

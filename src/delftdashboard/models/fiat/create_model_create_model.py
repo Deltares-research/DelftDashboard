@@ -14,6 +14,13 @@ def select(*args):
     map.update()
 
 def create_model(*args):
+    if app.active_model.domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+        return
+    
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
 
     try:

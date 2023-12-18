@@ -4,6 +4,7 @@ from delftdashboard.operations import map
 import geopandas as gpd
 from pathlib import Path
 import fiona
+import pandas as pd
 
 
 def select(*args):
@@ -22,12 +23,12 @@ def add_classification_field(*args):
     object_type = app.gui.getvar(model, "object_type")
     attribute_name = app.gui.getvar(model, "classification_file_field_name")
 
+    # Reset the self.updated_dict_categories dict
+    app.active_model.updated_dict_categories = app.active_model.default_dict_categories
+
     # Read the vector file and update the table for standardization
     gdf = gpd.read_file(path)
-    df = app.gui.getvar(model, "exposure_categories_to_standardize")
-    df[object_type] = list(gdf[attribute_name].unique())
-    df = df[[object_type, "Assigned"]]
-    df.fillna("", inplace=True)
+    df = pd.DataFrame({object_type: list(gdf[attribute_name].unique()), "Assigned": ""})
     df.sort_values(object_type, inplace=True, ignore_index=True)
     app.gui.setvar(model, "exposure_categories_to_standardize", df)
     dlg.close()
@@ -52,6 +53,8 @@ def load_upload_classification_source(*args):
 
 def display_primary_classification(*args):
     """Show/hide buildings layer"""
+    # TODO: ensure that the correct classification is shown
+    # if user-input data is used
     app.gui.setvar("fiat", "show_primary_classification", args[0])
     if args[0]:
         app.active_model.show_classification(type="primary")
@@ -64,6 +67,8 @@ def display_primary_classification(*args):
 
 def display_secondary_classification(*args):
     """Show/hide buildings layer"""
+    # TODO: ensure that the correct classification is shown
+    # if user-input data is used
     app.gui.setvar("fiat", "show_secondary_classification", args[0])
     if args[0]:
         app.active_model.show_classification(type="secondary")
@@ -80,11 +85,31 @@ def standarize_classification(*args):
 
 def add_classification(*args):
     model = "fiat"
-
-    # TODO: remove the exposure objects that are not linked to any 
-    # occupancy class
+    
+    # Get the source, object type and attribute name
+    source = app.gui.getvar(model, "classification_source_path")
+    object_type = app.gui.getvar(model, "object_type")
+    attribute_name = app.gui.getvar(model, "classification_file_field_name")
+    app.active_model.domain.exposure_vm.update_occupancy_types(source, attribute_name, object_type)
 
     # Set the source
-    source = app.gui.getvar(model, "classification_source_path")
     source_name = Path(source).name
     app.gui.setvar(model, "source_classification", source_name)
+
+    # Get the new primary and secondary object classifications
+    prim, secon = app.active_model.domain.exposure_vm.get_object_types()
+    app.active_model.set_object_types(prim, secon)
+
+    # Set the exposure categories to link for the damage functions
+    list_types = prim if prim is not None else secon
+    list_types.sort()
+    df = pd.DataFrame(data={object_type: list_types, "Assigned: Structure": "", "Assigned: Content": ""})
+    ## TODO: add the nr of stories and the basement?
+    app.gui.setvar(model, "exposure_categories_to_link", df)
+
+    # TODO: replace the exposure categories in the vulnerability linking table 
+
+    app.gui.window.dialog_info(
+        text="Standardized classification data was added to your model",
+        title="Added standardized classification data",
+    )

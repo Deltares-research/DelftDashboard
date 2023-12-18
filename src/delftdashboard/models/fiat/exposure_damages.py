@@ -50,7 +50,7 @@ def load_damages_file(*args):
 
         if geometry_type == "point":
             app.gui.setvar("fiat", "method_damages", "nearest")
-        elif geometry_type == "polygon":
+        elif geometry_type in ["polygon", "multipolygon"]:
             app.gui.setvar("fiat", "method_damages", "intersection")
         
         app.gui.setvar("fiat", "damages_file_field_name_value", list_columns)
