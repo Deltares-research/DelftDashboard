@@ -261,7 +261,9 @@ def load_sfincs_domain(*args):
             )
 
             # Add the polygon to the map
-            layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_sfincs"]
+            layer = app.map.layer["modelmaker_fiat"].layer[
+                "area_of_interest_from_sfincs"
+            ]
             layer.set_data(gdf)
 
             app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
@@ -301,7 +303,7 @@ def quick_build(*args):
 
     model = "fiat"
     checkbox_group = "_main"
-    # try:
+
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
     app.gui.setvar(model, "created_nsi_assets", "nsi")
     app.gui.setvar(model, "text_feedback_create_asset_locations", "NSI assets created")
@@ -429,12 +431,10 @@ def quick_build(*args):
 
     dlg.close()
 
-    # except FileNotFoundError:
-    #     app.gui.window.dialog_info(
-    #         text="Please first select a model boundary.",
-    #         title="No model boundary selected",
-    #     )
-    #     dlg.close()
+    app.gui.window.dialog_info(
+        f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",
+        "FIAT model created",
+    )
 
 
 def display_asset_locations(*args):
