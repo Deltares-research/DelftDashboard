@@ -20,9 +20,10 @@ def create_model(*args):
         buildings, roads = app.active_model.domain.run_hydromt_fiat()
     except Exception as e:
         app.gui.window.dialog_warning(
-            e,
+            str(e),
             "Not ready to build a FIAT model",
         )
+        dlg.close()
         return
 
     if buildings is not None:
