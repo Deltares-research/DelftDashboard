@@ -102,3 +102,12 @@ def display_asset_locations(*args):
         app.active_model.show_exposure_buildings()
     else:
         app.active_model.hide_exposure_buildings()
+
+def open_exposure_results(*args):
+    print("open exposure csv in tableview in extra window")
+
+def open_svi_results(*args):
+    print("open svi csv in tableview in extra window")
+
+def open_equity_results(*args):
+    print("open equity csv in tableview in extra window")
