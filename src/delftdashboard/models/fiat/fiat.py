@@ -493,9 +493,14 @@ class Model(GenericModel):
                 fname,
             )
             self.domain.read()
+
+            # TODO: read in the variables of the FIAT model
+            # to the GUI
             self.set_gui_variables()
+
             # Change working directory
             os.chdir(fname)
+            
             # Change CRS
             app.crs = self.domain.crs
             self.plot()

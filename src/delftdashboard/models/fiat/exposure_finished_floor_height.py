@@ -50,7 +50,7 @@ def load_asset_heights_file(*args):
 
         if geometry_type == "point":
             app.gui.setvar("fiat", "method_gfh", "nearest")
-        elif geometry_type == "polygon":
+        elif geometry_type in ["polygon", "multipolygon"]:
             app.gui.setvar("fiat", "method_gfh", "intersection")
         
         app.gui.setvar("fiat", "heights_file_field_name_value", list_columns)

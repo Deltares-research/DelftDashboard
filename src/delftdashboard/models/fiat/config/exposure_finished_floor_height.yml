@@ -50,6 +50,7 @@ element:
       height: 20
     text: "Attribute ID"
     text_position: "above"
+    select: index
     variable: heights_file_field_name
     option_string:
       variable: heights_file_field_name_string
