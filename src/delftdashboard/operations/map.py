@@ -37,7 +37,9 @@ def map_ready(*args):
     app.background_topography_layer.update = update_background
 
     # Go to point
-    app.map.jump_to(-98.74, 39.22, 3)  # SHOULD WE MAKE THIS CONFIGURABLE (FG)?
+    if "map_center" in app.config:
+        lon, lat, zoom = app.config["map_center"]
+        app.map.jump_to(lon, lat, zoom)
 
     # Add layers to map (we can only do this after the map has finished loading)
     for name, model in app.model.items():
