@@ -1,8 +1,11 @@
+import os
+import importlib
+import geopandas as gpd
+from hydromt_sfincs import utils
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-import geopandas as gpd
-from hydromt_sfincs import utils
 
 def select(*args):
     map.update()
@@ -19,7 +22,7 @@ def add_observation_point(gdf, merge=True):
     index = len(model.geoms["obs"]) - 1
     app.map.layer["sfincs_hmt"].layer["observation_points"].set_data(model.geoms["obs"], index)
     app.gui.setvar("sfincs_hmt", "active_observation_point", index)
-
+    update()
 
 def load(*args):
     # map.reset_cursor()
@@ -140,12 +143,31 @@ def update():
     app.gui.window.update()
 
 def go_to_observation_stations(*args):
+    """Go to observation stations toolbox in popup window."""	
 
     toolbox_name = "observation_stations"
+    toolbox_path = os.path.join(app.main_path, "toolboxes", toolbox_name)
 
-    # switch to observation stations toolbox
-    app.active_toolbox = app.toolbox[toolbox_name]
-    app.active_toolbox.select()
+    # intitialize toolbox
+    module = importlib.import_module(
+        "delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name
+    )
 
-    #TODO back to observations model-tab
-    # app.active_toolbox.select_tab("observations")    
+    # initialize toolboxes
+    toolbox = module.Toolbox(toolbox_name, )    
+
+    data = {}
+    # get map center
+    data["map_center"] = app.map.map_center
+    # get active model
+    data["active_model"] = app.active_model
+    # initialize toolbox
+    data["toolbox"] = toolbox
+    # set option
+    data["option"] = "obs"
+
+    # Read GUI config file
+    pop_win_config_path  = os.path.join(toolbox_path,"config", "observation_stations_popup.yml")
+    okay, data = app.gui.popup(
+        pop_win_config_path, data=data, id="observation_stations"
+    )
