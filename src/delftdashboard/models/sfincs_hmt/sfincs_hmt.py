@@ -230,6 +230,26 @@ class Model(GenericModel):
         app.gui.setvar(group, "wind", True)
         app.gui.setvar(group, "rain", True)
 
+        # Structures
+        app.gui.setvar(group, "structure_weirs_methods", ["Draw LineString", "Load from file"])
+        app.gui.setvar(group, "structure_weirs_method_index", 0)
+        app.gui.setvar(group, "structure_weir_index", None)
+        app.gui.setvar(group, "structure_weir_list", [])
+        app.gui.setvar(group, "active_structure_weir", 0)
+
+        app.gui.setvar(group, "structure_thin_dam_methods", ["Draw LineString", "Load from file"])
+        app.gui.setvar(group, "structure_thin_dam_method_index", 0)
+        app.gui.setvar(group, "structure_thd_index", None)
+        app.gui.setvar(group, "structure_thd_list", [])
+        app.gui.setvar(group, "active_structure_thd", 0)
+
+        app.gui.setvar(group, "structure_drainage_methods", ["Draw LineString", "Load from file"])
+        app.gui.setvar(group, "structure_drainage_method_index", 0)
+        app.gui.setvar(group, "structure_drn_index", None)
+        app.gui.setvar(group, "structure_drn_list", [])
+        app.gui.setvar(group, "active_structure_drn", 0)
+        app.gui.setvar(group, "drainage_type", 0)
+
         # Physics
         app.gui.setvar(group, "advection", False)
         app.gui.setvar(group, "coriolis", False)
