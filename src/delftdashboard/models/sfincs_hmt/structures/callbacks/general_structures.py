@@ -88,9 +88,9 @@ def make_geom_layer(geom_type: str, geom_list: list, layer):
 
 def set_variables(*args):
     """Method to set the variables in the gui
-    
+
     TODO: Is this method still needed?"""
-    
+
     # All variables will be set
     app.model["sfincs_hmt"].set_model_variables()
 
@@ -254,11 +254,20 @@ def add_measure():
     # TODO should the gui variables have the same name as the pydantic ?
     # Update measure with values from window
     measure = read_measure_window()
+
+    # Check if the name already exists. It cannot exist in any of the measure types (e.g. weir, dam, etc., mostly for clairty)
+    # TODO: Checking for all measure types is a bit of a shortcut because there is only one measure layer. If you then add multiple measures
+    # with the same name for different measure types, only one will be shown on the map. If you give informative names though, this should not be a problem.
+    for measure_type in ['weir', 'thd', 'drn']:
+        if measure["name"] in app.gui.getvar("sfincs_hmt", f"structure_{measure_type}_list"):
+            app.gui.window.dialog_warning(text = "Name already exists for any of the structures. \nPlease choose another name for the measure")
+            return
+
     try:
         # Create measure object
         measure_obj = api_measures.create_measure(
-                measure, selected_measure_type.measure_type
-            )
+            measure, selected_measure_type.measure_type
+        )
 
         # Get geometry based on the selection type
         selection_type = app.gui.getvar("measures", "selected_measure_selection_type")
@@ -375,8 +384,8 @@ def delete_structure(selected_measures: List[str], measure_type: str):
 
     Remarks
     -------
-    If the last measure is deleted, the active measure is set to None. 
-    Also, the geom group in the model is not actually deleted, but only the 
+    If the last measure is deleted, the active measure is set to None.
+    Also, the geom group in the model is not actually deleted, but only the
     geoms are deleted. This is something that SFINCS should be able to handle?
     """
 
