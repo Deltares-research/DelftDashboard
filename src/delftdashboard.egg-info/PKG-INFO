@@ -8,6 +8,7 @@ Requires-Dist: geopandas>=0.8
 Requires-Dist: numpy
 Requires-Dist: pandas
 Requires-Dist: pyproj
+Requires-Dist: plotly
 Requires-Dist: rasterio
 Requires-Dist: shapely
 Requires-Dist: scipy
@@ -19,9 +20,6 @@ Requires-Dist: Pillow
 Requires-Dist: matplotlib
 Requires-Dist: noaa-coops
 Requires-Dist: metpy
-Requires-Dist: siphon
-Requires-Dist: netCDF4
-Requires-Dist: mat73
 Requires-Dist: tabulate
 Requires-Dist: xugrid
 Requires-Dist: datashader
