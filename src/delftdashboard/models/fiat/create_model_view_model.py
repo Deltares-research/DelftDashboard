@@ -25,7 +25,8 @@ def display_properties(*args):
     properties_to_display = app.gui.getvar("fiat", "properties_to_display")
     if properties_to_display == "Classification":
         app.map.layer["buildings"].clear()
-        app.model[model].show_classification()
+        app.gui.setvar("fiat", "classification_display_string", ["Primary", "Secondary"])
+        app.gui.setvar("fiat", "classification_display_value", ["Primary", "Secondary"])
     elif properties_to_display == "Finished floor height":
         app.map.layer["buildings"].clear()
         app.model[model].show_asset_height()
@@ -40,13 +41,20 @@ def display_properties(*args):
         app.map.layer["buildings"].clear()
         app.model[model].show_svi()
 
+def display_classification(*args):
+    app.map.layer["buildings"].clear()
+    if app.gui.getvar("fiat", "classification_display_name") == "Primary":
+        app.active_model.show_classification(type="primary")
+    else:
+        app.active_model.show_classification(type="secondary")
+
 def display_damage(*args):
     app.map.layer["buildings"].clear()
     if app.gui.getvar("fiat", "max_potential_damage_name") == "Structure":
         app.active_model.show_max_potential_damage_struct()
     else:
         app.active_model.show_max_potential_damage_cont()
-    
+        
 def display_roads(*args):
     """Show/hide roads layer""" 
     app.gui.setvar("fiat", "show_roads", args[0])

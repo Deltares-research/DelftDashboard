@@ -252,6 +252,9 @@ class Model(GenericModel):
         app.gui.setvar(group, "asset_location_file", "*asset location file path*")
         app.gui.setvar(group, "control_enable", 0)
         app.gui.setvar(group, "area_classification", None)
+        app.gui.setvar(group, "classification_display_name", "")
+        app.gui.setvar(group, "classification_display_string", [])
+        app.gui.setvar(group, "classification_display_value", [])
         app.gui.setvar(group, "classification_source", "nsi_data")
         app.gui.setvar(
             group,

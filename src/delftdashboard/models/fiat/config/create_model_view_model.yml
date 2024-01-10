@@ -1,3 +1,4 @@
+
 element:
 - style: panel
   title: Display model ouput
@@ -17,6 +18,18 @@ element:
     option_string: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation", "Social Vulnerability Index (SVI)"]
     option_value: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation", "Social Vulnerability Index (SVI)"]
     method: display_properties
+  - style: popupmenu
+    position:
+      x: 190
+      y: 110
+      width: 100
+      height: 20
+    variable: classification_display_name
+    option_string:
+      variable: classification_display_string
+    option_value:
+      variable: classification_display_value
+    method: display_classification 
 
   - style: popupmenu
     position:
@@ -94,3 +107,4 @@ element:
     height: 25
   text: "Equity data"
   method: open_equity_results
+
