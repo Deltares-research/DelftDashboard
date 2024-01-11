@@ -30,6 +30,13 @@ element:
     option_value:
       variable: classification_display_value
     method: display_classification 
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: properties_to_display
+        operator: eq
+        value: Classification
 
   - style: popupmenu
     position:
@@ -43,6 +50,13 @@ element:
     option_value:
       variable: max_potential_damage_value
     method: display_damage 
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: properties_to_display
+        operator: eq
+        value: Max potential damages
 - style: checkbox
   position:
     x: 330
@@ -70,6 +84,7 @@ element:
   text: Display attributes
   variable: show_attributes
   method: toggle_attr_map  
+
 - style: popupmenu
   position:
     x: 460
@@ -83,6 +98,14 @@ element:
   option_value:
     variable: aggregation_label_display_value
   method: display_attribute
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: show_attributes
+      operator: eq
+      value: True
+
 - style: pushbutton
   position:
     x: 650
@@ -99,12 +122,5 @@ element:
     height: 25
   text: "SVI data"
   method: open_svi_results
-- style: pushbutton
-  position:
-    x: 650
-    y: 25
-    width: 110
-    height: 25
-  text: "Equity data"
-  method: open_equity_results
+
 

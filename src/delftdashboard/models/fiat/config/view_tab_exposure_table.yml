@@ -10,10 +10,10 @@ window:
 element:
 - style: tableview
   position:
-    x: 10
-    y: 30
-    width: 800
-    height: 580
+    x: 20
+    y: 50
+    width: 725
+    height: 550
   tooltip: Exposure data
   text_position: "above"
   selection_type: extended
