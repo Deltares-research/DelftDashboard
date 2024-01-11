@@ -31,7 +31,7 @@ class Model(GenericModel):
 
         # Set GUI variables
         self.set_gui_variables()
-
+    
     def add_layers(self):
         # Add main DDB layer
         layer = app.map.add_layer("buildings")
@@ -458,6 +458,8 @@ class Model(GenericModel):
         app.gui.setvar(group, "max_potential_damage_name", "")
         app.gui.setvar(group, "max_potential_damage_string",[])
         app.gui.setvar(group, "max_potential_damage_value",[])
+        app.gui.setvar(group,"view_svi_value", pd.DataFrame)
+        app.gui.setvar(group,"view_exposure_value", pd.DataFrame(columns=["Object ID", "Object Name", "Primary Object Type", "Secondary Object Type", "Max Potential Damage: Structure","Max Potential Damage: Content","Ground Floor Height","Ground Elevation","Extraction Method", "Damage Function: Structure", "Damage Function: Content", "lanes", "Segment Length [m]", "SVI_key_domain", "SVI"]))
     
     @staticmethod
     def set_dict_inverted(dictionary):
@@ -821,7 +823,7 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, data=None, id="specify_damage_curves")
         if not okay:
             return
-
+    
     def classification_standarize(self):
         # get window config yaml path
         pop_win_config_path = str(
@@ -869,7 +871,55 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, data=None)
         if not okay:
             return
-
+        
+    def view_exposure(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "view_tab_exposure_table.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            return
+    
+    def view_svi(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "view_tab_svi_table.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            return
+    
+    def view_equity(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.names
+            / "config"
+            / "view_tab_equity_table.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            return
+        
     def set_object_types(self, unique_primary_types, unique_secondary_types):
         model = 'fiat'
         unique_primary_types.sort()

@@ -5,7 +5,9 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 import geopandas as gpd
+import os
 from pathlib import Path
+import pandas as pd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -54,7 +56,7 @@ def display_damage(*args):
         app.active_model.show_max_potential_damage_struct()
     else:
         app.active_model.show_max_potential_damage_cont()
-        
+
 def display_roads(*args):
     """Show/hide roads layer""" 
     app.gui.setvar("fiat", "show_roads", args[0])
@@ -112,10 +114,31 @@ def display_asset_locations(*args):
         app.active_model.hide_exposure_buildings()
 
 def open_exposure_results(*args):
-    print("open exposure csv in tableview in extra window")
+    #TODO: Take file from output folder. If is empty open error window, else continue with below.
+    model_fn = app.gui.getvar("fiat", "scenario_folder")
+    exposure_data_fn = Path(os.path.abspath("")) / model_fn / "exposure" / "exposure.csv"
+    if exposure_data_fn.exists():
+        exposure_data = gpd.read_file(exposure_data_fn)
+        app.gui.setvar("fiat", "view_exposure_value", exposure_data)
+        app.active_model.view_exposure()
+    else:
+        app.gui.window.dialog_info(
+                text="Your model is empty. Please create model first.",
+                title="Empty model"
+                )
 
 def open_svi_results(*args):
-    print("open svi csv in tableview in extra window")
+    model_fn = app.gui.getvar("fiat", "scenario_folder")
+    svi_data_fn = Path(os.path.abspath("")) / model_fn / "exposure" / "SVI"/ "social_vulnerability_scores.csv"
+    if svi_data_fn.exists():
+        svi_data = pd.read_csv(svi_data_fn)
+        app.gui.setvar("fiat", "view_svi_value", svi_data)
+        app.active_model.view_svi()
+    else:
+        app.gui.window.dialog_info(
+                text="Your model is empty. Please create model first.",
+                title="Empty model"
+                )
 
 def open_equity_results(*args):
     print("open equity csv in tableview in extra window")

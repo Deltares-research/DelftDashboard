@@ -1,0 +1,23 @@
+window:
+  title: Exposure data
+  width: 800
+  height: 620
+  variable_group: fiat
+  module: models.fiat.view_tab_exposure_table
+  modal: True
+  cancel: True
+
+element:
+- style: tableview
+  position:
+    x: 10
+    y: 30
+    width: 800
+    height: 580
+  tooltip: Exposure data
+  text_position: "above"
+  selection_type: extended
+  sortable: true
+  option_value:
+    variable: view_exposure_value
+  
