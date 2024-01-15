@@ -38,6 +38,10 @@ def create_model(*args):
     if roads is not None:
         app.active_model.roads = roads
     
+    # Set the unit for Exposure Data for visualization
+    view_tab_unit = app.active_model.domain.fiat_model.exposure.unit
+    app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
+
     dlg.close()
     app.gui.window.dialog_info(
             f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",

@@ -58,7 +58,6 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="Ground Floor Height",
             big_data=True,
-            unit = "m",
             min_zoom=12,
         )
 
@@ -97,7 +96,6 @@ class Model(GenericModel):
             hover_property="Ground Elevation",
             big_data=True,
             min_zoom=12,
-            unit = "m"
         )
         layer.add_layer(
             "SVI",
@@ -265,6 +263,7 @@ class Model(GenericModel):
             "classification_source_string",
             ["National Structure Inventory (NSI)", "Upload data"],
         )
+        app.gui.setvar(group, "view_tab_unit","")
         app.gui.setvar(group, "classification_source_value", ["nsi_data", "upload_data"])
         app.gui.setvar(group, "classification_source_path", "")
         app.gui.setvar(
@@ -732,6 +731,7 @@ class Model(GenericModel):
             paint_properties = self.get_nsi_paint_properties(type=type)
             legend = []
             app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
             app.map.layer["buildings"].layer["asset_height"].set_data(
                 self.buildings, legend
             )
@@ -765,6 +765,7 @@ class Model(GenericModel):
             paint_properties = self.get_nsi_paint_properties(type=type)
             legend = []
             app.map.layer["buildings"].layer["ground_elevation"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["ground_elevation"].unit = app.gui.getvar("fiat", "view_tab_unit")
             app.map.layer["buildings"].layer["ground_elevation"].set_data(
                 self.buildings, legend
             )
