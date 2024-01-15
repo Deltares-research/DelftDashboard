@@ -58,6 +58,7 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="Ground Floor Height",
             big_data=True,
+            unit = "m",
             min_zoom=12,
         )
 
@@ -71,6 +72,7 @@ class Model(GenericModel):
             hover_property="Max Potential Damage: Structure",
             big_data=True,
             min_zoom=12,
+            unit = "$"
         )
 
         layer.add_layer(
@@ -83,6 +85,7 @@ class Model(GenericModel):
             hover_property="Max Potential Damage: Content",
             big_data=True,
             min_zoom=12,
+            unit = "$"
         )
         layer.add_layer(
             "ground_elevation",
@@ -94,6 +97,7 @@ class Model(GenericModel):
             hover_property="Ground Elevation",
             big_data=True,
             min_zoom=12,
+            unit = "m"
         )
         layer.add_layer(
             "SVI",
@@ -740,7 +744,7 @@ class Model(GenericModel):
             legend = []
             app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
-                self.buildings, legend
+                self.buildings,  legend
             )
             self.show_max_potential_damage_structure()
     
@@ -751,7 +755,7 @@ class Model(GenericModel):
             legend = []
             app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"]   
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
-                self.buildings, legend
+                self.buildings, legend, 
             )
             self.show_max_potential_damage_content()
     
