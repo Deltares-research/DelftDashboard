@@ -49,6 +49,12 @@ def display_asset_locations(*args):
     """Show/hide buildings layer"""
     app.gui.setvar("fiat", "show_asset_locations", args[0])
     if args[0]:
+        app.map.layer["buildings"].clear()
+        app.gui.setvar("fiat", "show_primary_classification", False)
+        app.gui.setvar("fiat", "show_secondary_classification", False)
+        app.map.layer["buildings"].layer["exposure_points"].crs = crs = app.gui.getvar("fiat", "selected_crs")
+        app.map.layer["buildings"].layer["exposure_points"].set_data(app.active_model.buildings)
+
         app.active_model.show_exposure_buildings()
     else:
         app.active_model.hide_exposure_buildings()

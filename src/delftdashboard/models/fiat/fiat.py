@@ -50,6 +50,32 @@ class Model(GenericModel):
         )
 
         layer.add_layer(
+            "primary_classification",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Buildings",
+            fill_color="orange",
+            line_color="transparent",
+            hover_property="Primary Object Type",
+            big_data=True,
+            min_zoom=12,
+        )
+
+        layer.add_layer(
+            "secondary_classification",
+            type="circle",
+            circle_radius=3,
+            legend_position="top-right",
+            legend_title="Buildings",
+            fill_color="orange",
+            line_color="transparent",
+            hover_property="Secondary Object Type",
+            big_data=True,
+            min_zoom=12,
+        )
+
+        layer.add_layer(
             "asset_height",
             type="circle",
             circle_radius=3,
@@ -204,7 +230,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "include_all", False)
 
         ## DISPLAY LAYERS ##
-        app.gui.setvar(group, "properties_to_display", "Classification")
+        app.gui.setvar(group, "properties_to_display", None)
         app.gui.setvar(group, "show_asset_locations", False)
         app.gui.setvar(group, "show_classification", False)
         app.gui.setvar(group, "show_asset_heights", False)
@@ -721,11 +747,16 @@ class Model(GenericModel):
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
             legend = []
-
-            app.map.layer["buildings"].layer["exposure_points"].set_data(
+            if type == "primary":
+                app.map.layer["buildings"].layer["primary_classification"].set_data(
                 self.buildings, paint_properties, legend
-            )
-            self.show_exposure_buildings()
+                )
+                self.show_exposure_buildings_primary()
+            else:
+                app.map.layer["buildings"].layer["secondary_classification"].set_data(
+                self.buildings, paint_properties, legend
+                )
+                self.show_exposure_buildings_secondary()
     
     def show_asset_height(self,type="asset_height"):
             paint_properties = self.get_nsi_paint_properties(type=type)
@@ -788,6 +819,12 @@ class Model(GenericModel):
 
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
+
+    def show_exposure_buildings_primary(self):
+        app.map.layer["buildings"].layer["primary_classification"].show()
+
+    def show_exposure_buildings_secondary(self):
+        app.map.layer["buildings"].layer["secondary_classification"].show()
 
     def show_asset_heights(self):
         app.map.layer["buildings"].layer["asset_height"].show()
