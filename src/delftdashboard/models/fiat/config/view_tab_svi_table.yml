@@ -1,0 +1,23 @@
+window:
+  title: SVI data
+  width: 800
+  height: 620
+  variable_group: fiat
+  module: models.fiat.view_tab_svi_table
+  modal: True
+  cancel: True
+
+element:
+- style: tableview
+  position:
+    x: 20
+    y: 50
+    width: 725
+    height: 550
+  tooltip: SVI data
+  text_position: "above"
+  selection_type: extended
+  sortable: true
+  option_value:
+    variable: view_svi_value
+  

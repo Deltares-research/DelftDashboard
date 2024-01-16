@@ -1,16 +1,17 @@
+
 element:
 - style: panel
   title: Display model ouput
   position:
     x: 10
-    y: 10
-    width: 290
-    height: 120
+    y: 5
+    width: 300
+    height: 165
   element:
   - style: radiobuttongroup
     position:
       x: 30
-      y: 10
+      y: 50
       width: 200
     text: "Display properties"
     variable: properties_to_display
@@ -20,52 +21,101 @@ element:
   - style: popupmenu
     position:
       x: 150
-      y: 50
+      y: 132
       width: 100
-      height: 20
+      height: 15
+    variable: classification_display_name
+    option_string:
+      variable: classification_display_string
+    option_value:
+      variable: classification_display_value
+    method: display_classification 
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: properties_to_display
+        operator: eq
+        value: Classification
+
+  - style: popupmenu
+    position:
+      x: 150
+      y: 92
+      width: 100
+      height: 15
     variable: max_potential_damage_name
     option_string:
       variable: max_potential_damage_string
     option_value:
       variable: max_potential_damage_value
     method: display_damage 
-- style: checkbox
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: properties_to_display
+        operator: eq
+        value: Max potential damages
+  - style: checkbox
+    position:
+      x: 30
+      y: 25
+      width: 100
+      height: 20
+    text: Display roads
+    variable: show_roads
+    method: display_roads
+  - style: checkbox
+    position:
+      x: 30
+      y: 5
+      width: 120
+      height: 25
+    text: Display attributes
+    variable: show_attributes
+    method: toggle_attr_map  
+  - style: popupmenu
+    position:
+      x: 150
+      y: 10
+      width: 100
+      height: 15
+    text: ""
+    variable: aggregation_label_display_name
+    option_string:
+      variable: aggregation_label_display_string
+    option_value:
+      variable: aggregation_label_display_value
+    method: display_attribute
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: show_attributes
+        operator: eq
+        value: True
+- style: panel
+  title: File ouput
   position:
-    x: 310
-    y: 50
-    width: 100
-    height: 20
-  text: Display assets
-  variable: show_asset_locations
-  method: display_asset_locations
-- style: checkbox
-  position:
-    x: 310
-    y: 30
-    width: 100
-    height: 20
-  text: Display roads
-  variable: show_roads
-  method: display_roads
-- style: checkbox
-  position:
-    x: 310
+    x: 330
     y: 10
-    width: 100
-    height: 20
-  text: Display attributes
-  variable: show_attributes
-  method: toggle_attr_map  
-- style: popupmenu
-  position:
-    x: 430
-    y: 10
-    width: 100
-    height: 20
-  text: ""
-  variable: aggregation_label_display_name
-  option_string:
-    variable: aggregation_label_display_string
-  option_value:
-    variable: aggregation_label_display_value
-  method: display_attribute
+    width: 200
+    height: 75
+  element:
+  - style: pushbutton
+    position:
+      x: 10
+      y: 40
+      width: 90
+      height: 20
+    text: "Exposure output"
+    method: open_exposure_results
+  - style: pushbutton
+    position:
+      x: 10
+      y: 10
+      width: 90
+      height: 20
+    text: "SVI data"
+    method: open_svi_results

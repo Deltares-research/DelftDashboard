@@ -46,6 +46,12 @@ def load_asset_heights_file(*args):
             # Access the schema to get the column names
             schema = src.schema
             list_columns = list(schema['properties'].keys())
+            geometry_type = schema["geometry"].lower()
+
+        if geometry_type == "point":
+            app.gui.setvar("fiat", "method_gfh", "nearest")
+        elif geometry_type in ["polygon", "multipolygon"]:
+            app.gui.setvar("fiat", "method_gfh", "intersection")
         
         app.gui.setvar("fiat", "heights_file_field_name_value", list_columns)
         app.gui.setvar("fiat", "heights_file_field_name_string", list_columns)
@@ -106,7 +112,7 @@ def add_to_model(*args):
         )
 
     # Set the source
-    app.gui.setvar(model, "source_finished_floor_elevation", source_name)
+    app.gui.setvar(model, "source_finished_floor_height", source_name)
 
     app.gui.window.dialog_info(
         text="Finished floor height data was added to your model",
