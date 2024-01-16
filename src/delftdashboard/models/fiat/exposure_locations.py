@@ -107,34 +107,21 @@ def build_nsi_exposure(*args):
         )
         gdf.set_crs(crs, inplace=True)
 
+        # Set the primary and secondary object type lists
+        app.active_model.set_object_types(unique_primary_types, unique_secondary_types)
+
         # Set the buildings attribute to gdf for easy visualization of the buildings
         app.active_model.buildings = gdf
 
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
         app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
 
-        unique_primary_types.sort()
-        unique_secondary_types.sort()
-        app.gui.setvar(
-            model, "selected_primary_classification_string", unique_primary_types
-        )
-        app.gui.setvar(
-            model, "selected_secondary_classification_string", unique_secondary_types
-        )
-        app.gui.setvar(
-            model, "selected_primary_classification_value", unique_primary_types
-        )
-        app.gui.setvar(
-            model, "selected_secondary_classification_value", unique_secondary_types
-        )
-
         app.gui.setvar(model, "show_asset_locations", True)
 
         list_types = list(gdf["Secondary Object Type"].unique())
         list_types.sort()
         df = pd.DataFrame(data={"Secondary Object Type": list_types, "Assigned: Structure": "", "Assigned: Content": ""})
-        ## TODO: add the nr of stories and the basement
-
+        ## TODO: add the nr of stories and the basement?
         app.gui.setvar(model, "exposure_categories_to_link", df)
 
         # Set the checkboxes checked
@@ -146,7 +133,7 @@ def build_nsi_exposure(*args):
         # Set the sources
         app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
         app.gui.setvar(model, "source_classification", "National Structure Inventory")
-        app.gui.setvar(model, "source_finished_floor_elevation", "National Structure Inventory")
+        app.gui.setvar(model, "source_finished_floor_height", "National Structure Inventory")
         app.gui.setvar(model, "source_max_potential_damage", "National Structure Inventory")
         app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
 

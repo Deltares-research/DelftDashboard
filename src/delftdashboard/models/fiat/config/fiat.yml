@@ -18,3 +18,6 @@ element:
     module: models.fiat.svi
   - string: Create Model
     element: create_model.yml
+  - string: View Model
+    element: create_model_view_model.yml
+    module: models.fiat.create_model_view_model

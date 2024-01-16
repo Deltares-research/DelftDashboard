@@ -46,7 +46,7 @@ element:
       y: 90
       width: 25
       height: 18
-    text: "Threshold value"
+    text: "Threshold value (ft)"
     variable: road_damage_threshold
   - style: text
     position:

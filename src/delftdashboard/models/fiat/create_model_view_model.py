@@ -5,7 +5,9 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 import geopandas as gpd
+import os
 from pathlib import Path
+import pandas as pd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -25,7 +27,8 @@ def display_properties(*args):
     properties_to_display = app.gui.getvar("fiat", "properties_to_display")
     if properties_to_display == "Classification":
         app.map.layer["buildings"].clear()
-        app.model[model].show_classification()
+        app.gui.setvar("fiat", "classification_display_string", ["Primary", "Secondary"])
+        app.gui.setvar("fiat", "classification_display_value", ["Primary", "Secondary"])
     elif properties_to_display == "Finished floor height":
         app.map.layer["buildings"].clear()
         app.model[model].show_asset_height()
@@ -40,13 +43,20 @@ def display_properties(*args):
         app.map.layer["buildings"].clear()
         app.model[model].show_svi()
 
+def display_classification(*args):
+    app.map.layer["buildings"].clear()
+    if app.gui.getvar("fiat", "classification_display_name") == "Primary":
+        app.active_model.show_classification(type="primary")
+    else:
+        app.active_model.show_classification(type="secondary")
+
 def display_damage(*args):
     app.map.layer["buildings"].clear()
     if app.gui.getvar("fiat", "max_potential_damage_name") == "Structure":
         app.active_model.show_max_potential_damage_struct()
     else:
         app.active_model.show_max_potential_damage_cont()
-    
+
 def display_roads(*args):
     """Show/hide roads layer""" 
     app.gui.setvar("fiat", "show_roads", args[0])
@@ -102,3 +112,33 @@ def display_asset_locations(*args):
         app.active_model.show_exposure_buildings()
     else:
         app.active_model.hide_exposure_buildings()
+
+def open_exposure_results(*args):
+    #TODO: Take file from output folder. If is empty open error window, else continue with below.
+    model_fn = app.gui.getvar("fiat", "scenario_folder")
+    exposure_data_fn = Path(os.path.abspath("")) / model_fn / "exposure" / "exposure.csv"
+    if exposure_data_fn.exists():
+        exposure_data = gpd.read_file(exposure_data_fn)
+        app.gui.setvar("fiat", "view_exposure_value", exposure_data)
+        app.active_model.view_exposure()
+    else:
+        app.gui.window.dialog_info(
+                text="Your model is empty. Please create model first.",
+                title="Empty model"
+                )
+
+def open_svi_results(*args):
+    model_fn = app.gui.getvar("fiat", "scenario_folder")
+    svi_data_fn = Path(os.path.abspath("")) / model_fn / "exposure" / "SVI"/ "social_vulnerability_scores.csv"
+    if svi_data_fn.exists():
+        svi_data = pd.read_csv(svi_data_fn)
+        app.gui.setvar("fiat", "view_svi_value", svi_data)
+        app.active_model.view_svi()
+    else:
+        app.gui.window.dialog_info(
+                text="Your model is empty. Please create model first.",
+                title="Empty model"
+                )
+
+def open_equity_results(*args):
+    print("open equity csv in tableview in extra window")

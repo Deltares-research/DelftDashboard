@@ -21,6 +21,8 @@ class Model(GenericModel):
         self.damage_function_database = pd.DataFrame()
         self.occupancy_to_description = dict()
         self.description_to_occupancy = dict()
+        self.default_dict_categories = dict()
+        self.updated_dict_categories = dict()
         self.aggregation = gpd.GeoDataFrame()
 
         print("Model " + self.name + " added!")
@@ -29,7 +31,7 @@ class Model(GenericModel):
 
         # Set GUI variables
         self.set_gui_variables()
-
+    
     def add_layers(self):
         # Add main DDB layer
         layer = app.map.add_layer("buildings")
@@ -69,6 +71,7 @@ class Model(GenericModel):
             hover_property="Max Potential Damage: Structure",
             big_data=True,
             min_zoom=12,
+            unit = "$"
         )
 
         layer.add_layer(
@@ -81,6 +84,7 @@ class Model(GenericModel):
             hover_property="Max Potential Damage: Content",
             big_data=True,
             min_zoom=12,
+            unit = "$"
         )
         layer.add_layer(
             "ground_elevation",
@@ -152,16 +156,38 @@ class Model(GenericModel):
 
         group = "fiat"
         
-        ## TO BE DESCRIBED ##
+        ## Damage curve tables ##
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         app.gui.setvar(group, "damage_curves_table", default_curves[["Exposure Link", "Damage Type", "Source", "Description"]])
         app.gui.setvar(group, "selected_damage_curve_database", "default_vulnerability_curves")
         app.gui.setvar(group, "selected_damage_curve_linking_table", "default_hazus_iwr_linking")
 
+        damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
+        damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
+        self.damage_function_database = damage_functions_database_info
+        default_curves_table = default_curves[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
+        default_curves_table.sort_values("Occupancy", inplace=True, ignore_index=True)
+
+        app.gui.setvar(group, "damage_curves_standard_info_static", default_curves_table)
+        app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
+
+        default_occupancy_df = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
+        default_occupancy_df.sort_values("Occupancy Class", inplace=True, ignore_index=True)
+        default_occupancy_df.fillna("", inplace=True)
+        app.gui.setvar(group, "hazus_iwr_occupancy_classes", default_occupancy_df)
+
+        cols = ["-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
+        app.gui.setvar(group, "damage_curves_standard_curves", damage_functions_database[["ID", "Description"] + cols])
+        app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
+
+        ## Standardizing of occupancy categories ##
+        self.default_dict_categories = {x: x for x in list(default_curves["Occupancy"])}
+        self.updated_dict_categories = self.default_dict_categories
+
         # Source names #
         app.gui.setvar(group, "source_asset_locations", "")
         app.gui.setvar(group, "source_classification", "")
-        app.gui.setvar(group, "source_finished_floor_elevation", "")
+        app.gui.setvar(group, "source_finished_floor_height", "")
         app.gui.setvar(group, "source_max_potential_damage", "")
         app.gui.setvar(group, "source_ground_elevation", "")
 
@@ -178,22 +204,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "include_all", False)
 
         ## DISPLAY LAYERS ##
-        damage_functions_database = app.data_catalog.get_dataframe("default_vulnerability_curves")
-        damage_functions_database_info = damage_functions_database[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
-        self.damage_function_database = damage_functions_database_info
-        default_curves_table = default_curves[["Occupancy", "Source", "Description", "Damage Type", "ID"]]
-        default_curves_table.sort_values("Occupancy", inplace=True)
-
-        app.gui.setvar(group, "damage_curves_standard_info_static", default_curves_table)
-        app.gui.setvar(group, "damage_curves_standard_info", damage_functions_database_info)
-
-        default_occupancy_df = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
-        app.gui.setvar(group, "hazus_iwr_occupancy_classes", default_occupancy_df)
-
-        cols = ["-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
-        app.gui.setvar(group, "damage_curves_standard_curves", damage_functions_database[["ID", "Description"] + cols])
-        app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
-
         app.gui.setvar(group, "properties_to_display", "Classification")
         app.gui.setvar(group, "show_asset_locations", False)
         app.gui.setvar(group, "show_classification", False)
@@ -213,14 +223,14 @@ class Model(GenericModel):
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
         ## STANDARDIZING EXPOSURE CATEGORIES ##
-        df = pd.DataFrame(columns=["Primary Object Type", "Secondary Object Type", "Assigned"])
+        df = pd.DataFrame(columns=["Primary Object Type", "Assigned"])
         app.gui.setvar(group, "exposure_categories_to_standardize", df)
         app.gui.setvar(group, "active_exposure_category_standardize", [0])
+        app.gui.setvar(group, "active_related_occupancy_type", [0])
 
         ## HAZUS IWR OCCUPANCY CLASSES ##
-        occupancy_types = app.data_catalog.get_dataframe("hazus_iwr_occupancy_classes")
-        self.occupancy_to_description = occupancy_types.set_index("Occupancy Class").to_dict(orient="index")
-        self.description_to_occupancy = occupancy_types.set_index("Class Description").to_dict(orient="index")
+        self.occupancy_to_description = default_occupancy_df.set_index("Occupancy Class").to_dict(orient="index")
+        self.description_to_occupancy = default_occupancy_df.set_index("Class Description").to_dict(orient="index")
 
         app.gui.setvar(group, "dmg_functions_html_filepath", "")
         
@@ -244,12 +254,16 @@ class Model(GenericModel):
         app.gui.setvar(group, "asset_location_file", "*asset location file path*")
         app.gui.setvar(group, "control_enable", 0)
         app.gui.setvar(group, "area_classification", None)
+        app.gui.setvar(group, "classification_display_name", "")
+        app.gui.setvar(group, "classification_display_string", [])
+        app.gui.setvar(group, "classification_display_value", [])
         app.gui.setvar(group, "classification_source", "nsi_data")
         app.gui.setvar(
             group,
             "classification_source_string",
             ["National Structure Inventory (NSI)", "Upload data"],
         )
+        app.gui.setvar(group, "view_tab_unit","")
         app.gui.setvar(group, "classification_source_value", ["nsi_data", "upload_data"])
         app.gui.setvar(group, "classification_source_path", "")
         app.gui.setvar(
@@ -447,8 +461,12 @@ class Model(GenericModel):
         app.gui.setvar(group, "max_potential_damage_name", "")
         app.gui.setvar(group, "max_potential_damage_string",[])
         app.gui.setvar(group, "max_potential_damage_value",[])
-        
-        
+        app.gui.setvar(group,"view_svi_value", pd.DataFrame)
+        app.gui.setvar(group,"view_exposure_value", pd.DataFrame(columns=["Object ID", "Object Name", "Primary Object Type", "Secondary Object Type", "Max Potential Damage: Structure","Max Potential Damage: Content","Ground Floor Height","Ground Elevation","Extraction Method", "Damage Function: Structure", "Damage Function: Content", "lanes", "Segment Length [m]", "SVI_key_domain", "SVI"]))
+    
+    @staticmethod
+    def set_dict_inverted(dictionary):
+        return {value: key for key, value in dictionary.items()}
 
     def set_input_variables(self):
         # Update all model input variables
@@ -483,9 +501,14 @@ class Model(GenericModel):
                 fname,
             )
             self.domain.read()
+
+            # TODO: read in the variables of the FIAT model
+            # to the GUI
             self.set_gui_variables()
+
             # Change working directory
             os.chdir(fname)
+            
             # Change CRS
             app.crs = self.domain.crs
             self.plot()
@@ -502,7 +525,8 @@ class Model(GenericModel):
 
     def get_filtered_damage_function_database(self, filter: str, col: str="Occupancy"):
         df = copy.deepcopy(self.damage_function_database)
-        return df.loc[df[col].str.startswith(filter)]
+        filter_occtype = self.updated_dict_categories[filter]
+        return df.loc[df[col].str.startswith(filter_occtype)]
 
     @staticmethod
     def generate_random_colors(n):
@@ -707,6 +731,7 @@ class Model(GenericModel):
             paint_properties = self.get_nsi_paint_properties(type=type)
             legend = []
             app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
             app.map.layer["buildings"].layer["asset_height"].set_data(
                 self.buildings, legend
             )
@@ -719,7 +744,7 @@ class Model(GenericModel):
             legend = []
             app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
-                self.buildings, legend
+                self.buildings,  legend
             )
             self.show_max_potential_damage_structure()
     
@@ -730,7 +755,7 @@ class Model(GenericModel):
             legend = []
             app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"]   
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
-                self.buildings, legend
+                self.buildings, legend, 
             )
             self.show_max_potential_damage_content()
     
@@ -740,6 +765,7 @@ class Model(GenericModel):
             paint_properties = self.get_nsi_paint_properties(type=type)
             legend = []
             app.map.layer["buildings"].layer["ground_elevation"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["ground_elevation"].unit = app.gui.getvar("fiat", "view_tab_unit")
             app.map.layer["buildings"].layer["ground_elevation"].set_data(
                 self.buildings, legend
             )
@@ -802,7 +828,7 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, data=None, id="specify_damage_curves")
         if not okay:
             return
-
+    
     def classification_standarize(self):
         # get window config yaml path
         pop_win_config_path = str(
@@ -850,3 +876,68 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, data=None)
         if not okay:
             return
+        
+    def view_exposure(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "view_tab_exposure_table.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            return
+    
+    def view_svi(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "view_tab_svi_table.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            return
+    
+    def view_equity(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.names
+            / "config"
+            / "view_tab_equity_table.yml"
+        )
+        # Create pop-up and only continue if user presses ok
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            return
+        
+    def set_object_types(self, unique_primary_types, unique_secondary_types):
+        model = 'fiat'
+        unique_primary_types.sort()
+        unique_secondary_types.sort()
+        app.gui.setvar(
+            model, "selected_primary_classification_string", unique_primary_types
+        )
+        app.gui.setvar(
+            model, "selected_secondary_classification_string", unique_secondary_types
+        )
+        app.gui.setvar(
+            model, "selected_primary_classification_value", unique_primary_types
+        )
+        app.gui.setvar(
+            model, "selected_secondary_classification_value", unique_secondary_types
+        )

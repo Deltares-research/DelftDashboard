@@ -12,7 +12,7 @@ element:
   position:
     x: 15
     y: 285
-    width: 250
+    width: 300
     height: 20
   text: "<b>Table</b>: Exposure categories to standardize"
 - style: tableview
@@ -41,15 +41,9 @@ element:
     width: 353
     height: 225
   tooltip: Standard IWR classifications
-  selection_type: extended
+  selection_type: single
+  variable: active_related_occupancy_type
+  method: assign_occupancy_type
   sortable: true
   option_value:
     variable: hazus_iwr_occupancy_classes
-- style: pushbutton
-  position:
-    x: 367
-    y: 35
-    width: 100
-    height: 20
-  text: Select occupancy type
-  method: select_occupancy_type
