@@ -47,17 +47,23 @@ def remove_datasource(*args):
     app.gui.setvar("fiat", "loaded_ground_elevation_files_value", current_list_value)
 
 
-def adjust_ground_elevation_settings(*args):
-    print("Adjust settings")
-
-
 def add_to_model(*args):
-    print("Add to model")
+    model = "fiat"
+
+    # Get the source
+    idx = app.gui.getvar(model, "loaded_ground_elevation_files")
+    current_list_string = app.gui.getvar(model, "loaded_ground_elevation_files_string")
+    current_list_value = app.gui.getvar(model, "loaded_ground_elevation_files_value")
+    name_ground_elevation_source = current_list_string[idx]
+    path_ground_elevation_source = str(current_list_value[idx])
 
     # Set the source
-    idx = app.gui.getvar("fiat", "loaded_ground_elevation_files")
-    current_list_string = app.gui.getvar("fiat", "loaded_ground_elevation_files_string")
-    app.gui.setvar("fiat", "source_ground_elevation", current_list_string[idx])
+    app.gui.setvar(model, "source_ground_elevation", name_ground_elevation_source)
+
+    # Set the settings in HydroMT-FIAT
+    app.active_model.domain.exposure_vm.set_ground_elevation(
+        source=path_ground_elevation_source
+    )
 
     app.gui.window.dialog_info(
         text="Ground elevation data was added to your model",

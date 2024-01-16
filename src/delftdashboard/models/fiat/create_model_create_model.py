@@ -14,13 +14,34 @@ def select(*args):
     map.update()
 
 def create_model(*args):
+    if app.active_model.domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+        return
+    
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
-    buildings, roads = app.active_model.domain.run_hydromt_fiat()
+
+    try:
+        buildings, roads = app.active_model.domain.run_hydromt_fiat()
+    except Exception as e:
+        app.gui.window.dialog_warning(
+            str(e),
+            "Not ready to build a FIAT model",
+        )
+        dlg.close()
+        return
+
     if buildings is not None:
         app.active_model.buildings = buildings
     if roads is not None:
         app.active_model.roads = roads
     
+    # Set the unit for Exposure Data for visualization
+    view_tab_unit = app.active_model.domain.fiat_model.exposure.unit
+    app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
+
     dlg.close()
     app.gui.window.dialog_info(
             f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",

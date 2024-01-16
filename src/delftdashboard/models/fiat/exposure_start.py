@@ -1,6 +1,8 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+import pandas as pd
+
 
 def select(*args):
     # De-activate existing layers
@@ -99,7 +101,7 @@ def build_nsi_exposure(*args):
             gdf,
             unique_primary_types,
             unique_secondary_types,
-        ) = app.active_model.domain.exposure_vm.set_asset_locations_source(
+        ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
             source="NSI", ground_floor_height="NSI", crs=crs
         )
         gdf.set_crs(crs, inplace=True)
@@ -139,11 +141,12 @@ def build_nsi_exposure(*args):
         app.gui.setvar(checkbox_group, "checkbox_classification", True)
         app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
         app.gui.setvar(checkbox_group, "checkbox_elevation", True)
+        app.gui.setvar(checkbox_group, "checkbox_finished_floor_height", True)
 
         # Set the sources
         app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
         app.gui.setvar(model, "source_classification", "National Structure Inventory")
-        app.gui.setvar(model, "source_finished_floor_elevation", "National Structure Inventory")
+        app.gui.setvar(model, "source_finished_floor_height", "National Structure Inventory")
         app.gui.setvar(model, "source_max_potential_damage", "National Structure Inventory")
         app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
 
