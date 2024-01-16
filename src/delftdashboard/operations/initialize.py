@@ -72,6 +72,10 @@ def initialize():
     # # Show splash screen
     # self.show_splash()
 
+    # Check if overlays folder exists in server
+    if not os.path.exists(os.path.join(app.server_path,"overlays")):
+        os.mkdir(os.path.join(app.server_path,"overlays"))
+
     # Define some other variables
     app.crs = CRS(4326)
     app.auto_update_topography = True
