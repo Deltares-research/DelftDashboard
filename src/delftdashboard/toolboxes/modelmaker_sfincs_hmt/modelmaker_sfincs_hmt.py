@@ -578,7 +578,6 @@ class Toolbox(GenericToolbox):
             "z_minimum": app.gui.getvar(group, "z_minimum"),
             "write_dep_tif": app.gui.getvar(group, "write_dep_tif"),
             "write_man_tif": app.gui.getvar(group, "write_man_tif"),
-            "extrapolate_values": app.gui.getvar(group, "extrapolate_values"),
         }
 
         model.setup_subgrid(**setup_subgrid)
