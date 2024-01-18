@@ -36,10 +36,11 @@ def delete_include_polygon(*args):
     update()
 
 def load_include_polygon(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select include polygon file ...", filter="*.geojson")
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select include polygon file ...", filter="*.geojson")
+    okay = True
     if not okay:
         return
-    app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_file", fname[2])
+    app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_file", name)
     app.toolbox["modelmaker_sfincs_cht"].read_include_polygon()
     app.toolbox["modelmaker_sfincs_cht"].plot_include_polygon()
     update()
