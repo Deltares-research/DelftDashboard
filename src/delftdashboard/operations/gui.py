@@ -6,7 +6,6 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 import os
-import importlib
 
 from delftdashboard.app import app
 from cht.bathymetry.bathymetry_database import bathymetry_database
@@ -182,6 +181,7 @@ def build_gui_config():
                 if app.data_catalog[key].meta["category"] == "topography":
                     # retrieve source name
                     source = app.data_catalog[key].meta["source"]
+
                     dependency = [
                         {
                             "action": "check",
@@ -194,9 +194,10 @@ def build_gui_config():
                                 }
                             ],
                         }
+
                     ]
-                    source_menu["menu"].append(
-                        {
+
+                    dataset =  {
                             "id": "topography." + key,
                             "variable_group": "menu",
                             "text": key,
@@ -206,41 +207,18 @@ def build_gui_config():
                             "method": "select_dataset",
                             "dependency": dependency,
                         }
-                    )
-        menu["menu"].append(source_menu)
-
-
                     
-
-
-        # source_menu = {}
-        # source_menu["text"] = "hydromt"
-        # source_menu["menu"] = []
-        # for key in app.data_catalog.keys:
-        #     if app.data_catalog[key].driver == "raster":
-        #         if app.data_catalog[key].meta["category"] == "topography":
-        #             dependency = [
-        #                 {   
-        #                     "action": "check",
-        #                     "checkfor": "all",
-        #                     "check": [{ "variable": "active_topography_name",
-        #                                 "operator": "eq",
-        #                                 "value": key}],
-        #                 }
-        #             ]
-        #             source_menu["menu"].append(
-        #                 {
-        #                     "id": "topography." + key,
-        #                     "variable_group": "menu",
-        #                     "text": key,
-        #                     "separator": False,
-        #                     "checkable": True,
-        #                     "option": key,
-        #                     "method": "select_dataset",
-        #                     "dependency": dependency,
-        #                 }
-        #             )
-        # menu["menu"].append(source_menu)
+                    # if source is not in menu, add it
+                    index = next((i for i, d in enumerate(menu["menu"]) if d["text"] == source), None)
+                    if index is None:
+                        source_menu = {}
+                        source_menu["text"] = source
+                        source_menu["menu"] = []
+                        source_menu["menu"].append(dataset)
+                        menu["menu"].append(source_menu)
+                    else:
+                        # get the index of the source in the menu
+                        menu["menu"][index]["menu"].append(dataset)
 
     app.gui.config["menu"].append(menu)
 
