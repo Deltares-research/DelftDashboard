@@ -1,0 +1,113 @@
+element:
+- style: panel
+  title: Meteo Forcing
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: popupmenu
+    position:
+      x: 50
+      y: 125
+      width: 150
+      height: 20
+    text: File Type
+    variable: wind_type
+    option_string:
+    - Uniform
+    - Spider web
+    - Regular Grid
+    - Regular Grid + Spider web
+    option_value:
+    - uniform
+    - spiderweb
+    - rectangular
+    - rectangular_and_spiderweb
+  - style: pushselectfile
+    position:
+      x: 50
+      y: 95
+      width: 150
+      height: 20
+    text: Wind File
+    variable: wndfile
+    showfilename: True
+    filter: "Wind file (*.wnd)"
+    title: Select wind file
+    tooltipstring: Select wind file
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: wind_type
+        operator: eq
+        value: uniform
+  - style: pushselectfile
+    position:
+      x: 50
+      y: 70
+      width: 150
+      height: 20
+    text: Spiderweb File
+    variable: spwfile
+    showfilename: True
+    filter: "Spiderweb file (*.spw)"
+    title: Select spiderweb file
+    tooltipstring: Select spiderweb file
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: wind_type
+        operator: eq
+        value: rectangular_and_spiderweb
+      - variable: wind_type
+        operator: eq
+        value: spiderweb
+  - style: pushselectfile
+    position:
+      x: 50
+      y: 45
+      width: 150
+      height: 20
+    text: AMU File
+    variable: amufile
+    showfilename: True
+    extension: "*.amu"
+    title: Select AMU file
+    tooltipstring: Select AMU file
+    filter: "AMU file (*.amu)"
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: wind_type
+        operator: eq
+        value: rectangular
+      - variable: wind_type
+        operator: eq
+        value: rectangular_and_spiderweb
+  - style: pushselectfile
+    position:
+      x: 50
+      y: 20
+      width: 150
+      height: 20
+    text: AMV File
+    variable: amvfile
+    showfilename: True
+    filter: "AMV file (*.amv)"
+    title: Select AMV file
+    tooltipstring: Select AMV file
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: wind_type
+        operator: eq
+        value: rectangular
+      - variable: wind_type
+        operator: eq
+        value: rectangular_and_spiderweb

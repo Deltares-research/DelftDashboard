@@ -1,0 +1,77 @@
+element:
+- style: panel
+  title: Spectral Domain
+  position:
+    x: 10
+    y: 10
+    width: 140
+    height: 160
+  element:
+  - style: edit
+    position:
+      x: 80
+      y: 130
+      width: 50
+      height: 20
+    text: Freq Min (Hz)
+    variable: freqmin
+    method: set_model_variables
+    tooltipstring: Edit lowest frequency (Hz)
+  - style: edit
+    position:
+      x: 80
+      y: 105
+      width: 50
+      height: 20
+    text: Freq Max (Hz)
+    variable: freqmax
+    method: set_model_variables
+    tooltipstring: Edit highest frequency (Hz)
+  - style: edit
+    position:
+      x: 80
+      y: 80
+      width: 50
+      height: 20
+    text: Frequency Bins
+    variable: nsigma
+    method: set_model_variables
+    tooltipstring: Edit number of frequency bins
+  - style: edit
+    position:
+      x: 80
+      y: 55
+      width: 50
+      height: 20
+    text: Directional Bins
+    variable: ntheta
+    method: set_model_variables
+    tooltipstring: Edit number of frequency bins
+- style: panel
+  title: Limiters
+  position:
+    x: 160
+    y: 10
+    width:  120
+    height: 160
+  element:
+  - style: edit
+    position:
+      x: 60
+      y: 130
+      width: 50
+      height: 20
+    text: Dmx1 (-)
+    variable: dmx1
+    method: set_model_variables
+    tooltipstring: Edit DMX1
+  - style: edit
+    position:
+      x: 60
+      y: 105
+      width: 50
+      height: 20
+    text: Dmx2 (-)
+    variable: dmx2
+    method: set_model_variables
+    tooltipstring: Edit DMX1

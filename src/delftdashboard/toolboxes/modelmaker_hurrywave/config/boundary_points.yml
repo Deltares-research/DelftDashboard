@@ -1,0 +1,20 @@
+element:
+- style: pushbutton
+  text: Create Boundary Points
+  position:
+    x: 10
+    y: 100
+    width: 110
+    height: 20
+  method: create_boundary_points
+- style: edit
+  text: Distance (m)
+  text_position: right  
+  position:
+    x: 130
+    y: 100
+    width: 50
+    height: 20
+  variable: boundary_dx  
+  
+

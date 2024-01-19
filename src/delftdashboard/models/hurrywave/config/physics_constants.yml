@@ -1,0 +1,19 @@
+element:
+- style: edit
+  position:
+    x: 110
+    y: 110
+    width: 50
+    height: 20
+  text: Air Density (kg/m3)
+  variable: rhoa
+  method: set_model_variables
+- style: edit
+  position:
+    x: 110
+    y: 85
+    width: 50
+    height: 20
+  text: Water Density (kg/m3)
+  variable: rhow
+  method: set_model_variables

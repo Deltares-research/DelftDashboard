@@ -1,0 +1,24 @@
+element:
+- style: tabpanel
+  id: modelmaker_hurrywave
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Domain
+    module: toolboxes.modelmaker_hurrywave.domain
+    element: domain.yml    
+  - string: Bathymetry
+    module: toolboxes.modelmaker_hurrywave.bathymetry
+    element: bathymetry.yml
+  - string: Mask Active Cells
+    module: toolboxes.modelmaker_hurrywave.mask_active_cells
+    element: mask_active_cells.yml
+  - string: Mask Boundary Cells
+    module: toolboxes.modelmaker_hurrywave.mask_boundary_cells
+    element: mask_boundary_cells.yml
+  - string: Boundary Points
+    module: toolboxes.modelmaker_hurrywave.boundary_points
+    element: boundary_points.yml

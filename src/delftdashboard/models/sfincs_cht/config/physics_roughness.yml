@@ -1,0 +1,136 @@
+element:
+- style: text
+  position:
+    x: 20
+    y: 110
+    width: 200
+    height: 20
+  text: Roughness is defined in the sub-grid tables
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: bathymetry_type
+      operator: eq
+      value: subgrid
+- style: popupmenu
+  position:
+    x: 80
+    y: 110
+    width: 150
+    height: 20
+  text: Roughness Type
+  variable: roughness_type
+  method: set_model_variables
+  option_string:
+  - Uniform
+  - Land-sea interface
+  - File
+  option_value:
+  - uniform
+  - landsea
+  - file
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: bathymetry_type
+      operator: eq
+      value: regular
+- style: edit
+  position:
+    x: 80
+    y: 85
+    width: 50
+    height: 20
+  text: Manning
+  variable: manning
+  method: set_model_variables
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: roughness_type
+      operator: eq
+      value: uniform
+    - variable: bathymetry_type
+      operator: eq
+      value: regular
+- style: edit
+  position:
+    x: 80
+    y: 85
+    width: 50
+    height: 20
+  text: Manning (land)
+  variable: manning_land
+  method: set_model_variables
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: roughness_type
+      operator: eq
+      value: landsea
+    - variable: bathymetry_type
+      operator: eq
+      value: regular
+- style: edit
+  position:
+    x: 80
+    y: 60
+    width: 50
+    height: 20
+  text: Manning (sea)
+  variable: manning_sea
+  method: set_model_variables
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: roughness_type
+      operator: eq
+      value: landsea
+    - variable: bathymetry_type
+      operator: eq
+      value: regular
+- style: edit
+  position:
+    x: 80
+    y: 35
+    width: 50
+    height: 20
+  text: Land level (m)
+  variable: rgh_lev_land
+  method: set_model_variables
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: roughness_type
+      operator: eq
+      value: landsea
+    - variable: bathymetry_type
+      operator: eq
+      value: regular
+- style: pushselectfile
+  position:
+    x: 10
+    y: 85
+    width: 80
+    height: 20
+  tooltipstring: Select Manning file
+  text: Manning File
+  variable: manningfile
+  extension: '*.rgh'
+  selectiontext: Select Manning file
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: roughness_type
+      operator: eq
+      value: file
+    - variable: bathymetry_type
+      operator: eq
+      value: regular
