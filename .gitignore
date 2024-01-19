@@ -14,3 +14,4 @@ hydromt.log
 temp_database
 fiat_database
 cache
+src/delftdashboard/config/delftdashboard.ini
