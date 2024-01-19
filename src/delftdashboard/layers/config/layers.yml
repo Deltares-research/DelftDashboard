@@ -1,0 +1,49 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 140
+  variable_group: layers  
+  element:
+  - style: pushbutton
+    position:
+      x: 100
+      y: 110
+      width: 130
+      height: 20
+    text: Push Me
+    method: push
+  - style: edit
+    position:
+      x: 100
+      y: 85
+      width: 130
+      height: 20
+    text: Contour (m)
+    variable: contour_elevation
+  - style: edit
+    position:
+      x: 100
+      y: 60
+      width: 130
+      height: 20
+    text: Landward Buffer
+    variable: buffer_land
+  - style: edit
+    position:
+      x: 100
+      y: 35
+      width: 130
+      height: 20
+    text: Seaward Buffer
+    variable: buffer_sea
+  - style: checkbox
+    position:
+      x: 100
+      y: 10
+      width: 130
+      height: 20
+    text: Single
+    variable: buffer_single

@@ -255,6 +255,11 @@ class Model(GenericModel):
         group = "sfincs_cht"
         for var_name in vars(self.domain.input.variables):
             setattr(self.domain.input.variables, var_name, app.gui.getvar(group, var_name))
+        if self.domain.input.variables.snapwave:
+            app.gui.setvar("modelmaker_sfincs_cht", "use_snapwave", True)
+        else:
+            app.gui.setvar("modelmaker_sfincs_cht", "use_snapwave", False)
+
 
     def initialize_domain(self):
         self.domain = SFINCS(crs=app.crs)

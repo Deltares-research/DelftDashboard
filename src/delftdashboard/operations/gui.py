@@ -48,12 +48,18 @@ def build_gui_config():
     app.gui.config["toolbar"] = []
     app.gui.config["element"] = []
 
+    # Layer tab
+    # Read elements
+    path = os.path.join(app.main_path, "layers", "config")
+    file_name = "layers.yml"
+    layer_tab_element = app.gui.read_gui_elements(path, file_name)
+
     # Add tab panels for models
     for model_name in app.model:
         # First insert tabs for Layers and Toolbox
         tab_panel = app.model[model_name].element
-        # tab_panel["tab"].insert(0, {"string": "Layers", "element": [], "module": ""}) #COMMENTED OUT BY LUIS TO REMOVE LAYERS TAB
-        tab_panel["tab"].insert(0, {"string": "Toolbox", "element": [], "module": ""})
+        tab_panel["tab"].insert(0, {'string': 'Layers', 'element': layer_tab_element, "module": "delftdashboard.layers.layers"})
+        tab_panel["tab"].insert(0, {'string': 'Toolbox', 'element': [], "module": ""})
         app.gui.config["element"].append(app.model[model_name].element)
 
     # Now add MapBox element

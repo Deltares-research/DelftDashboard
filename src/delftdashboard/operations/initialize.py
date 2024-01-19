@@ -36,9 +36,7 @@ def initialize():
     app.config["model"] = []
     app.config["toolbox"] = []
     app.config["window_icon"] = os.path.join(app.config_path, "images", "deltares.ico")
-    app.config["splash_file"] = os.path.join(
-        app.config_path, "images", "FloodAdaptModelBuilders.png"
-    )
+    app.config["splash_file"]   = os.path.join(app.config_path, "images", "DelftDashBoard.jpg")
     app.config["bathymetry_database"] = None
     app.config["data_libs"] = None
     app.config["working_directory"] = os.getcwd()
@@ -47,6 +45,9 @@ def initialize():
     inifile = open(os.path.join(app.config_path, "delftdashboard.ini"), "r")
     config = yaml.load(inifile, Loader=yaml.FullLoader)
     for key in config:
+        # for window_icon and splash_file, convert to absolute path
+        if key in ["window_icon", "splash_file"]:
+            config[key] = os.path.join(app.config_path, "images", config[key])
         app.config[key] = config[key]
     inifile.close()
 
@@ -125,6 +126,12 @@ def initialize():
     app.gui.setvar("menu", "show_topography", True)
     app.gui.setvar("menu", "show_terrain", False)
     app.gui.setvar("menu", "layer_style", app.view["layer_style"])
+
+    # Layers tab
+    app.gui.setvar("layers", "contour_elevation", 0.0)
+    app.gui.setvar("layers", "buffer_land", 5000.0)
+    app.gui.setvar("layers", "buffer_sea", 2000.0)
+    app.gui.setvar("layers", "buffer_single", True)
 
     # Now build up GUI config
     build_gui_config()

@@ -70,6 +70,7 @@ class Toolbox(GenericToolbox):
         if mode == "invisible":
             # Make all layers invisible
             app.map.layer["observation_stations"].hide()
+            app.map.layer["observation_stations"].hide()
 
     def add_layers(self):
         # Add Mapbox layers
