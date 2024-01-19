@@ -8,6 +8,7 @@ Requires-Dist: geopandas>=0.8
 Requires-Dist: numpy
 Requires-Dist: pandas
 Requires-Dist: pyproj
+Requires-Dist: plotly
 Requires-Dist: rasterio
 Requires-Dist: shapely
 Requires-Dist: scipy
