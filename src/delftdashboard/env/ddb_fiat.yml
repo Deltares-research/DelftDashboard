@@ -18,6 +18,7 @@ dependencies:
   - hydromt
   - hydromt_sfincs
   - numpy
+  - openpyxl
   - pyproj
   - shapely
   - xarray
@@ -26,6 +27,6 @@ dependencies:
   - pip
   - pip:
     - NDBC
-    - git+https://github.com/Deltares/hydromt_fiat.git
+    - git+https://github.com/Deltares/hydromt_fiat.git@gui-updates
     - git+https://github.com/Deltares/Guitares.git@env_fix_custom_coloring_points
-    - git+https://github.com/Deltares/CoastalHazardsToolkit.git@mvo
+    - git+https://github.com/Deltares/CoastalHazardsToolkit.git
