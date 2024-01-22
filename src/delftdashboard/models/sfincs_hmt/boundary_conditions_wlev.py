@@ -1,5 +1,5 @@
-import shapely
-import pandas as pd
+import os
+import importlib
 import geopandas as gpd
 
 from delftdashboard.app import app
@@ -38,8 +38,24 @@ def generate_boundary_points_from_msk(*args):
 def add_boundary_point(gdf, merge=True):
     model = app.model["sfincs_hmt"].domain
 
-    # add to existing boundary conditions
-    model.set_forcing_1d(gdf_locs=gdf, name="bzs", merge=merge)
+    nr_bnd = 0
+    if "bzs" in model.forcing:
+        nr_bnd = len(model.forcing["bzs"].index)
+    try:
+        # add to existing boundary conditions
+        model.set_forcing_1d(gdf_locs=gdf, name="bzs", merge=merge)
+        nr_bnd_new = len(model.forcing["bzs"].index)
+        if nr_bnd_new > nr_bnd:
+            app.gui.window.dialog_info(
+                text="Added {} boundary points".format(nr_bnd_new - nr_bnd),
+                title="Success",
+            )
+    except ValueError as e:
+        app.gui.window.dialog_info(
+            text=e.message,
+            title="Error",
+        )
+        return
 
     # retrieve all boundary points as gdf from xarray
     gdf = model.forcing["bzs"].vector.to_gdf()
@@ -144,12 +160,31 @@ def update_list():
 
     
 def go_to_observation_stations(*args):
+    """Go to observation stations toolbox in popup window."""	
 
     toolbox_name = "observation_stations"
+    toolbox_path = os.path.join(app.main_path, "toolboxes", toolbox_name)
 
-    # switch to observation stations toolbox
-    app.active_toolbox = app.toolbox[toolbox_name]
-    app.active_toolbox.select()
+    # intitialize toolbox
+    module = importlib.import_module(
+        "delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name
+    )
 
-    #TODO back to observations model-tab
-    # app.active_toolbox.select_tab("observations")
+    # initialize toolboxes
+    toolbox = module.Toolbox(toolbox_name, )    
+
+    data = {}
+    # get map center
+    data["map_center"] = app.map.map_center
+    # get active model
+    data["active_model"] = app.active_model
+    # initialize toolbox
+    data["toolbox"] = toolbox
+    # set option
+    data["option"] = "bnd"
+
+    # Read GUI config file
+    pop_win_config_path  = os.path.join(toolbox_path,"config", "observation_stations_popup.yml")
+    okay, data = app.gui.popup(
+        pop_win_config_path, data=data, id="observation_stations"
+    )    

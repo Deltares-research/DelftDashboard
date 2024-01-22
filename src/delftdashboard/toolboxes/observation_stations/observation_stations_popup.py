@@ -1,5 +1,3 @@
-import geopandas as gpd
-
 from delftdashboard.app import app
 from delftdashboard.toolboxes.observation_stations import observation_stations
 
@@ -31,46 +29,6 @@ def map_ready(mpbox):
     data["toolbox"].add_layers()
     data["toolbox"].select_tab()
 
-    # Add main layer
-    # data["main_layer"] = mp.add_layer("observation_stations")
-
-    # # Add stations layer
-    # data["stations_layer"] = data["main_layer"].add_layer(
-    #     "stations",
-    #     type="circle_selector",
-    #     line_color="white",
-    #     line_color_selected="white",
-    #     select=select_station_from_map,
-    # )
-
-    # # Add model outline
-    # data["outline_layer"] = data["main_layer"].add_layer(
-    #         "model_outline",
-    #         type="draw",
-    #         shape="polygon",
-    #         polygon_line_color="grey",
-    #         polygon_fill_opacity=0.3,
-    #     )
-
-    # # Get settings
-    # opt = app.gui.getvar("observation_stations", "naming_option")
-    # index = app.gui.getvar("observation_stations", "active_station_index")
-
-    # # Set data
-    # mp.layer["observation_stations"].layer["stations"].hover_property = opt
-    # mp.layer["observation_stations"].layer["stations"].set_data(data["toolbox"].gdf, index)
-
-    # # Show layer
-    # mp.layer["observation_stations"].layer["stations"].activate()
-    # mp.layer["observation_stations"].layer["stations"].show()
-
-    # # Add model outline
-    # model = data["active_model"].domain
-    # if not model.region.empty:
-    #     mp.layer["observation_stations"].layer["model_outline"].set_data(model.region)
-    #     mp.layer["observation_stations"].layer["model_outline"].deactivate()
-    #     mp.layer["observation_stations"].layer["model_outline"].show()    
-
     # Update list
     app.gui.popup_window[id].update()
 
@@ -85,17 +43,6 @@ def map_moved(coords, mpbox):
         Map object.
     """
     pass
-
-
-# def select_station_from_map(feature, mpbox):
-#     id = "observation_stations"
-
-#     # Get data
-#     index = feature["properties"]["index"]
-#     app.gui.setvar("observation_stations", "active_station_index", index)
-
-#     # Update list
-#     app.gui.popup_window[id].update()
 
 def select_source(*args):
     id = "observation_stations"

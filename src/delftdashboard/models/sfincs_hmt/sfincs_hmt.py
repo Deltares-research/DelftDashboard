@@ -104,11 +104,15 @@ class Model(GenericModel):
             circle_radius_selected=4,
             line_color_selected="white",
             fill_color_selected="red",
+            hover_property="name",
         )
+
+        from .observation_points import select_observation_point_from_map
 
         layer.add_layer(
             "observation_points",
             type="circle_selector",
+            select=select_observation_point_from_map,
             line_color="white",
             line_opacity=1.0,
             fill_color="blue",
@@ -117,6 +121,7 @@ class Model(GenericModel):
             circle_radius_selected=4,
             line_color_selected="white",
             fill_color_selected="red",
+            hover_property="name",
         )
 
         layer.add_layer(
