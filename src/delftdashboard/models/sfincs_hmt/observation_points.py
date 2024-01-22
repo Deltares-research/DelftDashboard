@@ -10,6 +10,9 @@ from delftdashboard.operations import map
 def select(*args):
     map.update()
     app.map.layer["sfincs_hmt"].layer["observation_points"].set_mode("active")
+    app.map.layer["sfincs_hmt"].layer["mask_active"].set_mode("active")
+    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("active")
+    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode("active")    
     update()
 
 def edit(*args):
@@ -17,7 +20,25 @@ def edit(*args):
 
 def add_observation_point(gdf, merge=True):
     model = app.model["sfincs_hmt"].domain
-    model.setup_observation_points(locations = gdf, merge=merge)
+
+    nr_obs = 0
+    if "obs" in model.geoms:
+        nr_obs = len(model.geoms["obs"].index)
+
+    try:
+        model.setup_observation_points(locations = gdf, merge=merge)
+        nr_obs_new = len(model.geoms["obs"].index)
+        if nr_obs_new > nr_obs:
+            app.gui.window.dialog_info(
+                text="Added {} observation points".format(nr_obs_new - nr_obs),
+                title="Success",
+            )
+    except ValueError as e:
+        app.gui.window.dialog_info(
+            text=e.message,
+            title="Error",
+        )
+        return
 
     index = len(model.geoms["obs"]) - 1
     app.map.layer["sfincs_hmt"].layer["observation_points"].set_data(model.geoms["obs"], index)
@@ -131,15 +152,14 @@ def delete_all_points_from_list(*args):
 def update():
     # get observation points
     gdf = app.map.layer["sfincs_hmt"].layer["observation_points"].data
-    if gdf is None:
-        return
     
     names = []
-    for index, row in gdf.iterrows():
-        names.append(row["name"])
+    if gdf is not None:      
+        for index, row in gdf.iterrows():
+            names.append(row["name"])
 
     app.gui.setvar("sfincs_hmt", "observation_point_names", names)
-    app.gui.setvar("sfincs_hmt", "nr_observation_points", len(gdf.index))
+    app.gui.setvar("sfincs_hmt", "nr_observation_points", len(names))
     app.gui.window.update()
 
 def go_to_observation_stations(*args):

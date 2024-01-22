@@ -45,12 +45,6 @@ class Toolbox(GenericToolbox):
 
     def select_tab(self):
         map.update()
-        # app.map.layer["observation_stations"].layer["stations"].activate()
-        # app.map.layer["observation_stations"].layer["stations"].show()
-        # opt = app.gui.getvar("observation_stations", "naming_option")
-        # app.map.layer["observation_stations"].layer["stations"].hover_property = opt
-        # index = app.gui.getvar("observation_stations", "active_station_index")
-        # app.map.layer["observation_stations"].layer["stations"].set_data(self.gdf, index)
 
         # Get settings
         opt = app.gui.getvar("observation_stations", "naming_option")
@@ -80,7 +74,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "station_names", stnames)
         app.gui.setvar(group, "active_station_index", 0)
         self.map.layer["observation_stations"].layer["stations"].set_data(self.gdf, 0)
-        self.update()
+        # self.update()
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
@@ -97,7 +91,7 @@ class Toolbox(GenericToolbox):
                          type="circle_selector",
                          line_color="white",
                          line_color_selected="white",
-                         select=self.select_station_from_map
+                         select=self.select_station_from_map,
                         )
 
         # Add model outline
@@ -131,36 +125,42 @@ class Toolbox(GenericToolbox):
         # only keep stations within model extent
         gdf = gpd.sjoin(gdf, gdf_model, op='within')
 
-        # model_option_index =  app.gui.getvar("observation_stations", "model_options_index")
         app.active_model.add_stations(gdf, 
                                       naming_option=app.gui.getvar("observation_stations", "naming_option"),
                                       model_option=model_option)
         
     def select_naming_option(self):
-        self.update()
+        stnames = []
         opt = app.gui.getvar("observation_stations", "naming_option")
-        index = app.gui.getvar("observation_stations", "active_station_index")
+        for index, row in self.gdf.iterrows():
+            stnames.append(row[opt])
+        app.gui.setvar("observation_stations", "station_names", stnames)
+
+        # also change the map layer (including hover property)
         self.map.layer["observation_stations"].layer["stations"].hover_property = opt
+        index = app.gui.getvar("observation_stations", "active_station_index")
         self.map.layer["observation_stations"].layer["stations"].set_data(self.gdf,
                                                                          index)
-
+        self.update()
+        
 
     def select_station_from_map(self, *args):
-        index = args[0]["properties"]["index"]
+        index = args[0]["id"]
         app.gui.setvar("observation_stations", "active_station_index", index)
-        self.map.layer["observation_stations"].layer["stations"].select_by_index(index)
-        app.gui.window.update()
+
+        self.update()
 
     def select_station_from_list(self):
         index = app.gui.getvar("observation_stations", "active_station_index")
         self.map.layer["observation_stations"].layer["stations"].select_by_index(index)
 
     def update(self):
-        stnames = []
-        opt = app.gui.getvar("observation_stations", "naming_option")
-        for index, row in self.gdf.iterrows():
-            stnames.append(row[opt])
-        app.gui.setvar("observation_stations", "station_names", stnames)
+        # check if this is a popup window
+        if hasattr(app.gui, "popup_window"):
+            if "observation_stations" in app.gui.popup_window:
+                app.gui.popup_window["observation_stations"].update()
+        else:
+            app.gui.window.update()
 
 # 
 def select(*args):
