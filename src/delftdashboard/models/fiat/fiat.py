@@ -52,7 +52,7 @@ class Model(GenericModel):
         layer.add_layer(
             "primary_classification",
             type="circle",
-            circle_radius=3,
+            circle_radius=5,
             legend_position="top-right",
             legend_title="Buildings",
             fill_color="orange",
@@ -746,7 +746,10 @@ class Model(GenericModel):
         """Show exposure layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
+            color_items = paint_properties['circle-color'][2:-1]
+            color_items.append('other')
+            color_items.append(paint_properties['circle-color'][-1])
+            legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
             if type == "primary":
                 app.map.layer["buildings"].layer["primary_classification"].set_data(
                 self.buildings, paint_properties, legend
@@ -760,11 +763,14 @@ class Model(GenericModel):
     
     def show_asset_height(self,type="asset_height"):
             paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
+            color_items = paint_properties['circle-color'][2:-1]
+            color_items.append('other')
+            color_items.append(paint_properties['circle-color'][-1])
+            legend = [{'style': color_items[i], 'label': color_items[i+1]} for i in range(0, len(color_items), 2)]
             app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
             app.map.layer["buildings"].layer["asset_height"].set_data(
-                self.buildings, legend
+                self.buildings, paint_properties, legend
             )
             self.show_asset_heights()
 
@@ -772,10 +778,13 @@ class Model(GenericModel):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
+            color_items = paint_properties['circle-color'][2:-1]
+            color_items.append('other')
+            color_items.append(paint_properties['circle-color'][-1])
+            legend = [{'style': color_items[i], 'label': color_items[i+1]} for i in range(0, len(color_items), 2)]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
-                self.buildings,  legend
+                self.buildings, paint_properties, legend
             )
             self.show_max_potential_damage_structure()
     
@@ -783,10 +792,13 @@ class Model(GenericModel):
         """Show maximum potential damage: content layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
+            color_items = paint_properties['circle-color'][2:-1]
+            color_items.append('other')
+            color_items.append(paint_properties['circle-color'][-1])
+            legend = [{'style': color_items[i], 'label': color_items[i+1]} for i in range(0, len(color_items), 2)]
             app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"]   
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
-                self.buildings, legend, 
+                self.buildings, paint_properties, legend, 
             )
             self.show_max_potential_damage_content()
     
@@ -794,19 +806,25 @@ class Model(GenericModel):
         """Show ground elevation"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
+            color_items = paint_properties['circle-color'][2:-1]
+            color_items.append('other')
+            color_items.append(paint_properties['circle-color'][-1])
+            legend = [{'style': color_items[i], 'label': color_items[i+1]} for i in range(0, len(color_items), 2)]
             app.map.layer["buildings"].layer["ground_elevation"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["ground_elevation"].unit = app.gui.getvar("fiat", "view_tab_unit")
             app.map.layer["buildings"].layer["ground_elevation"].set_data(
-                self.buildings, legend
+                self.buildings, paint_properties, legend
             )
             self.show_ground_elevations()
     
     def show_svi(self, type = "SVI"):
         """Show SVI Index"""  # str(Path(self.root) / "exposure" / "SVI")
         if not self.buildings.empty and "SVI_key_domain" in self.buildings.columns:
-            legend = []
             paint_properties = self.get_nsi_paint_properties(type=type)
+            color_items = paint_properties['circle-color'][2:-1]
+            color_items.append('other')
+            color_items.append(paint_properties['circle-color'][-1])
+            legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
             app.map.layer["buildings"].layer["SVI"].set_data(
                 self.buildings, paint_properties, legend
             )
