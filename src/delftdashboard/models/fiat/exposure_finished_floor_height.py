@@ -106,7 +106,7 @@ def add_to_model(*args):
 
     app.active_model.domain.exposure_vm.set_ground_floor_height(
         source=source_path,
-        attribute_name=attribute_name_gfh,
+        attr_name=attribute_name_gfh,
         method=method_gfh,
         max_dist=max_dist_gfh,
         )
@@ -114,6 +114,9 @@ def add_to_model(*args):
     # Set the source
     app.gui.setvar(model, "source_finished_floor_height", source_name)
 
+    # Set Exposure Model GFH variable
+    app.active_model.domain.exposure_vm.exposure_buildings_model.ground_floor_height = source_path
+    
     app.gui.window.dialog_info(
         text="Finished floor height data was added to your model",
         title="Added finished floor height data",
