@@ -15,8 +15,6 @@ def select(*args):
     # Show the grid and mask
     app.map.layer["sfincs_hmt"].layer["grid"].activate()
     app.map.layer["sfincs_hmt"].layer["mask_active"].activate()
-    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].activate()
-    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].activate()
 
 def select_mask_init_polygon_method(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_init_polygon_methods_index", args[0])

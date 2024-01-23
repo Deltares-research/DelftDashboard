@@ -10,8 +10,6 @@ def select(*args):
     map.update()
     app.map.layer["sfincs_hmt"].layer["discharge_points"].set_mode("active")
     app.map.layer["sfincs_hmt"].layer["mask_active"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode("active")
     update_list()
 
 def add_discharge_point(gdf, merge=True):

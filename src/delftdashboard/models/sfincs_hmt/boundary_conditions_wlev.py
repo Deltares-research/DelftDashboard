@@ -10,8 +10,6 @@ def select(*args):
     map.update()
     app.map.layer["sfincs_hmt"].layer["boundary_points"].set_mode("active")
     app.map.layer["sfincs_hmt"].layer["mask_active"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode("active")
     update_list()
 
 def generate_boundary_points_from_msk(*args):

@@ -82,24 +82,11 @@ class Model(GenericModel):
             "mask_active",
             type="circle",
             circle_radius=3,
+            legend_position="top-right",
+            legend_title="Cell type",
             fill_color="yellow",
             line_color="transparent",
-        )
-
-        layer.add_layer(
-            "mask_bound_wlev",
-            type="circle",
-            circle_radius=3,
-            fill_color="blue",
-            line_color="transparent",
-        )
-
-        layer.add_layer(
-            "mask_bound_outflow",
-            type="circle",
-            circle_radius=3,
-            fill_color="red",
-            line_color="transparent",
+            big_data=True,
         )
 
         # Move this to hurrywave.py
@@ -155,8 +142,6 @@ class Model(GenericModel):
 
             # Mask is made invisible
             app.map.layer["sfincs_hmt"].layer["mask_active"].hide()
-            app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].hide()
-            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].hide()
 
             # Boundary points are made grey
             app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
