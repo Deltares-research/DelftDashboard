@@ -117,7 +117,16 @@ def add_to_model(*args):
     # Set Exposure Model GFH variable
     app.active_model.domain.exposure_vm.exposure_buildings_model.ground_floor_height = source_path
     
+    gfh_model_user_input()
+
     app.gui.window.dialog_info(
         text="Finished floor height data was added to your model",
         title="Added finished floor height data",
     )
+
+    # Save model as an dictionary
+def gfh_model_user_input(*args):
+    model = "fiat"
+
+    gfh_model = app.active_model.domain.exposure_vm.exposure_ground_floor_height_model.dict()
+    return gfh_model
