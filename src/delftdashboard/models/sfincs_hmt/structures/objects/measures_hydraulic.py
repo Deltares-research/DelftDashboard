@@ -105,6 +105,7 @@ class Floodwall(BaseMeasureType):
 
         # Set default values for floodwall measure type
         app.gui.setvar("measure", "elevation", 0.0)
+        app.gui.setvar("measure", "absolute_elevation", True)
 
     def set_editable_values(self, measure_attributes: MeasureModel):
         """Sets the editable values for the floodwall measure type
@@ -121,6 +122,7 @@ class Floodwall(BaseMeasureType):
 
         # Set editable values for floodwall measure type
         app.gui.setvar("measure", "elevation", measure_attributes.elevation.value)
+        app.gui.setvar("measure", "absolute_elevation", measure_attributes.absolute_elevation)
 
     def get_window_values(self) -> Dict[str, Union[str, dict]]:
         """Returns the window values for the floodwall measure type
@@ -136,7 +138,8 @@ class Floodwall(BaseMeasureType):
             "elevation": {
                 "value": app.gui.getvar("measure", "elevation"),
                 "units": "meters",
-            }
+            },
+            "absolute_elevation": app.gui.getvar("measure", "absolute_elevation"),
         }
 
         # Combine window values for floodwall with window values for measure type and selection type
@@ -166,11 +169,15 @@ class Floodwall(BaseMeasureType):
 
         # Add floodwall attributes to geodataframe
         gdf["name"] = measure_attributes.attrs.name
-        gdf["z"] = measure_attributes.attrs.elevation.value
+        dz = None
+        if measure_attributes.attrs.absolute_elevation:
+            gdf["z"] = measure_attributes.attrs.elevation.value
+        else:
+            dz = measure_attributes.attrs.elevation.value
         gdf["par1"] = 0.6
 
         # HydroMT function: create floodwall
-        sfincs_model.setup_structures(structures=gdf, stype="weir", merge=True)
+        sfincs_model.setup_structures(structures=gdf, stype="weir", dz=dz, merge=True)
 
     def delete_window_values(self):
         """Deletes the window values for the floodwall measure type"""
@@ -181,6 +188,7 @@ class Floodwall(BaseMeasureType):
 
         # Delete window values for floodwall measure type
         app.gui.delvar("measure", "elevation")
+        app.gui.delvar("measure", "absolute_elevation")
 
 
 class Drainage(BaseMeasureType):
@@ -276,7 +284,7 @@ class Drainage(BaseMeasureType):
         # Add pump attributes to geodataframe
         gdf["name"] = measure_attributes.attrs.name
 
-        # HydroMT function: create floodwall
+        # HydroMT function: create pump (by default, reimplement for culvert)
         sfincs_model.setup_drainage_structures(
             structures=gdf,
             stype="pump",
@@ -316,6 +324,35 @@ class Culvert(Drainage):
         super().__init__()
         self._measure_type = "culvert"
 
+    def add_to_model(
+        self,
+        measure_attributes: MeasureModel,
+        sfincs_model: SfincsModel,
+        gdf: gpd.GeoDataFrame,
+    ):
+        """Adds the measure to the model
+
+        Parameters
+        ----------
+        measure_attributes : MeasureModel
+            measure attributes
+        sfincs_model : SfincsModel
+            sfincs model
+        gdf : gpd.GeoDataFrame
+            geodataframe with pump geometry
+        """
+
+        # Add pump attributes to geodataframe
+        gdf["name"] = measure_attributes.attrs.name
+
+        # HydroMT function: create culvert
+        sfincs_model.setup_drainage_structures(
+            structures=gdf,
+            stype="culvert",
+            discharge=measure_attributes.attrs.discharge.value,
+            merge=True,
+        )
+
 
 class ThinDam(Floodwall):
     """ThinDam measure type for measures at hydraulic level. Parameters that are set in the gui:
@@ -328,15 +365,6 @@ class ThinDam(Floodwall):
         super().__init__()
         self._measure_type = "thin_dam"
         self._selection_class = PolylineSelectionType()
-
-    def set_default_values(self):
-        """Sets the default initialization values for the floodwall measure type to the gui"""
-
-        # Set default values for measure type and selection type
-        super().set_default_values()
-
-        # Overwrite the elevation to a very high value
-        app.gui.setvar("measure", "elevation", 1000.0)
 
     def add_to_model(
         self,
@@ -358,8 +386,6 @@ class ThinDam(Floodwall):
 
         # Add floodwall attributes to geodataframe
         gdf["name"] = measure_attributes.attrs.name
-        gdf["z"] = measure_attributes.attrs.elevation.value
-        gdf["par1"] = 0.6
 
         # HydroMT function: create floodwall
         sfincs_model.setup_structures(structures=gdf, stype="thd", merge=True)

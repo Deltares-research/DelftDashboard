@@ -18,6 +18,7 @@ from delftdashboard.app import app
 
 
 def select(*args):
+    _set_gui_variables()
     select_general(*args)
 
 

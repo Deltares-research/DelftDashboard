@@ -10,10 +10,7 @@ from .measures_interfaces import ISelectionType
 
 class PolygonSelectionType(ISelectionType):
     """Polygon selection type for measures. Parameters that need to be set for every measure type:
-    - selection_type: polygon, aggregation_area, import_area
-    - aggregation_area_names: list of aggregation area names
-    - aggregation_area_name: name of the aggregation area (set to default if not aggregation area)
-    - aggregation_area_type: type of the aggregation area (set to default if not aggregation area)
+    - selection_type: polygon, import_area
     """
 
     def __init__(self):
@@ -56,24 +53,6 @@ class PolygonSelectionType(ISelectionType):
         self._selection_type = value
 
     @staticmethod
-    def set_aggregation_area_list(*args):
-        """Set the list of possible aggregation area names for the selected aggregation area type"""
-
-        # Get info of aggregation type
-        index = args[0]  # get index of aggregation type
-        aggr_dicts = app.database.site.attrs.fiat.aggregation
-        name = aggr_dicts[index].name
-        gdf = app.aggregation_areas[name]
-        gdf["id"] = gdf.index
-
-        # Update GUI list
-        app.gui.setvar(
-            "measure",
-            "aggregation_area_names",
-            list(app.aggregation_areas[name].loc[:, "name"]),
-        )
-
-    @staticmethod
     def get_measure_selection_types() -> List[str]:
         """Returns the possible measure selection types for the polygon measure category
 
@@ -82,7 +61,7 @@ class PolygonSelectionType(ISelectionType):
         list
             list of measure selection types
         """
-        return ["polygon", "aggregation_area", "import_area"]
+        return ["polygon", "import_area"]
 
     @staticmethod
     def get_measure_selection_type_names() -> List[str]:
@@ -93,15 +72,10 @@ class PolygonSelectionType(ISelectionType):
         list
             list of measure selection type names
         """
-        return ["Draw polygon", "Aggregation area", "Import polygon"]
+        return ["Draw polygon", "Import polygon"]
 
     def set_default_values(self):
-        """Sets the default initialization values for the polygon measure type to the gui.
-        These always needs to be set since the aggregation box can only be hidden and not
-        removed from the gui"""
-        PolygonSelectionType.set_aggregation_area_list(0)
-        app.gui.setvar("measure", "active_aggregation_area_type", 0)
-        app.gui.setvar("measure", "active_aggregation_area", 0)
+        """Sets the default initialization values for the polygon measure type to the gui."""
         app.gui.setvar("measure", "geometry_file", "")
 
     def set_editable_values(self, measure_attributes: MeasureModel):
@@ -119,25 +93,6 @@ class PolygonSelectionType(ISelectionType):
         elif self.selection_type == "import_area":
             # geometry_file is being set in the yml file
             pass
-        elif self.selection_type == "aggregation_area":
-            # Get and Set current aggragation area type
-            ind_type = app.gui.getvar("measure", "aggregation_area_types").index(
-                measure_attributes.aggregation_area_type
-            )
-            app.gui.setvar(
-                "measure",
-                "active_aggregation_area_type",
-                ind_type,
-            )
-
-            # Set list of aggregation area names
-            PolygonSelectionType.set_aggregation_area_list(ind_type)
-
-            # Get and Set current aggragation area name
-            ind_name = app.gui.getvar("measure", "aggregation_area_names").index(
-                measure_attributes.aggregation_area_name
-            )
-            app.gui.setvar("measure", "active_aggregation_area", ind_name)
 
     def save_geojson_data(self, measure: Dict[str, str], measure_path: str) -> str:
         """Saves the geojson data for the polygon measure type
@@ -155,7 +110,7 @@ class PolygonSelectionType(ISelectionType):
             full path to geojson file
         """
 
-        # Save geojson data if measure type is polygon. If measure type is aggregation area or import, do nothing
+        # Save geojson data if measure type is polygon 
         if self._selection_type == "polygon":
             gdf = app.gui.getvar("measures", "temp_gdf")
             gdf = GeoDataFrame(geometry=gdf["geometry"])
@@ -163,7 +118,7 @@ class PolygonSelectionType(ISelectionType):
             path = app.gui.getvar("measure", "geometry_file")
             gdf = GeoDataFrame.from_file(path)
         else:
-            # If the measure is an aggregation area or the type is unknown, do nothing
+            # If the measure type is unknown, do nothing
             return
 
         path = os.path.join(measure_path, "measures", measure["name"])
@@ -189,26 +144,12 @@ class PolygonSelectionType(ISelectionType):
                 "polygon_file": app.gui.getvar("measure", "name") + ".geojson",
                 "selection_type": self.selection_type,
             }
-        elif self.selection_type == "aggregation_area":
-            return {
-                "aggregation_area_name": app.gui.getvar(
-                    "measure", "aggregation_area_names"
-                )[app.gui.getvar("measure", "active_aggregation_area")],
-                "aggregation_area_type": app.gui.getvar(
-                    "measure", "aggregation_area_types"
-                )[app.gui.getvar("measure", "active_aggregation_area_type")],
-                "selection_type": "aggregation_area",
-            }
         else:
             return {}
 
     @staticmethod
     def delete_window_values():
         """Deletes the window values for the polygon measure type"""
-        app.gui.delvar("measure", "aggregation_area_names")
-        app.gui.delvar("measure", "aggregation_area_types")
-        app.gui.delvar("measure", "active_aggregation_area")
-        app.gui.delvar("measure", "active_aggregation_area_type")
         app.gui.delvar("measure", "geometry_file")
 
 
@@ -257,11 +198,6 @@ class PolylineSelectionType(ISelectionType):
         if value not in self.get_measure_selection_types():
             raise ValueError("Selection type not valid")
         self._selection_type = value
-
-    @staticmethod
-    def set_aggregation_area_list(*args):
-        """Set the list of possible aggregation area names for the selected aggregation area type"""
-        pass
 
     @staticmethod
     def get_measure_selection_types() -> List[str]:
@@ -399,11 +335,6 @@ class PointSelectionType(ISelectionType):
         if value not in self.get_measure_selection_types():
             raise ValueError("Selection type not valid")
         self._selection_type = value
-
-    @staticmethod
-    def set_aggregation_area_list(*args):
-        """Set the list of possible aggregation area names for the selected aggregation area type"""
-        pass
 
     @staticmethod
     def get_measure_selection_types() -> List[str]:

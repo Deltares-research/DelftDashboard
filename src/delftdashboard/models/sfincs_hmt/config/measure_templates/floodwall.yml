@@ -1,7 +1,7 @@
 window:
   title: Floodwall
   width: 460
-  height: 300
+  height: 250
   variable_group: measure
   module: models.sfincs_hmt.structures
   modal: True
@@ -10,7 +10,7 @@ element:
 - style: panel
   position:
     x: 10
-    y: 190
+    y: 140
     width: 440
     height: 100
   title: Description
@@ -19,12 +19,12 @@ element:
     x: 10
     y: 50
     width: 440
-    height: 130
+    height: 80
   title: Flood Wall Properties
 - style: edit
   position:
     x: 100
-    y: 250
+    y: 200
     width: 200
     height: 20
   variable: name
@@ -33,7 +33,7 @@ element:
 - style: edit
   position:
     x: 100
-    y: 225
+    y: 175
     width: 200
     height: 20
   variable: description
@@ -42,7 +42,7 @@ element:
 - style: edit
   position:
     x: 90
-    y: 150
+    y: 100
     width: 50
     height: 20
   variable: elevation
@@ -51,14 +51,14 @@ element:
 - style: text
   position:
     x: 150
-    y: 150
+    y: 100
     width: 50
     height: 20
   variable: elev_ref
 - style: pushselectfile
   position:
     x: 90
-    y: 120
+    y: 70
     width: 130
     height: 20
   text: Import Line Coordinates
@@ -73,3 +73,11 @@ element:
     - variable: selection_type
       operator: eq
       value: import_area
+- style: checkbox
+  position:
+    x: 210
+    y: 100
+    width: 100
+    height: 20
+  text: Absolute
+  variable: absolute_elevation

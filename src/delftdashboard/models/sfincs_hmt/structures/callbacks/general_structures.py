@@ -10,17 +10,54 @@ import geopandas as gpd
 from typing import List
 
 
+class FAMBNameConverter:
+    """Class to convert between the names of the measures from the flood adapt names to the names used in the model builder"""
+
+    @staticmethod
+    def to_model_builder(flood_adapt_type_name: str) -> str:
+        """Method to convert the type of the measure to the type of the model builder"""
+        converstion_dict = {
+            "floodwall": "weir",
+            "thin_dam": "thin_dam",
+            "pump": "drainage",
+            "culvert": "drainage",
+        }
+        return converstion_dict[flood_adapt_type_name]
+
+    @staticmethod
+    def to_model_builder_short_name(flood_adapt_type_name: str) -> str:
+        """Method to convert the type of the measure to the type of the model builder"""
+        converstion_dict = {
+            "floodwall": "weir",
+            "thin_dam": "thd",
+            "pump": "drn",
+            "culvert": "drn",
+        }
+        return converstion_dict[flood_adapt_type_name]
+
+
 def select(*args):
     model = app.model["sfincs_hmt"].domain
 
     # If no measures layer exists, create it
     if "measures" not in app.map.layer:
         app.map.add_layer("measures")
+        layer = app.map.layer["measures"].add_layer("weir")
+        layer.line_color_selected = "green"
+        layer.line_color = "darkgreen"
+        layer = app.map.layer["measures"].add_layer("thd")
+        layer.line_color_selected = "orange"
+        layer.line_color = "darkorange"
+        layer = app.map.layer["measures"].add_layer("drn")
+        layer.line_color_selected = "red"
+        layer.line_color = "darkred"
 
     # Add weir measures in the model to the map
     weirs_list = app.gui.getvar("sfincs_hmt", "structure_weir_list")
     if "weir" in model.geoms:
-        weirs_list = make_geom_layer("weir", weirs_list, app.map.layer["measures"])
+        weirs_list = make_geom_layer(
+            "weir", weirs_list, app.map.layer["measures"].layer["weir"]
+        )
     if weirs_list:
         app.gui.setvar("sfincs_hmt", "structure_weir_list", weirs_list)
         app.gui.setvar(
@@ -33,7 +70,7 @@ def select(*args):
     thin_dams_list = app.gui.getvar("sfincs_hmt", "structure_thd_list")
     if "thd" in model.geoms:
         thin_dams_list = make_geom_layer(
-            "thd", thin_dams_list, app.map.layer["measures"]
+            "thd", thin_dams_list, app.map.layer["measures"].layer["thd"]
         )
     if thin_dams_list:
         app.gui.setvar("sfincs_hmt", "structure_thd_list", thin_dams_list)
@@ -46,7 +83,9 @@ def select(*args):
     # Add drainage measures in the model to the map
     drainage_list = app.gui.getvar("sfincs_hmt", "structure_drn_list")
     if "drn" in model.geoms:
-        drainage_list = make_geom_layer("drn", drainage_list, app.map.layer["measures"])
+        drainage_list = make_geom_layer(
+            "drn", drainage_list, app.map.layer["measures"].layer["drn"]
+        )
     if drainage_list:
         app.gui.setvar("sfincs_hmt", "structure_drn_list", drainage_list)
         app.gui.setvar(
@@ -54,6 +93,32 @@ def select(*args):
             "structure_drn_index",
             drainage_list.index(app.gui.getvar("sfincs_hmt", "active_structure_drn")),
         )
+
+
+def select_struct(*args):
+    """Callback method to select a measure from the list"""
+    # Split the source in tab, struct_type, name
+    tab, struct_type, name = args[0]["source"].split(".")
+
+    # Get selected structure type
+    structure_type = app.gui.getvar("measures", "selected_structure_type")
+
+    # Check if the selected structure type is the same as the tab
+    if struct_type == structure_type:
+        # Get list of possible geoms and index of active geom
+        geom_list = app.gui.getvar("sfincs_hmt", f"structure_{structure_type}_list")
+
+        # Get index of selected geom in geom_list
+        structure_index = geom_list.index(name)
+
+        # Set active structure
+        app.gui.setvar(
+            "sfincs_hmt", f"structure_{structure_type}_index", structure_index
+        )
+        app.gui.setvar("sfincs_hmt", f"active_structure_{structure_type}", name)
+
+        # Update GUI
+        app.gui.window.update()
 
 
 def make_geom_layer(geom_type: str, geom_list: list, layer):
@@ -71,17 +136,20 @@ def make_geom_layer(geom_type: str, geom_list: list, layer):
 
         # Create geodataframe
         geom_gdf = gpd.GeoDataFrame(geometry=[geom["geometry"]])
+        geom_gdf["name"] = geom["name"]
         geom_gdf.crs = app.crs
 
         # Add layer to map
         layer.add_layer(
             geom["name"],
-            type="draw",
-            shape="polyline",
-            polygon_line_color="green",
-            polygon_fill_opacity=0.3,
+            type="line_selector",
+            circle_radius=0,
+            line_color=layer.line_color,
+            line_color_selected=layer.line_color_selected,
+            hover_param="name",
+            select=select_struct,
         )
-        layer.layer[geom["name"]].set_data(geom_gdf)
+        layer.layer[geom["name"]].set_data(geom_gdf, 0)
         geom_list.append(geom["name"])
     return geom_list
 
@@ -97,16 +165,8 @@ def set_variables(*args):
 
 def get_win_path(selected_measure_type, model_name):
     """Method to get the path of the window config yaml file"""
-    if selected_measure_type == "elevate_properties":
-        yml = "elevate_properties.yml"
-    elif selected_measure_type == "buyout_properties":
-        yml = "buyout_properties.yml"
-    elif selected_measure_type == "floodproof_properties":
-        yml = "floodproof_properties.yml"
-    elif selected_measure_type == "floodwall":
+    if selected_measure_type == "floodwall":
         yml = "floodwall.yml"
-    elif selected_measure_type == "levee":
-        yml = "levee.yml"
     elif selected_measure_type == "pump":
         yml = "pump.yml"
     elif selected_measure_type == "culvert":
@@ -115,8 +175,6 @@ def get_win_path(selected_measure_type, model_name):
         yml = "water_square.yml"
     elif selected_measure_type == "greening":
         yml = "greening.yml"
-    elif selected_measure_type == "point_storage":
-        yml = "point_storage.yml"
     elif selected_measure_type == "total_storage":
         yml = "total_storage.yml"
     elif selected_measure_type == "thin_dam":
@@ -251,17 +309,20 @@ def add_measure():
     if not okay:
         return
 
-    # TODO should the gui variables have the same name as the pydantic ?
     # Update measure with values from window
     measure = read_measure_window()
 
     # Check if the name already exists. It cannot exist in any of the measure types (e.g. weir, dam, etc., mostly for clairty)
-    # TODO: Checking for all measure types is a bit of a shortcut because there is only one measure layer. If you then add multiple measures
-    # with the same name for different measure types, only one will be shown on the map. If you give informative names though, this should not be a problem.
-    for measure_type in ['weir', 'thd', 'drn']:
-        if measure["name"] in app.gui.getvar("sfincs_hmt", f"structure_{measure_type}_list"):
-            app.gui.window.dialog_warning(text = "Name already exists for any of the structures. \nPlease choose another name for the measure")
-            return
+    if measure["name"] in app.gui.getvar(
+        "sfincs_hmt",
+        f"structure_{FAMBNameConverter.to_model_builder_short_name(measure['type'])}_list",
+    ):
+        app.gui.window.dialog_warning(
+            text="Name already exists for any of the structures. \nPlease choose another name for the measure"
+        )
+        # Open popup window again
+        add_measure()
+        return # Return to prevent that the measure is added twice
 
     try:
         # Create measure object
@@ -282,25 +343,8 @@ def add_measure():
                 f"Selection type {selection_type} not implemented"
             )
 
-        model = app.model["sfincs_hmt"].domain
-        # TODO: I dont think it is right that the crs is not yet set? But if I dont do this, i get:
-        # Traceback (most recent call last):
-        #     File "<string>", line 1, in <module>
-        #     File "C:\Users\adrichem\AppData\Local\anaconda3\envs\ddb_fiat\Lib\site-packages\hydromt_sfincs\sfincs.py", line 1458, in setup_structures
-        #         ).to_crs(self.crs)
-        #         ^^^^^^^^^^^^^^^^
-        #     File "C:\Users\adrichem\AppData\Local\anaconda3\envs\ddb_fiat\Lib\site-packages\geopandas\geodataframe.py", line 1425, in to_crs
-        #         geom = df.geometry.to_crs(crs=crs, epsg=epsg)
-        #             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        #     File "C:\Users\adrichem\AppData\Local\anaconda3\envs\ddb_fiat\Lib\site-packages\geopandas\geoseries.py", line 1157, in to_crs
-        #         self.values.to_crs(crs=crs, epsg=epsg), index=self.index, name=self.name
-        #         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        #     File "C:\Users\adrichem\AppData\Local\anaconda3\envs\ddb_fiat\Lib\site-packages\geopandas\array.py", line 864, in to_crs
-        #         raise ValueError("Must pass either crs or epsg.")
-        #     ValueError: Must pass either crs or epsg.
-        model.set_crs(app.crs)
-
         # Add measure to model
+        model = app.model["sfincs_hmt"].domain
         selected_measure_type.add_to_model(measure_obj, model, gdf)
 
         # Set active measure
@@ -309,15 +353,19 @@ def add_measure():
             "sfincs_hmt", f"active_structure_{structure_type}", measure["name"]
         )
 
+        # After adding the measure, make sure the data is cleared from the internal storage. This to prevent that if the user adds a measure, closes the window, and then adds another measure, the data from the first measure is still in the internal storage.
+        selected_measure_type.delete_window_values()
+
+        # Update the measures window
+        select()
+
     except Exception as e:
         print(e)
-        # TODO add error popup and reopen edit window to change
-
-    # After adding the measure, make sure the data is cleared from the internal storage. This to prevent that if the user adds a measure, closes the window, and then adds another measure, the data from the first measure is still in the internal storage.
-    selected_measure_type.delete_window_values()
-
-    # Update the measures window
-    select()
+        app.gui.window.dialog_warning(
+            text=f"There was an error adding the measure: {e}"
+        )
+        # Open popup window again
+        add_measure()
 
 
 def read_measure_window():
@@ -414,8 +462,10 @@ def delete_structure(selected_measures: List[str], measure_type: str):
         app.gui.setvar("sfincs_hmt", f"structure_{measure_type}_list", geom_list)
 
         # Delete layer from map
-        if selected_measure in app.map.layer["measures"].layer:
-            app.map.layer["measures"].layer[selected_measure].delete()
+        if selected_measure in app.map.layer["measures"].layer[measure_type].layer:
+            app.map.layer["measures"].layer[measure_type].layer[
+                selected_measure
+            ].delete()
 
     # Set active measure
     if len(geom_list) > 0:

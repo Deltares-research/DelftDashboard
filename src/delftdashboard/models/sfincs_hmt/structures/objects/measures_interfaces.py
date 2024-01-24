@@ -20,10 +20,6 @@ class ISelectionType(ABC):
         ...
 
     @abstractstaticmethod
-    def set_aggregation_area_list(*args):
-        ...
-
-    @abstractstaticmethod
     def get_measure_selection_types() -> List[str]:
         ...
 
