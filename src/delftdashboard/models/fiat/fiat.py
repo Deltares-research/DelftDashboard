@@ -388,7 +388,9 @@ class Model(GenericModel):
         app.gui.setvar(group, "method_damages", "nearest")
         app.gui.setvar(group, "method_damages_string", ["nearest", "intersection"])
         app.gui.setvar(group, "method_damages_value", ["nearest", "intersection"])
-
+        app.gui.setvar("fiat", "damage_type_structure", {})
+        app.gui.setvar("fiat", "damage_type_content", {})
+        app.gui.setvar("fiat", "damage_user_input",[])
         app.gui.setvar(group, "selected_primary_classification_value", 0)
         app.gui.setvar(group, "selected_asset_locations", 0)
         app.gui.setvar(

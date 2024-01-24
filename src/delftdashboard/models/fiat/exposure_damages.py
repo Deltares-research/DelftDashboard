@@ -102,12 +102,22 @@ def add_to_model(*args):
     # Get the max distance
     max_dist_damages = app.gui.getvar("fiat", "max_dist_damages")
 
+    # Get the damage type
+    damage_type = app.gui.getvar("fiat", "damage_type")
+
     app.active_model.domain.exposure_vm.set_damages(
         source=source_path,
         attribute_name=attribute_name_gfh,
+        damage_types = damage_type,
         method=method_damages,
         max_dist=max_dist_damages,
     )
+
+
+    # Set Exposure Model GFH variable
+    app.active_model.domain.exposure_vm.exposure_buildings_model.max_potential_damage = source_path
+    
+    damage_model_user_input()
 
     # Set the source
     app.gui.setvar(model, "source_max_potential_damage", source_name)
@@ -116,3 +126,33 @@ def add_to_model(*args):
         text="Maximum potential damage data was added to your model",
         title="Added maximum potential damage data",
     )
+
+    # Save model as an dictionary
+def damage_model_user_input(*args):
+    model = "fiat"
+
+    # Get selected damage type 
+    damage_type = app.gui.getvar("fiat", "damage_type")
+
+    # Create dictionary of selected damage type
+    damage_model_structure = app.active_model.domain.exposure_vm.exposure_damages_model.dict() if damage_type == "structure" else None
+    damage_model_content = app.active_model.domain.exposure_vm.exposure_damages_model.dict() if damage_type == "content" else None
+    
+    # Set variable 
+    app.gui.setvar("fiat", "damage_type_structure",[damage_model_structure]) if damage_model_structure is not None else app.gui.setvar("fiat", "damage_type_content",damage_model_content)
+    
+    # Create list of both damage type dictionaries
+    damages = []
+    if app.gui.getvar("fiat", "damage_type_structure") is not None and app.gui.getvar("fiat", "damage_type_content") is None:
+       damages.append(app.gui.getvar("fiat", "damage_type_structure"))
+    elif app.gui.getvar("fiat", "damage_type_content") is not None and app.gui.getvar("fiat", "damage_type_structure") is None:
+       damages.append(app.gui.getvar("fiat", "damage_type_content"))
+    elif app.gui.getvar("fiat", "damage_type_structure") is not None and app.gui.getvar("fiat", "damage_type_content") is not None:
+       damages.append(app.gui.getvar("fiat", "damage_type_structure"))
+       damages.append(app.gui.getvar("fiat", "damage_type_content"))
+
+    return damages
+#when running setup function: for i in damages
+                                   # if i struct...
+                                   # if i cont
+    
