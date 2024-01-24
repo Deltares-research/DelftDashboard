@@ -1,4 +1,4 @@
-# FIAT Model Builder GUI
+# FloodAdapt Model Builder GUI
 This repository contains the FIAT Model Builder GUI, using the [Guitares](https://github.com/Deltares/guitares) GUI framework and [HydroMT-FIAT](https://github.com/Deltares/hydromt_fiat) as back-end.
 
 # Contributing
@@ -6,7 +6,7 @@ This repository contains the FIAT Model Builder GUI, using the [Guitares](https:
 
 ## Setting up conda
 
-In order to develop on the `FIAT Model Builder GUI` locally, please follow the following steps:
+In order to develop on the `FloodAdapt Model Builder GUI` locally, please follow the following steps:
 
 - Download and install [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html#fresh-install).
 
@@ -27,20 +27,26 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 - Create (or update) the environment by executing the following in your terminal:
 
 ```
-cd <location of your repository clone>\DelftDashboard\src\delftdashboard\env
-mamba env create --file=ddb_fiat.yml --force
+cd <location of your repository clone of DelftDashboard> 
+mamba env create --file=./src/delftdashboard/env/ddb_FloodAdapt.yml --force
 ```
 
-## Installing the FIAT Model Builder GUI
+## Installing the FloodAdapt Model Builder GUI
 
 - Activate the environment
 
 ```
-conda activate ddb_fiat
+conda activate ddb_FloodAdapt
 ```
 
-In order to develop on the `FIAT Model Builder GUI` locally, execute the following line inside your virtual environment
+To be able to run the GUI, you need to:
+- create an account and generate a personal [mapbox_token.txt](https://www.mapbox.com/)
+- generate a personal [census_key.txt] (https://api.census.gov/data/key_signup.html)
+- Put 'mapbox_token.txt' and 'census_key.txt' in the same folder and make sure they are named correctly!
+- have access to the dependecy repositories (try makeing the environment, will get errors if you dont have access)
+- have access to P:\11207949-dhs-phaseii-floodadapt\Model-builder\Installation
+Then, in order to develop on the `FloodAdapt Model Builder GUI` locally and have the GUI use your local versions of repositories, run the [install script](src/delftdashboard/install.py).
 
-```bash
-pip install -e .
+```
+python ./src/delftdashboard/install.py
 ```
