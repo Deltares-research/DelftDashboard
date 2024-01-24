@@ -4,7 +4,9 @@ import os
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.menu import coordinate_system
 
+from hydromt import gis_utils
 from hydromt_sfincs import utils
 import time
 
@@ -72,6 +74,7 @@ def draw_aio(*args):
     app.map.layer[group].layer["area_of_interest"].draw()
 
 def load_aio(*args):
+    # Load a polygon file
     fname = app.gui.window.dialog_open_file(
         "Select polygon file", filter="*.pol *.shp *.geojson"
     )
@@ -82,12 +85,23 @@ def load_aio(*args):
         else:
             gdf = app.model["sfincs_hmt"].domain.data_catalog.get_geodataframe(fname[0])
 
-        # get the center of the polygon
-        lon = gdf.to_crs(4326).geometry.centroid.x[0]
-        lat = gdf.to_crs(4326).geometry.centroid.y[0]
+        # check if auto-select UTM is selected
+        auto_select_utm = app.gui.getvar("modelmaker_sfincs_hmt", "auto_select_utm")
+        if auto_select_utm:
+            pyproj_crs = gis_utils.parse_crs(
+                "utm", gdf.to_crs(4326).total_bounds
+            )
+            if pyproj_crs != app.crs:
+                # pop-up warning
+                ok = app.gui.window.dialog_yes_no(
+                    "The coordinate system of the GUI will be changed to {}. Continue?".format(pyproj_crs)
+                )
+                if ok:
+                    # change the coordinate system of the GUI
+                    coordinate_system.update_crs(pyproj_crs)
 
-        # Fly to the site
-        app.map.fly_to(lon, lat, 7)
+        # change map position to center of polygon
+        fly_to_site(gdf=gdf)
 
         # Add the polygon to the map
         layer = app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"]
@@ -99,8 +113,7 @@ def load_aio(*args):
             app.gui.setvar("modelmaker_sfincs_hmt", "grid_outline", 1)
 
 
-def fly_to_site(*args):
-    gdf = app.toolbox["modelmaker_sfincs_hmt"].grid_outline
+def fly_to_site(gdf):
     # get the center of the polygon
     lon = gdf.to_crs(4326).geometry.centroid.x[0]
     lat = gdf.to_crs(4326).geometry.centroid.y[0]
@@ -114,7 +127,6 @@ def fly_to_site(*args):
 
     # Fly to the site'
     app.map.fly_to(lon, lat, zoom)
-
 
 def grid_outline_created(gdf, index, id):
     group = "modelmaker_sfincs_hmt"
