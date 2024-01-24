@@ -15,10 +15,10 @@ element:
       height: 20
     variable: mask_boundary_type
     select: item
-    option_string:  ["Waterlevel", "Outflow"]
+    option_string:  ["Water level", "Outflow"]
     option_value: [2, 3]
   - style: pushbutton
-    text: Update bounds
+    text: Set bounds
     position:
       x: 10
       y: 35
@@ -34,7 +34,7 @@ element:
       height: 20
     method: reset_mask_bounds 
 - style: panel
-  title: "Waterlevel boundaries: "
+  title: "Water level boundaries: "
   position:
     x: 140
     y: 10

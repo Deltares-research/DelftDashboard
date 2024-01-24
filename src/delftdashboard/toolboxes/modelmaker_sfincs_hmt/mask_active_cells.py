@@ -220,6 +220,8 @@ def edit_mask_active(*args):
     okay, data = app.gui.popup(pop_win_config_path , None)
     if not okay:
         return
+    else:
+        update_mask_active()
 
 def update():
     nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon)

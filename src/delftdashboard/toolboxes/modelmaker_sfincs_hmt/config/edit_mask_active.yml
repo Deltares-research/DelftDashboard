@@ -1,7 +1,7 @@
 window:
-  title: Change default settings for active domain
+  title: "To proceed and update the SFINCS mask, press 'OK'."
   width: 400
-  height: 180
+  height: 200
   variable_group: modelmaker_sfincs_hmt
   module: toolboxes.modelmaker_sfincs_hmt.mask_active_cells
   modal: True
@@ -13,12 +13,12 @@ element:
     x: 10
     y: 40
     width: 380
-    height: 130
+    height: 150
   element:
   - style: text
     position:
       x: 10
-      y: 105
+      y: 120
       width: 360
       height: 20
     text: "The default settings are based on the type of model you are making (domain tab). In case you used \n

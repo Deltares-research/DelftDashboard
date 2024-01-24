@@ -8,15 +8,16 @@ element:
     height: 120
   element:
   - style: pushbutton
-    text: "View default active cells"
+    text: "Show active cells"
     position:
       x: 10
       y: 90
       width: 180
       height: 20
     method: update_mask_active
+    tooltip: "Show the active cells in your domain. If not specified, default settings are used."
   - style: pushbutton
-    text: "Modify default settings"
+    text: "Modify mask settings"
     position:
       x: 10
       y: 65
@@ -223,12 +224,12 @@ element:
       width: 80
       height: 20
     method: load_exclude_polygon   
-- style: pushbutton
-  text: Update Mask
-  position:
-    x: -10
-    y: 10
-    width: 80
-    height: 20
-  method: update_mask_active
+# - style: pushbutton
+#   text: Update Mask
+#   position:
+#     x: -10
+#     y: 10
+#     width: 80
+#     height: 20
+#   method: update_mask_active
 

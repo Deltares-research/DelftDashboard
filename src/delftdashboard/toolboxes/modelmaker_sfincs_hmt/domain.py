@@ -31,13 +31,18 @@ def select_model_type(*args):
         app.gui.setvar(group, "mask_active_zmin", -10.0)
         app.gui.setvar(group, "mask_active_drop_area", 10.0)
         app.gui.setvar(group, "mask_active_fill_area", 10.0)
+        app.gui.setvar(group, "auto_select_utm", True)
     elif model_type == 1:
         app.gui.setvar(group, "mask_active_zmax", 5.0)
         app.gui.setvar(group, "mask_active_zmin", -500.0)
         app.gui.setvar(group, "mask_active_drop_area", 10.0)
         app.gui.setvar(group, "mask_active_fill_area", 100.0)
+        app.gui.setvar(group, "auto_select_utm", False)
 
-    include_precip =  app.gui.getvar(group, "include_rainfall")
+def select_setup_grid_method(*args):
+    group = "modelmaker_sfincs_hmt"
+
+    include_precip =  app.gui.getvar(group, "include_precip")
     # include_rivers = app.gui.getvar(group, "include_rivers")
     # include_waves = app.gui.setvar(group, "include_waves", False)    
 
@@ -45,14 +50,10 @@ def select_model_type(*args):
     if include_precip: #or include_rivers:
         watershed = True
 
-    if model_type == 0 and watershed:
-        # we recommend to use watershed data to setup the model extent
+    if watershed:
         app.gui.setvar(group, "setup_grid_methods_index", 2)
-    elif model_type == 0 and not watershed:
-        app.gui.setvar(group, "setup_grid_methods_index", 1)
-    elif model_type == 1:
+    else:
         app.gui.setvar(group, "setup_grid_methods_index", 0)
-
 
 def select_method(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "setup_grid_methods_index", args[0])
@@ -69,8 +70,6 @@ def draw_aio(*args):
 
     app.map.layer[group].layer["area_of_interest"].crs = app.crs
     app.map.layer[group].layer["area_of_interest"].draw()
-
-
 
 def load_aio(*args):
     fname = app.gui.window.dialog_open_file(
@@ -166,9 +165,19 @@ def aio_created(gdf, index, id):
     else:
         precision = 3
 
-    x0, y0, mmax, nmax, rot = utils.rotated_grid(
-        gdf.unary_union, res, dec_origin=precision
-    )
+    # check if auto-rotate is selected
+    auto_rotate = app.gui.getvar(group, "auto_rotate")
+    if auto_rotate:
+        x0, y0, mmax, nmax, rot = utils.rotated_grid(
+            gdf.unary_union, res, dec_origin=precision
+        )
+    else:
+        x0, y0, x1, y1 = gdf.total_bounds
+        x0, y0 = round(x0, precision), round(y0, precision)
+        mmax = int(np.ceil((x1 - x0) / res))
+        nmax = int(np.ceil((y1 - y0) / res))
+        rot = 0
+
     app.gui.setvar(group, "x0", round(x0, precision))
     app.gui.setvar(group, "y0", round(y0, precision))
     app.gui.setvar(group, "mmax", mmax)
@@ -197,9 +206,19 @@ def aio_modified(gdf, index, id):
     else:
         precision = 3
 
-    x0, y0, mmax, nmax, rot = utils.rotated_grid(
-        gdf.unary_union, res, dec_origin=precision
-    )
+    # check if auto-rotate is selected
+    auto_rotate = app.gui.getvar(group, "auto_rotate")
+    if auto_rotate:
+        x0, y0, mmax, nmax, rot = utils.rotated_grid(
+            gdf.unary_union, res, dec_origin=precision
+        )
+    else:
+        x0, y0, x1, y1 = gdf.total_bounds
+        x0, y0 = round(x0, precision), round(y0, precision)
+        mmax = int(np.ceil((x1 - x0) / res))
+        nmax = int(np.ceil((y1 - y0) / res))
+        rot = 0
+        
     app.gui.setvar(group, "x0", round(x0, precision))
     app.gui.setvar(group, "y0", round(y0, precision))
     app.gui.setvar(group, "mmax", mmax)

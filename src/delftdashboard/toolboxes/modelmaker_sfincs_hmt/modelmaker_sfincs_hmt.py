@@ -57,8 +57,8 @@ class Toolbox(GenericToolbox):
             ["Overland model", "Surge model"],#, "Quadtree model"
         )
         app.gui.setvar(group, "model_type_index", 0)        
-        app.gui.setvar(group, "include_rainfall", False)
-        app.gui.setvar(group, "include_rivers", False)
+        app.gui.setvar(group, "include_precip", False)
+        # app.gui.setvar(group, "include_rivers", False)
         # app.gui.setvar(group, "include_waves", False)
 
         # Model extent determination
@@ -66,7 +66,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(
             group,
             "setup_grid_methods",
-            ["Draw Bounding Box", "Draw Polygon", "Load watershed", "Load shapefile"],
+            ["Draw Bounding Box", "Draw Polygon", "Load Watershed", "Load ShapeFile"],
         )
         app.gui.setvar(group, "setup_grid_methods_index", 0)
 
@@ -90,6 +90,7 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "unit", " (in m)")
         app.gui.setvar(group, "rotation", 0.0)
         app.gui.setvar(group, "auto_rotate", False)
+        app.gui.setvar(group, "auto_select_utm", True)
         app.gui.setvar(group, "lenx", 0.0)
         app.gui.setvar(group, "leny", 0.0)
 
