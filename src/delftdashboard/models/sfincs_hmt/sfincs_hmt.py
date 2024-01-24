@@ -387,4 +387,5 @@ def update_map():
         z=da_dep.values,
         colormap=app.color_map_earth,
         decimals=0,
+        legend_title="Bed levels [m+ref]",
     )
