@@ -106,7 +106,7 @@ def add_to_model(*args):
 
     app.active_model.domain.exposure_vm.set_ground_floor_height(
         source=source_path,
-        attr_name=attribute_name_gfh,
+        attribute_name=attribute_name_gfh,
         method=method_gfh,
         max_dist=max_dist_gfh,
         )
