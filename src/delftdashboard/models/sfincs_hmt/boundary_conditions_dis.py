@@ -8,8 +8,8 @@ from delftdashboard.operations import map
 def select(*args):
     # Set all layer inactive, except discharge_points
     map.update()
-    app.map.layer["sfincs_hmt"].layer["discharge_points"].set_mode("active")
-    app.map.layer["sfincs_hmt"].layer["mask_active"].set_mode("active")
+    app.map.layer["sfincs_hmt"].layer["discharge_points"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask_active"].activate()
     update_list()
 
 def add_discharge_point(gdf, merge=True):
