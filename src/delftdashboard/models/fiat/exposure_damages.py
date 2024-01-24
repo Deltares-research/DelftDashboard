@@ -139,20 +139,23 @@ def damage_model_user_input(*args):
     damage_model_content = app.active_model.domain.exposure_vm.exposure_damages_model.dict() if damage_type == "content" else None
     
     # Set variable 
-    app.gui.setvar("fiat", "damage_type_structure",[damage_model_structure]) if damage_model_structure is not None else app.gui.setvar("fiat", "damage_type_content",damage_model_content)
+    app.gui.setvar("fiat", "damage_type_structure",damage_model_structure) if damage_model_structure is not None else app.gui.setvar("fiat", "damage_type_content",damage_model_content)
     
+
     # Create list of both damage type dictionaries
     damages = []
-    if app.gui.getvar("fiat", "damage_type_structure") is not None and app.gui.getvar("fiat", "damage_type_content") is None:
-       damages.append(app.gui.getvar("fiat", "damage_type_structure"))
-    elif app.gui.getvar("fiat", "damage_type_content") is not None and app.gui.getvar("fiat", "damage_type_structure") is None:
-       damages.append(app.gui.getvar("fiat", "damage_type_content"))
-    elif app.gui.getvar("fiat", "damage_type_structure") is not None and app.gui.getvar("fiat", "damage_type_content") is not None:
-       damages.append(app.gui.getvar("fiat", "damage_type_structure"))
-       damages.append(app.gui.getvar("fiat", "damage_type_content"))
 
-    return damages
-#when running setup function: for i in damages
-                                   # if i struct...
-                                   # if i cont
+    # Get damage structure and content variables
+    damages_struct = app.gui.getvar("fiat", "damage_type_structure")
+    damages_cont = app.gui.getvar("fiat", "damage_type_content")
     
+    # Create combined damage variable
+    if damages_struct is not None and  damages_cont is None:
+       damages.append(app.gui.getvar("fiat", "damage_type_structure"))
+    elif damages_cont is not None and  damages_struct is None:
+       damages.append(app.gui.getvar("fiat", "damage_type_content"))
+    elif damages_struct is not None and  damages_cont is not None:
+       damages.append((damages_struct, damages_cont))
+    damages = [item for damage_tuple in damages for item in damage_tuple]
+   
+    return damages
