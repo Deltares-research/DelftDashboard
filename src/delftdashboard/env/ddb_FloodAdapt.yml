@@ -1,0 +1,48 @@
+﻿name: ddb_FloodAdapt
+
+channels:
+  - conda-forge
+  - numba
+  - pyviz
+
+dependencies:
+  - black
+  - build
+  - cartopy>=0.20 # to run examples  
+  - jupyterlab  # to run examples    
+  - descartes # to run examples
+  - ffmpeg  # to run examples (animation)
+  - pydata-sphinx-theme # docs
+  - pytest-cov # tests  
+  - pytest # tests  
+  - python>=3.10 # sfincs >3.10, fiat >3.7
+  - datashader
+  - hydromt_sfincs>=1.0.3
+  - pillow
+  - scipy
+  - xugrid
+  - geopandas
+  - pandas
+  - mypy
+  - plotly
+  - twine
+  - tomli
+  - tomli-w
+  - hydromt
+  - numpy
+  - openpyxl
+  - pyproj
+  - shapely
+  - xarray
+  - geojson
+  - rasterio
+  - pip
+  - pip:
+    - NDBC
+    - noaa-coops
+    - sphinx_design
+    - git+https://github.com/Deltares/cht_observations.git@add_ndb_coops
+    - git+https://github.com/Deltares/hydromt_fiat.git
+    - git+https://github.com/Deltares/CoastalHazardsToolkit.git
+    - git+https://github.com/Deltares-research/Guitares.git
+    # TODO add hydromt_fiat to regular dependencies (when its available as conda package), and do the editable install in the install.py script
