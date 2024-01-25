@@ -104,7 +104,7 @@ def add_to_model(*args):
     # Get the max distance
     max_dist_gfh = app.gui.getvar("fiat", "max_dist_gfh")
 
-    app.active_model.domain.exposure_vm.set_ground_floor_height(
+    app.active_model.domain.exposure_vm.set_finished_floor_height(
         source=source_path,
         attribute_name=attribute_name_gfh,
         method=method_gfh,

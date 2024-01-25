@@ -80,9 +80,9 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title="Ground Floor Height",
+            legend_title="Finished Floor Height",
             line_color="transparent",
-            hover_property="Ground Floor Height",
+            hover_property="Finished Floor Height",
             big_data=True,
             min_zoom=12,
         )
@@ -488,7 +488,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "max_potential_damage_string",[])
         app.gui.setvar(group, "max_potential_damage_value",[])
         app.gui.setvar(group,"view_svi_value", pd.DataFrame)
-        app.gui.setvar(group,"view_exposure_value", pd.DataFrame(columns=["Object ID", "Object Name", "Primary Object Type", "Secondary Object Type", "Max Potential Damage: Structure","Max Potential Damage: Content","Ground Floor Height","Ground Elevation","Extraction Method", "Damage Function: Structure", "Damage Function: Content", "lanes", "Segment Length [m]", "SVI_key_domain", "SVI"]))
+        app.gui.setvar(group,"view_exposure_value", pd.DataFrame(columns=["Object ID", "Object Name", "Primary Object Type", "Secondary Object Type", "Max Potential Damage: Structure","Max Potential Damage: Content","Finished Floor Height","Ground Elevation","Extraction Method", "Damage Function: Structure", "Damage Function: Content", "lanes", "Segment Length [m]", "SVI_key_domain", "SVI"]))
     
     @staticmethod
     def set_dict_inverted(dictionary):
@@ -659,7 +659,7 @@ class Model(GenericModel):
         if type == "asset_height":
              circle_color = [
                 "step",
-                ["get", "Ground Floor Height"],"#000000",
+                ["get", "Finished Floor Height"],"#000000",
                 0.00001, "#FFFFFF",      
                 0.5, "#D6E1F8",      
                 1.0, "#A4C4F2",     
