@@ -39,12 +39,12 @@ mamba env create --file=./src/delftdashboard/env/ddb_FloodAdapt.yml --force
 conda activate ddb_FloodAdapt
 ```
 
-To be able to run the GUI, you need to:
-- create an account and generate a personal [mapbox_token.txt](https://www.mapbox.com/)
-- generate a personal [census_key.txt] (https://api.census.gov/data/key_signup.html)
-- Put 'mapbox_token.txt' and 'census_key.txt' in the same folder and make sure they are named correctly!
-- have access to the dependecy repositories (try makeing the environment, will get errors if you dont have access)
-- have access to P:\11207949-dhs-phaseii-floodadapt\Model-builder\Installation
+To be able to run the `FloodAdapt Model Builder GUI`, you need to:
+- Create an account and generate a personal [mapbox_token.txt](https://www.mapbox.com/)
+- Generate a personal [census_key.txt](https://api.census.gov/data/key_signup.html)
+- Put `mapbox_token.txt` and `census_key.txt` in the same folder and make sure they are named correctly!
+- Have access to the dependecy repositories (try makeing the environment, will get errors if you dont have access)
+- Have access to `P:\11207949-dhs-phaseii-floodadapt`
 Then, in order to develop on the `FloodAdapt Model Builder GUI` locally and have the GUI use your local versions of repositories, run the [install script](src/delftdashboard/install.py).
 
 ```

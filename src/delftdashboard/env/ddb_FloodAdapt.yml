@@ -6,37 +6,37 @@ channels:
   - pyviz
 
 dependencies:
-  - black
-  - build
-  - cartopy>=0.20 # to run examples  
-  - jupyterlab  # to run examples    
-  - descartes # to run examples
-  - ffmpeg  # to run examples (animation)
-  - pydata-sphinx-theme # docs
-  - pytest-cov # tests  
-  - pytest # tests  
-  - python>=3.10 # sfincs >3.10, fiat >3.7
-  - datashader
-  - hydromt_sfincs>=1.0.3
-  - pillow
-  - scipy
-  - xugrid
-  - geopandas
-  - pandas
-  - mypy
-  - plotly
-  - twine
-  - tomli
-  - tomli-w
-  - hydromt
-  - numpy
-  - openpyxl
-  - pyproj
-  - shapely
-  - xarray
-  - geojson
-  - rasterio
-  - pip
+  - python>=3.10          # TODO check versioning sfincs >3.10, fiat >3.7
+  - black                 # code style
+  - build                 # environment
+  - mypy                  # static type checking
+  - pydata-sphinx-theme   # docs
+  - twine                 # docs
+  - cartopy>=0.20         # examples  
+  - jupyterlab            # examples    
+  - descartes             # examples
+  - ffmpeg                # examples (animation)
+  - pytest                # tests  
+  - pytest-cov            # tests  
+  - hydromt_sfincs>=1.0.3 # sfincs
+  - hydromt               # hydromt
+  - datashader            # plotting
+  - pillow                # plotting
+  - scipy                 # n-dim interpolation
+  - numpy                 # quick array operations
+  - openpyxl              # excel
+  - xarray                # multidimensional arrays
+  - xugrid                # geo data    
+  - geopandas             # geo data
+  - rasterio              # geo data
+  - shapely               # geo data
+  - geojson               # geo data
+  - pandas                # data
+  - plotly                # plotting
+  - tomli                 # toml files
+  - tomli-w               # toml files
+  - pyproj                # setting up pyproj.toml
+  - pip                   # installing from git
   - pip:
     - NDBC
     - noaa-coops
