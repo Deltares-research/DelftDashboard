@@ -12,6 +12,8 @@ from delftdashboard.operations import map
 def select(*args):
     # De-activate existing layers
     map.update()
+    if app.map.layer["buildings"].layer["exposure_points"].data is None:
+        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
 
 def create_model(*args):
     if app.active_model.domain is None:

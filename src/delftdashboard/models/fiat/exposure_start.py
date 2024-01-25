@@ -7,6 +7,7 @@ import pandas as pd
 def select(*args):
     # De-activate existing layers
     map.update()
+    app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
 
 
 def edit(*args):
@@ -19,7 +20,6 @@ def select_model_type(*args):
     if model_type == "Start with NSI":
         app.gui.setvar(group, "selected_asset_locations_string", ["National Structure Inventory (NSI)"])
         app.gui.setvar(group, "selected_asset_locations", 0)
-
         # For classification the NSI data cannot be used because it is already used, you can only update it with other data.
         app.gui.setvar(group, "classification_source", "nsi_data")
         app.gui.setvar(
@@ -82,8 +82,13 @@ def add_exposure_locations_to_model(*args):
             title="Not yet implemented",
         )
         return
-
+    
     app.active_model.domain.exposure_vm.set_asset_data_source(selected_asset_locations)
+
+    # Hide Boundary Box
+    if app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")]:
+        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].hide() 
+
 
 
 def build_nsi_exposure(*args):
