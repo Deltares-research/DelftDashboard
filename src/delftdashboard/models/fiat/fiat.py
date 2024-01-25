@@ -325,6 +325,16 @@ class Model(GenericModel):
         app.gui.setvar(group, "loaded_ground_elevation_files", 0)
         app.gui.setvar(
             group,
+            "ground_elevation_files_string",
+            ["SFINCS Ground Elevation", "Upload data"],
+        )
+        app.gui.setvar(
+            group,
+            "ground_elevation_files_value",
+            ["sfincs_data", "upload_data"],
+        )
+        app.gui.setvar(
+            group,
             "loaded_ground_elevation_files_string",
             [],
         )
