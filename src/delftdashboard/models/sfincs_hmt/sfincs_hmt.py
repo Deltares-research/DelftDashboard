@@ -325,6 +325,10 @@ def update_map():
     if not app.map.map_extent:
         print("Map extent not yet available ...")
         return
+    
+    # check if bed_levels layer is visible
+    if not app.map.layer["sfincs_hmt"].layer["bed_levels"].visible:
+        return
 
     # check if grid is already defined
     grid = app.model["sfincs_hmt"].domain.grid

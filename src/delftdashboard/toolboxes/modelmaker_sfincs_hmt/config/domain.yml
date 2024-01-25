@@ -85,7 +85,7 @@ element:
     text: "Include precipitation"
     text_position: right
     variable: include_precip
-    tooltip: "When you want to rainfall, we recommend to delineate your model domain with watershed boundaries."
+    tooltip: "When you want to include local precipitation, we recommend to delineate your model domain with watershed boundaries."
     method: select_setup_grid_method   
   - style: popupmenu
     position:
@@ -95,7 +95,7 @@ element:
       height: 20
     tooltip: Select method to determine model extent
     select: index
-    method: select_method
+    # method: select_method
     variable: setup_grid_methods_index
     option_string:
       variable: setup_grid_methods
