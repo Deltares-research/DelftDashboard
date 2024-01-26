@@ -65,7 +65,7 @@ def check_env_creation() -> None:
         exit()
 
 
-def get_user_input() -> tuple[dict[str, Union[Path, None]], Path]:
+def get_repo_paths() -> dict[str, Union[Path, None]]:
     print(
         f"\nEnter local repository paths RELATIVE to the CURRENT WORKING DIRECTORY:\n{os.getcwd()}\nLeave empty if you dont want to have a local editable installation of the repository."
     )
@@ -73,16 +73,21 @@ def get_user_input() -> tuple[dict[str, Union[Path, None]], Path]:
     repos = ["hydromt_fiat", "hydromt_sfincs", "guitares"]
     repo_paths = {repo_name: get_repo_path(repo_name) for repo_name in repos}
 
-    user_specific_folder = Path(
-        input(
-            "\nEnter the path to a folder containing your personal mapbox_token.txt and census_key.txt (that you generated):\n"
-        )
-    ).resolve()
-    check_dir_exists(user_specific_folder)
-    return repo_paths, user_specific_folder
+    return repo_paths
 
 
-def copy_user_files(user_specific_folder: Path, ddb_config_dir: Path) -> None:
+def get_and_copy_user_files(ddb_config_dir: Path) -> None:
+    valid = False
+    user_specific_folder = Path()
+
+    while not valid:
+        user_specific_folder = Path(
+            input(
+                "\nEnter the path to a folder containing your personal mapbox_token.txt and census_key.txt (that you generated):\n"
+            )
+        ).resolve()
+        valid = check_dir_exists(user_specific_folder)
+
     # These are files each user needs to generate themselves
     user_specific_files = {
         "mapbox_token.txt": user_specific_folder / "mapbox_token.txt",
@@ -215,17 +220,12 @@ def main():
     )
 
     check_env_creation()
-
-    repo_paths, user_specific_folder = get_user_input()
-
-    copy_user_files(user_specific_folder, ddb_config_dir)
-
+    repo_paths = get_repo_paths()
+    get_and_copy_user_files(ddb_config_dir)
     target_paths = copy_p_drive_files(
         p_drive_modelbuilder_installation, ddb_config_dir, repo_paths
     )
-
     update_delftdashboard_ini(target_paths)
-
     optional_editable_install(repo_paths)
 
 
