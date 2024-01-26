@@ -54,10 +54,6 @@ def load_sfincs_ground_elevation(*args):
             app.gui.setvar("fiat", "loaded_ground_elevation_files_string", current_list_string)
 
 
-             
-    
-    return fn_sfincs_ge
-
 def remove_datasource(*args):
     current_list_string = app.gui.getvar("fiat", "loaded_ground_elevation_files_string")
     deselected_aggregation = app.gui.getvar("fiat", "loaded_ground_elevation_files")
