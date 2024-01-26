@@ -108,11 +108,11 @@ def initialize_checklist():
             item = {}
             item["style"] = "pushbutton"
             item["position"] = {}
-            item["position"]["x"] = 90
+            item["position"]["x"] = 85
             item["position"]["y"] = space
-            item["position"]["width"] = 30
+            item["position"]["width"] = 16
             item["position"]["height"] = 16
-            item["text"] = 'zoom'
+            item["text"] = '\U0001F50E'
             item["method"] = "zoom_to_boundary"
             config_dict["element"].append(item)
 
