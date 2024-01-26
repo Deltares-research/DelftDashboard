@@ -348,6 +348,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "method_gfh_value", ["nearest", "intersection"])
 
         ## Ground Elevation tab ##
+        app.gui.setvar("fiat", "update_source_ground_elevation", "sfincs_data")
         app.gui.setvar(group, "loaded_ground_elevation_files", 0)
         app.gui.setvar(
             group,

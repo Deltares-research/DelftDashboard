@@ -14,7 +14,7 @@ element:
       width: 160
       height: 20
     text: ""
-    variable: source_ground_elevation
+    variable: update_source_ground_elevation
     option_string:
       variable: ground_elevation_files_string
     option_value:
@@ -25,7 +25,7 @@ element:
       y: 10
       width: 160
       height: 20
-    text: "Load source"
+    text: "Select source"
     method: select_ground_elevation_file
 
 - style: panel
