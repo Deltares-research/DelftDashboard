@@ -80,13 +80,14 @@ def delete_include_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "mask_include_polygon_index")
     # or: iac = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon.loc[
+    feature_id = app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].gdf.loc[
         index, "id"
     ]
     # Delete from map
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].delete_feature(
         feature_id
     )
+
     # Delete from app
     app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon = app.toolbox[
         "modelmaker_sfincs_hmt"
@@ -101,7 +102,6 @@ def delete_include_polygon(*args):
     
     # update list and GUI
     update()
-    app.gui.window.update()
 
 def load_include_polygon(*args):
     fname = app.gui.window.dialog_open_file(
@@ -171,7 +171,7 @@ def delete_exclude_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "mask_exclude_polygon_index")
     # or: iac = args[0]
-    feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon.loc[
+    feature_id = app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].gdf.loc[
         index, "id"
     ]
     # Delete from map
@@ -192,7 +192,6 @@ def delete_exclude_polygon(*args):
 
     # update list and GUI
     update()
-    app.gui.window.update()
 
 
 def load_exclude_polygon(*args):
@@ -220,7 +219,6 @@ def load_exclude_polygon(*args):
 def save_exclude_polygon(*args):
     pass
 
-
 def select_exclude_polygon(*args):
     index = args[0]
     feature_id = app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon.loc[
@@ -229,7 +227,6 @@ def select_exclude_polygon(*args):
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].activate_feature(
         feature_id
     )
-
 
 def exclude_polygon_created(gdf, index, id):
     """Add an exclude polygon to the modelmaker toolbox"""
