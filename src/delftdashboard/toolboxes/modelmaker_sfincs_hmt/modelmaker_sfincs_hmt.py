@@ -189,41 +189,39 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "qinf_dataset_names", qinf_dataset_names)
         app.gui.setvar(group, "qinf_dataset_index", 0)
 
-        # Mask active
+        # Mask active (initial)
         app.gui.setvar(group, "mask_init_fname", "")
         app.gui.setvar(group, "mask_active_zmax", 10.0)
         app.gui.setvar(group, "mask_active_zmin", -10.0)
         app.gui.setvar(group, "mask_active_drop_area", 0.0)
         app.gui.setvar(group, "mask_active_fill_area", 10.0)
         app.gui.setvar(group, "mask_active_reset", True)
+
+        # Mask active (explicitly include)
         app.gui.setvar(group, "mask_include_polygon_names", [])
         app.gui.setvar(group, "mask_include_polygon_index", 0)
         app.gui.setvar(group, "nr_mask_include_polygons", 0)
+        app.gui.setvar(group, "mask_active_add", False)
+
+        # Mask active (explicitly exclude)
         app.gui.setvar(group, "mask_exclude_polygon_names", [])
         app.gui.setvar(group, "mask_exclude_polygon_index", 0)
         app.gui.setvar(group, "nr_mask_exclude_polygons", 0)
-        app.gui.setvar(group, "mask_boundary_type", 2)
-        app.gui.setvar(group, "mask_active_add", False)
         app.gui.setvar(group, "mask_active_del", False)
 
         # Mask bounds
+        app.gui.setvar(group, "mask_boundary_type", 2)
+        # Waterlevel
         app.gui.setvar(group, "wlev_include_polygon_names", [])
         app.gui.setvar(group, "wlev_include_polygon_index", 0)
         app.gui.setvar(group, "nr_wlev_include_polygons", 0)
-        # app.gui.setvar(group, "wlev_exclude_polygon_names", [])
-        # app.gui.setvar(group, "wlev_exclude_polygon_index", 0)
-        # app.gui.setvar(group, "nr_wlev_exclude_polygons", 0)
         app.gui.setvar(group, "wlev_zmax", -2.0)
-        # app.gui.setvar(group, "wlev_reset", True)
 
+        # Outflow
         app.gui.setvar(group, "outflow_include_polygon_names", [])
         app.gui.setvar(group, "outflow_include_polygon_index", 0)
         app.gui.setvar(group, "nr_outflow_include_polygons", 0)
-        # app.gui.setvar(group, "outflow_exclude_polygon_names", [])
-        # app.gui.setvar(group, "outflow_exclude_polygon_index", 0)
-        # app.gui.setvar(group, "nr_outflow_exclude_polygons", 0)
         app.gui.setvar(group, "outflow_zmin", 2.0)
-        # app.gui.setvar(group, "outflow_reset", True)
 
         # subgrid
         app.gui.setvar(group, "nr_subgrid_pixels", 20)
