@@ -140,6 +140,10 @@ def draw_boundary(*args):
         elif selected_method == "sfincs":
             load_sfincs_domain()
         elif selected_method == "file":
+            app.gui.window.dialog_info(
+                "Please select your model boundary files",
+                "Select Model Boundary files",
+            )
             load_aoi_file()
     else:
         selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
@@ -269,11 +273,6 @@ def set_active_area_file(*args):
 
 def load_aoi_file():
     clear_aoi_layers()
-    if app.active_model.domain is not None:
-            app.gui.window.dialog_info(
-                "Now you can select your model boundary files",
-                "Select Model Boundary files",
-            )
     fname = app.gui.window.dialog_open_file(
         "Select Area of Interest File", filter="*.shp *.geojson *.gpkg"
     )
