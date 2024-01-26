@@ -190,16 +190,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "qinf_dataset_index", 0)
 
         # Mask active
-        mask_polygon_methods = [
-            "Load Polygon",
-            "Draw Polygon",
-            "Delete Polygon",
-            "Save Polygon",
-        ]
-
-        app.gui.setvar(group, "mask_init_polygon_methods", mask_polygon_methods)
-        app.gui.setvar(group, "mask_init_polygon_methods_index", 0)
-        app.gui.setvar(group, "nr_mask_init_polygons", 0)
+        app.gui.setvar(group, "mask_init_fname", "")
         app.gui.setvar(group, "mask_active_zmax", 10.0)
         app.gui.setvar(group, "mask_active_zmin", -10.0)
         app.gui.setvar(group, "mask_active_drop_area", 0.0)
@@ -482,6 +473,8 @@ class Toolbox(GenericToolbox):
         gdf = mask2gdf(mask, option="active")
         if gdf is not None:
             app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
+        else:
+            app.map.layer["sfincs_hmt"].layer["mask_active"].clear()
 
         # update bathymetry on map
         app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
