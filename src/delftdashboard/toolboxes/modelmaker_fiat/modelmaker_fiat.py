@@ -520,3 +520,22 @@ def display_roads(*args):
         app.active_model.show_exposure_roads()
     else:
         app.active_model.hide_exposure_roads()
+
+def remove_datasource(*args):
+    
+    # Get index of selected item and check length 
+    fn_index = app.gui.getvar("modelmaker_fiat", "selected_model_boundary")
+    list_model_boundaries= app.gui.getvar("modelmaker_fiat", "model_boundary_file_list")
+    if fn_index > len(
+        list_model_boundaries
+    ) or fn_index == len(list_model_boundaries):
+        fn_index = 0    
+    
+    # Update item list (file name)
+    list_model_boundaries.remove(list_model_boundaries[fn_index])
+    app.gui.setvar("modelmaker_fiat", "model_boundary_file_list", list_model_boundaries)
+
+    # Update item value (file path) 
+    fn_list_model_boundaries = app.gui.getvar("modelmaker_fiat", "fn_model_boundary_file_list")
+    fn_list_model_boundaries.remove(fn_list_model_boundaries[fn_index])
+    app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fn_list_model_boundaries)
