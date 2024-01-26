@@ -55,7 +55,7 @@ element:
           operator: eq
           value: box
     - style: pushbutton
-      text: Load
+      text: Select source
       position:
         x: 140
         y: 95
