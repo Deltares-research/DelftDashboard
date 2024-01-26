@@ -116,15 +116,34 @@ def select(*args):
 
 
 def draw_boundary(*args):
-    selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
-    if selected_method == "polygon":
-        draw_polygon()
-    elif selected_method == "box":
-        draw_bbox()
-    elif selected_method == "sfincs":
-        load_sfincs_domain()
-    elif selected_method == "file":
-        load_aoi_file()
+    if app.active_model.domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+        # Initiate a new FIAT model
+        app.active_model.new()
+
+        #Load the file
+        selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
+        if selected_method == "polygon":
+            draw_polygon()
+        elif selected_method == "box":
+            draw_bbox()
+        elif selected_method == "sfincs":
+            load_sfincs_domain()
+        elif selected_method == "file":
+            load_aoi_file()
+    else:
+        selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
+        if selected_method == "polygon":
+            draw_polygon()
+        elif selected_method == "box":
+            draw_bbox()
+        elif selected_method == "sfincs":
+            load_sfincs_domain()
+        elif selected_method == "file":
+            load_aoi_file()
 
 
 def generate_boundary(*args):
