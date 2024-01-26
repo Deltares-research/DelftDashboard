@@ -1,6 +1,7 @@
 import geopandas as gpd
 import pandas as pd
 import time
+import copy
 from pathlib import Path
 from shapely.geometry import Polygon
 
@@ -44,6 +45,12 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "titles_model_boundary_tab", 1)
 
         # Area of Interest
+        app.gui.setvar(group, "model_boundary_file_list", [])
+        app.gui.setvar(group, "selected_model_boundary", 0)
+        app.gui.setvar(group, "area_of_interest_string", "")
+        app.gui.setvar(group, "area_of_interest_value", None)
+        app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", [])
+        
         self.area_of_interest = gpd.GeoDataFrame()
         self.area_of_interest_file_name = "area_of_interest.geojson"
 
@@ -182,6 +189,8 @@ def generate_boundary(*args):
     # Check the checkbox
     app.gui.setvar("_main", "checkbox_model_boundary", True)
 
+    # Fly to the site
+    zoom_to_boundary()
 
 def select_method(*args):
     app.gui.setvar("modelmaker_fiat", "selected_aoi_method", args[0])
@@ -229,28 +238,64 @@ def draw_polygon():
         "modelmaker_fiat", "active_area_of_interest", "area_of_interest_polygon"
     )
 
+def write_fn_to_table(*args):
+    fn_model_boundary= app.gui.getvar("modelmaker_fiat", "area_of_interest_value")
+    name_model_boundary= app.gui.getvar("modelmaker_fiat", "area_of_interest_string")
+    list_model_boundaries = app.gui.getvar("modelmaker_fiat", "model_boundary_file_list")
+    fn_list_model_boundaries = app.gui.getvar("modelmaker_fiat", "fn_model_boundary_file_list")
+    if name_model_boundary not in list_model_boundaries:
+        list_model_boundaries.append(name_model_boundary)
+    app.gui.setvar("modelmaker_fiat", "model_boundary_file_list", list_model_boundaries)
+    if fn_model_boundary not in fn_list_model_boundaries:
+        fn_list_model_boundaries.append(fn_model_boundary)
+    app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fn_list_model_boundaries)
+
+
+def set_active_area_file(*args):
+    clear_aoi_layers()
+    fn_index = app.gui.getvar("modelmaker_fiat", "selected_model_boundary")
+    selected_fn_model_boundary= app.gui.getvar("modelmaker_fiat", "fn_model_boundary_file_list")[fn_index]
+    
+    gdf = gpd.read_file(selected_fn_model_boundary)
+    gdf.to_crs(app.crs, inplace=True)
+
+# Add the polygon to the map
+    layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
+    layer.set_data(gdf)
+    app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
+    app.gui.setvar(
+    "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file"
+    )
 
 def load_aoi_file():
     clear_aoi_layers()
-
+    if app.active_model.domain is not None:
+            app.gui.window.dialog_info(
+                "Now you can select your model boundary files",
+                "Select Model Boundary files",
+            )
     fname = app.gui.window.dialog_open_file(
         "Select Area of Interest File", filter="*.shp *.geojson *.gpkg"
     )
     if fname[0]:
-        gdf = gpd.read_file(fname[0])
-        gdf.to_crs(app.crs, inplace=True)
+        app.gui.setvar("modelmaker_fiat", "area_of_interest_string", Path(fname[0]).name)
+        app.gui.setvar("modelmaker_fiat", "area_of_interest_value", fname[0])
+        write_fn_to_table()
+        file_list = app.gui.getvar("modelmaker_fiat", "model_boundary_file_list")
+
+        if len(file_list) == 1:
+            gdf = gpd.read_file(fname[0])
+            gdf.to_crs(app.crs, inplace=True)
 
         # Add the polygon to the map
-        layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
-        layer.set_data(gdf)
-        app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
-        app.gui.setvar(
+            layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
+            layer.set_data(gdf)
+            app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
+            app.gui.setvar(
             "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file"
-        )
+            )
 
-        # Fly to the site
-        zoom_to_boundary()
-
+    
 
 def load_sfincs_domain(*args):
     clear_aoi_layers()
