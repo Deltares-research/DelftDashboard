@@ -2,52 +2,55 @@ import shutil
 from pathlib import Path
 import subprocess
 import os
+from typing import Union
 import yaml
+import sys
 
 
-def update_ini_values(ini_file: Path, replacements: dict):
-    with open(ini_file, "r") as f:
-        # needs at least PyYAML 5.1
-        config = yaml.safe_load(f)
-        for key in config:
-            if key in replacements:
-                config[key] = replacements[key]
-
-    with open(os.path.join(ini_file), "w") as f:
-        yaml.dump(config, f)
-
-
-def check_dir_exists(dir_path: Path):
+def check_dir_exists(dir_path: Path) -> bool:
     if not dir_path.exists():
-        print(f"Folder '{dir_path}' does not exist. Please provide a valid folder path.")
-        exit()
-
-def get_repo_path(repo_name: str):
-    path = Path(input(f"Enter the path to your local {repo_name} cloned repository (leave empty to install a non-editable git version):\n"))
-    if path.resolve() == Path('.').resolve() and repo_name.lower() != "delftdashboard":
-        return None
-    check_dir_exists(path)
-    return path.resolve()
-
-def main():
-    # Set the current working directory to the root for DelftDashboard so relative paths work
-    ddb_rootdir = Path(os.path.abspath(__file__)).parent.parent.parent
-    os.chdir(ddb_rootdir)
-
-    # Check if the last part of the path is "DelftDashboard"
-    if ddb_rootdir.name != "DelftDashboard":
         print(
-            f"Please make sure the root directory is 'DelftDashboard'. The current root directory is: {os.getcwd()}"
+            f"Folder '{dir_path}' does not exist. Please provide a valid folder path."
+        )
+        return False
+    return True
+
+
+def get_repo_path(repo_name: str) -> Union[Path, None]:
+    valid_path = False
+    path = Path()
+
+    while not valid_path:
+        user_input = input(
+            f"\nEnter the path to your local {repo_name} cloned repository (leave empty to install a non-editable git version):\n"
+        )
+        if user_input is None:
+            return None
+        else:
+            path = Path(user_input).resolve()
+            valid_path = check_dir_exists(path)
+    return path
+
+
+def get_and_check_script_location() -> Path:
+    script_path = Path(os.path.abspath(__file__))
+    ddb_src_dir = script_path.parent.parent
+
+    if ddb_src_dir.name != "src":
+        print(
+            f"Please make sure this script is in the directory: '<root>/src/delftDashboard/'. The current location is: {script_path}"
         )
         exit()
+    return script_path
 
-    env_created = (
-        input(
-            "Have you CREATED and ACTIVATED virtual environment (ddb_fiat or ddb_sfincs or ddb_FloodAdapt)? (y/n): "
-        ).lower()
-        == "y"
+
+def check_env_creation() -> None:
+    python_path = sys.executable
+    env_active = any(
+        env_name in python_path
+        for env_name in ["ddb_fiat", "ddb_sfincs", "ddb_dev", "ddb_floodadapt"]
     )
-    if not env_created:
+    if not env_active:
         print(
             """
             Please CREATE and ACTIVATE the virtual environment for DelftDashboard before running this script.\n
@@ -60,124 +63,171 @@ def main():
             """
         )
         exit()
-    P_DRIVE_modelbuilder_Installation = Path("P:/11207949-dhs-phaseii-floodadapt/Model-builder/Installation")
 
-    print("ENTER LOCAL REPOSITORY PATHS, LEAVE EMPTY IF YOU DONT WANT TO HAVE LOCAL EDITABLE VERSIONS" )
+
+def get_user_input() -> tuple[dict[str, Union[Path, None]], Path]:
+    print(
+        f"\nEnter local repository paths RELATIVE to the CURRENT WORKING DIRECTORY:\n{os.getcwd()}\nLeave empty if you dont want to have a local editable installation of the repository."
+    )
+
     repos = ["hydromt_fiat", "hydromt_sfincs", "guitares"]
-    repo_paths = {repo_name : get_repo_path(repo_name) for repo_name in repos}
+    repo_paths = {repo_name: get_repo_path(repo_name) for repo_name in repos}
 
     user_specific_folder = Path(
         input(
-            "Enter the path to a folder containing your personal mapbox_token.txt and census_key.txt (that you generated):\n"
+            "\nEnter the path to a folder containing your personal mapbox_token.txt and census_key.txt (that you generated):\n"
         )
     ).resolve()
     check_dir_exists(user_specific_folder)
+    return repo_paths, user_specific_folder
 
-    # === FILES THAT NEED TO BE COPIED TO THE REPOSITORY ===
-    # In the repo there exists a default catalog, if the user want more, add the path to the catalog in delftdashboard.ini
-    data_catalog_USA = P_DRIVE_modelbuilder_Installation / "data_catalog_USA.yml"
-    hydromt_fiat_catalog_USA = P_DRIVE_modelbuilder_Installation / "hydromt_fiat_catalog_USA.yml"
-    hydromt_sfincs_catalog = P_DRIVE_modelbuilder_Installation / "data_catalog.yml"
 
-    # cannot be in the repo
-    bathemetry_dataFolder = P_DRIVE_modelbuilder_Installation / "data" # too large for repo, needed for sfincs
-    Hazus_IWR_curves = P_DRIVE_modelbuilder_Installation / "Hazus_IWR_curves.csv" # sensitive data, needed for fiat
-
+def copy_user_files(user_specific_folder: Path, ddb_config_dir: Path) -> None:
+    # These are files each user needs to generate themselves
     user_specific_files = {
-        # These are files each user needs to generate themselves
-        "mapbox_token": user_specific_folder / "mapbox_token.txt",
-        "census_key": user_specific_folder / "census_key.txt",
+        "mapbox_token.txt": user_specific_folder / "mapbox_token.txt",
+        "census_key.txt": user_specific_folder / "census_key.txt",
     }
     # Check if the user-specific files exist
     for file_name, file_path in user_specific_files.items():
         if not file_path.exists():
             print(
-                f"File '{file_path}' does not exist. Please provide a valid file path to {file_name}."
+                f"File '{file_path}' does not exist. Please provide a valid file path to {file_name}"
             )
-            if file_name == "mapbox_token":
+            if file_name == "mapbox_token.txt":
                 print(
                     "go to https://www.mapbox.com/ and create an account to request a personal mapbox_token.txt"
                 )
-            elif file_name == "census_key":
+            elif file_name == "census_key.txt":
                 print(
                     "go to https://api.census.gov/data/key_signup.html to request a personal census_key.txt"
                 )
             exit()
+        else:
+            shutil.copy(user_specific_files[file_name], ddb_config_dir / file_name)
+            print(f"Copied {file_name} to {ddb_config_dir}")
+
+
+def copy_p_drive_files(
+    p_drive_modelbuilder_installation: Path,
+    ddb_config_dir: Path,
+    repo_paths: dict[str, Union[Path, None]],
+) -> dict[str, Path]:
+    # == P DRIVE FILES ==
+    file_names = [
+        "delftdashboard.ini",
+        "data_catalog_USA.yml",
+        "hydromt_fiat_catalog_USA.yml",
+        "data_catalog.yml",
+        "data",
+        "Hazus_IWR_curves.csv",
+    ]
+    keys = [
+        "delftdashboard.ini",
+        "datalib_delftdashboard",
+        "hydromt_fiat_catalog_USA",
+        "hydromt_sfincs_catalog",
+        "bathemetry_dataFolder",
+        "Hazus_IWR_curves",
+    ]
+
+    p_drive_files = {
+        key: p_drive_modelbuilder_installation / file_name
+        for key, file_name in zip(keys, file_names)
+    }
 
     # === TARGET PATHS ===
-    # TODO Check which are needed and which can be in the P drive!!
-    targetPath_config_folder = Path("src/delftdashboard/config").resolve()
-    targetPath_ini_file = (targetPath_config_folder/ "delftdashboard.ini")
-    targetPath_bathymetry_database = Path("data/bathymetry").resolve()
-    
-    targetPath_datalib_delftdashboard = Path(
-        "src/delftdashboard/config/data_catalog_USA.yml"
-    ).resolve()
-    targetPath_datalib_delftdashboard_roel = Path(
-        "src/delftdashboard/config/data_catalog.yml"
-    ).resolve()
-    targetPath_datalib_hydromt_fiat = (
-        repo_paths["hydromt_fiat"] / "hydromt_fiat/data/hydromt_fiat_catalog_USA.yml"
-    ).resolve()
-    targetPath_Hazus_IWR_curves = (
-        repo_paths["hydromt_fiat"]
-        / "hydromt_fiat/data/damage_functions/flooding/Hazus_IWR_curves.csv"
-    ).resolve()
+    target_paths = {
+        "delftdashboard.ini": ddb_config_dir / "delftdashboard.ini",
+        "datalib_delftdashboard": ddb_config_dir / "data_catalog_USA.yml",
+        "hydromt_sfincs_catalog": ddb_config_dir / "data_catalog.yml",
+        "bathemetry_dataFolder": ddb_config_dir.parent.parent / "data" / "bathemetry",
+    }
 
-    # === REPLACEMENTS FOR DELFDASHBOARD.INI ===
-    # add stuff to this dict if you want to replace something in the delftdashboard.ini
+    if repo_paths["hydromt_fiat"] is not None:
+        target_paths.update(
+            {
+                "hydromt_fiat_catalog_USA": repo_paths["hydromt_fiat"]
+                / "hydromt_fiat/data/hydromt_fiat_catalog_USA.yml",
+                "Hazus_IWR_curves": repo_paths["hydromt_fiat"]
+                / "hydromt_fiat/data/damage_functions/flooding/Hazus_IWR_curves.csv",
+            }
+        )
+    else:
+        pass
+        # TODO set targetpaths to environment folder?
+        # this will be gone eventually when hydromt_fiat is updated to not hardcoded to need the catalog anymore
+
+    # Copy files and folders from P drive to target paths
+    for source_name, source_path in p_drive_files.items():
+        if source_path.is_dir():
+            # Recursively copy folders
+            shutil.copytree(
+                p_drive_files[source_name],
+                target_paths[source_name],
+                dirs_exist_ok=True,
+            )
+            print(f"Copied folder {source_name} to {target_paths[source_name]}")
+        else:
+            # Copy files
+            shutil.copy(source_path, target_paths[source_name])
+            print(f"Copied file {source_name} to {target_paths[source_name]}")
+
+    print("\nConfidential files and data folder locations updated successfully.")
+
+    return target_paths
+
+
+def update_delftdashboard_ini(target_paths: dict[str, Path]) -> None:
+    # In the repo there exists a default catalog, if the user want more, add the path to the data_libs here
     replacements = {
-        "bathymetry_database": str(targetPath_bathymetry_database),
+        "bathymetry_database": str(target_paths["bathemetry_dataFolder"]),
         "data_libs": [
-            str(targetPath_datalib_delftdashboard),
-            str(targetPath_datalib_hydromt_fiat),
-            str(targetPath_datalib_delftdashboard_roel),
+            str(target_paths["datalib_delftdashboard"]),
+            str(target_paths["hydromt_fiat_catalog_USA"]),
+            str(target_paths["hydromt_sfincs_catalog"]),
         ],
     }
 
-    update_ini_values(targetPath_ini_file, replacements)
+    with open(target_paths["delftdashboard.ini"], "r+") as f:
+        config = yaml.safe_load(f)
+        for key in config:
+            if key in replacements:
+                config[key] = replacements[key]
+        yaml.dump(config, f)
     print("delftdashboard.ini updated successfully.")
 
-    # Copy the mapbox_token.txt file
-    shutil.copy(
-        user_specific_files["mapbox_token"], targetPath_config_folder / "mapbox_token.txt"
-    )
-    print(f"Copied mapbox_token.txt to {targetPath_config_folder}.")
 
-    # Copy the census_key.txt file
-    shutil.copy(
-        user_specific_files["census_key"], targetPath_config_folder / "census_key.txt"
-    )
-    print(f"Copied census_key.txt to {targetPath_config_folder}.")
-
-    # Copy the data_catalog_USA.yml file to the delftdashboard/config folder
-    shutil.copy(data_catalog_USA, targetPath_datalib_delftdashboard)
-    print(f"Copied data_catalog_USA.yml to {targetPath_datalib_delftdashboard}.")
-
-    # Copy the data_catalog_USA.yml file to the delftdashboard/config folder
-    shutil.copy(hydromt_sfincs_catalog, targetPath_datalib_delftdashboard_roel)
-    print(f"Copied hydromt_fiat_catalog_USA.yml to {targetPath_datalib_delftdashboard_roel}.")
-    
-    # Copy the data_catalog_USA.yml file to the hydromt_fiat/ folder
-    shutil.copy(hydromt_fiat_catalog_USA, targetPath_datalib_hydromt_fiat)
-    print(f"Copied hydromt_fiat_catalog_USA.yml to {targetPath_datalib_hydromt_fiat}.") 
-    
-    # Copy the Hazus_IWR_curves.csv file
-    shutil.copy(Hazus_IWR_curves, targetPath_Hazus_IWR_curves)
-    print(f"Copied Hazus_IWR_curves.csv to {targetPath_Hazus_IWR_curves}.")
-
-    # Recursively copy the DelftDashboard/data folder
-    shutil.copytree(bathemetry_dataFolder, "data", dirs_exist_ok=True)
-    print(f"Copied bathemetry data to {ddb_rootdir/'data'}.")
-
-    print("\nConfidential & user specific files/folder locations updated successfully.")
-
+def optional_editable_install(repo_paths: dict[str, Union[Path, None]]) -> None:
     print("\nSetting up local editable versions of repositories...")
-
     # Install the editable repositories
     for repo in repo_paths.values():
         if repo is not None:
             subprocess.run(["pip", "install", "-e", repo], shell=True)
+
+
+def main():
+    script_path = get_and_check_script_location()
+    ddb_config_dir = script_path.parent / "config"
+
+    p_drive_modelbuilder_installation = Path(
+        "P:/11207949-dhs-phaseii-floodadapt/Model-builder/Installation"
+    )
+
+    check_env_creation()
+
+    repo_paths, user_specific_folder = get_user_input()
+
+    copy_user_files(user_specific_folder, ddb_config_dir)
+
+    target_paths = copy_p_drive_files(
+        p_drive_modelbuilder_installation, ddb_config_dir, repo_paths
+    )
+
+    update_delftdashboard_ini(target_paths)
+
+    optional_editable_install(repo_paths)
+
 
 if __name__ == "__main__":
     main()

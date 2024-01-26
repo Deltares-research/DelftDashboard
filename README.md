@@ -1,5 +1,5 @@
 # FloodAdapt Model Builder GUI
-This repository contains the FIAT Model Builder GUI, using the [Guitares](https://github.com/Deltares/guitares) GUI framework and [HydroMT-FIAT](https://github.com/Deltares/hydromt_fiat) as back-end.
+This repository contains the FloodAdapt Model Builder GUI, using the [Guitares](https://github.com/Deltares/guitares) GUI framework as frontend, and [HydroMT-SFINCS](https://github.com/Deltares/hydromt_sfincs) and [HydroMT-FIAT](https://github.com/Deltares/hydromt_fiat) as back-end.
 
 # Contributing
 
@@ -28,7 +28,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 
 ```
 cd <location of your repository clone of DelftDashboard> 
-mamba env create --file=./src/delftdashboard/env/ddb_FloodAdapt.yml --force
+mamba env create --file=./src/delftdashboard/env/ddb_floodadapt.yml --force
 ```
 
 ## Installing the FloodAdapt Model Builder GUI
@@ -36,15 +36,20 @@ mamba env create --file=./src/delftdashboard/env/ddb_FloodAdapt.yml --force
 - Activate the environment
 
 ```
-conda activate ddb_FloodAdapt
+conda activate ddb_floodadapt
 ```
 
 To be able to run the `FloodAdapt Model Builder GUI`, you need to:
-- Create an account and generate a personal [mapbox_token.txt](https://www.mapbox.com/)
-- Generate a personal [census_key.txt](https://api.census.gov/data/key_signup.html)
-- Put `mapbox_token.txt` and `census_key.txt` in the same folder and make sure they are named correctly!
-- Have access to the dependecy repositories (try makeing the environment, will get errors if you dont have access)
-- Have access to `P:\11207949-dhs-phaseii-floodadapt`
+- Create an account and generate a personal [token](https://www.mapbox.com/), view all your tokens [here](https://account.mapbox.com/access-tokens)
+- Create a new folder somewhere (for example `<userFiles>`)
+- Copy the token to a file, name it `mapbox_token.txt`, and paste the file in `<userFiles>`
+- Request a personal [census_key token](https://api.census.gov/data/key_signup.html) by entering your company name and email adress
+- Copy the token to a file, name it `census_key.txt`, and paste the file in `<userFiles>`
+- Be a `contributor` on all the dependency repositories
+- Be a `member` of the `deltares` and `deltares-research` GitHub organisations
+- If you are working remotely, activate your Deltares VPN
+- Have access rights to `P:\11207949-dhs-phaseii-floodadapt`, contact [Kathryn Roscoe](kathryn.roscoe@deltares.nl) if you dont have it.
+
 Then, in order to develop on the `FloodAdapt Model Builder GUI` locally and have the GUI use your local versions of repositories, run the [install script](src/delftdashboard/install.py).
 
 ```

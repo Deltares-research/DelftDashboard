@@ -30,4 +30,3 @@ dependencies:
     - git+https://github.com/Deltares-research/Guitares.git
     - git+https://github.com/Deltares/CoastalHazardsToolkit.git
     - git+https://github.com/Deltares-research/hydromt_fiat.git
-    # TODO add hydromt_fiat to regular dependencies (when its available as conda package), and do the editable install in the install.py script

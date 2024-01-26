@@ -8,24 +8,24 @@ channels:
 dependencies:
   - black
   - build
-  - cartopy>=0.20 # to run examples  
+  - cartopy>=0.20
   - geopandas
   - datashader
-  - descartes # to run examples
-  - ffmpeg  # to run examples (animation)
+  - descartes
+  - ffmpeg
   - geojson  
   - hydromt
   - hydromt_sfincs>=1.0.3
-  - jupyterlab  # to run examples    
+  - jupyterlab  
   - pandas
   - mypy
   - pillow
   - plotly  
   - pytest
-  - pytest-cov # tests  
+  - pytest-cov
   - python>=3.10
   - pyproj  
-  - pydata-sphinx-theme # docs
+  - pydata-sphinx-theme
   - rasterio
   - scipy
   - shapely
