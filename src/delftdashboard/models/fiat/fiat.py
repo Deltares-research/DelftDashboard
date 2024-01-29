@@ -8,7 +8,7 @@ from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel   
 import copy
-
+from .utils import make_labels
 
 class Model(GenericModel):
     def __init__(self, name):
@@ -701,21 +701,21 @@ class Model(GenericModel):
                 "step",
                 ["get", "Ground Elevation"],
                 "#FFFFFF", 0, 
-                "#F7FFF6", 500,
-                "#E1FCE4", 1000,
-                "#CDEA88", 1500,
-                "#A8E496", 2000,
-                "#74CC9C", 2500,
-                "#4BAF7A", 3000,
-                "#3F9E6F", 3500,
-                "#359364", 4000,
-                "#2C7B5A", 4500,
-                "#236B50", 5000, 
-                "#1A5A45", 5500, 
-                "#124A3A", 6000, 
-                "#093931", 6500,
-                "#032C27", 7000, 
-                "#00211D", 7500, 
+                "#F7FFF6", 1,
+                "#E1FCE4", 2,
+                "#CDEA88", 3,
+                "#A8E496", 4,
+                "#74CC9C", 5,
+                "#4BAF7A", 6,
+                "#3F9E6F", 7,
+                "#359364", 8,
+                "#2C7B5A", 9,
+                "#236B50", 10, 
+                "#1A5A45", 11, 
+                "#124A3A", 12, 
+                "#093931", 13,
+                "#032C27", 14, 
+                "#00211D", 15, 
                 "#001615",                                    
                 ]
         if type == "SVI":
@@ -769,26 +769,30 @@ class Model(GenericModel):
                 self.show_exposure_buildings_secondary()
     
     def show_asset_height(self,type="asset_height"):
-            paint_properties = self.get_nsi_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:-1]
-            color_items.append('other')
-            color_items.append(paint_properties['circle-color'][-1])
-            legend = [{'style': color_items[i], 'label': color_items[i+1]} for i in range(0, len(color_items), 2)]
-            app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
-            app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
-            app.map.layer["buildings"].layer["asset_height"].set_data(
-                self.buildings, paint_properties, legend
-            )
-            self.show_asset_heights()
+        paint_properties = self.get_nsi_paint_properties(type=type)
+        color_items = paint_properties['circle-color'][2:]
+        
+        colors = [color_items[i] for i in range(0, len(color_items), 2)]
+        labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+        
+        legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
+        app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
+        app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
+        app.map.layer["buildings"].layer["asset_height"].set_data(
+            self.buildings, paint_properties, legend
+        )
+        self.show_asset_heights()
 
     def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:-1]
-            color_items.append('other')
-            color_items.append(paint_properties['circle-color'][-1])
-            legend = [{'style': color_items[i], 'label': color_items[i+1]} for i in range(0, len(color_items), 2)]
+            color_items = paint_properties['circle-color'][2:]
+            
+            colors = [color_items[i] for i in range(0, len(color_items), 2)]
+            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+            
+            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
                 self.buildings, paint_properties, legend
@@ -799,10 +803,12 @@ class Model(GenericModel):
         """Show maximum potential damage: content layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:-1]
-            color_items.append('other')
-            color_items.append(paint_properties['circle-color'][-1])
-            legend = [{'style': color_items[i], 'label': color_items[i+1]} for i in range(0, len(color_items), 2)]
+            color_items = paint_properties['circle-color'][2:]
+            
+            colors = [color_items[i] for i in range(0, len(color_items), 2)]
+            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+            
+            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"]   
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
                 self.buildings, paint_properties, legend, 
@@ -813,10 +819,12 @@ class Model(GenericModel):
         """Show ground elevation"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:-1]
-            color_items.append('other')
-            color_items.append(paint_properties['circle-color'][-1])
-            legend = [{'style': color_items[i], 'label': color_items[i+1]} for i in range(0, len(color_items), 2)]
+            color_items = paint_properties['circle-color'][2:]
+            
+            colors = [color_items[i] for i in range(0, len(color_items), 2)]
+            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+            
+            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["ground_elevation"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["ground_elevation"].unit = app.gui.getvar("fiat", "view_tab_unit")
             app.map.layer["buildings"].layer["ground_elevation"].set_data(
