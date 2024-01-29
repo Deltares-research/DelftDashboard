@@ -1,6 +1,7 @@
 import geopandas as gpd
 import pandas as pd
 import time
+import copy
 from pathlib import Path
 from shapely.geometry import Polygon
 
@@ -44,6 +45,12 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "titles_model_boundary_tab", 1)
 
         # Area of Interest
+        app.gui.setvar(group, "model_boundary_file_list", [])
+        app.gui.setvar(group, "selected_model_boundary", 0)
+        app.gui.setvar(group, "area_of_interest_string", "")
+        app.gui.setvar(group, "area_of_interest_value", None)
+        app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", [])
+        
         self.area_of_interest = gpd.GeoDataFrame()
         self.area_of_interest_file_name = "area_of_interest.geojson"
 
@@ -116,15 +123,38 @@ def select(*args):
 
 
 def draw_boundary(*args):
-    selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
-    if selected_method == "polygon":
-        draw_polygon()
-    elif selected_method == "box":
-        draw_bbox()
-    elif selected_method == "sfincs":
-        load_sfincs_domain()
-    elif selected_method == "file":
-        load_aoi_file()
+    if app.active_model.domain is None:
+        app.gui.window.dialog_warning(
+            "Please first select a folder for your FIAT model",
+            "No FIAT model initiated yet",
+        )
+        # Initiate a new FIAT model
+        app.active_model.new()
+
+        #Load the file
+        selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
+        if selected_method == "polygon":
+            draw_polygon()
+        elif selected_method == "box":
+            draw_bbox()
+        elif selected_method == "sfincs":
+            load_sfincs_domain()
+        elif selected_method == "file":
+            app.gui.window.dialog_info(
+                "Please select your model boundary files",
+                "Select Model Boundary files",
+            )
+            load_aoi_file()
+    else:
+        selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
+        if selected_method == "polygon":
+            draw_polygon()
+        elif selected_method == "box":
+            draw_bbox()
+        elif selected_method == "sfincs":
+            load_sfincs_domain()
+        elif selected_method == "file":
+            load_aoi_file()
 
 
 def generate_boundary(*args):
@@ -163,6 +193,8 @@ def generate_boundary(*args):
     # Check the checkbox
     app.gui.setvar("_main", "checkbox_model_boundary", True)
 
+    # Fly to the site
+    zoom_to_boundary()
 
 def select_method(*args):
     app.gui.setvar("modelmaker_fiat", "selected_aoi_method", args[0])
@@ -210,28 +242,59 @@ def draw_polygon():
         "modelmaker_fiat", "active_area_of_interest", "area_of_interest_polygon"
     )
 
+def write_fn_to_table(*args):
+    fn_model_boundary= app.gui.getvar("modelmaker_fiat", "area_of_interest_value")
+    name_model_boundary= app.gui.getvar("modelmaker_fiat", "area_of_interest_string")
+    list_model_boundaries = app.gui.getvar("modelmaker_fiat", "model_boundary_file_list")
+    fn_list_model_boundaries = app.gui.getvar("modelmaker_fiat", "fn_model_boundary_file_list")
+    if name_model_boundary not in list_model_boundaries:
+        list_model_boundaries.append(name_model_boundary)
+    app.gui.setvar("modelmaker_fiat", "model_boundary_file_list", list_model_boundaries)
+    if fn_model_boundary not in fn_list_model_boundaries:
+        fn_list_model_boundaries.append(fn_model_boundary)
+    app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fn_list_model_boundaries)
+
+
+def set_active_area_file(*args):
+    clear_aoi_layers()
+    fn_index = app.gui.getvar("modelmaker_fiat", "selected_model_boundary")
+    selected_fn_model_boundary= app.gui.getvar("modelmaker_fiat", "fn_model_boundary_file_list")[fn_index]
+    
+    gdf = gpd.read_file(selected_fn_model_boundary)
+    gdf.to_crs(app.crs, inplace=True)
+
+# Add the polygon to the map
+    layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
+    layer.set_data(gdf)
+    app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
+    app.gui.setvar(
+    "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file"
+    )
 
 def load_aoi_file():
     clear_aoi_layers()
-
     fname = app.gui.window.dialog_open_file(
         "Select Area of Interest File", filter="*.shp *.geojson *.gpkg"
     )
     if fname[0]:
-        gdf = gpd.read_file(fname[0])
-        gdf.to_crs(app.crs, inplace=True)
+        app.gui.setvar("modelmaker_fiat", "area_of_interest_string", Path(fname[0]).name)
+        app.gui.setvar("modelmaker_fiat", "area_of_interest_value", fname[0])
+        write_fn_to_table()
+        file_list = app.gui.getvar("modelmaker_fiat", "model_boundary_file_list")
+
+        if len(file_list) == 1:
+            gdf = gpd.read_file(fname[0])
+            gdf.to_crs(app.crs, inplace=True)
 
         # Add the polygon to the map
-        layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
-        layer.set_data(gdf)
-        app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
-        app.gui.setvar(
+            layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
+            layer.set_data(gdf)
+            app.gui.setvar("modelmaker_fiat", "area_of_interest", 1)
+            app.gui.setvar(
             "modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file"
-        )
+            )
 
-        # Fly to the site
-        zoom_to_boundary()
-
+    
 
 def load_sfincs_domain(*args):
     clear_aoi_layers()
@@ -457,3 +520,22 @@ def display_roads(*args):
         app.active_model.show_exposure_roads()
     else:
         app.active_model.hide_exposure_roads()
+
+def remove_datasource(*args):
+    
+    # Get index of selected item and check length 
+    fn_index = app.gui.getvar("modelmaker_fiat", "selected_model_boundary")
+    list_model_boundaries= app.gui.getvar("modelmaker_fiat", "model_boundary_file_list")
+    if fn_index > len(
+        list_model_boundaries
+    ) or fn_index == len(list_model_boundaries):
+        fn_index = 0    
+    
+    # Update item list (file name)
+    list_model_boundaries.remove(list_model_boundaries[fn_index])
+    app.gui.setvar("modelmaker_fiat", "model_boundary_file_list", list_model_boundaries)
+
+    # Update item value (file path) 
+    fn_list_model_boundaries = app.gui.getvar("modelmaker_fiat", "fn_model_boundary_file_list")
+    fn_list_model_boundaries.remove(fn_list_model_boundaries[fn_index])
+    app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fn_list_model_boundaries)
