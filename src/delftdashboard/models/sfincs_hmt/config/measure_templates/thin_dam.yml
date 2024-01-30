@@ -1,7 +1,7 @@
 window:
   title: Thin Dam
   width: 460
-  height: 300
+  height: 200
   variable_group: measure
   module: models.sfincs_hmt.structures
   modal: True
@@ -10,21 +10,21 @@ element:
 - style: panel
   position:
     x: 10
-    y: 190
+    y: 90
     width: 440
     height: 100
   title: Description
 - style: panel
   position:
     x: 10
-    y: 50
+    y: 40
     width: 440
-    height: 130
+    height: 40
   title: Thin dam Properties
 - style: edit
   position:
     x: 100
-    y: 250
+    y: 150
     width: 200
     height: 20
   variable: name
@@ -33,33 +33,16 @@ element:
 - style: edit
   position:
     x: 100
-    y: 225
+    y: 125
     width: 200
     height: 20
   variable: description
   text: Description
   tooltip: Edit the description of the thin dam
-- style: edit
-  position:
-    x: 90
-    y: 150
-    width: 50
-    height: 20
-  variable: elevation
-  text: Elevation
-  tooltip: Edit the elevation
-  enable: false 
-- style: text
-  position:
-    x: 150
-    y: 150
-    width: 50
-    height: 20
-  variable: elev_ref
 - style: pushselectfile
   position:
     x: 90
-    y: 120
+    y: 50
     width: 130
     height: 20
   text: Import Line Coordinates
