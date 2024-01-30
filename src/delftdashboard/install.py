@@ -132,7 +132,7 @@ def copy_p_drive_files(
         "datalib_delftdashboard",
         "hydromt_fiat_catalog_USA",
         "hydromt_sfincs_catalog",
-        "bathemetry_dataFolder",
+        "dataFolder_bathymetry",
         "Hazus_IWR_curves",
     ]
 
@@ -146,23 +146,23 @@ def copy_p_drive_files(
         "delftdashboard.ini": ddb_config_dir / "delftdashboard.ini",
         "datalib_delftdashboard": ddb_config_dir / "data_catalog_USA.yml",
         "hydromt_sfincs_catalog": ddb_config_dir / "data_catalog.yml",
-        "bathemetry_dataFolder": ddb_config_dir.parent.parent / "data" / "bathemetry",
+        "dataFolder_bathymetry": ddb_config_dir.parent.parent.parent / "data",
     }
 
-    if repo_paths["hydromt_fiat"] is not None:
-        target_paths.update(
-            {
-                "hydromt_fiat_catalog_USA": repo_paths["hydromt_fiat"]
-                / "hydromt_fiat/data/hydromt_fiat_catalog_USA.yml",
-                "Hazus_IWR_curves": repo_paths["hydromt_fiat"]
-                / "hydromt_fiat/data/damage_functions/flooding/Hazus_IWR_curves.csv",
-            }
-        )
-    else:
-        pass
-        # TODO set targetpaths to environment folder?
-        # this will be gone eventually when hydromt_fiat is updated to not hardcoded to need the catalog anymore
-
+    # this will be gone eventually when hydromt_fiat is updated to not hardcoded to need the catalog anymore
+    while (repo_paths["hydromt_fiat"] is None):
+        print("Currrently, hydromt_fiat is required to be locally installed to run DelftDashboard, please provide the path to your local clone:\n")
+        repo_paths["hydromt_fiat"] = get_repo_path("hydromt_fiat")
+    
+    target_paths.update(
+        {
+            "hydromt_fiat_catalog_USA": repo_paths["hydromt_fiat"]
+            / "hydromt_fiat/data/hydromt_fiat_catalog_USA.yml",
+            "Hazus_IWR_curves": repo_paths["hydromt_fiat"]
+            / "hydromt_fiat/data/damage_functions/flooding/Hazus_IWR_curves.csv",
+        }
+    )
+    
     # Copy files and folders from P drive to target paths
     for source_name, source_path in p_drive_files.items():
         if source_path.is_dir():
@@ -186,7 +186,7 @@ def copy_p_drive_files(
 def update_delftdashboard_ini(target_paths: dict[str, Path]) -> None:
     # In the repo there exists a default catalog, if the user want more, add the path to the data_libs here
     replacements = {
-        "bathymetry_database": str(target_paths["bathemetry_dataFolder"]),
+        "dataFolder_bathymetry": str(target_paths["dataFolder_bathymetry"]),
         "data_libs": [
             str(target_paths["datalib_delftdashboard"]),
             str(target_paths["hydromt_fiat_catalog_USA"]),
@@ -205,7 +205,9 @@ def update_delftdashboard_ini(target_paths: dict[str, Path]) -> None:
 
 def optional_editable_install(repo_paths: dict[str, Union[Path, None]]) -> None:
     print("\nSetting up local editable versions of repositories...")
-    # Install the editable repositories
+
+
+    # Install the optional repositories
     for repo in repo_paths.values():
         if repo is not None:
             subprocess.run(["pip", "install", "-e", repo], shell=True)
@@ -226,6 +228,10 @@ def main():
         p_drive_modelbuilder_installation, ddb_config_dir, repo_paths
     )
     update_delftdashboard_ini(target_paths)
+    
+    # Install the required repositories
+    subprocess.run(["pip", "install", "-e", "."], shell=True)
+    
     optional_editable_install(repo_paths)
 
 
