@@ -99,7 +99,7 @@ def add_to_model(*args):
     attribute_name_gfh = list_attr_names[idx]
 
     # Get the method
-    join_method = app.gui.getvar("fiat", "method_gfh")
+    gfh_method = app.gui.getvar("fiat", "method_gfh")
 
     # Get the max distance
     max_dist_gfh = app.gui.getvar("fiat", "max_dist_gfh")
@@ -107,7 +107,7 @@ def add_to_model(*args):
     app.active_model.domain.exposure_vm.set_ground_floor_height(
         source=source_path,
         attribute_name=attribute_name_gfh,
-        join_method=join_method,
+        gfh_method=gfh_method,
         max_dist=max_dist_gfh,
         )
 
