@@ -169,7 +169,7 @@ def make_geom_layer(geom_type: str, geom_list: list, layer):
         )
 
         # Snap to grid
-        _, snapped = snap_to_grid(geom_gdf, xugrid_mask, 1000000)
+        _, snapped = snap_to_grid(geom_gdf, xugrid_mask, 1.0)
         geom_gdf["name"] = geom["name"] 
         geom_gdf.crs = app.crs
         snapped["name"] = geom["name"]
