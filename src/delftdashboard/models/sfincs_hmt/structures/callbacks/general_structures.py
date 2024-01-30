@@ -3,6 +3,8 @@ from delftdashboard.models.sfincs_hmt.structures.objects.measures_categories imp
     MeasureCategoryFactory,
 )
 import flood_adapt.api.measures as api_measures
+from xugrid.core.wrap import UgridDataArray
+from xugrid.ugrid.snapping import snap_to_grid
 
 from pathlib import Path
 import geopandas as gpd
@@ -126,6 +128,12 @@ def make_geom_layer(geom_type: str, geom_list: list, layer):
     # Get geometry from model
     geoms = app.model["sfincs_hmt"].domain.geoms[geom_type]
 
+    # Get mask from model as xugrid
+    if app.model["sfincs_hmt"].domain.reggrid.rotation != 0: # This is a rotated regular grid
+        xugrid_mask = UgridDataArray.from_structured(app.model["sfincs_hmt"].domain.mask, 'xc', 'yc')
+    else:
+        xugrid_mask = UgridDataArray.from_structured(app.model["sfincs_hmt"].domain.mask)
+
     # Create geodataframe
     for idx, geom in geoms.iterrows():
         if "name" not in geom:
@@ -136,20 +144,38 @@ def make_geom_layer(geom_type: str, geom_list: list, layer):
 
         # Create geodataframe
         geom_gdf = gpd.GeoDataFrame(geometry=[geom["geometry"]])
-        geom_gdf["name"] = geom["name"]
-        geom_gdf.crs = app.crs
 
         # Add layer to map
         layer.add_layer(
-            geom["name"],
+            str(geom["name"]),
             type="line_selector",
             circle_radius=0,
+            line_width = 3,
             line_color=layer.line_color,
+            line_style='--',
+            line_width_selected = 3,
             line_color_selected=layer.line_color_selected,
+            line_style_selected='--',
             hover_param="name",
             select=select_struct,
         )
-        layer.layer[geom["name"]].set_data(geom_gdf, 0)
+
+        layer.add_layer(
+            str(geom["name"]) + '_snapped',
+            type="line",
+            circle_radius=0,
+            line_width = 5,
+            line_color=layer.line_color,
+        )
+
+        # Snap to grid
+        _, snapped = snap_to_grid(geom_gdf, xugrid_mask, 1000000)
+        geom_gdf["name"] = geom["name"] 
+        geom_gdf.crs = app.crs
+        snapped["name"] = geom["name"]
+        snapped.crs = app.crs
+        layer.layer[str(geom["name"])].set_data(geom_gdf, 0)
+        layer.layer[str(geom["name"]) + '_snapped'].set_data(snapped)
         geom_list.append(geom["name"])
     return geom_list
 
