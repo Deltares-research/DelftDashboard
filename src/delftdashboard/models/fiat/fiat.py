@@ -372,6 +372,7 @@ class Model(GenericModel):
             "loaded_damages_files_value",
             [],
         )
+        app.gui.setvar(group, "damages_file_field_name_list",[])
         app.gui.setvar(group, "damages_file_field_name", 0)
         app.gui.setvar(group, "damages_file_field_name_string",[])
         app.gui.setvar(
@@ -379,13 +380,18 @@ class Model(GenericModel):
             "damages_file_field_name_value",
             [],
         )
+        app.gui.setvar(group, "loaded_damages_files_value_list",[])
+        app.gui.setvar(group, "loaded_damages_files_string_list",[])
         app.gui.setvar(group, "damage_type", "structure")
+        app.gui.setvar(group, "damage_type_list", [])
         app.gui.setvar(group, "damage_type_string", ["structure", "content"])
         app.gui.setvar(group, "damage_type_value", ["structure", "content"])
 
         # Damages settings popup #
         app.gui.setvar(group, "max_dist_damages", 10)
+        app.gui.setvar(group, "max_dist_damages_list",[])
         app.gui.setvar(group, "method_damages", "nearest")
+        app.gui.setvar(group, "method_damages_list", [])
         app.gui.setvar(group, "method_damages_string", ["nearest", "intersection"])
         app.gui.setvar(group, "method_damages_value", ["nearest", "intersection"])
 

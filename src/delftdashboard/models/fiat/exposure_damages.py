@@ -87,26 +87,60 @@ def add_to_model(*args):
     model = "fiat"
 
     # Get the file path
-    idx = app.gui.getvar("fiat", "loaded_damages_files")
-    current_list_string = app.gui.getvar("fiat", "loaded_damages_files_string")
+    idx = app.gui.getvar(model, "loaded_damages_files")
+    current_list_string = app.gui.getvar(model, "loaded_damages_files_string")
     current_list_value = app.gui.getvar(model, "loaded_damages_files_value")
-    source_name = current_list_string[idx]
-    source_path = str(current_list_value[idx])
+    
+    app.gui.getvar(model, "loaded_damages_files_value_list").append(str(current_list_value[0]))
+    fn_damages = app.gui.getvar(model, "loaded_damages_files_value_list")
+    app.gui.setvar(model, "loaded_damages_files_value_list",fn_damages)
+    source_path = app.gui.getvar(model, "loaded_damages_files_value_list")
+    
+    app.gui.getvar(model, "loaded_damages_files_string_list").append(current_list_string[0])
+    name_damages = app.gui.getvar(model, "loaded_damages_files_string_list")
+    app.gui.setvar(model, "loaded_damages_files_string_list",name_damages)
+
+    source_name = app.gui.getvar(model, "loaded_damages_files_string_list")
 
     # Get the attribute name
-    attribute_name_gfh = app.gui.getvar(model, "damages_file_field_name")
+    attribute_name_damage = app.gui.getvar(model, "damages_file_field_name")
+    
+    app.gui.getvar(model, "damages_file_field_name_list").append(attribute_name_damage)
+    attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
+    app.gui.setvar(model, "damages_file_field_name_list",attribute_name_damages)
+    attribute_name_damages= app.gui.getvar(model, "damages_file_field_name_list")
 
     # Get the method
     method_damages = app.gui.getvar("fiat", "method_damages")
+    
+    app.gui.getvar(model, "method_damages_list").append(method_damages)
+    method_damages = app.gui.getvar(model, "method_damages_list")
+    app.gui.setvar("fiat", "method_damages_list",method_damages)
+    method_damages = app.gui.getvar(model, "method_damages_list")
+
 
     # Get the max distance
     max_dist_damages = app.gui.getvar("fiat", "max_dist_damages")
 
+    app.gui.getvar(model, "max_dist_damages_list").append(max_dist_damages)
+    max_dist_damages = app.gui.getvar(model, "max_dist_damages_list")
+    app.gui.setvar(model, "max_dist_damages_list",max_dist_damages)
+    max_dist_damages = app.gui.getvar(model, "max_dist_damages_list")
+
+    # Get the damage type
+    damage_type = app.gui.getvar("fiat", "damage_type")
+    
+    app.gui.getvar(model, "damage_type_list").append(damage_type)
+    damage_types = app.gui.getvar(model, "damage_type_list")
+    app.gui.setvar(model, "damage_type_list",damage_types)
+    damage_types = app.gui.getvar(model, "damage_type_list")
+
     app.active_model.domain.exposure_vm.set_damages(
         source=source_path,
-        attribute_name=attribute_name_gfh,
-        method=method_damages,
-        max_dist=max_dist_damages,
+        attribute_name=attribute_name_damages,
+        method_damages=method_damages,
+        max_dist= max_dist_damages,
+        damage_types = damage_types
     )
 
     # Set the source
