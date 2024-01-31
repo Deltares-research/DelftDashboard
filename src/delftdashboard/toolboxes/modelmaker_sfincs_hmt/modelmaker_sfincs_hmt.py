@@ -1,16 +1,10 @@
-import math
-import numpy as np
 import geopandas as gpd
-import shapely
-import json
-
-from delftdashboard.operations.toolbox import GenericToolbox
-from delftdashboard.app import app
-
-from cht.bathymetry.bathymetry_database import bathymetry_database
-
 from hydromt.config import configread, configwrite
 from hydromt_sfincs.utils import mask2gdf
+
+from delftdashboard.app import app
+from delftdashboard.operations.toolbox import GenericToolbox
+from delftdashboard.models.sfincs_hmt.boundary_conditions_wlev import generate_boundary_points_from_msk
 
 
 class Toolbox(GenericToolbox):
@@ -631,6 +625,8 @@ class Toolbox(GenericToolbox):
         self.set_active_cell_layer()
 
     def generate_subgrid(self):
+        """Callback function for generating subgrid"""
+        # NOTE this is now "misused" as a build model for Flood Adapt, split up later
         model = app.model["sfincs_hmt"].domain
 
         dlg = app.gui.window.dialog_wait("Generating subgrid ...")
@@ -656,6 +652,23 @@ class Toolbox(GenericToolbox):
         self.setup_dict.update({"setup_subgrid": setup_subgrid})
 
         dlg.close()
+
+        # add tiles
+        value, okay = app.gui.window.dialog_string(
+            text = "Specify maximum zoom level (0-20) for tiles:",
+            title = "Create tiles. Press cancel to skip.")
+        if okay:
+            dlg = app.gui.window.dialog_wait("Writing tiles ...")
+            setup_tiles = {"zoom_range": int(value), "fmt": "png"}
+            model.setup_tiles(**setup_tiles)
+            self.setup_dict.update({"setup_tiles": setup_tiles})
+            dlg.close()
+
+        # add boundary points
+        okay = app.gui.window.dialog_yes_no("Do you want to automatically generate water level boundary points?")
+        if okay:
+            #TODO add to setup_dict
+            generate_boundary_points_from_msk()
 
         dlg = app.gui.window.dialog_wait("Writing SFINCS model ...")
         app.model["sfincs_hmt"].save()
