@@ -138,6 +138,10 @@ def draw_boundary(*args):
         elif selected_method == "box":
             draw_bbox()
         elif selected_method == "sfincs":
+            app.gui.window.dialog_info(
+                "Please select your SFINCS model root folder",
+                "Select SFINCS root folder",
+            )
             load_sfincs_domain()
         elif selected_method == "file":
             app.gui.window.dialog_info(
@@ -322,6 +326,11 @@ def load_sfincs_domain(*args):
                 },
                 crs=app.crs,
             )
+            
+            # Write file into table
+            app.gui.setvar("modelmaker_fiat", "area_of_interest_string",  path_to_sfincs_domain.name)
+            app.gui.setvar("modelmaker_fiat", "area_of_interest_value",  path_to_sfincs_domain)
+            write_fn_to_table()
 
             # Add the polygon to the map
             layer = app.map.layer["modelmaker_fiat"].layer[
@@ -336,8 +345,6 @@ def load_sfincs_domain(*args):
                 "area_of_interest_from_sfincs",
             )
 
-            # Fly to the site
-            zoom_to_boundary()
         else:
             app.gui.window.dialog_warning(
                 f"The region.geojson file cannot be found in folder {str(Path(fname) / 'gis')}",
