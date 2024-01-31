@@ -22,12 +22,15 @@ def select_asset_heights_file(*args):
     fn_value = app.gui.getvar("fiat", "loaded_asset_heights_files_value")
     if fn not in fn_value:
         fn_value.append(Path(fn))
+    fn_value= [item for item in fn_value if item != Path('.')]
     app.gui.setvar("fiat", "loaded_asset_heights_files_value", fn_value)
+    
     name = Path(fn).name
     current_list_string = app.gui.getvar("fiat", "loaded_asset_heights_files_string")
     if name not in current_list_string:
         current_list_string.append(name)
 
+    current_list_string = [item for item in current_list_string if item != '']
     app.gui.setvar("fiat", "loaded_asset_heights_files_string", current_list_string)
 
 
