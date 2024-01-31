@@ -80,7 +80,7 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title="Ground Floor Height [ft]",
+            legend_title=f'Ground Floor Height [{app.gui.getvar("fiat", "view_tab_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Ground Floor Height",
@@ -120,7 +120,7 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title="Ground elevation [ft]",
+            legend_title=f'Ground elevation [{app.gui.getvar("fiat", "view_tab_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Ground Elevation",
@@ -778,6 +778,7 @@ class Model(GenericModel):
         legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
         app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
         app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
+        app.map.layer["buildings"].layer["asset_height"].legend_title = f'Finished Floor Height [{app.gui.getvar("fiat", "view_tab_unit")}]'
         app.map.layer["buildings"].layer["asset_height"].set_data(
             self.buildings, paint_properties, legend
         )
@@ -827,6 +828,7 @@ class Model(GenericModel):
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["ground_elevation"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["ground_elevation"].unit = app.gui.getvar("fiat", "view_tab_unit")
+            app.map.layer["buildings"].layer["ground_elevation"].legend_title = f'Ground elevation [{app.gui.getvar("fiat", "view_tab_unit")}]'
             app.map.layer["buildings"].layer["ground_elevation"].set_data(
                 self.buildings, paint_properties, legend
             )
