@@ -612,7 +612,7 @@ class Toolbox(GenericToolbox):
             legend.append({"style": "#FF0000", "label": "Outflow"})
 
         # Set data
-        app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(
+        app.map.layer["sfincs_hmt"].layer["mask"].set_data(
             data=gdf, color_by_attribute=paint_properties, legend_items=legend
         )
 

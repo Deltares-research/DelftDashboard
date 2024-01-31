@@ -1,4 +1,6 @@
 from delftdashboard.app import app
+from delftdashboard.operations import map
+
 from delftdashboard.models.sfincs_hmt.structures.objects.measures_categories import (
     MeasureCategoryFactory,
 )
@@ -39,6 +41,10 @@ class FAMBNameConverter:
 
 
 def select(*args):
+    # reset the map
+    map.update()
+    app.map.layer["sfincs_hmt"].layer["mask"].activate()
+
     model = app.model["sfincs_hmt"].domain
 
     # If no measures layer exists, create it

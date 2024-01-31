@@ -1,12 +1,17 @@
-from delftdashboard.app import app
-from delftdashboard.operations import map
-
+import os
+import importlib
 import geopandas as gpd
 from hydromt_sfincs import utils
 
+from delftdashboard.app import app
+from delftdashboard.operations import map
+from delftdashboard.toolboxes.observation_stations.observation_stations import Toolbox as ObservationStationsToolbox
+
+
 def select(*args):
     map.update()
-    app.map.layer["sfincs_hmt"].layer["observation_points"].set_mode("active")
+    app.map.layer["sfincs_hmt"].layer["mask"].activate()
+    app.map.layer["sfincs_hmt"].layer["observation_points"].activate()
     update()
 
 def edit(*args):
@@ -14,12 +19,36 @@ def edit(*args):
 
 def add_observation_point(gdf, merge=True):
     model = app.model["sfincs_hmt"].domain
-    model.setup_observation_points(locations = gdf, merge=merge)
+
+    nr_obs = 0
+    if "obs" in model.geoms:
+        nr_obs = len(model.geoms["obs"].index)
+
+    try:
+        model.setup_observation_points(locations = gdf, merge=merge)
+        nr_obs_new = len(model.geoms["obs"].index)
+        if nr_obs_new > nr_obs:
+            app.gui.window.dialog_info(
+                text="Added {} observation points".format(nr_obs_new - nr_obs),
+                title="Success",
+            )
+        else:
+            app.gui.window.dialog_info(
+                text="Observation point(s) outside model domain!",
+                title="Failed",
+            )
+            return
+    except ValueError as e:
+        app.gui.window.dialog_info(
+            text=e.message,
+            title="Error",
+        )
+        return
 
     index = len(model.geoms["obs"]) - 1
     app.map.layer["sfincs_hmt"].layer["observation_points"].set_data(model.geoms["obs"], index)
     app.gui.setvar("sfincs_hmt", "active_observation_point", index)
-
+    update()
 
 def load(*args):
     # map.reset_cursor()
@@ -128,24 +157,34 @@ def delete_all_points_from_list(*args):
 def update():
     # get observation points
     gdf = app.map.layer["sfincs_hmt"].layer["observation_points"].data
-    if gdf is None:
-        return
     
     names = []
-    for index, row in gdf.iterrows():
-        names.append(row["name"])
+    if gdf is not None:      
+        for index, row in gdf.iterrows():
+            names.append(row["name"])
 
     app.gui.setvar("sfincs_hmt", "observation_point_names", names)
-    app.gui.setvar("sfincs_hmt", "nr_observation_points", len(gdf.index))
+    app.gui.setvar("sfincs_hmt", "nr_observation_points", len(names))
     app.gui.window.update()
 
 def go_to_observation_stations(*args):
+    """Go to observation stations toolbox in popup window."""	
 
     toolbox_name = "observation_stations"
+    toolbox_path = os.path.join(app.main_path, "toolboxes", toolbox_name)
 
-    # switch to observation stations toolbox
-    app.active_toolbox = app.toolbox[toolbox_name]
-    app.active_toolbox.select()
+    # initialize toolboxes
+    toolbox = ObservationStationsToolbox(toolbox_name)   
 
-    #TODO back to observations model-tab
-    # app.active_toolbox.select_tab("observations")    
+    data = {
+        "map_center": app.map.map_center,
+        "active_model": app.active_model,
+        "toolbbox": toolbox,
+        "option": "obs",
+    }
+
+    # Read GUI config file
+    pop_win_config_path  = os.path.join(toolbox_path,"config", "observation_stations_popup.yml")
+    okay, data = app.gui.popup(
+        pop_win_config_path, data=data, id="observation_stations"
+    )
