@@ -99,9 +99,9 @@ class GenericModel:
 
 def select_model(model_name):
     if model_name.lower() == "fiat":
-        app.gui.setvar("_main", "fiat_active", True)
+        app.gui.setvar("_main", "show_fiat_checkbox", True)
     else:
-        app.gui.setvar("_main", "fiat_active", False)
+        app.gui.setvar("_main", "show_fiat_checkbox", False)
 
     # Called from menu
     app.active_model = app.model[model_name]

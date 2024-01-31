@@ -182,7 +182,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "checkbox_vulnerability", False)
         app.gui.setvar(group, "checkbox_svi_(optional)", False)
         app.gui.setvar(group, "checkbox_roads_(optional)", False)
-        app.gui.setvar(group, "fiat_active", False)
+        app.gui.setvar(group, "show_fiat_checkbox", False)
 
         group = "fiat"
         
