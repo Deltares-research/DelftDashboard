@@ -22,12 +22,15 @@ def select_asset_heights_file(*args):
     fn_value = app.gui.getvar("fiat", "loaded_asset_heights_files_value")
     if fn not in fn_value:
         fn_value.append(Path(fn))
+    fn_value= [item for item in fn_value if item != Path('.')]
     app.gui.setvar("fiat", "loaded_asset_heights_files_value", fn_value)
+    
     name = Path(fn).name
     current_list_string = app.gui.getvar("fiat", "loaded_asset_heights_files_string")
     if name not in current_list_string:
         current_list_string.append(name)
 
+    current_list_string = [item for item in current_list_string if item != '']
     app.gui.setvar("fiat", "loaded_asset_heights_files_string", current_list_string)
 
 
@@ -99,7 +102,7 @@ def add_to_model(*args):
     attribute_name_gfh = list_attr_names[idx]
 
     # Get the method
-    method_gfh = app.gui.getvar("fiat", "method_gfh")
+    gfh_method = app.gui.getvar("fiat", "method_gfh")
 
     # Get the max distance
     max_dist_gfh = app.gui.getvar("fiat", "max_dist_gfh")
@@ -107,7 +110,7 @@ def add_to_model(*args):
     app.active_model.domain.exposure_vm.set_ground_floor_height(
         source=source_path,
         attribute_name=attribute_name_gfh,
-        method=method_gfh,
+        gfh_method=gfh_method,
         max_dist=max_dist_gfh,
     )
 

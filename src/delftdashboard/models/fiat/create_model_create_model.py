@@ -12,6 +12,7 @@ from delftdashboard.operations import map
 def select(*args):
     # De-activate existing layers
     map.update()
+    app.gui.setvar("_main", "show_fiat_checkbox", True)
 
 
 def create_model(*args):
