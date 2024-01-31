@@ -14,7 +14,7 @@ def select(*args):
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].activate()
     # Show the grid and mask
     app.map.layer["sfincs_hmt"].layer["grid"].activate()
-    app.map.layer["sfincs_hmt"].layer["mask_active"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask"].activate()
 
 
 def delete_mask_init_polygon(*args):

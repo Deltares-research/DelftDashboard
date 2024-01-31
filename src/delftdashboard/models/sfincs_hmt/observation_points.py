@@ -5,6 +5,7 @@ from hydromt_sfincs import utils
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.toolboxes.observation_stations.observation_stations import Toolbox as ObservationStationsToolbox
 
 
 def select(*args):
@@ -31,6 +32,12 @@ def add_observation_point(gdf, merge=True):
                 text="Added {} observation points".format(nr_obs_new - nr_obs),
                 title="Success",
             )
+        else:
+            app.gui.window.dialog_info(
+                text="Observation point(s) outside model domain!",
+                title="Failed",
+            )
+            return
     except ValueError as e:
         app.gui.window.dialog_info(
             text=e.message,
@@ -166,23 +173,15 @@ def go_to_observation_stations(*args):
     toolbox_name = "observation_stations"
     toolbox_path = os.path.join(app.main_path, "toolboxes", toolbox_name)
 
-    # intitialize toolbox
-    module = importlib.import_module(
-        "delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name
-    )
-
     # initialize toolboxes
-    toolbox = module.Toolbox(toolbox_name, )    
+    toolbox = ObservationStationsToolbox(toolbox_name)   
 
-    data = {}
-    # get map center
-    data["map_center"] = app.map.map_center
-    # get active model
-    data["active_model"] = app.active_model
-    # initialize toolbox
-    data["toolbox"] = toolbox
-    # set option
-    data["option"] = "obs"
+    data = {
+        "map_center": app.map.map_center,
+        "active_model": app.active_model,
+        "toolbbox": toolbox,
+        "option": "obs",
+    }
 
     # Read GUI config file
     pop_win_config_path  = os.path.join(toolbox_path,"config", "observation_stations_popup.yml")

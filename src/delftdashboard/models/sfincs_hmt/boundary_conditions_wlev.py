@@ -1,15 +1,15 @@
 import os
-import importlib
 import geopandas as gpd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.toolboxes.observation_stations.observation_stations import Toolbox as ObservationStationsToolbox
 
 def select(*args):
     # Set all layer inactive, except boundary_points
     map.update()
+    app.map.layer["sfincs_hmt"].layer["mask"].activate()
     app.map.layer["sfincs_hmt"].layer["boundary_points"].activate()
-    app.map.layer["sfincs_hmt"].layer["mask_active"].activate()
     update_list()
 
 def generate_boundary_points_from_msk(*args):
@@ -50,9 +50,15 @@ def add_boundary_point(gdf, merge=True):
                 text="Added {} boundary points".format(nr_bnd_new - nr_bnd),
                 title="Success",
             )
+        else:
+            app.gui.window.dialog_info(
+                text="No new boundary points added ...",
+                title="Failed",
+            )
+            return
     except ValueError as e:
         app.gui.window.dialog_info(
-            text=e.message,
+            text=e.args[0],
             title="Error",
         )
         return
@@ -165,23 +171,15 @@ def go_to_observation_stations(*args):
     toolbox_name = "observation_stations"
     toolbox_path = os.path.join(app.main_path, "toolboxes", toolbox_name)
 
-    # intitialize toolbox
-    module = importlib.import_module(
-        "delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name
-    )
-
     # initialize toolboxes
-    toolbox = module.Toolbox(toolbox_name, )    
+    toolbox = ObservationStationsToolbox(toolbox_name)    
 
-    data = {}
-    # get map center
-    data["map_center"] = app.map.map_center
-    # get active model
-    data["active_model"] = app.active_model
-    # initialize toolbox
-    data["toolbox"] = toolbox
-    # set option
-    data["option"] = "bnd"
+    data = {
+        "map_center": app.map.map_center,
+        "active_model": app.active_model,
+        "toolbbox": toolbox,
+        "option": "bnd",
+    }
 
     # Read GUI config file
     pop_win_config_path  = os.path.join(toolbox_path,"config", "observation_stations_popup.yml")

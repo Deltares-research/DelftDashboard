@@ -74,7 +74,6 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "station_names", stnames)
         app.gui.setvar(group, "active_station_index", 0)
         self.map.layer["observation_stations"].layer["stations"].set_data(self.gdf, 0)
-        # self.update()
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
@@ -94,7 +93,8 @@ class Toolbox(GenericToolbox):
                          select=self.select_station_from_map,
                         )
 
-        # Add model outline
+        # Add model outline (for now a draw-layer that we deactivate)
+        # TODO make this a PolygonLayer (but not yet proeprly implemented in Guitares)
         layer.add_layer(
             "model_outline",
             type="draw",
@@ -107,7 +107,6 @@ class Toolbox(GenericToolbox):
         index = app.gui.getvar("observation_stations", "active_station_index")
         gdf = self.gdf.iloc[[index]]
 
-        # model_option_index =  app.gui.getvar("observation_stations", "model_options_index")
         app.active_model.add_stations(gdf, 
                                       naming_option=app.gui.getvar("observation_stations", "naming_option"),
                                       model_option=model_option)
@@ -119,7 +118,10 @@ class Toolbox(GenericToolbox):
         try:
             gdf_model = app.active_model.domain.region
         except:
-            print("Warning: No model extent found")
+            app.gui.window.dialog_info(
+                text="No active model extent found ...",
+                title="Failed",
+            )
             return
         
         # only keep stations within model extent

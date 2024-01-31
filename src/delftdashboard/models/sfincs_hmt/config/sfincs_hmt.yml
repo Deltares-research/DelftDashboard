@@ -8,31 +8,14 @@ element:
     height: -10
   variable_group: sfincs_hmt
   tab:
-  # - string: Domain
-  #   module: models.sfincs_hmt.domain
-  #   method: set_variables
-  #   element: domain.yml
   - string: Time Frame
     module: models.sfincs_hmt.timeframe
     element: timeframe.yml
-  # - string: Physics
-  #   # module: models.sfincs_hmt.physics
-  #   element: physics.yml
-  # - string: Numerics
-  #   module: models.sfincs_hmt.numerics
-  #   element: numerics.yml
   - string: Boundary Conditions
-    # module: models.sfincs_hmt.boundary_conditions
     element: boundary_conditions.yml
   - string: Observations
-    # module: models.sfincs_hmt.observations
     element: observations.yml
   - string: Structures
-    module: models.sfincs_hmt.structures
     element: structures.yml
-  # - string: Output
-  #   module: models.sfincs_hmt.output
-  #   element: output.yml
   - string: Settings
-    # module: models.sfincs_hmt.settings
     element: settings.yml

@@ -7,6 +7,11 @@ from hydromt_sfincs import SfincsModel
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 
+from .observation_points import add_observation_point
+from .observation_points import select_observation_point_from_map
+from .boundary_conditions_wlev import add_boundary_point
+from .boundary_conditions_wlev import select_boundary_point_from_map
+
 class Model(GenericModel):
     def __init__(self, name):
         super().__init__()
@@ -79,7 +84,7 @@ class Model(GenericModel):
         bed_levels.update = update_map
 
         layer.add_layer(
-            "mask_active",
+            "mask",
             type="circle",
             circle_radius=3,
             legend_position="top-right",
@@ -88,9 +93,6 @@ class Model(GenericModel):
             line_color="transparent",
             big_data=True,
         )
-
-        # Move this to hurrywave.py
-        from .boundary_conditions_wlev import select_boundary_point_from_map
 
         layer.add_layer(
             "boundary_points",
@@ -106,8 +108,6 @@ class Model(GenericModel):
             fill_color_selected="red",
             hover_property="name",
         )
-
-        from .observation_points import select_observation_point_from_map
 
         layer.add_layer(
             "observation_points",
@@ -146,7 +146,7 @@ class Model(GenericModel):
             app.map.layer["sfincs_hmt"].layer["bed_levels"].hide()
 
             # Mask is made invisible
-            app.map.layer["sfincs_hmt"].layer["mask_active"].hide()
+            app.map.layer["sfincs_hmt"].layer["mask"].hide()
 
             # Boundary points are made grey
             app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
@@ -318,8 +318,6 @@ class Model(GenericModel):
         pass
 
     def add_stations(self, gdf, naming_option="name", model_option="obs"):
-        from .observation_points import add_observation_point
-        from .boundary_conditions_wlev import add_boundary_point
         # if id is used as naming option, rename column
         if naming_option == "id":
             gdf = gdf.rename(columns={"id": "name"})
