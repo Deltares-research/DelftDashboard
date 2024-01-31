@@ -148,6 +148,10 @@ class Model(GenericModel):
             # Mask is made invisible
             app.map.layer["sfincs_hmt"].layer["mask"].hide()
 
+            # Hide structure layers
+            if 'measures' in app.map.layer["sfincs_hmt"].layer:
+                app.map.layer["sfincs_hmt"].layer["measures"].hide()
+
             # Boundary points are made grey
             app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
             

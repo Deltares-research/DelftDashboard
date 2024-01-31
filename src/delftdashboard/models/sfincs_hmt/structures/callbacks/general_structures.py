@@ -12,6 +12,8 @@ from pathlib import Path
 import geopandas as gpd
 
 from typing import List
+from shapely.geometry import Point
+
 
 
 class FAMBNameConverter:
@@ -48,23 +50,28 @@ def select(*args):
     model = app.model["sfincs_hmt"].domain
 
     # If no measures layer exists, create it
-    if "measures" not in app.map.layer:
-        app.map.add_layer("measures")
-        layer = app.map.layer["measures"].add_layer("weir")
+    if "measures" not in app.map.layer['sfincs_hmt'].layer.keys():
+        measures_layer = app.map.layer['sfincs_hmt'].add_layer("measures")
+        layer = measures_layer.add_layer("weir")
         layer.line_color_selected = "green"
         layer.line_color = "darkgreen"
-        layer = app.map.layer["measures"].add_layer("thd")
+        layer = measures_layer.add_layer("thd")
         layer.line_color_selected = "orange"
         layer.line_color = "darkorange"
-        layer = app.map.layer["measures"].add_layer("drn")
+        layer = measures_layer.add_layer("drn")
         layer.line_color_selected = "red"
         layer.line_color = "darkred"
+    else:
+        measures_layer = app.map.layer["sfincs_hmt"].layer["measures"]
+        measures_layer.show()
 
     # Add weir measures in the model to the map
     weirs_list = app.gui.getvar("sfincs_hmt", "structure_weir_list")
     if "weir" in model.geoms:
         weirs_list = make_geom_layer(
-            "weir", weirs_list, app.map.layer["measures"].layer["weir"]
+            geom_type="weir",
+            geom_list=weirs_list,
+            layer=measures_layer.layer["weir"],
         )
     if weirs_list:
         app.gui.setvar("sfincs_hmt", "structure_weir_list", weirs_list)
@@ -78,7 +85,9 @@ def select(*args):
     thin_dams_list = app.gui.getvar("sfincs_hmt", "structure_thd_list")
     if "thd" in model.geoms:
         thin_dams_list = make_geom_layer(
-            "thd", thin_dams_list, app.map.layer["measures"].layer["thd"]
+            geom_type="thd",
+            geom_list=thin_dams_list,
+            layer=measures_layer.layer["thd"],
         )
     if thin_dams_list:
         app.gui.setvar("sfincs_hmt", "structure_thd_list", thin_dams_list)
@@ -92,7 +101,11 @@ def select(*args):
     drainage_list = app.gui.getvar("sfincs_hmt", "structure_drn_list")
     if "drn" in model.geoms:
         drainage_list = make_geom_layer(
-            "drn", drainage_list, app.map.layer["measures"].layer["drn"]
+            geom_type="drn",
+            geom_list=drainage_list,
+            layer=measures_layer.layer["drn"],
+            add_snapped=False,
+            add_cornerpoints=True,
         )
     if drainage_list:
         app.gui.setvar("sfincs_hmt", "structure_drn_list", drainage_list)
@@ -106,7 +119,7 @@ def select(*args):
 def select_struct(*args):
     """Callback method to select a measure from the list"""
     # Split the source in tab, struct_type, name
-    tab, struct_type, name = args[0]["source"].split(".")
+    _, _, struct_type, name = args[0]["source"].split(".")
 
     # Get selected structure type
     structure_type = app.gui.getvar("measures", "selected_structure_type")
@@ -129,16 +142,43 @@ def select_struct(*args):
         app.gui.window.update()
 
 
-def make_geom_layer(geom_type: str, geom_list: list, layer):
-    """Method to create a layer from a geometry"""
+def make_geom_layer(geom_type: str, geom_list: list, layer, add_snapped: bool = True, add_cornerpoints: bool = False):
+    """Method to add a geom layer to the map
+
+    Parameters
+    ----------
+    geom_type : str
+        Type of geom to add
+    geom_list : list
+        List of geoms to add
+    layer : Layer
+        Layer to add the geoms to
+    add_snapped : bool, optional
+        Whether to add a snapped version of the geoms, by default True
+    add_cornerpoints : bool, optional
+        Whether to add the cornerpoints of the geoms, by default False
+
+    Returns
+    -------
+    list
+        List of geoms that are added to the map
+    """
+
     # Get geometry from model
     geoms = app.model["sfincs_hmt"].domain.geoms[geom_type]
 
-    # Get mask from model as xugrid
-    if app.model["sfincs_hmt"].domain.reggrid.rotation != 0: # This is a rotated regular grid
-        xugrid_mask = UgridDataArray.from_structured(app.model["sfincs_hmt"].domain.mask, 'xc', 'yc')
-    else:
-        xugrid_mask = UgridDataArray.from_structured(app.model["sfincs_hmt"].domain.mask)
+    # Get mask from model as xugrid (only if you also want to add the snapped version)
+    if add_snapped:
+        if (
+            app.model["sfincs_hmt"].domain.reggrid.rotation != 0
+        ):  # This is a rotated regular grid
+            xugrid_mask = UgridDataArray.from_structured(
+                app.model["sfincs_hmt"].domain.mask, "xc", "yc"
+            )
+        else:
+            xugrid_mask = UgridDataArray.from_structured(
+                app.model["sfincs_hmt"].domain.mask
+            )
 
     # Create geodataframe
     for idx, geom in geoms.iterrows():
@@ -155,34 +195,56 @@ def make_geom_layer(geom_type: str, geom_list: list, layer):
         layer.add_layer(
             str(geom["name"]),
             type="line_selector",
-            circle_radius=0,
-            line_width = 3,
+            line_width=3,
             line_color=layer.line_color,
-            line_style='--',
-            line_width_selected = 3,
+            line_style="--",
+            line_width_selected=3,
             line_color_selected=layer.line_color_selected,
-            line_style_selected='--',
+            line_style_selected="--",
             hover_param="name",
             select=select_struct,
         )
 
+        # Add cornerpoints layer to map
+        if add_cornerpoints:
+            layer.add_layer(
+                str(geom["name"]) + "_cornerpoints",
+                type="circle",
+                circle_radius=5,
+                fill_color=layer.line_color,
+                line_color="transparent",
+            )
+
+        # Add snapped layer to map
         layer.add_layer(
-            str(geom["name"]) + '_snapped',
-            type="line",
+            str(geom["name"]) + "_snapped",
             circle_radius=0,
-            line_width = 5,
+            type="line",
+            line_width=5,
             line_color=layer.line_color,
         )
 
-        # Snap to grid
-        _, snapped = snap_to_grid(geom_gdf, xugrid_mask, 1.0)
-        geom_gdf["name"] = geom["name"] 
+        # Snap to grid (only if you also want to add the snapped version)
+        if add_snapped:
+            _, snapped = snap_to_grid(geom_gdf, xugrid_mask, 1.0)
+            snapped["name"] = geom["name"]
+            snapped.crs = app.crs
+            layer.layer[str(geom["name"]) + "_snapped"].set_data(snapped)
+
+        # Add original geometry to map
+        geom_gdf["name"] = geom["name"]
         geom_gdf.crs = app.crs
-        snapped["name"] = geom["name"]
-        snapped.crs = app.crs
         layer.layer[str(geom["name"])].set_data(geom_gdf, 0)
-        layer.layer[str(geom["name"]) + '_snapped'].set_data(snapped)
         geom_list.append(geom["name"])
+
+        # Add cornerpoints to map
+        if add_cornerpoints:
+            cornerpoints = gpd.GeoDataFrame(
+                geometry=[Point(coord) for coord in geom['geometry'].coords]
+            )
+            cornerpoints.crs = app.crs
+            layer.layer[str(geom["name"]) + "_cornerpoints"].set_data(cornerpoints)
+
     return geom_list
 
 
@@ -299,9 +361,10 @@ def click_add_structure(*args):
     selected_measure_type.set_default_values()
 
     # Select area to add measure
+    measures_layer = app.map.layer["sfincs_hmt"].layer["measures"]
     if selected_measure_type.selection_class.selection_type == "polygon":
         # First add temporary draw layer with create callback to add measure
-        app.map.layer["measures"].add_layer(
+        measures_layer.add_layer(
             "_TEMP",
             type="draw",
             shape="polygon",
@@ -309,11 +372,11 @@ def click_add_structure(*args):
             polygon_line_color="mediumblue",
             polygon_fill_opacity=0.3,
         )
-        app.map.layer["measures"].layer["_TEMP"].draw()
+        measures_layer.layer["_TEMP"].draw()
 
     elif selected_measure_type.selection_class.selection_type == "polyline":
         # First add temporary draw layer with create callback to add measure
-        app.map.layer["measures"].add_layer(
+        measures_layer.add_layer(
             "_TEMP",
             type="draw",
             shape="polyline",
@@ -321,7 +384,7 @@ def click_add_structure(*args):
             polygon_line_color="mediumblue",
             polygon_fill_opacity=0.3,
         )
-        app.map.layer["measures"].layer["_TEMP"].draw()
+        measures_layer.layer["_TEMP"].draw()
 
     else:
         # Directly go to add measure
@@ -354,7 +417,7 @@ def add_measure():
         )
         # Open popup window again
         add_measure()
-        return # Return to prevent that the measure is added twice
+        return  # Return to prevent that the measure is added twice
 
     try:
         # Create measure object
@@ -413,7 +476,7 @@ def temporary_measure_created(*args):
     # Store temporary geometry of this measure (is it best to do this with setvar?)
     app.gui.setvar("measures", "temp_gdf", args[0])
     # Delete temporary draw layer
-    app.map.layer["measures"].layer["_TEMP"].delete()
+    app.map.layer["sfincs_hmt"].layer["measures"].layer["_TEMP"].delete()
     # Add the measure
     add_measure()
     # Remove temporary geometry
@@ -473,7 +536,7 @@ def delete_structure(selected_measures: List[str], measure_type: str):
     model = app.model["sfincs_hmt"].domain
 
     # Check if measure layer exists
-    if "measures" not in app.map.layer:
+    if "measures" not in app.map.layer['sfincs_hmt'].layer.keys():
         # Delete measure layer. You can only delete a measure if the layer exists
         raise ValueError("Cannot find measure layer")
 
@@ -493,11 +556,29 @@ def delete_structure(selected_measures: List[str], measure_type: str):
         geom_list.remove(selected_measure)
         app.gui.setvar("sfincs_hmt", f"structure_{measure_type}_list", geom_list)
 
-        # Delete layer from map
-        if selected_measure in app.map.layer["measures"].layer[measure_type].layer:
-            app.map.layer["measures"].layer[measure_type].layer[
+        # Delete layers from map
+        measures_layer = app.map.layer["sfincs_hmt"].layer["measures"]
+        if selected_measure in measures_layer.layer[measure_type].layer:
+            measures_layer.layer[measure_type].layer[
                 selected_measure
             ].delete()
+
+            # Delete cornerpoints layer
+            if selected_measure + "_cornerpoints" in measures_layer.layer[
+                measure_type
+            ].layer:
+                measures_layer.layer[measure_type].layer[
+                    selected_measure + "_cornerpoints"
+                ].delete()
+
+            # Delete snapped layer
+            if selected_measure + "_snapped" in measures_layer.layer[
+                measure_type
+            ].layer:
+                measures_layer.layer[measure_type].layer[
+                    selected_measure + "_snapped"
+                ].delete()
+            
 
     # Set active measure
     if len(geom_list) > 0:
