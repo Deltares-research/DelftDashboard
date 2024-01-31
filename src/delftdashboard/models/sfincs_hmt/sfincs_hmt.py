@@ -63,10 +63,10 @@ class Model(GenericModel):
             "grid",
             type="line",
             circle_radius=0,
-            line_width=1,
+            line_width=0.5,
             line_color="black",
             line_width_inactive=0.5,
-            line_color_inactive="lightgrey",
+            line_color_inactive="lightgrey", #TODO fix this
             line_opacity_inactive=0.5,
         )
 
@@ -174,7 +174,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
 
         # Boundary conditions
-        bc_wlev_methods = ["Click Points", "Generate along boundary", "Select from database", "Load from file"]
+        bc_wlev_methods = ["Click Points", "Generate along Boundary", "Select from Database", "Load from File"]
         app.gui.setvar(group, "bc_wlev_methods", bc_wlev_methods)
         app.gui.setvar(group, "bc_wlev_methods_index", 0)
         app.gui.setvar(group, "bc_dist_along_msk", 5e3)
@@ -183,7 +183,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_boundary_points", 0)
         app.gui.setvar(group, "active_boundary_point", 0)
 
-        bc_dis_methods = ["Click Points", "Load from file"]
+        bc_dis_methods = ["Click Points", "Load from File"]
         app.gui.setvar(group, "bc_dis_methods", bc_dis_methods)
         app.gui.setvar(group, "bc_dis_methods_index", 0)
         app.gui.setvar(group, "merge_bc_dis", True)
@@ -192,14 +192,14 @@ class Model(GenericModel):
         app.gui.setvar(group, "active_discharge_point", 0)
 
         # Observation points 
-        obs_methods = ["Click Points", "Select from database", "Load from file"]
+        obs_methods = ["Click Points", "Select from Database", "Load from File"]
         app.gui.setvar(group, "obs_methods", obs_methods)
         app.gui.setvar(group, "obs_methods_index", 0)
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
 
-        crs_methods = ["Draw LineString", "Load from file"]
+        crs_methods = ["Draw LineString", "Load from File"]
         app.gui.setvar(group, "crs_methods", crs_methods)
         app.gui.setvar(group, "crs_methods_index", 0)
         app.gui.setvar(group, "cross_section_names", [])
@@ -214,6 +214,26 @@ class Model(GenericModel):
         app.gui.setvar(group, "boundaryconditions_zs", 0.0)
         app.gui.setvar(group, "wind", True)
         app.gui.setvar(group, "rain", True)
+
+        # Structures
+        app.gui.setvar(group, "structure_weirs_methods", ["Draw LineString", "Load from file"])
+        app.gui.setvar(group, "structure_weirs_method_index", 0)
+        app.gui.setvar(group, "structure_weir_index", None)
+        app.gui.setvar(group, "structure_weir_list", [])
+        app.gui.setvar(group, "active_structure_weir", 0)
+
+        app.gui.setvar(group, "structure_thin_dam_methods", ["Draw LineString", "Load from file"])
+        app.gui.setvar(group, "structure_thin_dam_method_index", 0)
+        app.gui.setvar(group, "structure_thd_index", None)
+        app.gui.setvar(group, "structure_thd_list", [])
+        app.gui.setvar(group, "active_structure_thd", 0)
+
+        app.gui.setvar(group, "structure_drainage_methods", ["Draw LineString", "Load from file"])
+        app.gui.setvar(group, "structure_drainage_method_index", 0)
+        app.gui.setvar(group, "structure_drn_index", None)
+        app.gui.setvar(group, "structure_drn_list", [])
+        app.gui.setvar(group, "active_structure_drn", 0)
+        app.gui.setvar(group, "drainage_type", 0)
 
         # Physics
         app.gui.setvar(group, "advection", False)
@@ -310,6 +330,10 @@ def update_map():
     if not app.map.map_extent:
         print("Map extent not yet available ...")
         return
+    
+    # check if bed_levels layer is visible
+    if not app.map.layer["sfincs_hmt"].layer["bed_levels"].visible:
+        return
 
     # check if grid is already defined
     grid = app.model["sfincs_hmt"].domain.grid
@@ -351,5 +375,6 @@ def update_map():
         y=yv,
         z=da_dep.values,
         colormap=app.color_map_earth,
-        decimals=0,
+        decimals=1,
+        legend_title="Bed levels [m+ref]",
     )

@@ -14,55 +14,32 @@ element:
       width: 130
       height: 20
     select: index
-    tooltip: Select how you want to add observation cross sections
-    variable: crs_methods_index
+    tooltip: Select how you want to add thin dams
+    variable: structure_thin_dam_method_index
     option_string: 
-      variable: crs_methods
+      variable: structure_thin_dam_methods
   - style: pushbutton
-    text: Add point on map
+    text: Add thin dam
     position:
       x: 10
       y: 60
       width: 130
       height: 20
-    method: add_crs_on_map
+    method: click_add_structure
     tooltip: Add cross-section point on map
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: crs_methods_index
-        operator: eq
-        value: 0
-  - style: pushbutton
-    text: Load from file
-    position:
-      x: 10
-      y: 60
-      width: 130
-      height: 20
-    method: load_crs_from_file
-    tooltip: Load cross-sections from file
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: crs_methods_index
-        operator: eq
-        value: 1
 - style: listbox
   position:
     x: 170
     y: 10
     width: 300
     height: 110
-  method: select_crs_from_list
-  variable: active_crs_point
+  method: click_select_structure
+  variable: structure_thd_index
   select: index
   text: Thin Dams
   text_position: above
   option_string:
-    variable: cross_section_names
+    variable: structure_thd_list
   tooltip: Select cross-section
 - style: pushbutton
   text: Delete
@@ -71,15 +48,8 @@ element:
     y: 100
     width: 80
     height: 20
-  method: delete_crs_from_list
+  method: click_delete_structure
   tooltip: Delete observation point from list
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_cross_sections
-      operator: gt
-      value: 0
 - style: pushbutton
   text: Delete All
   position:
@@ -87,12 +57,5 @@ element:
     y: 75
     width: 80
     height: 20
-  method: delete_all_crs_from_list
+  method: click_delete_all_structures
   tooltip: Delete all observation points from list
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_cross_sections
-      operator: gt
-      value: 0

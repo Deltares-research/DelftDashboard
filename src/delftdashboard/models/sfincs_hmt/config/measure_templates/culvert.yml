@@ -1,0 +1,68 @@
+window:
+  title: Culvert
+  width: 460
+  height: 300
+  variable_group: measure
+  module: models.sfincs_hmt.structures
+  modal: True
+  cancel: True
+element:
+- style: panel
+  position:
+    x: 10
+    y: 190
+    width: 440
+    height: 100
+  title: Description
+- style: panel
+  position:
+    x: 10
+    y: 50
+    width: 440
+    height: 130
+  title: Culvert Properties
+- style: edit
+  position:
+    x: 100
+    y: 250
+    width: 200
+    height: 20
+  variable: name
+  text: Name
+  tooltip: Edit the name of the culvert (no spaces allowed!).
+- style: edit
+  position:
+    x: 100
+    y: 225
+    width: 200
+    height: 20
+  variable: description
+  text: Description
+  tooltip: Edit the description of the culvert
+- style: edit
+  position:
+    x: 90
+    y: 150
+    width: 50
+    height: 20
+  variable: discharge
+  text: Discharge
+  tooltip: Edit the discharge
+- style: pushselectfile
+  position:
+    x: 90
+    y: 120
+    width: 130
+    height: 20
+  text: Import Line Coordinates
+  variable: geometry_file
+  showfilename: 'yes'
+  extension: '*.csv'
+  tooltip: Import coordinates
+  dependency:
+  - action: visible
+    checkfor: any
+    check:
+    - variable: selection_type
+      operator: eq
+      value: import_area
