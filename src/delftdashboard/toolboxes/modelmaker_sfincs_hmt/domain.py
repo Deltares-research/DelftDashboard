@@ -31,6 +31,13 @@ def select_model_type(*args):
     *args: Additional arguments (not used in the function)
 
     """	
+
+    # TODO: Make this into an enum, e.g.:
+    # class ModelType(Enum):
+    #     OVERLAND = 0
+    #     SURGE = 1
+    #     QUADTREE = 2 # Not implemented
+    
     group = "modelmaker_sfincs_hmt"
 
     model_type = app.gui.getvar(group, "model_type_index")
