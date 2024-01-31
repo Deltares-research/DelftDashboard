@@ -6,6 +6,7 @@ from delftdashboard.operations import map
 
 import cht_observations.observation_stations as obs
 
+
 class Toolbox(GenericToolbox):
     def __init__(self, name):
         super().__init__()
@@ -17,8 +18,10 @@ class Toolbox(GenericToolbox):
         self.gdf = gpd.GeoDataFrame()
 
         # add sources
-        self.sources = {"ndbc": "National Data Buoy Center (NDBC)",
-                   "noaa_coops": "NOAA Tides and Currents (CO-OPS)"}
+        self.sources = {
+            "ndbc": "National Data Buoy Center (NDBC)",
+            "noaa_coops": "NOAA Tides and Currents (CO-OPS)",
+        }
 
         # Set GUI variables
         group = "observation_stations"
@@ -44,7 +47,9 @@ class Toolbox(GenericToolbox):
         opt = app.gui.getvar("observation_stations", "naming_option")
         app.map.layer["observation_stations"].layer["stations"].hover_property = opt
         index = app.gui.getvar("observation_stations", "active_station_index")
-        app.map.layer["observation_stations"].layer["stations"].set_data(self.gdf, index)
+        app.map.layer["observation_stations"].layer["stations"].set_data(
+            self.gdf, index
+        )
 
         # show active model extent
         active_model = app.active_model
@@ -57,7 +62,7 @@ class Toolbox(GenericToolbox):
     def select_source(self, index):
         group = "observation_stations"
         stnames, self.gdf = get_station_names(list(self.sources.keys())[index])
-    
+
         app.gui.setvar(group, "station_names", stnames)
         app.gui.setvar(group, "active_station_index", 0)
         app.map.layer["observation_stations"].layer["stations"].set_data(self.gdf, 0)
@@ -74,21 +79,26 @@ class Toolbox(GenericToolbox):
     def add_layers(self):
         # Add Mapbox layers
         layer = app.map.add_layer("observation_stations")
-        layer.add_layer("stations",
-                         type="circle_selector",
-                         line_color="white",
-                         line_color_selected="white",
-                         select=self.select_station_from_map
-                        )        
+        layer.add_layer(
+            "stations",
+            type="circle_selector",
+            line_color="white",
+            line_color_selected="white",
+            select=self.select_station_from_map,
+        )
 
     def add_stations_to_model(self):
         index = app.gui.getvar("observation_stations", "active_station_index")
         gdf = self.gdf.iloc[[index]]
 
-        model_option_index =  app.gui.getvar("observation_stations", "model_options_index")
-        app.active_model.add_stations(gdf, 
-                                      naming_option=app.gui.getvar("observation_stations", "naming_option"),
-                                      model_option=list(self.model_options.keys())[model_option_index])
+        model_option_index = app.gui.getvar(
+            "observation_stations", "model_options_index"
+        )
+        app.active_model.add_stations(
+            gdf,
+            naming_option=app.gui.getvar("observation_stations", "naming_option"),
+            model_option=list(self.model_options.keys())[model_option_index],
+        )
 
     def add_all_stations_to_model(self):
         gdf = self.gdf
@@ -99,22 +109,27 @@ class Toolbox(GenericToolbox):
         except:
             print("Warning: No model extent found")
             return
-        
-        # only keep stations within model extent
-        gdf = gpd.sjoin(gdf, gdf_model, op='within')
 
-        model_option_index =  app.gui.getvar("observation_stations", "model_options_index")
-        app.active_model.add_stations(gdf, 
-                                      naming_option=app.gui.getvar("observation_stations", "naming_option"),
-                                      model_option=list(self.model_options.keys())[model_option_index])
+        # only keep stations within model extent
+        gdf = gpd.sjoin(gdf, gdf_model, op="within")
+
+        model_option_index = app.gui.getvar(
+            "observation_stations", "model_options_index"
+        )
+        app.active_model.add_stations(
+            gdf,
+            naming_option=app.gui.getvar("observation_stations", "naming_option"),
+            model_option=list(self.model_options.keys())[model_option_index],
+        )
+
     def select_naming_option(self):
         self.update()
         opt = app.gui.getvar("observation_stations", "naming_option")
         index = app.gui.getvar("observation_stations", "active_station_index")
         app.map.layer["observation_stations"].layer["stations"].hover_property = opt
-        app.map.layer["observation_stations"].layer["stations"].set_data(self.gdf,
-                                                                         index)
-
+        app.map.layer["observation_stations"].layer["stations"].set_data(
+            self.gdf, index
+        )
 
     def select_station_from_map(self, *args):
         index = args[0]["properties"]["index"]
@@ -132,25 +147,32 @@ class Toolbox(GenericToolbox):
             stnames.append(row[opt])
         app.gui.setvar("observation_stations", "station_names", stnames)
 
-# 
+
+#
 def select(*args):
     app.toolbox["observation_stations"].select_tab()
 
+
 def select_source(*args):
-    index= app.gui.getvar("observation_stations", "active_source_index")
+    index = app.gui.getvar("observation_stations", "active_source_index")
     app.toolbox["observation_stations"].select_source(index=index)
+
 
 def select_station(*args):
     app.toolbox["observation_stations"].select_station_from_list()
 
+
 def select_naming_option(*args):
     app.toolbox["observation_stations"].select_naming_option()
+
 
 def add_stations_to_model(*args):
     app.toolbox["observation_stations"].add_stations_to_model()
 
+
 def add_all_stations_to_model(*args):
     app.toolbox["observation_stations"].add_all_stations_to_model()
+
 
 def return_to_modelmaker(*args):
     active_model = app.active_model
@@ -165,8 +187,9 @@ def return_to_modelmaker(*args):
     app.active_toolbox = app.toolbox[toolbox_name]
     app.active_toolbox.select()
 
-    #TODO back to observations model-tab
+    # TODO back to observations model-tab
     # app.active_toolbox.select_tab("observations")
+
 
 ##
 def get_station_names(source):

@@ -7,6 +7,7 @@ from hydromt_sfincs import SfincsModel
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 
+
 class Model(GenericModel):
     def __init__(self, name):
         super().__init__()
@@ -46,7 +47,7 @@ class Model(GenericModel):
                 app.gui.setvar(group, "dy", 500)
                 app.gui.setvar(group, "res", 500)
                 app.gui.setvar(group, "unit", " (in m)")
-        
+
         # update map
         self.plot()
 
@@ -71,7 +72,7 @@ class Model(GenericModel):
         )
 
         bed_levels = layer.add_layer(
-            "bed_levels", 
+            "bed_levels",
             type="raster",
         )
 
@@ -160,7 +161,7 @@ class Model(GenericModel):
 
             # Boundary points are made grey
             app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
-            
+
             # Observation points are made grey
             app.map.layer["sfincs_hmt"].layer["observation_points"].deactivate()
             app.map.layer["sfincs_hmt"].layer["cross_sections"].deactivate()
@@ -189,7 +190,12 @@ class Model(GenericModel):
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
 
         # Boundary conditions
-        bc_wlev_methods = ["Click Points", "Generate along boundary", "Select from database", "Load from file"]
+        bc_wlev_methods = [
+            "Click Points",
+            "Generate along boundary",
+            "Select from database",
+            "Load from file",
+        ]
         app.gui.setvar(group, "bc_wlev_methods", bc_wlev_methods)
         app.gui.setvar(group, "bc_wlev_methods_index", 0)
         app.gui.setvar(group, "bc_dist_along_msk", 5e3)
@@ -206,7 +212,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_discharge_points", 0)
         app.gui.setvar(group, "active_discharge_point", 0)
 
-        # Observation points 
+        # Observation points
         obs_methods = ["Click Points", "Select from database", "Load from file"]
         app.gui.setvar(group, "obs_methods", obs_methods)
         app.gui.setvar(group, "obs_methods_index", 0)
@@ -239,7 +245,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "storevelmax", False)
         app.gui.setvar(group, "storecumprcp", False)
         app.gui.setvar(group, "storemaxwind", False)
-
 
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input
@@ -310,6 +315,7 @@ class Model(GenericModel):
     def add_stations(self, gdf, naming_option="name", model_option="obs"):
         from .observation_points import add_observation_point
         from .boundary_conditions_wlev import add_boundary_point
+
         # if id is used as naming option, rename column
         if naming_option == "id":
             gdf = gdf.rename(columns={"id": "name"})
@@ -334,9 +340,9 @@ def update_map():
             return
     else:
         return
-    
+
     if "msk" in grid:
-        da_dep = da_dep.where(grid["msk"] > 0) 
+        da_dep = da_dep.where(grid["msk"] > 0)
 
     coords = app.map.map_extent
     xl = [coords[0][0], coords[1][0]]

@@ -8,6 +8,7 @@ Created on Tue Jul  5 13:40:07 2022
 from delftdashboard.app import app
 import inspect
 
+
 class GenericToolbox:
     def __init__(self):
         pass
@@ -34,7 +35,7 @@ class GenericToolbox:
 
         # And select this tab
         app.gui.window.elements[index].widget.select_tab(0)
-        
+
         app.gui.window.update()
 
     def add_layers(self):
@@ -43,6 +44,7 @@ class GenericToolbox:
     def set_crs(self):
         pass
 
+
 def select_toolbox(toolbox_name):
     # Called from menu, or from model->select
     app.active_toolbox = app.toolbox[toolbox_name]
@@ -50,4 +52,3 @@ def select_toolbox(toolbox_name):
     # # And go to this tab
     # app.gui.window.elements[0].widget.select_tab(0)
     # app.gui.window.update()
-

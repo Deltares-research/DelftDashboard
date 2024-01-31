@@ -187,10 +187,10 @@ def build_gui_config():
                             "action": "check",
                             "checkfor": "all",
                             "check": [
-                                { 
+                                {
                                     "variable": "active_topography_name",
                                     "operator": "eq",
-                                    "value": key
+                                    "value": key,
                                 }
                             ],
                         }
@@ -209,10 +209,6 @@ def build_gui_config():
                     )
         menu["menu"].append(source_menu)
 
-
-                    
-
-
         # source_menu = {}
         # source_menu["text"] = "hydromt"
         # source_menu["menu"] = []
@@ -220,7 +216,7 @@ def build_gui_config():
         #     if app.data_catalog[key].driver == "raster":
         #         if app.data_catalog[key].meta["category"] == "topography":
         #             dependency = [
-        #                 {   
+        #                 {
         #                     "action": "check",
         #                     "checkfor": "all",
         #                     "check": [{ "variable": "active_topography_name",

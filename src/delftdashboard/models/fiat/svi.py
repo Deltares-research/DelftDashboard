@@ -23,20 +23,16 @@ def add_svi(*args):
         fid = open(census_key_path, "r")
         census_key = fid.readlines()
         fid.close()
-    
+
     census_key = census_key[0]
     year_data = app.gui.getvar(group, "selected_year")
 
     if app.gui.getvar(group, "use_svi"):
-        app.active_model.domain.svi_vm.set_svi_settings(
-            census_key, year_data
-        )
-    
+        app.active_model.domain.svi_vm.set_svi_settings(census_key, year_data)
+
     if app.gui.getvar(group, "use_equity"):
-        app.active_model.domain.svi_vm.set_equity_settings(
-            census_key, year_data
-        )
-    
+        app.active_model.domain.svi_vm.set_equity_settings(census_key, year_data)
+
     if app.gui.getvar(group, "use_svi") or app.gui.getvar(group, "use_equity"):
         app.gui.setvar("group", "checkbox_svi_(optional)", True)
 

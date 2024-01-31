@@ -9,6 +9,7 @@ from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+
 class Polygon:
     def __init__(self, name, gdf):
         self.name = name
@@ -49,19 +50,19 @@ class Toolbox(GenericToolbox):
             if mode == "invisible":
                 app.map.layer["drawing"].hide()
         except:
-            pass        
-
+            pass
 
     def draw_polygon(self):
         layer = app.map.add_layer("drawing")
-        draw_layer = layer.add_layer("polygon",
-                                     type="draw",
-                                     shape="polygon",
-                                          create=self.polygon_created,
-                                          modify=self.polygon_modified,
-                                          select=self.polygon_selected)
+        draw_layer = layer.add_layer(
+            "polygon",
+            type="draw",
+            shape="polygon",
+            create=self.polygon_created,
+            modify=self.polygon_modified,
+            select=self.polygon_selected,
+        )
         draw_layer.draw()
-
 
     def polygon_created(self, gdf, feature_shape, feature_id):
         # Polygon was added on map
@@ -104,10 +105,12 @@ class Toolbox(GenericToolbox):
 
     def draw_rectangle(self):
         layer = app.map.add_layer("drawing")
-        draw_layer = layer.add_draw_layer("rectangle",
-                                          create=self.rectangle_created,
-                                          modify=self.rectangle_modified,
-                                          select=self.rectangle_selected)
+        draw_layer = layer.add_draw_layer(
+            "rectangle",
+            create=self.rectangle_created,
+            modify=self.rectangle_modified,
+            select=self.rectangle_selected,
+        )
         draw_layer.draw_rectangle()
 
     def rectangle_created(self, gdf, feature_shape, feature_id):
@@ -132,7 +135,6 @@ class Toolbox(GenericToolbox):
             app.gui.setvar("drawing", "active_rectangle", index)
             self.update()
 
-
     def select_rectangle(self):
         # Polygon selected from list
         iac = app.gui.getvar("drawing", "active_rectangle")
@@ -150,11 +152,13 @@ class Toolbox(GenericToolbox):
 
     def draw_polyline(self):
         layer = app.map.add_layer("drawing")
-        draw_layer = layer.add_draw_layer("polyline",
-                                          create=self.polyline_created,
-                                          modify=self.polyline_modified,
-                                          select=self.polyline_selected,
-                                          polyline_line_width=5)
+        draw_layer = layer.add_draw_layer(
+            "polyline",
+            create=self.polyline_created,
+            modify=self.polyline_modified,
+            select=self.polyline_selected,
+            polyline_line_width=5,
+        )
         draw_layer.draw_polyline()
 
     def polyline_created(self, gdf, feature_shape, feature_id):
@@ -238,11 +242,14 @@ class Toolbox(GenericToolbox):
                 return item, index
         return None, None
 
+
 # Methods that are called from the GUI
+
 
 def select(*args):
     # De-activate existing layers
     map.update()
+
 
 def draw_polygon(*args):
     app.toolbox["drawing"].draw_polygon()
@@ -266,6 +273,7 @@ def select_rectangle(*args):
 
 def delete_rectangle(*args):
     app.toolbox["drawing"].delete_rectangle()
+
 
 def draw_polyline(*args):
     app.toolbox["drawing"].draw_polyline()
