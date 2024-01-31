@@ -111,7 +111,7 @@ class Toolbox(GenericToolbox):
                                       naming_option=app.gui.getvar("observation_stations", "naming_option"),
                                       model_option=model_option)
 
-    def add_all_stations_to_model(self, model_option="obs"):
+    def add_all_stations_to_model(self, model_option):
         gdf = self.gdf
 
         # get model extent
@@ -125,7 +125,7 @@ class Toolbox(GenericToolbox):
             return
         
         # only keep stations within model extent
-        gdf = gpd.sjoin(gdf, gdf_model, op='within')
+        gdf = gpd.sjoin(gdf.to_crs(gdf_model.crs), gdf_model, op='within')
 
         app.active_model.add_stations(gdf, 
                                       naming_option=app.gui.getvar("observation_stations", "naming_option"),
