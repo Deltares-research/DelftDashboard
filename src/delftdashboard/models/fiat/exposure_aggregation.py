@@ -163,6 +163,7 @@ def add_aggregations(*args):
                 text="Your additional attributes are not within your model boundaries. Make sure to set the crs to EPSG:4326 in all your data.",
                 title="Additional attribute outside model boundaries. ",
                 )
+            app.gui.setvar("_main", "checkbox_attributes_(optional)", True)
     else:
         print("no active model")
         app.gui.window.dialog_info(
