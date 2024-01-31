@@ -752,7 +752,7 @@ class Model(GenericModel):
     def show_classification(self, type="secondary"):
         """Show exposure layer(s)"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_nsi_paint_properties(type="primary") # always paint according to primary
             color_items = paint_properties['circle-color'][2:-1]
             color_items.append('other')
             color_items.append(paint_properties['circle-color'][-1])
