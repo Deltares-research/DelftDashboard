@@ -113,7 +113,7 @@ def select(*args):
 def select_struct(*args):
     """Callback method to select a measure from the list"""
     # Split the source in tab, struct_type, name
-    tab, struct_type, name = args[0]["source"].split(".")
+    _, _, struct_type, name = args[0]["source"].split(".")
 
     # Get selected structure type
     structure_type = app.gui.getvar("measures", "selected_structure_type")
