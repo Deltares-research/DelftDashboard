@@ -120,6 +120,7 @@ def select(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
     if active_layer:
         app.map.layer["modelmaker_fiat"].layer[active_layer].set_mode("active")
+    app.gui.setvar("_main", "show_fiat_checkbox", True)
 
 
 def draw_boundary(*args):

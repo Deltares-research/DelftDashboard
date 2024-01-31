@@ -7,6 +7,7 @@ from pathlib import Path
 def select(*args):
     # De-activate existing layers
     map.update()
+    app.gui.setvar("_main", "show_fiat_checkbox", True)
 
 
 def edit(*args):

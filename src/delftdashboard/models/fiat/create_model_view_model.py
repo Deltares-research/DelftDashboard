@@ -16,6 +16,7 @@ from delftdashboard.models.fiat.exposure_aggregation import get_table_data
 def select(*args):
     # De-activate existing layers
     map.update()
+    app.gui.setvar("_main", "show_fiat_checkbox", False)
 
 
 def edit(*args):

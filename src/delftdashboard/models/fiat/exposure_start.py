@@ -7,7 +7,7 @@ import pandas as pd
 def select(*args):
     # De-activate existing layers
     map.update()
-
+    app.gui.setvar("_main", "show_fiat_checkbox", True)
 
 def edit(*args):
     app.active_model.set_model_variables()
