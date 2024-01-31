@@ -65,7 +65,7 @@ def check_env_creation() -> None:
         exit()
 
 
-def get_repo_paths() -> dict[str, Union[Path, None]]:
+def get_repo_paths() -> dict:
     print(
         f"\nEnter local repository paths RELATIVE to the CURRENT WORKING DIRECTORY:\n{os.getcwd()}\nLeave empty if you dont want to have a local editable installation of the repository."
     )
@@ -116,8 +116,8 @@ def get_and_copy_user_files(ddb_config_dir: Path) -> None:
 def copy_p_drive_files(
     p_drive_modelbuilder_installation: Path,
     ddb_config_dir: Path,
-    repo_paths: dict[str, Union[Path, None]],
-) -> dict[str, Path]:
+    repo_paths: dict,
+) -> dict:
     # == P DRIVE FILES ==
     file_names = [
         "delftdashboard.ini",
@@ -150,19 +150,27 @@ def copy_p_drive_files(
     }
 
     # this will be gone eventually when hydromt_fiat is updated to not hardcoded to need the catalog anymore
-    while (repo_paths["hydromt_fiat"] is None):
-        print("Currrently, hydromt_fiat is required to be locally installed to run DelftDashboard, please provide the path to your local clone:\n")
+    while repo_paths["hydromt_fiat"] is None:
+        print(
+            "Currrently, hydromt_fiat is required to be locally installed to run DelftDashboard, please provide the path to your local clone:\n"
+        )
         repo_paths["hydromt_fiat"] = get_repo_path("hydromt_fiat")
-    
+
     target_paths.update(
         {
             "hydromt_fiat_catalog_USA": repo_paths["hydromt_fiat"]
-            / "hydromt_fiat/data/hydromt_fiat_catalog_USA.yml",
+            / Path("hydromt_fiat", "data", "hydromt_fiat_catalog_USA.yml"),
             "Hazus_IWR_curves": repo_paths["hydromt_fiat"]
-            / "hydromt_fiat/data/damage_functions/flooding/Hazus_IWR_curves.csv",
+            / Path(
+                "hydromt_fiat",
+                "data",
+                "damage_functions",
+                "flooding",
+                "Hazus_IWR_curves.csv",
+            ),
         }
     )
-    
+
     # Copy files and folders from P drive to target paths
     for source_name, source_path in p_drive_files.items():
         if source_path.is_dir():
@@ -183,14 +191,14 @@ def copy_p_drive_files(
     return target_paths
 
 
-def update_delftdashboard_ini(target_paths: dict[str, Path]) -> None:
+def update_delftdashboard_ini(target_paths: dict) -> None:
     # In the repo there exists a default catalog, if the user want more, add the path to the data_libs here
     replacements = {
-        "dataFolder_bathymetry": str(target_paths["dataFolder_bathymetry"]),
+        "dataFolder_bathymetry": os.fspath(target_paths["dataFolder_bathymetry"]),
         "data_libs": [
-            str(target_paths["datalib_delftdashboard"]),
-            str(target_paths["hydromt_fiat_catalog_USA"]),
-            str(target_paths["hydromt_sfincs_catalog"]),
+            os.fspath(target_paths["datalib_delftdashboard"]),
+            os.fspath(target_paths["hydromt_fiat_catalog_USA"]),
+            os.fspath(target_paths["hydromt_sfincs_catalog"]),
         ],
     }
 
@@ -203,10 +211,8 @@ def update_delftdashboard_ini(target_paths: dict[str, Path]) -> None:
     print("delftdashboard.ini updated successfully.")
 
 
-def optional_editable_install(repo_paths: dict[str, Union[Path, None]]) -> None:
+def optional_editable_install(repo_paths: dict) -> None:
     print("\nSetting up local editable versions of repositories...")
-
-
     # Install the optional repositories
     for repo in repo_paths.values():
         if repo is not None:
@@ -218,7 +224,7 @@ def main():
     ddb_config_dir = script_path.parent / "config"
 
     p_drive_modelbuilder_installation = Path(
-        "P:/11207949-dhs-phaseii-floodadapt/Model-builder/Installation"
+        "P:", "11207949-dhs-phaseii-floodadapt", "Model-builder", "Installation"
     )
 
     check_env_creation()
@@ -228,10 +234,10 @@ def main():
         p_drive_modelbuilder_installation, ddb_config_dir, repo_paths
     )
     update_delftdashboard_ini(target_paths)
-    
+
     # Install the required repositories
     subprocess.run(["pip", "install", "-e", "."], shell=True)
-    
+
     optional_editable_install(repo_paths)
 
 
