@@ -24,9 +24,9 @@ def select_damages_file(*args):
         fn_value.append(Path(fn))
     
     # Remove empty string if in list 
-    fn_value = [item for item in fn_value if item != '']
-
+    fn_value = [item for item in fn_value if item != Path('.')]
     app.gui.setvar("fiat", "loaded_damages_files_value", fn_value)
+
     name = Path(fn).name
     current_list_string = app.gui.getvar("fiat", "loaded_damages_files_string")
     if name not in current_list_string:
