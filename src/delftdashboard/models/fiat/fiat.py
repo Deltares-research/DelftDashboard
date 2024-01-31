@@ -8,7 +8,7 @@ from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel   
 import copy
-
+from .utils import make_labels
 
 class Model(GenericModel):
     def __init__(self, name):
@@ -52,7 +52,7 @@ class Model(GenericModel):
         layer.add_layer(
             "primary_classification",
             type="circle",
-            circle_radius=3,
+            circle_radius=5,
             legend_position="top-right",
             legend_title="Buildings",
             fill_color="orange",
@@ -80,7 +80,8 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title="Ground Floor Height",
+            legend_title=f'Ground Floor Height [{app.gui.getvar("fiat", "view_tab_unit")}]',
+            # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Ground Floor Height",
             big_data=True,
@@ -92,7 +93,8 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title="Max. potential damage: Structure",
+            legend_title="Max. potential damage: Structure [$]",
+            # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Max Potential Damage: Structure",
             big_data=True,
@@ -105,7 +107,8 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title="Max. potential damage: Content",
+            legend_title="Max. potential damage: Content [$]",
+            # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Max Potential Damage: Content",
             big_data=True,
@@ -117,7 +120,8 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title="Ground elevation",
+            legend_title=f'Ground elevation [{app.gui.getvar("fiat", "view_tab_unit")}]',
+            # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Ground Elevation",
             big_data=True,
@@ -659,57 +663,60 @@ class Model(GenericModel):
         if type == "asset_height":
              circle_color = [
                 "step",
-                ["get", "Ground Floor Height"],"#000000",
-                0.00001, "#FFFFFF",      
-                0.5, "#D6E1F8",      
-                1.0, "#A4C4F2",     
-                1.5, "#6C95E1",    
-                2.0, "#3750B2",    
-                2.5, "#1A237E",                                    
+                ["get", "Ground Floor Height"],
+                "#FFFFFF", 0,
+                "#EBF0FC", 0.5, 
+                "#D6E1F8", 1.0, 
+                "#A4C4F2", 1.5, 
+                "#6C95E1", 2.0, 
+                "#3750B2", 2.5, 
+                "#1A237E",
                 ]
-            
         if type == "damage_struct":
              circle_color = [
                 "step",
-                ["get", "Max Potential Damage: Structure"],"#FFFFFF",
-                0.00001, "#FFFFFF",      
-                15000.0, "#FEE9CE",      
-                50000.0, "#FDBB84",     
-                100000.0, "#FC844E",    
-                250000.0, "#E03720",    
-                500000.0, "#860000",                                    
+                ["get", "Max Potential Damage: Structure"],
+                "#FFFFFF", 0, 
+                "#FFF4E7", 15000.0, 
+                "#FEE9CE", 50000.0, 
+                "#FDBB84", 100000.0, 
+                "#FC844E", 250000.0, 
+                "#E03720", 500000.0, 
+                "#860000",                                    
                 ]
         if type == "damage_cont":
              circle_color = [
                 "step",
-                ["get", "Max Potential Damage: Content"],"#FFFFFF",
-                0.00001, "#FFFFFF",      
-                15000.0, "#FEE9CE",      
-                50000.0, "#FDBB84",     
-                100000.0, "#FC844E",    
-                250000.0, "#E03720",    
-                500000.0, "#860000",                                    
+                ["get", "Max Potential Damage: Content"],
+                "#FFFFFF", 0, 
+                "#FFF4E7", 15000.0, 
+                "#FEE9CE", 50000.0, 
+                "#FDBB84", 100000.0, 
+                "#FC844E", 250000.0, 
+                "#E03720", 500000.0, 
+                "#860000",                                    
                 ]
         if type == "ground_elevation":
              circle_color = [
                 "step",
-                ["get", "Ground Elevation"],"#FFFFFF",
-                0, "#F7FFF6",      
-                500, "#E1FCE4",      
-                1000, "#CDEA88",     
-                1500, "#A8E496",    
-                2000, "#74CC9C",    
-                2500, "#4BAF7A", 
-                3000, "#3F9E6F", 
-                3500, "#359364", 
-                4000, "#2C7B5A", 
-                4500, "#236B50", 
-                5000, "#1A5A45", 
-                5500, "#124A3A", 
-                6000, "#093931", 
-                6500, "#032C27", 
-                7000, "#00211D", 
-                7500, "#001615",                                    
+                ["get", "Ground Elevation"],
+                "#FFFFFF", 0, 
+                "#F7FFF6", 1,
+                "#E1FCE4", 2,
+                "#CDEA88", 3,
+                "#A8E496", 4,
+                "#74CC9C", 5,
+                "#4BAF7A", 6,
+                "#3F9E6F", 7,
+                "#359364", 8,
+                "#2C7B5A", 9,
+                "#236B50", 10, 
+                "#1A5A45", 11, 
+                "#124A3A", 12, 
+                "#093931", 13,
+                "#032C27", 14, 
+                "#00211D", 15, 
+                "#001615",                                    
                 ]
         if type == "SVI":
             circle_color = [
@@ -745,8 +752,11 @@ class Model(GenericModel):
     def show_classification(self, type="secondary"):
         """Show exposure layer(s)"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
+            paint_properties = self.get_nsi_paint_properties(type="primary") # always paint according to primary
+            color_items = paint_properties['circle-color'][2:-1]
+            color_items.append('other')
+            color_items.append(paint_properties['circle-color'][-1])
+            legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
             if type == "primary":
                 app.map.layer["buildings"].layer["primary_classification"].set_data(
                 self.buildings, paint_properties, legend
@@ -759,23 +769,34 @@ class Model(GenericModel):
                 self.show_exposure_buildings_secondary()
     
     def show_asset_height(self,type="asset_height"):
-            paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
-            app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
-            app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
-            app.map.layer["buildings"].layer["asset_height"].set_data(
-                self.buildings, legend
-            )
-            self.show_asset_heights()
+        paint_properties = self.get_nsi_paint_properties(type=type)
+        color_items = paint_properties['circle-color'][2:]
+        
+        colors = [color_items[i] for i in range(0, len(color_items), 2)]
+        labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+        
+        legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
+        app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
+        app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
+        app.map.layer["buildings"].layer["asset_height"].legend_title = f'Finished Floor Height [{app.gui.getvar("fiat", "view_tab_unit")}]'
+        app.map.layer["buildings"].layer["asset_height"].set_data(
+            self.buildings, paint_properties, legend
+        )
+        self.show_asset_heights()
 
     def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
+            color_items = paint_properties['circle-color'][2:]
+            
+            colors = [color_items[i] for i in range(0, len(color_items), 2)]
+            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+            
+            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
-                self.buildings,  legend
+                self.buildings, paint_properties, legend
             )
             self.show_max_potential_damage_structure()
     
@@ -783,10 +804,15 @@ class Model(GenericModel):
         """Show maximum potential damage: content layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
+            color_items = paint_properties['circle-color'][2:]
+            
+            colors = [color_items[i] for i in range(0, len(color_items), 2)]
+            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+            
+            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"]   
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
-                self.buildings, legend, 
+                self.buildings, paint_properties, legend, 
             )
             self.show_max_potential_damage_content()
     
@@ -794,19 +820,28 @@ class Model(GenericModel):
         """Show ground elevation"""
         if not self.buildings.empty:
             paint_properties = self.get_nsi_paint_properties(type=type)
-            legend = []
+            color_items = paint_properties['circle-color'][2:]
+            
+            colors = [color_items[i] for i in range(0, len(color_items), 2)]
+            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+            
+            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["ground_elevation"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["ground_elevation"].unit = app.gui.getvar("fiat", "view_tab_unit")
+            app.map.layer["buildings"].layer["ground_elevation"].legend_title = f'Ground elevation [{app.gui.getvar("fiat", "view_tab_unit")}]'
             app.map.layer["buildings"].layer["ground_elevation"].set_data(
-                self.buildings, legend
+                self.buildings, paint_properties, legend
             )
             self.show_ground_elevations()
     
     def show_svi(self, type = "SVI"):
         """Show SVI Index"""  # str(Path(self.root) / "exposure" / "SVI")
         if not self.buildings.empty and "SVI_key_domain" in self.buildings.columns:
-            legend = []
             paint_properties = self.get_nsi_paint_properties(type=type)
+            color_items = paint_properties['circle-color'][2:-1]
+            color_items.append('other')
+            color_items.append(paint_properties['circle-color'][-1])
+            legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
             app.map.layer["buildings"].layer["SVI"].set_data(
                 self.buildings, paint_properties, legend
             )
