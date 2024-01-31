@@ -22,12 +22,15 @@ def select_asset_heights_file(*args):
     fn_value = app.gui.getvar("fiat", "loaded_asset_heights_files_value")
     if fn not in fn_value:
         fn_value.append(Path(fn))
+    fn_value= [item for item in fn_value if item != Path('.')]
     app.gui.setvar("fiat", "loaded_asset_heights_files_value", fn_value)
+    
     name = Path(fn).name
     current_list_string = app.gui.getvar("fiat", "loaded_asset_heights_files_string")
     if name not in current_list_string:
         current_list_string.append(name)
 
+    current_list_string = [item for item in current_list_string if item != '']
     app.gui.setvar("fiat", "loaded_asset_heights_files_string", current_list_string)
 
 
@@ -45,14 +48,14 @@ def load_asset_heights_file(*args):
         with fiona.open(path) as src:
             # Access the schema to get the column names
             schema = src.schema
-            list_columns = list(schema['properties'].keys())
+            list_columns = list(schema["properties"].keys())
             geometry_type = schema["geometry"].lower()
 
         if geometry_type == "point":
             app.gui.setvar("fiat", "method_gfh", "nearest")
         elif geometry_type in ["polygon", "multipolygon"]:
             app.gui.setvar("fiat", "method_gfh", "intersection")
-        
+
         app.gui.setvar("fiat", "heights_file_field_name_value", list_columns)
         app.gui.setvar("fiat", "heights_file_field_name_string", list_columns)
 
@@ -99,7 +102,7 @@ def add_to_model(*args):
     attribute_name_gfh = list_attr_names[idx]
 
     # Get the method
-    method_gfh = app.gui.getvar("fiat", "method_gfh")
+    gfh_method = app.gui.getvar("fiat", "method_gfh")
 
     # Get the max distance
     max_dist_gfh = app.gui.getvar("fiat", "max_dist_gfh")
@@ -107,9 +110,9 @@ def add_to_model(*args):
     app.active_model.domain.exposure_vm.set_ground_floor_height(
         source=source_path,
         attribute_name=attribute_name_gfh,
-        method=method_gfh,
+        gfh_method=gfh_method,
         max_dist=max_dist_gfh,
-        )
+    )
 
     # Set the source
     app.gui.setvar(model, "source_finished_floor_height", source_name)

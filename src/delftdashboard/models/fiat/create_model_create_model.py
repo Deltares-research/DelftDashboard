@@ -14,6 +14,8 @@ def select(*args):
     map.update()
     if app.map.layer["buildings"].layer["exposure_points"].data is None:
         app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    app.gui.setvar("_main", "show_fiat_checkbox", True)
+
 
 def create_model(*args):
     if app.active_model.domain is None:
@@ -22,7 +24,7 @@ def create_model(*args):
             "No FIAT model initiated yet",
         )
         return
-    
+
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
 
     try:
@@ -39,16 +41,17 @@ def create_model(*args):
         app.active_model.buildings = buildings
     if roads is not None:
         app.active_model.roads = roads
-    
+
     # Set the unit for Exposure Data for visualization
     view_tab_unit = app.active_model.domain.fiat_model.exposure.unit
     app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
 
     dlg.close()
     app.gui.window.dialog_info(
-            f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",
-            "FIAT model created",
-        )
+        f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",
+        "FIAT model created",
+    )
+
 
 def edit(*args):
     app.active_model.set_model_variables()

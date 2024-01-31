@@ -5,6 +5,7 @@ import geopandas as gpd
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+
 def select(*args):
     # Set all layer inactive, except discharge_points
     map.update()
@@ -13,6 +14,7 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_mode("active")
     app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_mode("active")
     update_list()
+
 
 def add_discharge_point(gdf, merge=True):
     model = app.model["sfincs_hmt"].domain
@@ -30,11 +32,12 @@ def add_discharge_point(gdf, merge=True):
     app.gui.setvar("sfincs_hmt", "active_discharge_point", index)
     update_list()
 
+
 def add_discharge_point_on_map(*args):
     app.map.click_point(point_clicked)
 
 
-def point_clicked(x,y):
+def point_clicked(x, y):
     # Add point to discharge conditions
     model = app.model["sfincs_hmt"].domain
 
@@ -77,7 +80,7 @@ def delete_point_from_list(*args):
     model = app.model["sfincs_hmt"].domain
     index = app.gui.getvar("sfincs_hmt", "active_discharge_point")
 
-    # delete point from model forcing 
+    # delete point from model forcing
     model.forcing["dis"] = model.forcing["dis"].drop_sel(index=index)
 
     if len(model.forcing["dis"].index) == 0:
@@ -95,20 +98,22 @@ def delete_point_from_list(*args):
         app.gui.setvar("sfincs_hmt", "active_discharge_point", index)
     update_list()
 
+
 def delete_all_points_from_list(*args):
     model = app.model["sfincs_hmt"].domain
     model.forcing.pop("dis")
     app.map.layer["sfincs_hmt"].layer["discharge_points"].clear()
     update_list()
 
+
 def update_list():
     # Get discharge points
     gdf = app.map.layer["sfincs_hmt"].layer["discharge_points"].data
-    discharge_point_names = []    
+    discharge_point_names = []
 
     if gdf is None:
         index = 0
-    else:        
+    else:
         # Loop through discharge points
         for index, row in gdf.iterrows():
             # Get the name of the discharge point if present
@@ -116,12 +121,12 @@ def update_list():
                 discharge_point_names.append(row["name"])
             else:
                 discharge_point_names.append("Point {}".format(index))
-        
+
     app.gui.setvar("sfincs_hmt", "discharge_point_names", discharge_point_names)
     app.gui.setvar("sfincs_hmt", "nr_discharge_points", index)
     app.gui.window.update()
 
-    
+
 def go_to_observation_stations(*args):
 
     toolbox_name = "observation_stations"
@@ -130,5 +135,5 @@ def go_to_observation_stations(*args):
     app.active_toolbox = app.toolbox[toolbox_name]
     app.active_toolbox.select()
 
-    #TODO back to observations model-tab
+    # TODO back to observations model-tab
     # app.active_toolbox.select_tab("observations")

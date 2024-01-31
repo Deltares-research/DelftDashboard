@@ -54,9 +54,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(
             group,
             "model_type",
-            ["Overland model", "Surge model"],#, "Quadtree model"
+            ["Overland model", "Surge model"],  # , "Quadtree model"
         )
-        app.gui.setvar(group, "model_type_index", 0)        
+        app.gui.setvar(group, "model_type_index", 0)
         app.gui.setvar(group, "include_rainfall", False)
         app.gui.setvar(group, "include_rivers", False)
         # app.gui.setvar(group, "include_waves", False)
@@ -76,8 +76,10 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "nmax", 0)
         app.gui.setvar(group, "mmax", 0)
         app.gui.setvar(
-            group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
-            )
+            group,
+            "nr_cells",
+            app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax"),
+        )
         if app.crs.is_geographic:
             app.gui.setvar(group, "dx", 0.1)
             app.gui.setvar(group, "dy", 0.1)
@@ -108,7 +110,7 @@ class Toolbox(GenericToolbox):
                     # only keep topography datasets
                     if app.data_catalog[key].meta["category"] == "topography":
                         # retrieve source name
-                        source= app.data_catalog[key].meta["source"]
+                        source = app.data_catalog[key].meta["source"]
                         if source not in source_names:
                             source_names.append(source)
 
@@ -404,11 +406,26 @@ class Toolbox(GenericToolbox):
         # Update grid summary
         group = "modelmaker_sfincs_hmt"
 
-        app.gui.setvar(group, "resolution_str", "Resolution: {}{}".format(app.gui.getvar(group, "res"),app.gui.getvar(group, "unit")))
-        app.gui.setvar(group, "nr_cells_str", "Number of cells: {}".format(app.gui.getvar(group, "nr_cells")))
-        app.gui.setvar(group, "rotation_str", "Rotation angle: {}".format(model.config.get("rotation")))
-        app.gui.setvar(group, "crs_str", "Coordinate system: {}".format(app.crs.to_string()))
-
+        app.gui.setvar(
+            group,
+            "resolution_str",
+            "Resolution: {}{}".format(
+                app.gui.getvar(group, "res"), app.gui.getvar(group, "unit")
+            ),
+        )
+        app.gui.setvar(
+            group,
+            "nr_cells_str",
+            "Number of cells: {}".format(app.gui.getvar(group, "nr_cells")),
+        )
+        app.gui.setvar(
+            group,
+            "rotation_str",
+            "Rotation angle: {}".format(model.config.get("rotation")),
+        )
+        app.gui.setvar(
+            group, "crs_str", "Coordinate system: {}".format(app.crs.to_string())
+        )
 
         dlg.close()
 
@@ -426,7 +443,7 @@ class Toolbox(GenericToolbox):
 
         model.setup_dep(**setup_dep)
         self.setup_dict.update({"setup_dep": setup_dep})
-    
+
         # show merged bathymetry on map
         app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
 
@@ -457,15 +474,21 @@ class Toolbox(GenericToolbox):
         dlg = app.gui.window.dialog_wait("Generating active mask  ...")
         group = "modelmaker_sfincs_hmt"
         setup_mask_active = {
-            "mask": app.toolbox[group].mask_init_polygon
-            if not app.toolbox[group].mask_init_polygon.empty
-            else None,
-            "include_mask": app.toolbox[group].mask_include_polygon
-            if not app.toolbox[group].mask_include_polygon.empty
-            else None,
-            "exclude_mask": app.toolbox[group].mask_exclude_polygon
-            if not app.toolbox[group].mask_exclude_polygon.empty
-            else None,
+            "mask": (
+                app.toolbox[group].mask_init_polygon
+                if not app.toolbox[group].mask_init_polygon.empty
+                else None
+            ),
+            "include_mask": (
+                app.toolbox[group].mask_include_polygon
+                if not app.toolbox[group].mask_include_polygon.empty
+                else None
+            ),
+            "exclude_mask": (
+                app.toolbox[group].mask_exclude_polygon
+                if not app.toolbox[group].mask_exclude_polygon.empty
+                else None
+            ),
             "zmin": app.gui.getvar(group, "mask_active_zmin"),
             "zmax": app.gui.getvar(group, "mask_active_zmax"),
             "drop_area": app.gui.getvar(group, "mask_active_drop_area"),
@@ -497,9 +520,11 @@ class Toolbox(GenericToolbox):
 
             setup_mask_bounds = {
                 "btype": "waterlevel",
-                "include_mask": app.toolbox[group].wlev_include_polygon
-                if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
-                else None,
+                "include_mask": (
+                    app.toolbox[group].wlev_include_polygon
+                    if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
+                    else None
+                ),
                 "zmin": app.gui.getvar(group, "wlev_zmin"),
                 "zmax": app.gui.getvar(group, "wlev_zmax"),
                 "reset_bounds": True,
@@ -511,9 +536,11 @@ class Toolbox(GenericToolbox):
             dlg = app.gui.window.dialog_wait("Generating outflow boundaries ...")
             setup_mask_bounds2 = {
                 "btype": "outflow",
-                "include_mask": app.toolbox[group].outflow_include_polygon
-                if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
-                else None,
+                "include_mask": (
+                    app.toolbox[group].outflow_include_polygon
+                    if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
+                    else None
+                ),
                 "zmin": app.gui.getvar(group, "outflow_zmin"),
                 "zmax": app.gui.getvar(group, "outflow_zmax"),
                 "reset_bounds": True,
