@@ -82,8 +82,6 @@ def update_background():
         dxy = (xl[1] - xl[0]) / npix
         xv = np.arange(xl[0], xl[1], dxy)
         yv = np.arange(yl[0], yl[1], dxy)
-        dataset = bathymetry_database.get_dataset(app.background_topography)
-        dataset_list = [{"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}]
 
         # NOTE : we first check if hydromt data is initiated, if not we use the ddb data
         if app.config["data_libs"] is not None:

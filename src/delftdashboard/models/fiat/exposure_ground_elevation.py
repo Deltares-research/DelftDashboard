@@ -15,18 +15,43 @@ def set_variables(*args):
 
 
 def select_ground_elevation_file(*args):
-    fn = app.gui.window.dialog_open_file("Select raster", filter="Raster (*.tif)")
-    fn = fn[0]
-    fn_value = app.gui.getvar("fiat", "loaded_ground_elevation_files_value")
-    if fn not in fn_value:
-        fn_value.append(Path(fn))
-    app.gui.setvar("fiat", "loaded_ground_elevation_files_value", fn_value)
-    name = Path(fn).name
-    current_list_string = app.gui.getvar("fiat", "loaded_ground_elevation_files_string")
-    if name not in current_list_string:
-        current_list_string.append(name)
+    if app.gui.getvar("fiat", "update_source_ground_elevation") == "sfincs_data":
+        load_sfincs_ground_elevation()
+    elif app.gui.getvar("fiat", "update_source_ground_elevation") == "upload_data":
+        fn = app.gui.window.dialog_open_file(
+            "Select raster", filter="Raster (*.tif)"
+        )
+        fn = fn[0]
+        fn_value = app.gui.getvar("fiat", "loaded_ground_elevation_files_value")
+        if fn not in fn_value:
+            fn_value.append(Path(fn))
+        app.gui.setvar("fiat", "loaded_ground_elevation_files_value", fn_value)
+        name = Path(fn).name
+        current_list_string = app.gui.getvar("fiat", "loaded_ground_elevation_files_string")
+        if name not in current_list_string:
+            current_list_string.append(name)
 
-    app.gui.setvar("fiat", "loaded_ground_elevation_files_string", current_list_string)
+        current_list_string = [item for item in current_list_string if item != '']
+        app.gui.setvar("fiat", "loaded_ground_elevation_files_string", current_list_string)
+
+def load_sfincs_ground_elevation(*args):
+    fname = app.gui.window.dialog_select_path("Select the SFINCS model folder")
+    if fname:
+        path_to_sfincs_domain = Path(fname) / "subgrid" / "dep_subgrid.tif"
+        if path_to_sfincs_domain.exists():
+            fn = Path(path_to_sfincs_domain)
+            fn_value = app.gui.getvar("fiat", "loaded_ground_elevation_files_value")
+            if fn not in fn_value:
+                fn_value.append(fn)
+            app.gui.setvar("fiat", "loaded_ground_elevation_files_value", fn_value)
+
+            name = Path(fn).name
+            current_list_string = app.gui.getvar("fiat", "loaded_ground_elevation_files_string")
+            if name not in current_list_string:
+                current_list_string.append(name)
+
+            current_list_string = [item for item in current_list_string if item != '']
+            app.gui.setvar("fiat", "loaded_ground_elevation_files_string", current_list_string)
 
 
 def remove_datasource(*args):

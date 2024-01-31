@@ -6,7 +6,6 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 import os
-import importlib
 
 from delftdashboard.app import app
 from cht.bathymetry.bathymetry_database import bathymetry_database
@@ -126,13 +125,13 @@ def build_gui_config():
     app.gui.config["menu"].append(menu)
 
     # NOTE: switched off for the FloodAdapt model builder purpose with only SFINCS and FIAT models inside that do not share toolboxes
-    # # Toolbox
-    # menu = {}
-    # menu["text"] = "Toolbox"
-    # menu["module"] = "delftdashboard.menu.toolbox"
-    # menu["menu"] = []
-    # menu["menu"].append({"text": "toolbox"})
-    # app.gui.config["menu"].append(menu)
+    # Toolbox
+    menu = {}
+    menu["text"] = "Toolbox"
+    menu["module"] = "delftdashboard.menu.toolbox"
+    menu["menu"] = []
+    menu["menu"].append({"text": "toolbox"})
+    app.gui.config["menu"].append(menu)
 
     # Topography
     menu = {}
@@ -182,6 +181,7 @@ def build_gui_config():
                 if app.data_catalog[key].meta["category"] == "topography":
                     # retrieve source name
                     source = app.data_catalog[key].meta["source"]
+
                     dependency = [
                         {
                             "action": "check",
@@ -194,9 +194,10 @@ def build_gui_config():
                                 }
                             ],
                         }
+
                     ]
-                    source_menu["menu"].append(
-                        {
+
+                    dataset =  {
                             "id": "topography." + key,
                             "variable_group": "menu",
                             "text": key,
@@ -206,7 +207,7 @@ def build_gui_config():
                             "method": "select_dataset",
                             "dependency": dependency,
                         }
-                    )
+                    
         menu["menu"].append(source_menu)
 
         # source_menu = {}
