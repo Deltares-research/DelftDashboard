@@ -17,6 +17,7 @@ from cht.tropical_cyclone.cyclone_track_database import CycloneTrackDatabase
 
 # Callbacks
 
+
 def select(*args):
     # De-activate() existing layers
     app.update_map()
@@ -30,7 +31,6 @@ def select_track(*args):
 
 def build_spiderweb(*args):
     app.toolbox["tropical_cyclone"].build_spiderweb()
-
 
 
 class Toolbox(GenericToolbox):
@@ -102,17 +102,19 @@ class Toolbox(GenericToolbox):
         self.tc.write_track(self.tc.name + ".cyc", "ddb_cyc")
         # Build and save the spw file
         spw_file = self.tc.name + ".spw"
-        p = app.gui.window.dialog_progress("               Generating wind fields ...                ", len(self.tc.track))
+        p = app.gui.window.dialog_progress(
+            "               Generating wind fields ...                ",
+            len(self.tc.track),
+        )
         self.tc.to_spiderweb(spw_file, progress_bar=p)
-        if app.active_model.name== "hurrywave":
+        if app.active_model.name == "hurrywave":
             app.active_model.domain.input.variables.spwfile = spw_file
             app.active_model.domain.input.write()
             app.gui.setvar("hurrywave", "wind_type", "spiderweb")
             app.gui.setvar("hurrywave", "spwfile", spw_file)
-        elif app.active_model.name== "sfincs":
+        elif app.active_model.name == "sfincs":
             app.active_model.domain.input.variables.spwfile = spw_file
 
     # def update_progress(self, it):
     #     self.progress_dialog.set_value(it + 1)
-    #     pass        
-
+    #     pass

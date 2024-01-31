@@ -5,6 +5,7 @@ from hydromt_sfincs import utils
 import geopandas as gpd
 import os
 
+
 def select(*args):
     # De-activate existing layers
     map.update()
@@ -17,6 +18,7 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["mask_active"].activate()
     app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].activate()
     app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].activate()
+
 
 def select_mask_init_polygon_method(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_init_polygon_methods_index", args[0])
@@ -207,19 +209,23 @@ def exclude_polygon_selected(index):
 def mask_add_tick_box(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_active_add", args[0])
 
+
 def mask_del_tick_box(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_active_del", args[0])
+
 
 def tick_box(*args):
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_active_reset", args[0])
 
+
 def edit_mask_active(*args):
     toolbox_name = "modelmaker_sfincs_hmt"
     path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
-    pop_win_config_path  = os.path.join(path, "edit_mask_active.yml")
-    okay, data = app.gui.popup(pop_win_config_path , None)
+    pop_win_config_path = os.path.join(path, "edit_mask_active.yml")
+    okay, data = app.gui.popup(pop_win_config_path, None)
     if not okay:
         return
+
 
 def update():
     nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon)

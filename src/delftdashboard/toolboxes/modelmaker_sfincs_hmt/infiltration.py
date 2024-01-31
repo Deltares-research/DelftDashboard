@@ -11,8 +11,10 @@ def select(*args):
 def select_infiltration_method(*args):
     pass
 
+
 def select_cn_method(*args):
     pass
+
 
 def select_qinf_method(*args):
     pass

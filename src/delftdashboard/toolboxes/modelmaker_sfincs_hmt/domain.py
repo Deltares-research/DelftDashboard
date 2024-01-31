@@ -8,6 +8,7 @@ from delftdashboard.operations import map
 from hydromt_sfincs import utils
 import time
 
+
 def select(*args):
     # De-activate existing layers
     map.update()
@@ -16,15 +17,16 @@ def select(*args):
     app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].activate()
     app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].activate()
 
+
 def select_model_type(*args):
-    """" change default model extent methods for different model types"""	
+    """ " change default model extent methods for different model types"""
     group = "modelmaker_sfincs_hmt"
 
     model_type = app.gui.getvar(group, "model_type_index")
 
-    #model_type = 0 #overland
-    #model_type = 1 #surge
-    #model_type = 2 #quadtree
+    # model_type = 0 #overland
+    # model_type = 1 #surge
+    # model_type = 2 #quadtree
 
     if model_type == 0:
         app.gui.setvar(group, "mask_active_zmax", 10.0)
@@ -37,12 +39,12 @@ def select_model_type(*args):
         app.gui.setvar(group, "mask_active_drop_area", 10.0)
         app.gui.setvar(group, "mask_active_fill_area", 100.0)
 
-    include_precip =  app.gui.getvar(group, "include_rainfall")
+    include_precip = app.gui.getvar(group, "include_rainfall")
     # include_rivers = app.gui.getvar(group, "include_rivers")
-    # include_waves = app.gui.setvar(group, "include_waves", False)    
+    # include_waves = app.gui.setvar(group, "include_waves", False)
 
     watershed = False
-    if include_precip: #or include_rivers:
+    if include_precip:  # or include_rivers:
         watershed = True
 
     if model_type == 0 and watershed:
@@ -64,12 +66,12 @@ def draw_bbox(*args):
     app.map.layer[group].layer["grid_outline"].crs = app.crs
     app.map.layer[group].layer["grid_outline"].draw()
 
+
 def draw_aio(*args):
     group = "modelmaker_sfincs_hmt"
 
     app.map.layer[group].layer["area_of_interest"].crs = app.crs
     app.map.layer[group].layer["area_of_interest"].draw()
-
 
 
 def load_aio(*args):
@@ -133,7 +135,7 @@ def grid_outline_created(gdf, index, id):
     # Remove area of interest (if present)
     if not app.map.layer[group].layer["area_of_interest"].gdf.empty:
         app.map.layer[group].layer["area_of_interest"].clear()
-    
+
     update_geometry()
     app.gui.window.update()
 
@@ -149,9 +151,7 @@ def aio_created(gdf, index, id):
     if len(gdf) > 1:
         # Remove the old area of interest
         id0 = gdf["id"][0]
-        app.map.layer[group].layer["area_of_interest"].delete_feature(
-            id0
-        )
+        app.map.layer[group].layer["area_of_interest"].delete_feature(id0)
         gdf = gdf.drop([0]).reset_index(drop=True)
     app.toolbox[group].area_of_interest = gdf
 
@@ -175,7 +175,7 @@ def aio_created(gdf, index, id):
     app.gui.setvar(group, "nmax", nmax)
     app.gui.setvar(
         group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
-    )    
+    )
     app.gui.setvar(group, "rotation", round(rot, 3))
     redraw_rectangle()
 
@@ -242,6 +242,7 @@ def update_geometry():
         group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
     )
 
+
 def edit_origin(*args):
     redraw_rectangle()
 
@@ -268,31 +269,34 @@ def edit_dxdy(*args):
         group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
     )
 
+
 def edit_res(*args):
     group = "modelmaker_sfincs_hmt"
-    
+
     # set dx and dy to res
     app.gui.setvar(group, "dx", app.gui.getvar(group, "res"))
     app.gui.setvar(group, "dy", app.gui.getvar(group, "res"))
 
     edit_dxdy(*args)
 
+
 def edit_domain(*args):
     toolbox_name = "modelmaker_sfincs_hmt"
     path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
-    pop_win_config_path  = os.path.join(path, "edit_domain.yml")
-    okay, data = app.gui.popup(pop_win_config_path , None)
+    pop_win_config_path = os.path.join(path, "edit_domain.yml")
+    okay, data = app.gui.popup(pop_win_config_path, None)
     if not okay:
         return
 
+
 def redraw_rectangle():
     group = "modelmaker_sfincs_hmt"
-    app.toolbox[group].lenx = app.gui.getvar(
-        group, "dx"
-    ) * app.gui.getvar(group, "mmax")
-    app.toolbox[group].leny = app.gui.getvar(
-        group, "dy"
-    ) * app.gui.getvar(group, "nmax")
+    app.toolbox[group].lenx = app.gui.getvar(group, "dx") * app.gui.getvar(
+        group, "mmax"
+    )
+    app.toolbox[group].leny = app.gui.getvar(group, "dy") * app.gui.getvar(
+        group, "nmax"
+    )
     app.map.layer[group].layer["grid_outline"].clear()
     app.map.layer[group].layer["grid_outline"].add_rectangle(
         app.gui.getvar(group, "x0"),
@@ -308,7 +312,7 @@ def redraw_rectangle():
     gdf = app.map.layer[group].layer["grid_outline"].get_gdf()
     app.toolbox[group].grid_outline = gdf
     # if not app.toolbox[group].grid_outline.empty:
-    #NOTE apparently this needs time to update the map hence first time the gdf is empty
+    # NOTE apparently this needs time to update the map hence first time the gdf is empty
     # howeevr, the bbox should be present once reaching this part of the code
     app.gui.setvar(group, "grid_outline", 1)
 

@@ -15,9 +15,7 @@ def set_variables(*args):
 
 
 def select_ground_elevation_file(*args):
-    fn = app.gui.window.dialog_open_file(
-        "Select raster", filter="Raster (*.tif)"
-    )
+    fn = app.gui.window.dialog_open_file("Select raster", filter="Raster (*.tif)")
     fn = fn[0]
     fn_value = app.gui.getvar("fiat", "loaded_ground_elevation_files_value")
     if fn not in fn_value:
