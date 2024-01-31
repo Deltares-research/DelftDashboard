@@ -207,7 +207,7 @@ def build_gui_config():
                             "method": "select_dataset",
                             "dependency": dependency,
                         }
-                    )
+                    
         menu["menu"].append(source_menu)
 
         # source_menu = {}
