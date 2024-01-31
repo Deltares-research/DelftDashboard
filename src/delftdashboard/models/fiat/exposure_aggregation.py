@@ -68,6 +68,7 @@ def load_aggregation(name):
     if name not in current_list_string:
         current_list_string.append(name)
 
+    current_list_string = [item for item in current_list_string if item != '']
     app.gui.setvar("fiat", "loaded_aggregation_files_string", current_list_string)
 
 
