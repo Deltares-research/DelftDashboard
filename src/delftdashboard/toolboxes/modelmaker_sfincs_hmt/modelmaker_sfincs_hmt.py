@@ -57,8 +57,8 @@ class Toolbox(GenericToolbox):
             ["Overland model", "Surge model"],#, "Quadtree model"
         )
         app.gui.setvar(group, "model_type_index", 0)        
-        app.gui.setvar(group, "include_rainfall", False)
-        app.gui.setvar(group, "include_rivers", False)
+        app.gui.setvar(group, "include_precip", False)
+        # app.gui.setvar(group, "include_rivers", False)
         # app.gui.setvar(group, "include_waves", False)
 
         # Model extent determination
@@ -66,7 +66,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(
             group,
             "setup_grid_methods",
-            ["Draw Bounding Box", "Draw Polygon", "Load watershed", "Load shapefile"],
+            ["Draw Bounding Box", "Draw Polygon", "Load Watershed", "Load ShapeFile"],
         )
         app.gui.setvar(group, "setup_grid_methods_index", 0)
 
@@ -90,6 +90,7 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "unit", " (in m)")
         app.gui.setvar(group, "rotation", 0.0)
         app.gui.setvar(group, "auto_rotate", False)
+        app.gui.setvar(group, "auto_select_utm", True)
         app.gui.setvar(group, "lenx", 0.0)
         app.gui.setvar(group, "leny", 0.0)
 
@@ -188,50 +189,39 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "qinf_dataset_names", qinf_dataset_names)
         app.gui.setvar(group, "qinf_dataset_index", 0)
 
-        # Mask active
-        mask_polygon_methods = [
-            "Load Polygon",
-            "Draw Polygon",
-            "Delete Polygon",
-            "Save Polygon",
-        ]
-
-        app.gui.setvar(group, "mask_init_polygon_methods", mask_polygon_methods)
-        app.gui.setvar(group, "mask_init_polygon_methods_index", 0)
-        app.gui.setvar(group, "nr_mask_init_polygons", 0)
+        # Mask active (initial)
+        app.gui.setvar(group, "mask_init_fname", "")
         app.gui.setvar(group, "mask_active_zmax", 10.0)
         app.gui.setvar(group, "mask_active_zmin", -10.0)
         app.gui.setvar(group, "mask_active_drop_area", 0.0)
         app.gui.setvar(group, "mask_active_fill_area", 10.0)
         app.gui.setvar(group, "mask_active_reset", True)
+
+        # Mask active (explicitly include)
         app.gui.setvar(group, "mask_include_polygon_names", [])
         app.gui.setvar(group, "mask_include_polygon_index", 0)
         app.gui.setvar(group, "nr_mask_include_polygons", 0)
+        app.gui.setvar(group, "mask_active_add", False)
+
+        # Mask active (explicitly exclude)
         app.gui.setvar(group, "mask_exclude_polygon_names", [])
         app.gui.setvar(group, "mask_exclude_polygon_index", 0)
         app.gui.setvar(group, "nr_mask_exclude_polygons", 0)
-        app.gui.setvar(group, "mask_boundary_type", 2)
-        app.gui.setvar(group, "mask_active_add", False)
         app.gui.setvar(group, "mask_active_del", False)
 
         # Mask bounds
+        app.gui.setvar(group, "mask_boundary_type", 2)
+        # Waterlevel
         app.gui.setvar(group, "wlev_include_polygon_names", [])
         app.gui.setvar(group, "wlev_include_polygon_index", 0)
         app.gui.setvar(group, "nr_wlev_include_polygons", 0)
-        # app.gui.setvar(group, "wlev_exclude_polygon_names", [])
-        # app.gui.setvar(group, "wlev_exclude_polygon_index", 0)
-        # app.gui.setvar(group, "nr_wlev_exclude_polygons", 0)
         app.gui.setvar(group, "wlev_zmax", -2.0)
-        # app.gui.setvar(group, "wlev_reset", True)
 
+        # Outflow
         app.gui.setvar(group, "outflow_include_polygon_names", [])
         app.gui.setvar(group, "outflow_include_polygon_index", 0)
         app.gui.setvar(group, "nr_outflow_include_polygons", 0)
-        # app.gui.setvar(group, "outflow_exclude_polygon_names", [])
-        # app.gui.setvar(group, "outflow_exclude_polygon_index", 0)
-        # app.gui.setvar(group, "nr_outflow_exclude_polygons", 0)
         app.gui.setvar(group, "outflow_zmin", 2.0)
-        # app.gui.setvar(group, "outflow_reset", True)
 
         # subgrid
         app.gui.setvar(group, "nr_subgrid_pixels", 20)
@@ -481,6 +471,8 @@ class Toolbox(GenericToolbox):
         gdf = mask2gdf(mask, option="active")
         if gdf is not None:
             app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
+        else:
+            app.map.layer["sfincs_hmt"].layer["mask_active"].clear()
 
         # update bathymetry on map
         app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
