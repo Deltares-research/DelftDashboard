@@ -46,7 +46,7 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="Secondary Object Type",
             big_data=True,
-            min_zoom=12,
+            min_zoom=10,
         )
 
         layer.add_layer(
@@ -59,7 +59,7 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="Primary Object Type",
             big_data=True,
-            min_zoom=12,
+            min_zoom=10,
         )
 
         layer.add_layer(
@@ -72,7 +72,7 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="Secondary Object Type",
             big_data=True,
-            min_zoom=12,
+            min_zoom=10,
         )
 
         layer.add_layer(
@@ -85,7 +85,7 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="Ground Floor Height",
             big_data=True,
-            min_zoom=12,
+            min_zoom=10,
         )
 
         layer.add_layer(
@@ -98,7 +98,7 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="Max Potential Damage: Structure",
             big_data=True,
-            min_zoom=12,
+            min_zoom=10,
             unit="$",
         )
 
@@ -112,7 +112,7 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="Max Potential Damage: Content",
             big_data=True,
-            min_zoom=12,
+            min_zoom=10,
             unit="$",
         )
         layer.add_layer(
@@ -125,7 +125,7 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="Ground Elevation",
             big_data=True,
-            min_zoom=12,
+            min_zoom=10,
         )
         layer.add_layer(
             "SVI",
@@ -137,7 +137,7 @@ class Model(GenericModel):
             line_color="transparent",
             hover_property="SVI_key_domain",
             big_data=True,
-            min_zoom=12,
+            min_zoom=10,
         )
         layer = app.map.add_layer("roads")
         layer.add_layer(

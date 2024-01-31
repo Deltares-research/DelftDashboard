@@ -152,7 +152,7 @@ def add_damages():
     attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
 
     # Empty field name parameter
-    app.gui.setvar(model, "damages_file_field_name", 0)
+    #app.gui.setvar(model, "damages_file_field_name", 0)
 
     # Get the method
     method_damages = app.gui.getvar("fiat", "method_damages")
@@ -227,7 +227,7 @@ def replace_damage(damage_index):
     attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
     
     # Empty field name parameter
-    app.gui.setvar(model, "damages_file_field_name", 0)
+    #app.gui.setvar(model, "damages_file_field_name", 0)
 
     # Get the method
     method_damages = app.gui.getvar("fiat", "method_damages")

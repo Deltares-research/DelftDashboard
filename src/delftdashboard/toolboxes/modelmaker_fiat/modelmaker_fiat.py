@@ -324,23 +324,7 @@ def load_sfincs_domain(*args):
         if path_to_sfincs_domain.exists():
             gdf = gpd.read_file(path_to_sfincs_domain)
             gdf.to_crs(app.crs, inplace=True)
-            bounds = gdf.total_bounds
-            gdf = gpd.GeoDataFrame(
-                data={
-                    "geometry": [
-                        Polygon(
-                            (
-                                (bounds[0], bounds[3]),
-                                (bounds[2], bounds[3]),
-                                (bounds[2], bounds[1]),
-                                (bounds[0], bounds[1]),
-                                (bounds[0], bounds[3]),
-                            )
-                        )
-                    ]
-                },
-                crs=app.crs,
-            )
+
 
             # Write file into table
             app.gui.setvar(
