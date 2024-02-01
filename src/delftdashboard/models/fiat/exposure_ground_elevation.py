@@ -8,6 +8,9 @@ import fiona
 def select(*args):
     # De-activate existing layers
     map.update()
+    if app.map.layer["buildings"].layer["exposure_points"].data is None:
+        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    
 
 
 def set_variables(*args):
