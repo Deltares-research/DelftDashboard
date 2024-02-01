@@ -9,22 +9,25 @@ def open():
 
 def map_ready(*args):
     mp = app.gui.popup_window["watershed"].find_element_by_id("watershed_map").widget
-    mp.jump_to(0.0, 0.0, 0)
     layer = mp.add_layer("watersheds")
     polygon_layer = layer.add_layer(
-        "aggr_layer",
+        "watersheds",
         type="polygon_selector",
         line_color="k",
         line_width=1,
         fill_color="r",
         fill_opacity=0.6,
         select=select_watershed,
-        hover_property="",
+        selection_type="multiple",  # "multiple" "single"
+        hover_property="name",
     )
-    polygon_layer.set_data(gdf, 0)
+    gdf = app.active_model.domain.data_catalog.get_geodataframe("watersheds")
+    polygon_layer.set_data(gdf)
+    bounds = gdf.geometry.total_bounds
+    mp.jump_to((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2, 8)
 
 def map_moved(*args):
     pass
 
 def select_watershed(feature, widget):
-    app.gui.popup_data["watershed"] = feature["properties"]
+    app.gui.popup_data["watershed"] = feature

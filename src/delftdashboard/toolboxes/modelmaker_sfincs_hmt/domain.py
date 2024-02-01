@@ -131,13 +131,24 @@ def load_aio(*args):
 
 def open_watershed_selector(*args):
     """ Method to open the selector of wathersheds"""
+    group = "modelmaker_sfincs_hmt"
+
     okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "select_watershed", "watershed.yml"), id="watershed", data=None)
     if not okay:
         return
-    lon = 0
-    lat = 0
-    zoom = 6
-    app.map.fly_to(lon, lat, zoom)
+    # Add the polygon to the map
+    layer = app.map.layer[group].layer["area_of_interest"]
+    gdf = gpd.GeoDataFrame.from_features(data, crs=4326)
+    if len(gdf)>1:
+        gdf['new_column'] = 0
+        gdf = gdf.dissolve(by='new_column')
+    layer.set_data(gdf)
+
+    # Create boundinx box based on area of interest
+    aio_created(gdf.to_crs(app.crs), 0, 0)
+
+    # change map position to center of polygon
+    fly_to_site(gdf=gdf)
 
 def grid_outline_created(gdf, index, id):
     """Function that specifies what happens when you create the bounding box"""
