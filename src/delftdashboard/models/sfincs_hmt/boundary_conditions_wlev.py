@@ -1,5 +1,8 @@
+from datetime import datetime
 import os
 import geopandas as gpd
+import numpy as np
+import pandas as pd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -106,13 +109,26 @@ def point_clicked(x,y):
 
 
 def select_boundary_point_from_list(*args):
+    model = app.model["sfincs_hmt"].domain
     index = app.gui.getvar("sfincs_hmt", "active_boundary_point")
+
+    # get maximum values of the model
+    bzs = model.forcing["bzs"].values[:,index].max()
+    app.gui.setvar("sfincs_hmt", "bc_wlev_value", bzs)
+
     app.map.layer["sfincs_hmt"].layer["boundary_points"].select_by_index(index)
 
 
 def select_boundary_point_from_map(*args):
+    model = app.model["sfincs_hmt"].domain
+
     index = args[0]["id"]
     app.gui.setvar("sfincs_hmt", "active_boundary_point", index)
+
+    # get maximum values of the model
+    bzs = model.forcing["bzs"].values[:,index].max()
+    app.gui.setvar("sfincs_hmt", "bc_wlev_value", bzs)
+
     app.gui.window.update()
 
 
@@ -149,11 +165,11 @@ def update_list():
     gdf = app.map.layer["sfincs_hmt"].layer["boundary_points"].data
     boundary_point_names = []    
 
-    if gdf is None:
-        index = 0
-    else:        
+    nr_points = 0
+    if gdf is not None:
         # Loop through boundary points
         for index, row in gdf.iterrows():
+            nr_points += 1
             # Get the name of the boundary point if present
             if "name" in row:
                 boundary_point_names.append(row["name"])
@@ -161,7 +177,7 @@ def update_list():
                 boundary_point_names.append("Point {}".format(index))
         
     app.gui.setvar("sfincs_hmt", "boundary_point_names", boundary_point_names)
-    app.gui.setvar("sfincs_hmt", "nr_boundary_points", index)
+    app.gui.setvar("sfincs_hmt", "nr_boundary_points", nr_points)
     app.gui.window.update()
 
     
@@ -185,4 +201,61 @@ def go_to_observation_stations(*args):
     pop_win_config_path  = os.path.join(toolbox_path,"config", "observation_stations_popup.yml")
     okay, data = app.gui.popup(
         pop_win_config_path, data=data, id="observation_stations"
-    )    
+    )
+
+## Add timeseries to the boundary points
+
+def add_constant_water_level(*args):
+    index = app.gui.getvar("sfincs_hmt", "active_boundary_point")
+    value = app.gui.getvar("sfincs_hmt", "bc_wlev_value")
+
+    # get the model
+    model = app.model["sfincs_hmt"].domain
+    # convert start and stop time to seconds
+    tstart = model.config["tstart"]
+    tstop = model.config["tstop"]
+
+    # make constant timeseries
+    duration = (tstop - tstart).total_seconds()
+    tt = np.arange(0, duration + 1, duration)
+    # values with same length as tt
+    ts = value * np.ones(len(tt))
+
+    # get forcing locations in the model
+    gdf_locs = model.forcing["bzs"].vector.to_gdf()
+    model_index = gdf_locs.index[index]
+
+    # convert to pandas dataframe
+    df_ts = pd.DataFrame({model_index: ts})
+
+    # replace the boundary condition of the selected point
+    model.set_forcing_1d(df_ts = df_ts)
+
+def add_synthetical_water_level(*args):
+    index = app.gui.getvar("sfincs_hmt", "active_boundary_point")
+    value = app.gui.getvar("sfincs_hmt", "bc_wlev_value")
+
+    # get the model
+    model = app.model["sfincs_hmt"].domain
+    # convert start and stop time to seconds
+    tstart = model.config["tstart"]
+    tstop = model.config["tstop"]
+
+    # make timeseries with gaussian peak
+    peak = value
+    duration = (tstop - tstart).total_seconds()
+    tt = np.arange(0, duration + 1, 600)        
+    ts = peak * np.exp(-((tt / (0.25 * duration)) ** 2))
+
+    # get forcing locations in the model
+    gdf_locs = model.forcing["bzs"].vector.to_gdf()
+    model_index = gdf_locs.index[index]
+
+    # convert to pandas dataframe
+    df_ts = pd.DataFrame({model_index: ts})
+
+    # replace the boundary condition of the selected point
+    model.set_forcing_1d(df_ts = df_ts)
+
+def download_water_level():
+    pass

@@ -505,7 +505,6 @@ class Toolbox(GenericToolbox):
                 "include_mask": app.toolbox[group].wlev_include_polygon
                 if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
                 else None,
-                "zmin": app.gui.getvar(group, "wlev_zmin"),
                 "zmax": app.gui.getvar(group, "wlev_zmax"),
                 "reset_bounds": True,
             }
@@ -520,7 +519,6 @@ class Toolbox(GenericToolbox):
                 if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
                 else None,
                 "zmin": app.gui.getvar(group, "outflow_zmin"),
-                "zmax": app.gui.getvar(group, "outflow_zmax"),
                 "reset_bounds": True,
             }
 

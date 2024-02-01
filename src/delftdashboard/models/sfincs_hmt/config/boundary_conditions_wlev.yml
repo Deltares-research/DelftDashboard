@@ -170,14 +170,83 @@ element:
       operator: ge
       value: 1
   element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 180
+      height: 20
+    select: index
+    tooltip: Select method to specify timeseries
+    variable: bc_wlev_timeseries_methods_index
+    option_string:
+      variable: bc_wlev_timeseries_methods
   - style: edit
     text: Constant water level
     position:
       x: -10
-      y: 90
+      y: 65
       width: 45
       height: 20
-    tooltip: Add constant water level
+    tooltip: Specify constant water level
+    # method: add_constant_water_level
+    variable: bc_wlev_value
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_wlev_timeseries_methods_index
+        operator: eq
+        value: 0
+  - style: pushbutton
+    text: Add
+    position:
+      x: -10
+      y: 40
+      width: 45
+      height: 20
+    method: add_constant_water_level
+    tooltip: Add timeseries
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_wlev_timeseries_methods_index
+        operator: eq
+        value: 0
+  - style: edit
+    text: Peak water level
+    position:
+      x: -10
+      y: 65
+      width: 45
+      height: 20
+    tooltip: Specify peak water level
+    # method: add_constant_water_level
+    variable: bc_wlev_value
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_wlev_timeseries_methods_index
+        operator: eq
+        value: 1
+  - style: pushbutton
+    text: Add
+    position:
+      x: -10
+      y: 40
+      width: 45
+      height: 20
+    method: add_synthetical_water_level
+    tooltip: Add timeseries
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_wlev_timeseries_methods_index
+        operator: eq
+        value: 1        
 - style: text
   text: "Boundary points: "
   position:
