@@ -50,9 +50,9 @@ element:
   - style: pushbutton
     position:
       x: 165
-      y: 80
-      width: 20
-      height: 20
+      y: 85
+      width: 15
+      height: 15
     text: "\u0078"
     method: remove_datasource
 

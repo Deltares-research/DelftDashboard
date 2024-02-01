@@ -37,9 +37,9 @@ element:
   - style: pushbutton
     position:
       x: 220
-      y: 60
-      width: 20
-      height: 20
+      y: 65
+      width: 15
+      height: 15
     text: "\u0078"
     method: remove_datasource
   - style: popupmenu
