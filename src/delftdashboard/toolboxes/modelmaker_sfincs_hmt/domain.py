@@ -68,9 +68,9 @@ def select_setup_grid_method(*args):
         watershed = True
 
     if watershed:
-        app.gui.setvar(group, "setup_grid_methods_index", 2)
+        app.gui.setvar(group, "setup_grid_method", "Load Watershed")
     else:
-        app.gui.setvar(group, "setup_grid_methods_index", 0)
+        app.gui.setvar(group, "setup_grid_method", "Draw Bounding Box")
 
 def draw_bbox(*args):
     """Callback to specify what happens when you click the draw bbox button"""
@@ -113,7 +113,7 @@ def load_aio(*args):
         fly_to_site(gdf=gdf)
 
         # When a wayershed was loaded, also use this as initial mask
-        load_watershed = app.gui.getvar(group , "setup_grid_methods_index") == 2
+        load_watershed = app.gui.getvar(group , "setup_grid_method") == "Load Watershed"
         if load_watershed:
             # Save filename as variable
             app.gui.setvar(group, "mask_init_fname", fname[0])
@@ -129,6 +129,15 @@ def load_aio(*args):
             app.gui.setvar(group, "mask_active_zmax", 10000.0)
             app.gui.setvar(group, "mask_active_zmin", -10000.0)
 
+def open_watershed_selector(*args):
+    """ Method to open the selector of wathersheds"""
+    okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "select_watershed", "watershed.yml"), id="watershed", data=None)
+    if not okay:
+        return
+    lon = 0
+    lat = 0
+    zoom = 6
+    app.map.fly_to(lon, lat, zoom)
 
 def grid_outline_created(gdf, index, id):
     """Function that specifies what happens when you create the bounding box"""

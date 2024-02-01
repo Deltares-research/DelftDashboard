@@ -15,9 +15,10 @@ element:
       height: 20
     text: Select method
     tooltip: Select method to determine model extent
-    select: index
     method: select_method
-    variable: setup_grid_methods_index
+    variable: setup_grid_method
+    option:
+      variable: setup_grid_methods
     option_string:
       variable: setup_grid_methods
   - style: pushbutton
@@ -33,9 +34,9 @@ element:
     - action: visible
       checkfor: any
       check:
-      - variable: setup_grid_methods_index
+      - variable: setup_grid_method
         operator: eq
-        value: 0 
+        value: Draw Bounding Box 
   - style: pushbutton
     text: Draw Area of Interest
     tooltip: Draw a polygon describing the area of interest
@@ -49,9 +50,9 @@ element:
     - action: visible
       checkfor: any
       check:
-      - variable: setup_grid_methods_index
+      - variable: setup_grid_method
         operator: eq
-        value: 1
+        value: Draw Polygon
   - style: pushbutton
     text: Load Area of Interest
     tooltip: Load a polygon describing the area of interest
@@ -65,9 +66,9 @@ element:
     - action: visible
       checkfor: any
       check:
-      - variable: setup_grid_methods_index
+      - variable: setup_grid_method
         operator: eq
-        value: 2   
+        value: Load Watershed  
   - style: pushbutton
     text: Fly to site
     tooltip: Move the map to the area of interest

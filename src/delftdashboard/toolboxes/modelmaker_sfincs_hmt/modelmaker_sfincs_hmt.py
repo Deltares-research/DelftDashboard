@@ -68,9 +68,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(
             group,
             "setup_grid_methods",
-            ["Draw Bounding Box", "Draw Polygon", "Load Watershed", "Load ShapeFile"],
+            ["Draw Bounding Box", "Draw Polygon", "Load Watershed", "Select Watershed", "Load ShapeFile"],
         )
-        app.gui.setvar(group, "setup_grid_methods_index", 0)
+        app.gui.setvar(group, "setup_grid_method", "Draw Bounding Box")
 
         # Domain
         app.gui.setvar(group, "x0", 0.0)
