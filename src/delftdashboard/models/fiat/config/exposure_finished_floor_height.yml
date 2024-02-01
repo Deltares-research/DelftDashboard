@@ -64,13 +64,6 @@ element:
       height: 20
     text: "Settings"
     method: adjust_ffe_settings
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: heights_file_field_name_string
-        operator: ne
-        value: []
 
 - style: pushbutton
   position:
