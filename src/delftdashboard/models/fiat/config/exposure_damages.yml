@@ -4,14 +4,14 @@ element:
   position:
     x: 10
     y: 10
-    width: 375
+    width: 480
     height: 120
   element:
   - style: listbox
     position:
         x: 5
         y: 30
-        width: 110
+        width: 210
         height: 50
     text_position: "above"
     variable: loaded_damages_files
@@ -22,7 +22,7 @@ element:
     position:
       x: 5
       y: 90
-      width: 80
+      width: 100
       height: 20
     text: "Select source"
     method: select_damages_file
@@ -30,13 +30,13 @@ element:
     position:
       x: 5
       y: 5
-      width: 110
+      width: 210
       height: 20
     text: Load
     method: load_damages_file
   - style: pushbutton
     position:
-      x: 120
+      x: 220
       y: 60
       width: 20
       height: 20
@@ -44,7 +44,7 @@ element:
     method: remove_datasource
   - style: popupmenu
     position:
-      x: 155
+      x: 255
       y: 60
       width: 100
       height: 20
@@ -57,7 +57,7 @@ element:
       variable: damages_file_field_name_value
   - style: popupmenu
     position:
-      x: 265
+      x: 370
       y: 60
       width: 100
       height: 20
@@ -70,19 +70,13 @@ element:
       variable: damage_type_value
   - style: pushbutton
     position:
-      x: 155
+      x: 370
       y: 5
       width: 100
       height: 20
     text: "Settings"
     method: adjust_damage_settings
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: damages_file_field_name_string
-        operator: ne
-        value: []
+
 
 - style: pushbutton
   position:
