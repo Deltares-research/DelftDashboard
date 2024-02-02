@@ -24,7 +24,7 @@ def map_ready(*args):
     gdf = app.active_model.domain.data_catalog.get_geodataframe("watersheds")
     polygon_layer.set_data(gdf)
     bounds = gdf.geometry.total_bounds
-    mp.jump_to((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2, 8)
+    mp.fly_to((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2, 8)
 
 def map_moved(*args):
     pass
