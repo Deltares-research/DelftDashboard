@@ -18,13 +18,11 @@ def new(option):
     for toolbox in app.toolbox.keys():
         if toolbox in app.map.layer:
             app.map.layer[toolbox].delete()
-    if app.active_model in app.model.values():
+
+    if app.active_model.name in app.model.keys():
         app.map.layer["buildings"].delete()
         app.map.layer["roads"].delete()
-        app.map.layer["aggregation"].delete()
-        k,_ = app.model.popitem()
-
-                
+        app.map.layer["aggregation"].delete()                
 
     # Initialize toolboxes
     initialize_toolboxes()
@@ -35,7 +33,8 @@ def new(option):
     # Add layers
     for toolbox in app.toolbox:
         app.toolbox[toolbox].add_layers()
-    if k in app.model.keys():
+        
+    if app.active_model.name in app.model.keys():
         app.active_model.add_layers()
 
     ## FREDERIQUE: commented out below because it changes the active model
