@@ -246,7 +246,23 @@ element:
       check:
       - variable: bc_wlev_timeseries_methods_index
         operator: eq
-        value: 1        
+        value: 1
+  - style: pushbutton
+    position:
+      x: 10
+      y: 10
+      width: 180
+      height: 20
+    text: Copy to all points
+    method: copy_to_all
+    tooltip: Copy timeseries to all points
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_boundary_points
+        operator: gt
+        value: 1
 - style: text
   text: "Boundary points: "
   position:

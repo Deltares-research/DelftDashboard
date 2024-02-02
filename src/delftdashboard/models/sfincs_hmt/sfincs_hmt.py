@@ -76,6 +76,15 @@ class Model(GenericModel):
             line_opacity_inactive=0.5,
         )
 
+        # TODO make this a PolygonLayer (but not yet proeprly implemented in Guitares)
+        layer.add_layer(
+            "region",
+            type="draw",
+            shape="polygon",
+            polygon_line_color="grey",
+            polygon_fill_opacity=0.3,
+        )
+
         bed_levels = layer.add_layer(
             "bed_levels", 
             type="raster",
@@ -157,6 +166,7 @@ class Model(GenericModel):
         if mode == "inactive":
             # Grid is made inactive
             app.map.layer["sfincs_hmt"].layer["grid"].deactivate()
+            app.map.layer["sfincs_hmt"].layer["region"].hide()
 
             # Bed levels are hidden
             app.map.layer["sfincs_hmt"].layer["bed_levels"].hide()

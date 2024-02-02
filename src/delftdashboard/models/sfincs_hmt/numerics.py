@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
-
-@author: ormondt
-"""
-
 from delftdashboard.app import app
+from delftdashboard.operations import map
 
 
 def select(*args):
-    pass
-
+    map.update()
+    app.map.layer["sfincs_hmt"].layer["region"].show()
+    app.map.layer["sfincs_hmt"].layer["region"].deactivate()
+    app.map.layer["sfincs_hmt"].layer["boundary_points"].activate()
+    app.map.layer["sfincs_hmt"].layer["discharge_points"].activate()
+    app.map.layer["sfincs_hmt"].layer["observation_points"].activate()    
+    app.map.layer["sfincs_hmt"].layer["measures"].activate()    
 
 def set_variables(*args):
     # All variables will be set

@@ -10,7 +10,9 @@ from delftdashboard.toolboxes.observation_stations.observation_stations import T
 
 def select(*args):
     map.update()
-    app.map.layer["sfincs_hmt"].layer["mask"].activate()
+    # show outline but inactive (fix properly in guitares to not be a draw layer)
+    app.map.layer["sfincs_hmt"].layer["region"].show()
+    app.map.layer["sfincs_hmt"].layer["region"].deactivate()
     app.map.layer["sfincs_hmt"].layer["observation_points"].activate()
     update()
 

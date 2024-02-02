@@ -532,6 +532,7 @@ class Toolbox(GenericToolbox):
     def set_active_cell_layer(self):
         model = app.model["sfincs_hmt"].domain
         mask = model.mask
+        region = model.region
 
         # Set original mask as active
         gdf = mask2gdf(mask, option="active")
@@ -613,6 +614,8 @@ class Toolbox(GenericToolbox):
         app.map.layer["sfincs_hmt"].layer["mask"].set_data(
             data=gdf, color_by_attribute=paint_properties, legend_items=legend
         )
+        app.map.layer["sfincs_hmt"].layer["region"].set_data(region)
+
 
     def reset_mask_bounds(self, btype):
         model = app.model["sfincs_hmt"].domain
