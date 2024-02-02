@@ -951,20 +951,21 @@ class Model(GenericModel):
                 self.show_exposure_buildings_secondary()
     
     def show_asset_height(self,type="asset_height"):
-        paint_properties = self.get_nsi_paint_properties(type=type)
-        color_items = paint_properties['circle-color'][2:]
-        
-        colors = [color_items[i] for i in range(0, len(color_items), 2)]
-        labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
-        
-        legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
-        app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
-        app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
-        app.map.layer["buildings"].layer["asset_height"].legend_title = f'Finished Floor Height [{app.gui.getvar("fiat", "view_tab_unit")}]'
-        app.map.layer["buildings"].layer["asset_height"].set_data(
-            self.buildings, paint_properties, legend
-        )
-        self.show_asset_heights()
+        if not self.buildings.empty:
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            color_items = paint_properties['circle-color'][2:]
+            
+            colors = [color_items[i] for i in range(0, len(color_items), 2)]
+            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+            
+            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
+            app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
+            app.map.layer["buildings"].layer["asset_height"].legend_title = f'Finished Floor Height [{app.gui.getvar("fiat", "view_tab_unit")}]'
+            app.map.layer["buildings"].layer["asset_height"].set_data(
+                self.buildings, paint_properties, legend
+            )
+            self.show_asset_heights()
 
     def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
