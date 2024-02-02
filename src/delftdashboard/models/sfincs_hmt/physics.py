@@ -9,9 +9,9 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["boundary_points"].activate()
     app.map.layer["sfincs_hmt"].layer["discharge_points"].activate()
     app.map.layer["sfincs_hmt"].layer["observation_points"].activate()    
-    app.map.layer["sfincs_hmt"].layer["measures"].activate()
+    # app.map.layer["sfincs_hmt"].layer["measures"].activate()s
 
-    
+
 def set_variables(*args):
     # All variables will be set
     app.model["sfincs_hmt"].set_model_variables()

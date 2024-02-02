@@ -15,7 +15,7 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["boundary_points"].activate()
     update_list()
 
-def generate_boundary_points_from_msk():
+def generate_boundary_points_from_msk(*args):
     """Generate boundary points from mask and add to model and map."""
     model = app.model["sfincs_hmt"].domain
 

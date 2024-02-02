@@ -281,14 +281,14 @@ class Model(GenericModel):
         app.gui.setvar(group, "drainage_type", 0)
 
         # Physics
-        app.gui.setvar(group, "advection", False)
-        app.gui.setvar(group, "coriolis", False)
+        app.gui.setvar(group, "advection", 0)
+        app.gui.setvar(group, "coriolis", 0)
 
         # Output
-        app.gui.setvar(group, "storetwet", False)
-        app.gui.setvar(group, "storevelmax", False)
-        app.gui.setvar(group, "storecumprcp", False)
-        app.gui.setvar(group, "storemaxwind", False)
+        app.gui.setvar(group, "storetwet", 0)
+        app.gui.setvar(group, "storevelmax", 0)
+        app.gui.setvar(group, "storecumprcp", 0)
+        app.gui.setvar(group, "storemaxwind", 0)
 
 
     def set_model_variables(self, varid=None, value=None):
