@@ -17,7 +17,7 @@ from delftdashboard.models.fiat.exposure_aggregation import get_table_data
 def select(*args):
     # De-activate existing layers
     map.update()
-    if app.map.layer["buildings"].layer["exposure_points"].data is None:
+    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
         app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
     app.gui.setvar("_main", "show_fiat_checkbox", False)
 
@@ -122,7 +122,7 @@ def toggle_attr_map(*args):
         fn, attribute, label = get_table_data()
         if len(fn) == 0:
             app.gui.window.dialog_info(
-                text="There are no additional attributes in your model. Please add attributes when you set up the exposure data.",
+                text="There are no additional attributes in your model.  Please add additional attribute data when you set up your model.",
                 title="Additional attributes not found.",
             )
             app.gui.setvar("fiat", "show_attributes", False)

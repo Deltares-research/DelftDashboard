@@ -16,6 +16,9 @@ element:
   - string: SVI + Equity
     element: svi.yml
     module: models.fiat.svi
+  - string: Additional Attributes
+    element: exposure_aggregation.yml
+    module: models.fiat.exposure_aggregation
   - string: Create Model
     element: create_model.yml
   - string: View Model

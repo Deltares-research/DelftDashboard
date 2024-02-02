@@ -14,7 +14,7 @@ import pandas as pd
 def select(*args):
     # De-activate existing layers
     map.update()
-    if app.map.layer["buildings"].layer["exposure_points"].data is None:
+    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
         app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
 
 
