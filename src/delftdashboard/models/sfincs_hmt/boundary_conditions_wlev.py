@@ -15,12 +15,15 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["boundary_points"].activate()
     update_list()
 
-def generate_boundary_points_from_msk(*args):
+def generate_boundary_points_from_msk():
+    """Generate boundary points from mask and add to model and map."""
     model = app.model["sfincs_hmt"].domain
 
     if "bzs" in model.forcing:
-        ok = app.gui.window.dialog_ok_cancel("Existing boundary points will be overwritten! Continue?",                                
-                                    title="Warning")
+        ok = app.gui.window.dialog_ok_cancel(
+            text = "Existing boundary points will be overwritten! Continue?",                                
+            title="Warning"
+        )
         if not ok:
             return    
 
