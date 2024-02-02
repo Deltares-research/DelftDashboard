@@ -130,16 +130,16 @@ def load_aio(*args):
             app.gui.setvar(group, "mask_active_zmin", -10000.0)
 
 def open_watershed_selector(*args):
-    """ Method to open the selector of wathersheds"""
+    """Method to open the selector of wathersheds"""
     group = "modelmaker_sfincs_hmt"
-
+    # Open pop-up window
     okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "select_watershed", "watershed.yml"), id="watershed", data=None)
-    if not okay:
+    if not okay or not data:
         return
-    # Add the polygon to the map
+    # Add the polygon(s) to the map
     layer = app.map.layer[group].layer["area_of_interest"]
     gdf = gpd.GeoDataFrame.from_features(data, crs=4326)
-    if len(gdf)>1:
+    if len(gdf)>1: # If more that one watershed is provided try to combine
         gdf['new_column'] = 0
         gdf = gdf.dissolve(by='new_column')
     layer.set_data(gdf)
