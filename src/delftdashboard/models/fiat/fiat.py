@@ -1149,6 +1149,21 @@ class Model(GenericModel):
         if not okay:
             raise ValueError("The data will not be overwritten")
 
+    def overwrite_model(self):
+        # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "create_model_settings.yml"
+        )
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            raise ValueError("The data will not be overwritten")
+
     def view_exposure(self):
         # get window config yaml path
         pop_win_config_path = str(

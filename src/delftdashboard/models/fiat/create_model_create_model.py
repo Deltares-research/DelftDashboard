@@ -25,6 +25,16 @@ def create_model(*args):
         )
         return
 
+    # If model was already created create pop-up to ask if should be overwritten?
+    if app.active_model.domain.fiat_model.exposure is not None:
+        try:
+            app.active_model.overwrite_model()
+        except ValueError as e:
+            return
+        
+        app.gui.setvar("fiat", "properties_to_display", None)
+        app.map.layer["buildings"].hide()
+
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
 
     try:
@@ -46,14 +56,12 @@ def create_model(*args):
     view_tab_unit = app.active_model.domain.fiat_model.exposure.unit
     app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
 
-    dlg.close()
-    
-    # Clear map from previous model if existing and show only exposure points
-    if app.active_model.domain.exposure_vm.exposure.exposure_db is not None:
-        app.map.layer["buildings"].hide()
-        app.map.layer["buildings"].layer["exposure_points"].show()
-        app.gui.setvar("fiat", "properties_to_display", None)
+    # Show exposure buildings
+    app.map.layer["buildings"].show()
+    app.active_model.show_exposure_buildings()
 
+    dlg.close()
+        
     app.gui.window.dialog_info(
         f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",
         "FIAT model created",
