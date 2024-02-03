@@ -49,8 +49,7 @@ def create_model(*args):
     dlg.close()
     
     # Clear map from previous model if existing and show only exposure points
-    properties_to_display = app.gui.getvar("fiat", "properties_to_display")
-    if properties_to_display is not None:
+    if app.active_model.domain.exposure_vm.exposure.exposure_db is not None:
         app.map.layer["buildings"].hide()
         app.map.layer["buildings"].layer["exposure_points"].show()
         app.gui.setvar("fiat", "properties_to_display", None)
