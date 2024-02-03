@@ -64,7 +64,6 @@ def display_primary_classification(*args):
         app.map.layer["buildings"].clear()
         app.gui.setvar("fiat", "show_asset_locations", False)
         app.gui.setvar("fiat", "show_secondary_classification", False)
-        # app.map.layer["buildings"].layer["exposure_points"].hover_property = "Primary Object Type"
         app.active_model.show_classification(type="primary")
         map.update()
     else:
@@ -81,7 +80,6 @@ def display_secondary_classification(*args):
         app.map.layer["buildings"].clear()
         app.gui.setvar("fiat", "show_asset_locations", False)
         app.gui.setvar("fiat", "show_primary_classification", False)
-        # app.map.layer["buildings"].layer["exposure_points"].hover_property = "Secondary Object Type"
         app.active_model.show_classification(type="secondary")
         map.update()
     else:

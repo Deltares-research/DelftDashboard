@@ -47,6 +47,14 @@ def create_model(*args):
     app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
 
     dlg.close()
+    
+    # Clear map from previous model if existing and show only exposure points
+    properties_to_display = app.gui.getvar("fiat", "properties_to_display")
+    if properties_to_display is not None:
+        app.map.layer["buildings"].hide()
+        app.map.layer["buildings"].layer["exposure_points"].show()
+        app.gui.setvar("fiat", "properties_to_display", None)
+
     app.gui.window.dialog_info(
         f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",
         "FIAT model created",
