@@ -9,6 +9,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 
+
 def select(*args):
     # De-activate existing layers
     map.update()
@@ -30,10 +31,8 @@ def create_model(*args):
         try:
             app.active_model.overwrite_model()
         except ValueError as e:
-            return
-        
-        app.gui.setvar("fiat", "properties_to_display", None)
-        app.map.layer["buildings"].hide()
+            return  
+        app.map.layer["buildings"].clear()
 
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
 
@@ -57,8 +56,7 @@ def create_model(*args):
     app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
 
     # Show exposure buildings
-    app.map.layer["buildings"].show()
-    app.active_model.show_exposure_buildings()
+    display_asset_locations()
 
     dlg.close()
         
@@ -70,3 +68,13 @@ def create_model(*args):
 
 def edit(*args):
     app.active_model.set_model_variables()
+
+def display_asset_locations(*args):
+    """Show/hide buildings layer"""
+    app.map.layer["buildings"].layer["exposure_points"].crs = crs = app.gui.getvar(
+        "fiat", "selected_crs"
+    )
+    app.map.layer["buildings"].layer["exposure_points"].set_data(
+        app.active_model.buildings
+    )
+    app.active_model.show_exposure_buildings()
