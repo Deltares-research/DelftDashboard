@@ -33,26 +33,21 @@ def display_properties(*args):
     app.gui.setvar("fiat", "show_secondary_classification", False)
     app.gui.setvar("fiat", "show_asset_locations", False)
     if properties_to_display == "Classification":
-        app.map.layer["buildings"].clear()
         app.gui.setvar(model, "classification_display_string", ["Primary", "Secondary"])
         app.gui.setvar(model, "classification_display_value", ["Primary", "Secondary"])
         app.gui.setvar(model, "classification_display_name", "Primary")
         display_classification()
     elif properties_to_display == "Finished floor height":
-        app.map.layer["buildings"].clear()
-        app.model[model].show_asset_height()
+        display_asset_height()
     elif properties_to_display == "Max potential damages":
-        app.map.layer["buildings"].clear()
         app.gui.setvar(model, "max_potential_damage_string", ["Structure", "Content"])
         app.gui.setvar(model, "max_potential_damage_value", ["Structure", "Content"])
         app.gui.setvar(model, "max_potential_damage_name", "Structure")
         display_damage()
     elif properties_to_display == "Ground Elevation":
-        app.map.layer["buildings"].clear()
-        app.model[model].show_ground_elevation()
+        display_ground_elevation()
     elif properties_to_display == "Social Vulnerability Index (SVI)":
-        app.map.layer["buildings"].clear()
-        app.model[model].show_svi()
+        display_svi()
 
 
 def display_classification(*args):
@@ -76,6 +71,17 @@ def display_damage(*args):
     else:
         app.active_model.show_max_potential_damage_cont()
 
+def display_asset_height(*args):
+    app.map.layer["buildings"].clear()
+    app.active_model.show_asset_height()
+
+def display_ground_elevation(*args):
+    app.map.layer["buildings"].clear()
+    app.active_model.show_ground_elevation()
+
+def display_svi(*args):
+    app.map.layer["buildings"].clear()
+    app.active_model.show_svi()
 
 def display_roads(*args):
     """Show/hide roads layer"""
