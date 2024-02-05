@@ -98,11 +98,6 @@ def add_to_model(*args):
     damage_type = app.gui.getvar("fiat", "damage_type")
 
     if damage_type in app.gui.getvar(model, "damage_type_list"):
-        # app.gui.window.dialog_warning(
-        #    "You already added that damage type to your model. Do you want to overwrite it?",
-        #    "Damage type was already added",
-        # )
-        # return
         damage_index = app.gui.getvar(model, "damage_type_list").index(damage_type)
 
         # Create pop-up and only continue if user presses ok
