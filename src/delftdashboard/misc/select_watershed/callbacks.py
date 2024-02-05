@@ -22,7 +22,10 @@ def map_ready(*args):
         selection_type="multiple", 
         hover_property="name",
     )
-    gdf = app.active_model.domain.data_catalog.get_geodataframe("watersheds")
+    try:
+        gdf = app.active_model.domain.data_catalog.get_geodataframe("watersheds")
+    except Exception as error:
+        print(error) 
     polygon_layer.set_data(gdf)
     bounds = gdf.geometry.total_bounds
     mp.fly_to((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2, 8)
