@@ -22,6 +22,9 @@ conda init
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 ```
 
+- Make sure you have `git` installed and added to your system's `PATH` environment variable. You can download a Windows installer [here](https://gitforwindows.org/).
+
+
 ## Creating (or updating) the environment
 
 - Create (or update) the environment by executing the following in your terminal:
