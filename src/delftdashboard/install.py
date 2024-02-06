@@ -132,7 +132,7 @@ def copy_p_drive_files(
         "datalib_delftdashboard",
         "hydromt_fiat_catalog_USA",
         "hydromt_sfincs_catalog",
-        "dataFolder_bathymetry",
+        "bathymetry_database",
         "Hazus_IWR_curves",
     ]
 
@@ -146,7 +146,7 @@ def copy_p_drive_files(
         "delftdashboard.ini": ddb_config_dir / "delftdashboard.ini",
         "datalib_delftdashboard": ddb_config_dir / "data_catalog_USA.yml",
         "hydromt_sfincs_catalog": ddb_config_dir / "data_catalog.yml",
-        "dataFolder_bathymetry": ddb_config_dir.parent.parent.parent / "data",
+        "bathymetry_database": ddb_config_dir.parent.parent.parent / "data",
     }
 
     # this will be gone eventually when hydromt_fiat is updated to not hardcoded to need the catalog anymore
@@ -197,7 +197,7 @@ def copy_p_drive_files(
 def update_delftdashboard_ini(target_paths: dict) -> None:
     # In the repo there exists a default catalog, if the user want more, add the path to the data_libs here
     replacements = {
-        "bathymetry_database": os.fspath(target_paths["dataFolder_bathymetry"]),
+        "bathymetry_database": os.fspath( Path(target_paths["bathymetry_database"]) / "bathymetry" ),
         "data_libs": [
             os.fspath(target_paths["datalib_delftdashboard"]),
             os.fspath(target_paths["hydromt_fiat_catalog_USA"]),
