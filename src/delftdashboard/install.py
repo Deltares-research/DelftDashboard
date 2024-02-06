@@ -152,7 +152,10 @@ def copy_p_drive_files(
     # this will be gone eventually when hydromt_fiat is updated to not hardcoded to need the catalog anymore
     while repo_paths["hydromt_fiat"] is None:
         print(
-            "Currrently, hydromt_fiat is required to be locally installed to run DelftDashboard, please provide the path to your local clone:\n"
+            """
+            Currrently, hydromt_fiat is required to be locally installed to run the DelftDashboard FloodAdapt Modelbuilders.
+            do: 'git clone https://github.com/Deltares/hydromt_fiat.git' and provide the path to your local clone:\n
+            """
         )
         repo_paths["hydromt_fiat"] = get_repo_path("hydromt_fiat")
 
@@ -194,7 +197,7 @@ def copy_p_drive_files(
 def update_delftdashboard_ini(target_paths: dict) -> None:
     # In the repo there exists a default catalog, if the user want more, add the path to the data_libs here
     replacements = {
-        "dataFolder_bathymetry": os.fspath(target_paths["dataFolder_bathymetry"]),
+        "bathymetry_database": os.fspath(target_paths["dataFolder_bathymetry"]),
         "data_libs": [
             os.fspath(target_paths["datalib_delftdashboard"]),
             os.fspath(target_paths["hydromt_fiat_catalog_USA"]),
@@ -202,11 +205,12 @@ def update_delftdashboard_ini(target_paths: dict) -> None:
         ],
     }
 
-    with open(target_paths["delftdashboard.ini"], "r+") as f:
+    with open(target_paths["delftdashboard.ini"], "r") as f:
         config = yaml.safe_load(f)
-        for key in config:
-            if key in replacements:
-                config[key] = replacements[key]
+
+    with open(target_paths["delftdashboard.ini"], "w") as f:
+        for key in replacements:
+            config[key] = replacements[key]
         yaml.dump(config, f)
     print("delftdashboard.ini updated successfully.")
 
