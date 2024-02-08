@@ -162,17 +162,25 @@ def add_aggregations(*args):
                 app.active_model.domain.exposure_vm.set_aggregation_areas_config(
                     fn, attribute, label
                 )
-                print("Attributes added to model")
-                app.gui.window.dialog_info(
-                    text="Your additional attributes were added to the model",
-                    title="Added additional attributes",
-                )
+
             else:
                 app.gui.window.dialog_info(
                     text="Your additional attributes are not within your model boundaries. Make sure to set the crs to EPSG:4326 in all your data.",
                     title="Additional attribute outside model boundaries. ",
                 )
+            
             app.gui.setvar("_main", "checkbox_attributes_(optional)", True)
+        
+        # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
+        if app.active_model.domain.fiat_model.exposure is not None:
+            dlg = app.gui.window.dialog_wait("\nAdding additional attributes to your FIAT model...")
+            run_model()
+            dlg.close()
+
+        app.gui.window.dialog_info(
+            text="Your additional attributes were added to the model",
+            title="Added additional attributes",
+        )
     else:
         print("no active model")
         app.gui.window.dialog_info(
@@ -229,3 +237,18 @@ def select_additional_attribute(*args):
         )
     else:
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
+
+def run_model(*args):
+    try:
+        buildings, roads = app.active_model.domain.run_hydromt_fiat()
+    except Exception as e:
+        app.gui.window.dialog_warning(
+            str(e),
+            "Not ready to build a FIAT model",
+        )
+        return
+
+    if buildings is not None:
+        app.active_model.buildings = buildings
+    if roads is not None:
+        app.active_model.roads = roads
