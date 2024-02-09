@@ -1,0 +1,16 @@
+window:
+  title: Select Watershed ...
+  width: 800
+  height: 400
+  module: delftdashboard.misc.select_watershed.callbacks
+  variable_group: popup_window
+  modal: True
+  cancel: True
+element:
+- style: mapbox
+  id: watershed_map
+  position:
+    x: 20
+    y: 40
+    width: -20
+    height: -20

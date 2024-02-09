@@ -68,9 +68,9 @@ def select_setup_grid_method(*args):
         watershed = True
 
     if watershed:
-        app.gui.setvar(group, "setup_grid_methods_index", 2)
+        app.gui.setvar(group, "setup_grid_method", "Select Watershed")
     else:
-        app.gui.setvar(group, "setup_grid_methods_index", 0)
+        app.gui.setvar(group, "setup_grid_method", "Draw Bounding Box")
 
 def draw_bbox(*args):
     """Callback to specify what happens when you click the draw bbox button"""
@@ -112,23 +112,49 @@ def load_aio(*args):
         # change map position to center of polygon
         fly_to_site(gdf=gdf)
 
-        # When a wayershed was loaded, also use this as initial mask
-        load_watershed = app.gui.getvar(group , "setup_grid_methods_index") == 2
+        # When a watershed was loaded, also use this as initial mask
+        load_watershed = app.gui.getvar(group , "setup_grid_method") == "Load Watershed"
         if load_watershed:
             # Save filename as variable
             app.gui.setvar(group, "mask_init_fname", fname[0])
             # Add to GUI
-            layer = app.map.layer[group].layer["mask_init"]
-            layer.set_data(gdf)
-            # Add to modelmaker
-            app.toolbox[group].mask_init_polygon = gdf.to_crs(app.crs)
+            watershed_as_mask(gdf, group)
 
-            # Change default settings of zmin zmax
-            # TODO replace the numerica values for None 
-            # (but that is now interpreted as a string in the GUI which causes trouble in hydromt_sfincs)
-            app.gui.setvar(group, "mask_active_zmax", 10000.0)
-            app.gui.setvar(group, "mask_active_zmin", -10000.0)
+def open_watershed_selector(*args):
+    """Method to open the selector of wathersheds"""
+    group = "modelmaker_sfincs_hmt"
+    # Open pop-up window
+    okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "select_watershed", "watershed.yml"), id="watershed", data=None)
+    if not okay or not data:
+        return
+    # Add the polygon(s) to the map
+    layer = app.map.layer[group].layer["area_of_interest"]
+    gdf = gpd.GeoDataFrame.from_features(data, crs=4326)
+    if len(gdf)>1: # If more that one watershed is provided try to combine
+        gdf['new_column'] = 0
+        gdf = gdf.dissolve(by='new_column')
+    layer.set_data(gdf)
 
+    # Create bounding box based on area of interest
+    aio_created(gdf.to_crs(app.crs), 0, 0)
+
+    # change map position to center of polygon
+    fly_to_site(gdf=gdf)
+    
+    watershed_as_mask(gdf, group)
+    
+    
+def watershed_as_mask(gdf, group):
+    """"When a watershed was loaded, also use this as initial mask"""
+    layer = app.map.layer[group].layer["mask_init"]
+    layer.set_data(gdf)
+    # Add to modelmaker
+    app.toolbox[group].mask_init_polygon = gdf.to_crs(app.crs)
+    # Change default settings of zmin zmax
+    # TODO replace the numerical values for None 
+    # (but that is now interpreted as a string in the GUI which causes trouble in hydromt_sfincs)
+    app.gui.setvar(group, "mask_active_zmax", 10000.0)
+    app.gui.setvar(group, "mask_active_zmin", -10000.0)
 
 def grid_outline_created(gdf, index, id):
     """Function that specifies what happens when you create the bounding box"""
