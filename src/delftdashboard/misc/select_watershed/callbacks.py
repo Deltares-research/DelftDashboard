@@ -22,10 +22,10 @@ def map_ready(*args):
         selection_type="multiple", 
         hover_property="name",
     )
-    try:
+    if "watersheds" in app.active_model.domain.data_catalog:
         gdf = app.active_model.domain.data_catalog.get_geodataframe("watersheds")
-    except Exception as error:
-        print(error) 
+    else:
+        raise ValueError("In order to use the polygon selector, a watershed vector dataset needs to be included in the data catalog.")
     polygon_layer.set_data(gdf)
     bounds = gdf.geometry.total_bounds
     mp.fly_to((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2, 8)

@@ -135,7 +135,7 @@ def open_watershed_selector(*args):
         gdf = gdf.dissolve(by='new_column')
     layer.set_data(gdf)
 
-    # Create boundinx box based on area of interest
+    # Create bounding box based on area of interest
     aio_created(gdf.to_crs(app.crs), 0, 0)
 
     # change map position to center of polygon
