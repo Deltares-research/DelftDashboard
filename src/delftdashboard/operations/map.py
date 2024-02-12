@@ -7,6 +7,7 @@ Created on Tue Jul  5 13:40:07 2022
 import numpy as np
 import traceback
 from pyproj import CRS
+import matplotlib as mpl
 
 from delftdashboard.app import app
 from cht.bathymetry.bathymetry_database import bathymetry_database
@@ -80,9 +81,10 @@ def update_background():
         dataset_list = [{"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}]
 
         try:
+            cmap = mpl.cm.get_cmap(app.view["topography"]["colormap"])
             z = bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(4326), dataset_list,
                                                            method=app.view["topography"]["interp_method"])
-            app.background_topography_layer.set_data(x=xv, y=yv, z=z, colormap=app.color_map_earth, decimals=0)
+            app.background_topography_layer.set_data(x=xv, y=yv, z=z, colormap=cmap, decimals=0)
         except:
             print("Error loading background topo ...")
             traceback.print_exc()

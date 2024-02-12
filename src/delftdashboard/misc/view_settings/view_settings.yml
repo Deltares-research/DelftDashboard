@@ -1,0 +1,22 @@
+window:
+  title: View Settings
+  width: 800
+  height: 400
+  module: delftdashboard.misc.view_settings.callbacks
+  modal: True
+  cancel: True
+element:
+- style: tabpanel
+  position:
+    x: 20
+    y: 40
+    width: 760
+    height: 350
+  tab:
+  - string: Topography
+    variable_group: topography_view_settings
+    element: topography.yml
+  - string: Misc
+    variable_group: misc_view_settings
+    element: misc.yml
+    

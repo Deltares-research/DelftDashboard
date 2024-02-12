@@ -34,8 +34,9 @@ class GenericToolbox:
 
         # And select this tab
         app.gui.window.elements[index].widget.select_tab(0)
-        
+
         app.gui.window.update()
+        # app.gui.window.resize()
 
     def add_layers(self):
         pass

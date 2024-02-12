@@ -107,11 +107,11 @@ def redraw_rectangle():
     )
 
 def read_setup_yaml(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
-    if not okay:
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
+    if not full_name:
         return
     # This will automatically also read and plot the polygons    
-    app.toolbox["modelmaker_sfincs_cht"].read_setup_yaml(fname[0])
+    app.toolbox["modelmaker_sfincs_cht"].read_setup_yaml(full_name)
 
 def write_setup_yaml(*args):
     # This will automatically also write the polygons    
@@ -121,7 +121,7 @@ def build_model(*args):
     app.toolbox["modelmaker_sfincs_cht"].build_model()
 
 def use_snapwave(*args):
-    group = "modelmaker_sfincs_cht"
+    # group = "modelmaker_sfincs_cht"
     app.gui.setvar("sfincs_cht", "snapwave", app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"))
     app.model["sfincs_cht"].domain.input.variables.snapwave = app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave")
 

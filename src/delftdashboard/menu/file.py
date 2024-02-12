@@ -39,9 +39,17 @@ def save(option):
     app.active_model.save()
 
 def select_working_directory(option):
-    path = app.gui.window.select_path(os.getcwd())
+    path = app.gui.window.dialog_select_path("Select working directory ...", path=os.getcwd())
     if path:
         os.chdir(path)
+        # Set path for all models to new working directory
+        for model in app.model:
+            try:
+                app.model[model].domain.path = path   
+            except Exception as e:
+                print("Could not set path for model : ", model)
+                pass
+
 
 def exit(option):
     app.gui.quit()

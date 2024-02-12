@@ -158,6 +158,7 @@ def build_gui_config():
 
     layer_style_menu = {}
     layer_style_menu["text"] = "Layer Style"
+    layer_style_menu["separator"] = True
     layer_style_menu["menu"] = []
     layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.streets", "text": "Streets", "separator": False,  "checkable": True, "option": "streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "streets-v12"}]}]})
     layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.satellite", "text": "Satellite", "separator": False,  "checkable": True, "option": "satellite-v9", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-v9"}]}]})
@@ -166,6 +167,8 @@ def build_gui_config():
     layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.light", "text": "Light", "separator": False,  "checkable": True, "option": "light-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "light-v11"}]}]})
     menu["menu"].append(layer_style_menu)
 
+    # View settings
+    menu["menu"].append({"variable_group": "menu", "id": "view.settings",  "text": "Settings ...", "method": "settings", "separator": True,  "checkable": False})
 
     app.gui.config["menu"].append(menu)
 
