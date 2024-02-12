@@ -42,7 +42,7 @@ element:
   element:
   - style: edit
     position:
-      x: 80
+      x: 100
       y: 90
       width: 25
       height: 18
@@ -79,6 +79,14 @@ element:
       height: 20
     text: "Primary"
     variable: include_primary
+  - style: pushbutton
+    position:
+      x: 10
+      y: 92
+      width: 15
+      height: 15
+    text: "\u2139"
+    method: open_info
   - style: checkbox
     position:
       x: 80

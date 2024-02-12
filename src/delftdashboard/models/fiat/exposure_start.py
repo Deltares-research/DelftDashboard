@@ -287,6 +287,6 @@ def display_asset_locations(*args):
 
 def open_info(*args):
     app.gui.window.dialog_info(
-    text="The threshold value indicates the watrer level at which a road is not accessible anymore." ,
+    text="The threshold value indicates the water level at which a road is not accessible anymore." ,
     title="Threshold value",
     )
