@@ -284,3 +284,9 @@ def display_asset_locations(*args):
         app.active_model.show_exposure_buildings()
     else:
         app.active_model.hide_exposure_buildings()
+
+def open_info(*args):
+    app.gui.window.dialog_info(
+    text="The threshold value indicates the watrer level at which a road is not accessible anymore." ,
+    title="Threshold value",
+    )
