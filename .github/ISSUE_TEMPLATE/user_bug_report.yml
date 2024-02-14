@@ -49,10 +49,12 @@ body:
       label: Desired behaviour
     validations:
       required: true
-  
-  - type: file
-    id: attachments
+
+  - type: textarea
+    id: additional-context
     attributes:
-      label: Attachments
-      description: >
-        If applicable, attach any screenshots, logs, or code
+      label: Additional context
+      description: Please add any other context, logs, code or screenshots about the bug here. You can select the textbox and 'Paste, drop or click to add files' to attach them to this bug report.
+    validations:
+      required: false
+

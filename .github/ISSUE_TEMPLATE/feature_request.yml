@@ -1,4 +1,3 @@
----
 name: Feature Request
 description: Suggest an idea/enhancement for this project
 labels: [enhancement, needs refinement]
@@ -43,12 +42,5 @@ body:
     id: context
     attributes:
       description: >
-        Please add any other context about the enhancement here
+        Please add any other context or screenshots about the feature request here. You can select the textbox and 'Paste, drop or click to add files' to attach them to this request.
       label: Additional Context
-
-  - type: file
-    id: attachments
-    attributes:
-      label: Attachments
-      description: >
-        If applicable, attach any screenshots, logs, or code
