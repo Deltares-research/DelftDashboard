@@ -12,6 +12,7 @@ mapbox_token.txt
 /data
 /hydromt.log
 /src/delftdashboard/config/data_catalog_USA.yml
+/src/delftdashboard/config/data_catalog.yml
 temp_database
 fiat_database
 /src/delftdashboard/config/delftdashboard.ini
