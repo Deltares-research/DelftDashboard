@@ -1,10 +1,11 @@
-import shutil
-from pathlib import Path
-import subprocess
 import os
-from typing import Union
-import yaml
+import shutil
+import subprocess
 import sys
+from pathlib import Path
+from typing import Union
+
+import yaml
 
 
 def check_dir_exists(dir_path: Path) -> bool:
@@ -46,10 +47,7 @@ def get_and_check_script_location() -> Path:
 
 def check_env_creation() -> None:
     python_path = sys.executable
-    env_active = any(
-        env_name in python_path
-        for env_name in ["ddb_fiat", "ddb_sfincs", "ddb_dev", "ddb_floodadapt"]
-    )
+    env_active = any(env_name in python_path for env_name in ["ddb_floodadapt"])
     if not env_active:
         print(
             """
@@ -57,8 +55,8 @@ def check_env_creation() -> None:
             You can do this by running the following commands in a terminal:\n
             conda init\n
             cd <location of your repository clone of DelftDashboard>\n
-            mamba env create --file=./src/delftdashboard/env/ddb_FloodAdapt.yml --force\n
-            conda activate ddb_FloodAdapt\n
+            mamba env create --file=./src/delftdashboard/env/ddb_floodadapt.yml --force\n
+            conda activate ddb_floodadapt\n
             Now you can run this script.
             """
         )
@@ -197,7 +195,9 @@ def copy_p_drive_files(
 def update_delftdashboard_ini(target_paths: dict) -> None:
     # In the repo there exists a default catalog, if the user want more, add the path to the data_libs here
     replacements = {
-        "bathymetry_database": os.fspath( Path(target_paths["bathymetry_database"]) / "bathymetry" ),
+        "bathymetry_database": os.fspath(
+            Path(target_paths["bathymetry_database"]) / "bathymetry"
+        ),
         "data_libs": [
             os.fspath(target_paths["datalib_delftdashboard"]),
             os.fspath(target_paths["hydromt_fiat_catalog_USA"]),
