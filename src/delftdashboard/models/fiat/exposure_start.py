@@ -190,13 +190,14 @@ def build_nsi_exposure(*args):
     ## ROADS ##
     if app.gui.getvar(model, "include_osm_roads"):
         road_types = get_road_types()
+        vertical_unit = app.gui.getvar("fiat", "vertical_unit")
 
         try:
             dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
 
             # Get the roads to show in the map
             gdf = app.active_model.domain.exposure_vm.get_osm_roads(
-                road_types=road_types
+                road_types=road_types, vertical_unit = vertical_unit
             )
 
             crs = app.gui.getvar("fiat", "selected_crs")
@@ -204,11 +205,13 @@ def build_nsi_exposure(*args):
 
             app.map.layer["roads"].layer["exposure_lines"].crs = crs
             app.map.layer["roads"].layer["exposure_lines"].set_data(gdf)
+           
+            
 
             # Set the road damage threshold
             road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
             app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
-                road_damage_threshold
+                road_damage_threshold, vertical_unit = vertical_unit
             )
 
             # Show the roads
@@ -287,6 +290,6 @@ def display_asset_locations(*args):
 
 def open_info(*args):
     app.gui.window.dialog_info(
-    text="The threshold value indicates the water level at which a road is not accessible anymore." ,
+    text="The threshold value indicates the water level at which a road is not accessible anymore. If you provide a threshold in meter it will be automatically converted into feet in your output." ,
     title="Threshold value",
     )

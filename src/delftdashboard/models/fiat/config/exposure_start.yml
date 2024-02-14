@@ -30,7 +30,7 @@ element:
   position:
     x: 190
     y: 10
-    width: 170
+    width: 200
     height: 120
   dependency:
     - action: visible
@@ -42,12 +42,23 @@ element:
   element:
   - style: edit
     position:
-      x: 100
+      x: 68
       y: 90
       width: 25
-      height: 18
-    text: "Threshold value (ft)"
+      height: 15
+    text: "Threshold value"
     variable: road_damage_threshold
+  - style: popupmenu
+    position:
+      x: 100
+      y: 90
+      width: 50
+      height: 15
+    variable: vertical_unit
+    option_string:
+      variable: vertical_unit_string
+    option_value:
+      variable: vertical_unit_value
   - style: text
     position:
       x: 10
@@ -81,8 +92,8 @@ element:
     variable: include_primary
   - style: pushbutton
     position:
-      x: 10
-      y: 92
+      x: 180
+      y: 100
       width: 15
       height: 15
     text: "\u2139"

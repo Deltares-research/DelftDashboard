@@ -293,7 +293,9 @@ class Model(GenericModel):
         app.gui.setvar(group, "include_secondary", False)
         app.gui.setvar(group, "include_tertiary", False)
         app.gui.setvar(group, "include_all", False)
-
+        app.gui.setvar(group, "vertical_unit", "ft")
+        app.gui.setvar(group, "vertical_unit_string", ["feet", "meter"])
+        app.gui.setvar(group, "vertical_unit_value", ["ft", "m"])
         ## DISPLAY LAYERS ##
         app.gui.setvar(group, "properties_to_display", None)
         app.gui.setvar(group, "show_asset_locations", False)
