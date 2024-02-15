@@ -6,9 +6,10 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 from delftdashboard.app import app
+from typing import List, Optional, Union
 
 
-def update_parameters(parameter: str):
+def update_parameters(parameter: Union[str, list]):
     try:
         buildings, roads = app.active_model.domain.update_model(parameter)
     except Exception as e:
