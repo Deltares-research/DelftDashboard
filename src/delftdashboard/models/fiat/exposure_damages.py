@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.operations import  update
 from pathlib import Path
 import fiona
 
@@ -177,7 +178,7 @@ def add_damages():
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
     if app.active_model.domain.fiat_model.exposure is not None:
         dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
-        update_damages()
+        update.update_parameters("Max Potential Damages")
         dlg.close()
 
     # Set the source
@@ -259,7 +260,7 @@ def replace_damage(damage_index):
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
     if app.active_model.domain.fiat_model.exposure is not None:
         dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
-        update_damages()
+        update.update_parameters("Max Potential Damages")
         dlg.close()
 
     # Set the source
@@ -270,17 +271,3 @@ def replace_damage(damage_index):
         title="Added maximum potential damage data",
     )
 
-def update_damages(parameter: str = "Max Potential Damages"):
-    try:
-        buildings, roads = app.active_model.domain.update_model(parameter)
-    except Exception as e:
-        app.gui.window.dialog_warning(
-            str(e),
-            "Not ready to build a FIAT model",
-        )
-        return
-
-    if buildings is not None:
-        app.active_model.buildings = buildings
-    if roads is not None:
-        app.active_model.roads = roads

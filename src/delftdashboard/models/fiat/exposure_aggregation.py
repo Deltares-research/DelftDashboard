@@ -7,6 +7,7 @@ Created on Mon October 30 12:18:09 2023
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.operations import  update
 import geopandas as gpd
 from pathlib import Path
 import pandas as pd
@@ -174,7 +175,7 @@ def add_aggregations(*args):
         # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
         if app.active_model.domain.fiat_model.exposure is not None:
             dlg = app.gui.window.dialog_wait("\nAdding additional attributes to your FIAT model...")
-            update_additional_attributes()
+            update.update_parameters("Additional Attributes")
             dlg.close()
 
         app.gui.window.dialog_info(
@@ -237,18 +238,3 @@ def select_additional_attribute(*args):
         )
     else:
         app.map.layer["aggregation"].layer["aggregation_layer"].hide()
-
-def update_additional_attributes(parameter: str = "Additional Attributes"):
-    try:
-        buildings, roads = app.active_model.domain.update_model(parameter)
-    except Exception as e:
-        app.gui.window.dialog_warning(
-            str(e),
-            "Not ready to build a FIAT model",
-        )
-        return
-
-    if buildings is not None:
-        app.active_model.buildings = buildings
-    if roads is not None:
-        app.active_model.roads = roads
