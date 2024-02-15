@@ -174,6 +174,11 @@ def add_damages():
         max_dist=max_dist_damages,
         damage_types=damage_types,
     )
+    # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
+    if app.active_model.domain.fiat_model.exposure is not None:
+        dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
+        update_damages()
+        dlg.close()
 
     # Set the source
     app.gui.setvar(model, "source_max_potential_damage", source_name)
@@ -250,6 +255,12 @@ def replace_damage(damage_index):
         max_dist=max_dist_damages,
         damage_types=damage_types,
     )
+    
+    # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
+    if app.active_model.domain.fiat_model.exposure is not None:
+        dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
+        update_damages()
+        dlg.close()
 
     # Set the source
     app.gui.setvar(model, "source_max_potential_damage", source_name)
@@ -258,3 +269,18 @@ def replace_damage(damage_index):
         text="Maximum potential damage data was added to your model",
         title="Added maximum potential damage data",
     )
+
+def update_damages(parameter: str = "Max Potential Damages"):
+    try:
+        buildings, roads = app.active_model.domain.update_model(parameter)
+    except Exception as e:
+        app.gui.window.dialog_warning(
+            str(e),
+            "Not ready to build a FIAT model",
+        )
+        return
+
+    if buildings is not None:
+        app.active_model.buildings = buildings
+    if roads is not None:
+        app.active_model.roads = roads
