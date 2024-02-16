@@ -1228,3 +1228,5 @@ class Model(GenericModel):
         app.gui.setvar(
             model, "selected_secondary_classification_value", unique_secondary_types
         )
+
+

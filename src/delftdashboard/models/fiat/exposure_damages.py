@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.operations import  update
 from pathlib import Path
 import fiona
 
@@ -174,6 +175,11 @@ def add_damages():
         max_dist=max_dist_damages,
         damage_types=damage_types,
     )
+    # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
+    if app.active_model.domain.fiat_model.exposure is not None:
+        dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
+        update.update_parameters("Max Potential Damages")
+        dlg.close()
 
     # Set the source
     app.gui.setvar(model, "source_max_potential_damage", source_name)
@@ -250,6 +256,12 @@ def replace_damage(damage_index):
         max_dist=max_dist_damages,
         damage_types=damage_types,
     )
+    
+    # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
+    if app.active_model.domain.fiat_model.exposure is not None:
+        dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
+        update.update_parameters("Max Potential Damages")
+        dlg.close()
 
     # Set the source
     app.gui.setvar(model, "source_max_potential_damage", source_name)
@@ -258,3 +270,4 @@ def replace_damage(damage_index):
         text="Maximum potential damage data was added to your model",
         title="Added maximum potential damage data",
     )
+

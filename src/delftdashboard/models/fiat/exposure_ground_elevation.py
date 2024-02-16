@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.operations import  update
 from pathlib import Path
 import fiona
 
@@ -94,25 +95,10 @@ def add_to_model(*args):
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
     if app.active_model.domain.fiat_model.exposure is not None:
         dlg = app.gui.window.dialog_wait("\nUpdating Ground Elevation in your FIAT model...")
-        update_ground_elevation()
+        update.update_parameters("Ground Elevation")
         dlg.close()
 
     app.gui.window.dialog_info(
         text="Ground elevation data was added to your model",
         title="Added ground elevation data",
     )
-
-def update_ground_elevation(parameter: str = "Ground Elevation"):
-    try:
-        buildings, roads = app.active_model.domain.update_model(parameter)
-    except Exception as e:
-        app.gui.window.dialog_warning(
-            str(e),
-            "Not ready to build a FIAT model",
-        )
-        return
-
-    if buildings is not None:
-        app.active_model.buildings = buildings
-    if roads is not None:
-        app.active_model.roads = roads
