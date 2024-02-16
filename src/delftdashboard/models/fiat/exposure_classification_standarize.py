@@ -28,9 +28,6 @@ def assign_occupancy_type(*args):
         .iloc[active_exposure_category_standardize]
         .values
     )
-    app.gui.setvar(
-        model, "new_occupancy_type", exposure_categories_to_standardize["Secondary Object Type"].to_list()
-    )
 
     # Get the hazus/iwr occupancy class
     active_related_occupancy_type = app.gui.getvar(
@@ -42,9 +39,6 @@ def assign_occupancy_type(*args):
         .iloc[active_related_occupancy_type]
         .values[0]
     )
-    app.gui.setvar(
-        model, "old_occupancy_type", exposure_categories_to_standardize["Assigned"].to_list()
-    )
 
     # Assign the selected hazus/iwr occupancy class to the selected exposure category table and dictionary
     exposure_categories_to_standardize.loc[
@@ -55,5 +49,11 @@ def assign_occupancy_type(*args):
         model, "exposure_categories_to_standardize", exposure_categories_to_standardize
     )
 
+    app.gui.setvar(
+        model, "old_occupancy_type", exposure_categories_to_standardize["Assigned"].to_list()
+    )
+    app.gui.setvar(
+        model, "new_occupancy_type", exposure_categories_to_standardize["Secondary Object Type"].to_list()
+    )
     for ec in exposure_category:
         app.active_model.default_dict_categories[ec] = hazus_iwr_occupancy_class
