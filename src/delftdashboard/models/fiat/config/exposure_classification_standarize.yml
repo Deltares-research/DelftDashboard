@@ -47,3 +47,11 @@ element:
   sortable: true
   option_value:
     variable: hazus_iwr_occupancy_classes
+- style: pushbutton
+  position:
+    x: 20
+    y: 10
+    width: 50
+    height: 20
+  text: Reset
+  method: reset_occupancy_type_user_input

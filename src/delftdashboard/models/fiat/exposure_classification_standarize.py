@@ -57,3 +57,15 @@ def assign_occupancy_type(*args):
     )
     for ec in exposure_category:
         app.active_model.default_dict_categories[ec] = hazus_iwr_occupancy_class
+
+def reset_occupancy_type_user_input(*args):
+    model = "fiat"
+    app.gui.setvar(
+        model, "old_occupancy_type","")
+    exposure_categories_to_standardize = app.gui.getvar(
+        model, "exposure_categories_to_standardize"
+    )
+    exposure_categories_to_standardize["Assigned"] = ""
+    app.gui.setvar(
+        model, "exposure_categories_to_standardize", exposure_categories_to_standardize
+    )
