@@ -22,7 +22,7 @@ def generate_boundary_points_from_msk():
             title="Warning"
         )
         if not ok:
-            return    
+            return
 
     # distance in meters
     distance = app.gui.getvar("sfincs_hmt", "bc_dist_along_msk")
@@ -37,6 +37,7 @@ def generate_boundary_points_from_msk():
     app.map.layer["sfincs_hmt"].layer["boundary_points"].set_data(gdf, 0)
     app.gui.setvar("sfincs_hmt", "active_boundary_point", 0)
     update_list()
+
 
 def add_boundary_point(gdf, merge=True):
     model = app.model["sfincs_hmt"].domain
@@ -76,11 +77,12 @@ def add_boundary_point(gdf, merge=True):
     app.gui.setvar("sfincs_hmt", "active_boundary_point", index)
     update_list()
 
+
 def add_boundary_point_on_map(*args):
     app.map.click_point(point_clicked)
 
 
-def point_clicked(x,y):
+def point_clicked(x, y):
     # Add point to boundary conditions
     model = app.model["sfincs_hmt"].domain
 
@@ -123,7 +125,7 @@ def delete_point_from_list(*args):
     model = app.model["sfincs_hmt"].domain
     index = app.gui.getvar("sfincs_hmt", "active_boundary_point")
 
-    # delete point from model forcing 
+    # delete point from model forcing
     model.forcing["bzs"] = model.forcing["bzs"].drop_sel(index=index)
 
     if len(model.forcing["bzs"].index) == 0:
@@ -141,20 +143,22 @@ def delete_point_from_list(*args):
         app.gui.setvar("sfincs_hmt", "active_boundary_point", index)
     update_list()
 
+
 def delete_all_points_from_list(*args):
     model = app.model["sfincs_hmt"].domain
     model.forcing.pop("bzs")
     app.map.layer["sfincs_hmt"].layer["boundary_points"].clear()
     update_list()
 
+
 def update_list():
     # Get boundary points
     gdf = app.map.layer["sfincs_hmt"].layer["boundary_points"].data
-    boundary_point_names = []    
+    boundary_point_names = []
 
     if gdf is None:
         index = 0
-    else:        
+    else:
         # Loop through boundary points
         for index, row in gdf.iterrows():
             # Get the name of the boundary point if present
@@ -162,12 +166,12 @@ def update_list():
                 boundary_point_names.append(row["name"])
             else:
                 boundary_point_names.append("Point {}".format(index))
-        
+
     app.gui.setvar("sfincs_hmt", "boundary_point_names", boundary_point_names)
     app.gui.setvar("sfincs_hmt", "nr_boundary_points", index)
     app.gui.window.update()
 
-    
+
 def go_to_observation_stations(*args):
     """Go to observation stations toolbox in popup window."""	
 

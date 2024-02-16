@@ -18,9 +18,11 @@ def new(option):
     for toolbox in app.toolbox.keys():
         if toolbox in app.map.layer:
             app.map.layer[toolbox].delete()
-    for model in app.model.keys():
-        if model in app.map.layer:
-            app.map.layer[model].delete()
+
+    if app.active_model.name in app.model.keys():
+        app.map.layer["buildings"].delete()
+        app.map.layer["roads"].delete()
+        app.map.layer["aggregation"].delete()                
 
     # Initialize toolboxes
     initialize_toolboxes()
@@ -31,8 +33,9 @@ def new(option):
     # Add layers
     for toolbox in app.toolbox:
         app.toolbox[toolbox].add_layers()
-    for model in app.model:
-        app.model[model].add_layers()
+        
+    if app.active_model.name in app.model.keys():
+        app.active_model.add_layers()
 
     ## FREDERIQUE: commented out below because it changes the active model
     # app.active_model = app.model[list(app.model)[0]]
@@ -58,13 +61,13 @@ def select_working_directory(option):
         os.chdir(path)
         app.gui.config["working_directory"] = path
 
-
         for model in app.model:
             try:
                 app.model[model].select_working_directory()
             except:
                 print("No method select_working_directory for model: ", model)
                 pass
+
 
 def exit(option):
     app.gui.quit()

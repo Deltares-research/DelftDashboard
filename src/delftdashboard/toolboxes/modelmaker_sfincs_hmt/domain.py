@@ -19,6 +19,7 @@ def select(*args):
     app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].activate()
     app.map.layer["modelmaker_sfincs_hmt"].layer["area_of_interest"].activate()
 
+
 def select_model_type(*args):
     """" 
     Adjusts default GUI settings based on different model types:
@@ -61,10 +62,10 @@ def select_setup_grid_method(*args):
 
     include_precip =  app.gui.getvar(group, "include_precip")
     # include_rivers = app.gui.getvar(group, "include_rivers")
-    # include_waves = app.gui.setvar(group, "include_waves", False)    
+    # include_waves = app.gui.setvar(group, "include_waves", False)
 
     watershed = False
-    if include_precip: #or include_rivers:
+    if include_precip:  # or include_rivers:
         watershed = True
 
     if watershed:
@@ -79,6 +80,7 @@ def draw_bbox(*args):
 
     app.map.layer[group].layer["grid_outline"].crs = app.crs
     app.map.layer[group].layer["grid_outline"].draw()
+
 
 def draw_aio(*args):
     """Callback to specify what happens when you click the draw area of interest button"""
@@ -213,9 +215,7 @@ def aio_created(gdf, index, id):
     if len(gdf) > 1:
         # Remove the old area of interest
         id0 = gdf["id"][0]
-        app.map.layer[group].layer["area_of_interest"].delete_feature(
-            id0
-        )
+        app.map.layer[group].layer["area_of_interest"].delete_feature(id0)
         gdf = gdf.drop([0]).reset_index(drop=True)
 
     # check if auto-select UTM is selected
@@ -265,7 +265,7 @@ def aio_created(gdf, index, id):
     app.gui.setvar(group, "nmax", nmax)
     app.gui.setvar(
         group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
-    )    
+    )
     app.gui.setvar(group, "rotation", round(rot, 3))
 
     # Redraw the grid outline
@@ -346,20 +346,22 @@ def edit_dxdy(*args):
         group, "nr_cells", app.gui.getvar(group, "mmax") * app.gui.getvar(group, "nmax")
     )
 
+
 def edit_res(*args):
     group = "modelmaker_sfincs_hmt"
-    
+
     # set dx and dy to res
     app.gui.setvar(group, "dx", app.gui.getvar(group, "res"))
     app.gui.setvar(group, "dy", app.gui.getvar(group, "res"))
 
     edit_dxdy(*args)
 
+
 def edit_domain(*args):
     toolbox_name = "modelmaker_sfincs_hmt"
     path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
-    pop_win_config_path  = os.path.join(path, "edit_domain.yml")
-    okay, data = app.gui.popup(pop_win_config_path , None)
+    pop_win_config_path = os.path.join(path, "edit_domain.yml")
+    okay, data = app.gui.popup(pop_win_config_path, None)
     if not okay:
         return
 
@@ -430,12 +432,12 @@ def redraw_rectangle():
     """Redraw the grid outline based on the current settings"""
 
     group = "modelmaker_sfincs_hmt"
-    app.toolbox[group].lenx = app.gui.getvar(
-        group, "dx"
-    ) * app.gui.getvar(group, "mmax")
-    app.toolbox[group].leny = app.gui.getvar(
-        group, "dy"
-    ) * app.gui.getvar(group, "nmax")
+    app.toolbox[group].lenx = app.gui.getvar(group, "dx") * app.gui.getvar(
+        group, "mmax"
+    )
+    app.toolbox[group].leny = app.gui.getvar(group, "dy") * app.gui.getvar(
+        group, "nmax"
+    )
     app.map.layer[group].layer["grid_outline"].clear()
     app.map.layer[group].layer["grid_outline"].add_rectangle(
         app.gui.getvar(group, "x0"),

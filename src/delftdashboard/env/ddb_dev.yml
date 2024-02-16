@@ -1,0 +1,49 @@
+name: ddb_dev
+
+channels:
+  - conda-forge
+  - numba
+  - pyviz
+  
+dependencies:
+  - black
+  - build
+  - cartopy>=0.20 # to run examples  
+  - geopandas
+  - datashader
+  - descartes # to run examples
+  - ffmpeg  # to run examples (animation)
+  - geojson  
+  - hydromt
+  - hydromt_sfincs>=1.0.3
+  - jupyterlab  # to run examples    
+  - pandas
+  - mypy
+  - numba
+  - numpy
+  - pandas
+  - pillow
+  - plotly  
+  - pytest
+  - pytest-cov # tests  
+  - python>=3.10
+  - pyproj  
+  - pydata-sphinx-theme # docs
+  - rasterio
+  - scipy
+  - shapely
+  - sphinx
+  - tomli
+  - tomli-w  
+  - twine
+  - xarray
+  - xugrid
+  - pip
+  - pip:
+    - NDBC
+    - noaa-coops
+    - sphinx_design
+    - git+https://github.com/Deltares/cht_observations.git
+    - git+https://github.com/Deltares/hydromt_fiat.git
+    - git+https://github.com/Deltares/CoastalHazardsToolkit.git
+    - git+https://github.com/Deltares/Guitares.git

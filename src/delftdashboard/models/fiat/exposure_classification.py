@@ -10,6 +10,8 @@ import pandas as pd
 def select(*args):
     # De-activate existing layers
     map.update()
+    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
+        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
 
 
 def set_variables(*args):
@@ -44,11 +46,13 @@ def load_upload_classification_source(*args):
     with fiona.open(fn[0]) as src:
         # Access the schema to get the column names
         schema = src.schema
-        list_columns = list(schema['properties'].keys())
-    
+        list_columns = list(schema["properties"].keys())
+
     app.gui.setvar(model, "classification_file_field_name_string", list_columns)
     app.gui.setvar(model, "classification_file_field_name_value", list_columns)
-    app.gui.setvar(model, "assign_classification_active", True)  # This variable needs to be set to False when NSI is used
+    app.gui.setvar(
+        model, "assign_classification_active", True
+    )  # This variable needs to be set to False when NSI is used
 
 
 def display_primary_classification(*args):
@@ -60,7 +64,6 @@ def display_primary_classification(*args):
         app.map.layer["buildings"].clear()
         app.gui.setvar("fiat", "show_asset_locations", False)
         app.gui.setvar("fiat", "show_secondary_classification", False)
-        #app.map.layer["buildings"].layer["exposure_points"].hover_property = "Primary Object Type"
         app.active_model.show_classification(type="primary")
         map.update()
     else:
@@ -77,7 +80,6 @@ def display_secondary_classification(*args):
         app.map.layer["buildings"].clear()
         app.gui.setvar("fiat", "show_asset_locations", False)
         app.gui.setvar("fiat", "show_primary_classification", False)
-        #app.map.layer["buildings"].layer["exposure_points"].hover_property = "Secondary Object Type"
         app.active_model.show_classification(type="secondary")
         map.update()
     else:
@@ -91,12 +93,14 @@ def standarize_classification(*args):
 
 def add_classification(*args):
     model = "fiat"
-    
+
     # Get the source, object type and attribute name
     source = app.gui.getvar(model, "classification_source_path")
     object_type = app.gui.getvar(model, "object_type")
     attribute_name = app.gui.getvar(model, "classification_file_field_name")
-    app.active_model.domain.exposure_vm.update_occupancy_types(source, attribute_name, object_type)
+    app.active_model.domain.exposure_vm.update_occupancy_types(
+        source, attribute_name, object_type
+    )
 
     # Set the source
     source_name = Path(source).name
@@ -109,11 +113,17 @@ def add_classification(*args):
     # Set the exposure categories to link for the damage functions
     list_types = prim if prim is not None else secon
     list_types.sort()
-    df = pd.DataFrame(data={object_type: list_types, "Assigned: Structure": "", "Assigned: Content": ""})
+    df = pd.DataFrame(
+        data={
+            object_type: list_types,
+            "Assigned: Structure": "",
+            "Assigned: Content": "",
+        }
+    )
     ## TODO: add the nr of stories and the basement?
     app.gui.setvar(model, "exposure_categories_to_link", df)
 
-    # TODO: replace the exposure categories in the vulnerability linking table 
+    # TODO: replace the exposure categories in the vulnerability linking table
 
     app.gui.window.dialog_info(
         text="Standardized classification data was added to your model",

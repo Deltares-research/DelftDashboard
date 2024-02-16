@@ -1,6 +1,7 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+
 def select(*args):
     # De-activate existing layers
     map.update()

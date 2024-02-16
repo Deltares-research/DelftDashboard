@@ -51,7 +51,7 @@ class Model(GenericModel):
                 app.gui.setvar(group, "dy", 500)
                 app.gui.setvar(group, "res", 500)
                 app.gui.setvar(group, "unit", " (in m)")
-        
+
         # update map
         self.plot()
 
@@ -76,7 +76,7 @@ class Model(GenericModel):
         )
 
         bed_levels = layer.add_layer(
-            "bed_levels", 
+            "bed_levels",
             type="raster",
         )
 
@@ -154,7 +154,7 @@ class Model(GenericModel):
 
             # Boundary points are made grey
             app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
-            
+
             # Observation points are made grey
             app.map.layer["sfincs_hmt"].layer["observation_points"].deactivate()
             app.map.layer["sfincs_hmt"].layer["cross_sections"].deactivate()
@@ -254,7 +254,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "storecumprcp", False)
         app.gui.setvar(group, "storemaxwind", False)
 
-
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input
         group = "sfincs_hmt"
@@ -350,9 +349,9 @@ def update_map():
             return
     else:
         return
-    
+
     if "msk" in grid:
-        da_dep = da_dep.where(grid["msk"] > 0) 
+        da_dep = da_dep.where(grid["msk"] > 0)
 
     coords = app.map.map_extent
     xl = [coords[0][0], coords[1][0]]

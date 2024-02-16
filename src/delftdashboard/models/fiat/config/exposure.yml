@@ -24,6 +24,3 @@ element:
   - string: Max Potential Damages
     module: models.fiat.exposure_damages
     element: exposure_damages.yml
-  - string: Additional Attributes
-    module: models.fiat.exposure_aggregation
-    element: exposure_aggregation.yml

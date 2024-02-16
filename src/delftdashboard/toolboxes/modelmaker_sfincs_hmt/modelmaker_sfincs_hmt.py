@@ -460,15 +460,21 @@ class Toolbox(GenericToolbox):
         dlg = app.gui.window.dialog_wait("Generating active mask  ...")
         group = "modelmaker_sfincs_hmt"
         setup_mask_active = {
-            "mask": app.toolbox[group].mask_init_polygon
-            if not app.toolbox[group].mask_init_polygon.empty
-            else None,
-            "include_mask": app.toolbox[group].mask_include_polygon
-            if not app.toolbox[group].mask_include_polygon.empty
-            else None,
-            "exclude_mask": app.toolbox[group].mask_exclude_polygon
-            if not app.toolbox[group].mask_exclude_polygon.empty
-            else None,
+            "mask": (
+                app.toolbox[group].mask_init_polygon
+                if not app.toolbox[group].mask_init_polygon.empty
+                else None
+            ),
+            "include_mask": (
+                app.toolbox[group].mask_include_polygon
+                if not app.toolbox[group].mask_include_polygon.empty
+                else None
+            ),
+            "exclude_mask": (
+                app.toolbox[group].mask_exclude_polygon
+                if not app.toolbox[group].mask_exclude_polygon.empty
+                else None
+            ),
             "zmin": app.gui.getvar(group, "mask_active_zmin"),
             "zmax": app.gui.getvar(group, "mask_active_zmax"),
             "drop_area": app.gui.getvar(group, "mask_active_drop_area"),
@@ -496,9 +502,11 @@ class Toolbox(GenericToolbox):
 
             setup_mask_bounds = {
                 "btype": "waterlevel",
-                "include_mask": app.toolbox[group].wlev_include_polygon
-                if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
-                else None,
+                "include_mask": (
+                    app.toolbox[group].wlev_include_polygon
+                    if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
+                    else None
+                ),
                 "zmin": app.gui.getvar(group, "wlev_zmin"),
                 "zmax": app.gui.getvar(group, "wlev_zmax"),
                 "reset_bounds": True,
@@ -510,9 +518,11 @@ class Toolbox(GenericToolbox):
             dlg = app.gui.window.dialog_wait("Generating outflow boundaries ...")
             setup_mask_bounds2 = {
                 "btype": "outflow",
-                "include_mask": app.toolbox[group].outflow_include_polygon
-                if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
-                else None,
+                "include_mask": (
+                    app.toolbox[group].outflow_include_polygon
+                    if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
+                    else None
+                ),
                 "zmin": app.gui.getvar(group, "outflow_zmin"),
                 "zmax": app.gui.getvar(group, "outflow_zmax"),
                 "reset_bounds": True,

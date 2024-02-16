@@ -1,18 +1,47 @@
 element:
 - style: panel
-  title: Add new ground elevation source
+  title: Ground elevation source
   position:
     x: 10
+    y: 10
+    width: 180
+    height: 120
+  element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 80
+      width: 160
+      height: 20
+    text: ""
+    variable: update_source_ground_elevation
+    option_string:
+      variable: ground_elevation_files_string
+    option_value:
+      variable: ground_elevation_files_value
+  - style: pushbutton
+    position:
+      x: 10
+      y: 10
+      width: 160
+      height: 20
+    text: "Select source"
+    method: select_ground_elevation_file
+
+- style: panel
+  title: Uploaded ground elevation sources
+  position:
+    x: 205
     y: 10
     width: 190
     height: 120
   element:
   - style: listbox
     position:
-        x: 5
-        y: 30
-        width: 110
-        height: 50
+        x: 10
+        y: 10
+        width: 150
+        height: 90
     text_position: "above"
     variable: loaded_ground_elevation_files
     select: index
@@ -20,18 +49,10 @@ element:
       variable: loaded_ground_elevation_files_string
   - style: pushbutton
     position:
-      x: 5
-      y: 90
-      width: 80
-      height: 20
-    text: "Select source"
-    method: select_ground_elevation_file
-  - style: pushbutton
-    position:
-      x: 120
-      y: 60
-      width: 20
-      height: 20
+      x: 165
+      y: 85
+      width: 15
+      height: 15
     text: "\u0078"
     method: remove_datasource
 
