@@ -111,7 +111,8 @@ def add_classification(*args):
     app.active_model.set_object_types(prim, secon)
 
     # Set the exposure categories to link for the damage functions
-    list_types = prim if prim is not None else secon
+    #list_types = prim if prim is not None else secon
+    list_types = secon if secon is not None else prim
     list_types.sort()
     df = pd.DataFrame(
         data={
@@ -123,7 +124,14 @@ def add_classification(*args):
     ## TODO: add the nr of stories and the basement?
     app.gui.setvar(model, "exposure_categories_to_link", df)
 
-    # TODO: replace the exposure categories in the vulnerability linking table
+    # TODO: ge the variables that are changed!
+    new_occupancy_value = app.gui.getvar(
+        model, "new_occupancy_type")
+    
+    old_occupancy_value = [app.gui.getvar(
+        model, "old_occupancy_type")]
+    
+    app.active_model.domain.vulnerability_vm.update_user_linking_table(old_occupancy_value , new_occupancy_value)
 
     app.gui.window.dialog_info(
         text="Standardized classification data was added to your model",

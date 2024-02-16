@@ -271,6 +271,10 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
 
+        #User classification
+        app.gui.setvar(group, "old_occupancy_type", "")
+        app.gui.setvar(group, "new_occupancy_type", "")
+
         ## Standardizing of occupancy categories ##
         self.default_dict_categories = {x: x for x in list(default_curves["Occupancy"])}
         self.updated_dict_categories = self.default_dict_categories
