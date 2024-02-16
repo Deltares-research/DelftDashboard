@@ -112,7 +112,7 @@ def add_classification(*args):
 
     # Set the exposure categories to link for the damage functions
     #list_types = prim if prim is not None else secon
-    list_types = secon if secon is not None else prim
+    list_types = prim if prim is not None else secon
     list_types.sort()
     df = pd.DataFrame(
         data={

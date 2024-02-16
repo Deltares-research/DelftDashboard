@@ -53,7 +53,7 @@ def assign_occupancy_type(*args):
         model, "old_occupancy_type", exposure_categories_to_standardize["Assigned"].to_list()
     )
     app.gui.setvar(
-        model, "new_occupancy_type", exposure_categories_to_standardize["Secondary Object Type"].to_list()
+        model, "new_occupancy_type", exposure_categories_to_standardize[object_type].to_list()
     )
     for ec in exposure_category:
         app.active_model.default_dict_categories[ec] = hazus_iwr_occupancy_class
