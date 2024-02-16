@@ -1,16 +1,10 @@
-import math
-import numpy as np
 import geopandas as gpd
-import shapely
-import json
-
-from delftdashboard.operations.toolbox import GenericToolbox
-from delftdashboard.app import app
-
-from cht.bathymetry.bathymetry_database import bathymetry_database
-
 from hydromt.config import configread, configwrite
 from hydromt_sfincs.utils import mask2gdf
+
+from delftdashboard.app import app
+from delftdashboard.operations.toolbox import GenericToolbox
+from delftdashboard.models.sfincs_hmt.boundary_conditions_wlev import generate_boundary_points_from_msk
 
 
 class Toolbox(GenericToolbox):
@@ -56,9 +50,11 @@ class Toolbox(GenericToolbox):
             "model_type",
             ["Overland model", "Surge model"],  # , "Quadtree model"
         )
-        app.gui.setvar(group, "model_type_index", 0)
-        app.gui.setvar(group, "include_rainfall", False)
-        app.gui.setvar(group, "include_rivers", False)
+
+        app.gui.setvar(group, "model_type_index", 0)        
+        app.gui.setvar(group, "include_precip", False)
+        # app.gui.setvar(group, "include_rivers", False)
+
         # app.gui.setvar(group, "include_waves", False)
 
         # Model extent determination
@@ -66,9 +62,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(
             group,
             "setup_grid_methods",
-            ["Draw Bounding Box", "Draw Polygon", "Load watershed", "Load shapefile"],
+            ["Draw Bounding Box", "Draw Polygon", "Load Watershed", "Select Watershed", "Load ShapeFile"],
         )
-        app.gui.setvar(group, "setup_grid_methods_index", 0)
+        app.gui.setvar(group, "setup_grid_method", "Draw Bounding Box")
 
         # Domain
         app.gui.setvar(group, "x0", 0.0)
@@ -92,6 +88,7 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "unit", " (in m)")
         app.gui.setvar(group, "rotation", 0.0)
         app.gui.setvar(group, "auto_rotate", False)
+        app.gui.setvar(group, "auto_select_utm", True)
         app.gui.setvar(group, "lenx", 0.0)
         app.gui.setvar(group, "leny", 0.0)
 
@@ -190,50 +187,39 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "qinf_dataset_names", qinf_dataset_names)
         app.gui.setvar(group, "qinf_dataset_index", 0)
 
-        # Mask active
-        mask_polygon_methods = [
-            "Load Polygon",
-            "Draw Polygon",
-            "Delete Polygon",
-            "Save Polygon",
-        ]
-
-        app.gui.setvar(group, "mask_init_polygon_methods", mask_polygon_methods)
-        app.gui.setvar(group, "mask_init_polygon_methods_index", 0)
-        app.gui.setvar(group, "nr_mask_init_polygons", 0)
+        # Mask active (initial)
+        app.gui.setvar(group, "mask_init_fname", "")
         app.gui.setvar(group, "mask_active_zmax", 10.0)
         app.gui.setvar(group, "mask_active_zmin", -10.0)
         app.gui.setvar(group, "mask_active_drop_area", 0.0)
         app.gui.setvar(group, "mask_active_fill_area", 10.0)
         app.gui.setvar(group, "mask_active_reset", True)
+
+        # Mask active (explicitly include)
         app.gui.setvar(group, "mask_include_polygon_names", [])
         app.gui.setvar(group, "mask_include_polygon_index", 0)
         app.gui.setvar(group, "nr_mask_include_polygons", 0)
+        app.gui.setvar(group, "mask_active_add", False)
+
+        # Mask active (explicitly exclude)
         app.gui.setvar(group, "mask_exclude_polygon_names", [])
         app.gui.setvar(group, "mask_exclude_polygon_index", 0)
         app.gui.setvar(group, "nr_mask_exclude_polygons", 0)
-        app.gui.setvar(group, "mask_boundary_type", 2)
-        app.gui.setvar(group, "mask_active_add", False)
         app.gui.setvar(group, "mask_active_del", False)
 
         # Mask bounds
+        app.gui.setvar(group, "mask_boundary_type", 2)
+        # Waterlevel
         app.gui.setvar(group, "wlev_include_polygon_names", [])
         app.gui.setvar(group, "wlev_include_polygon_index", 0)
         app.gui.setvar(group, "nr_wlev_include_polygons", 0)
-        # app.gui.setvar(group, "wlev_exclude_polygon_names", [])
-        # app.gui.setvar(group, "wlev_exclude_polygon_index", 0)
-        # app.gui.setvar(group, "nr_wlev_exclude_polygons", 0)
         app.gui.setvar(group, "wlev_zmax", -2.0)
-        # app.gui.setvar(group, "wlev_reset", True)
 
+        # Outflow
         app.gui.setvar(group, "outflow_include_polygon_names", [])
         app.gui.setvar(group, "outflow_include_polygon_index", 0)
         app.gui.setvar(group, "nr_outflow_include_polygons", 0)
-        # app.gui.setvar(group, "outflow_exclude_polygon_names", [])
-        # app.gui.setvar(group, "outflow_exclude_polygon_index", 0)
-        # app.gui.setvar(group, "nr_outflow_exclude_polygons", 0)
         app.gui.setvar(group, "outflow_zmin", 2.0)
-        # app.gui.setvar(group, "outflow_reset", True)
 
         # subgrid
         app.gui.setvar(group, "nr_subgrid_pixels", 20)
@@ -499,11 +485,7 @@ class Toolbox(GenericToolbox):
         model.setup_mask_active(**setup_mask_active)
         self.setup_dict.update({"setup_mask_active": setup_mask_active})
 
-        mask = model.mask
-
-        gdf = mask2gdf(mask, option="active")
-        if gdf is not None:
-            app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
+        self.set_active_cell_layer()      
 
         # update bathymetry on map
         app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
@@ -549,43 +531,112 @@ class Toolbox(GenericToolbox):
             app.model["sfincs_hmt"].domain.setup_mask_bounds(**setup_mask_bounds2)
             self.setup_dict.update({"setup_mask_bounds2": setup_mask_bounds2})
 
-        mask = model.mask
-
-        gdf_wlev = mask2gdf(mask, option="wlev")
-        if gdf_wlev is not None:
-            app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].set_data(gdf_wlev)
-
-        gdf_outflow = mask2gdf(mask, option="outflow")
-        if gdf_outflow is not None:
-            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].set_data(
-                gdf_outflow
-            )
+        self.set_active_cell_layer()
 
         dlg.close()
+
+    def set_active_cell_layer(self):
+        model = app.model["sfincs_hmt"].domain
+        mask = model.mask
+
+        # Set original mask as active
+        gdf = mask2gdf(mask, option="active")
+
+        # Add column for mask type ('active' is default)
+        gdf["mask_type"] = "Active"
+        if gdf is None:
+            # TODO: Can it also be that there are only boundary cells?
+            raise ValueError("No active cells found")
+        
+        # GeoDataFrame with water level boundary cells
+        gdf_wlev = mask2gdf(mask, option="wlev")
+
+        include_waterlevels = False
+        # Check if there are water level boundary cells
+        if gdf_wlev is not None:
+            # Add column for mask type ('waterlevel' is default)
+            gdf_wlev["mask_type"] = "Water level"
+            
+            # Check if there are no overlapping geometries
+            assert set(gdf_wlev["geometry"]).isdisjoint(set(gdf["geometry"]))
+
+            # Append geometries from gdf_wlev to gdf
+            gdf = gdf.append(gdf_wlev, ignore_index=True)           
+
+            include_waterlevels = True
+
+        # GeoDataFrame with outflow boundary cells
+        gdf_outflow = mask2gdf(mask, option="outflow")
+        
+        include_outflow = False
+        # Check if there are outflow boundary cells
+        if gdf_outflow is not None:
+            # Add column for mask type ('outflow' is default)
+            gdf_outflow["mask_type"] = "Outflow"
+
+            # Check if there are no overlapping geometries
+            assert set(gdf_outflow["geometry"]).isdisjoint(set(gdf["geometry"]))
+
+            # Append geometries from gdf_outflow to gdf
+            gdf = gdf.append(gdf_outflow, ignore_index=True)
+
+            include_outflow = True
+
+        # Set paint properties
+        circle_color = [
+            "match",
+            ["get", "mask_type"],
+            "Active", "#FFFF00",
+        ]
+        if include_waterlevels:
+            circle_color.append("Water level")
+            circle_color.append("#0000FF")
+        if include_outflow:
+            circle_color.append("Outflow")
+            circle_color.append("#FF0000")
+        # Default color, in this case probably not needed
+        circle_color.append("#000000")
+
+        paint_properties = {
+            "circle-color": circle_color,
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "black",
+            "circle-stroke-opacity": 0,
+            "circle-radius": 3,  #TODO: think about making this relative to cell size and on zoom level
+            "circle-opacity": 1,
+        }
+
+        # Set legend
+        legend = [
+            {"style": "#FFFF00", "label": "Active"},
+        ]
+        if include_waterlevels:
+            legend.append({"style": "#0000FF", "label": "Water level"})
+        if include_outflow:
+            legend.append({"style": "#FF0000", "label": "Outflow"})
+
+        # Set data
+        app.map.layer["sfincs_hmt"].layer["mask"].set_data(
+            data=gdf, color_by_attribute=paint_properties, legend_items=legend
+        )
 
     def reset_mask_bounds(self, btype):
         model = app.model["sfincs_hmt"].domain
 
         if btype == "waterlevel":
             model.setup_mask_bounds(reset_bounds=True, btype="waterlevel")
-            # remove old waterlevel mask data
-            app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].clear()
             # remove settings from setup_dict
             self.setup_dict.pop("setup_mask_bounds", None)
         elif btype == "outflow":
             model.setup_mask_bounds(reset_bounds=True, btype="outflow")
-            # remove old outflow mask data
-            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].clear()
             # remove settings from setup_dict
             self.setup_dict.pop("setup_mask_bounds2", None)
 
-        mask = model.mask
-        # possibly mask active has ben changed so, recalculate it
-        gdf = mask2gdf(mask, option="active")
-        if gdf is not None:
-            app.map.layer["sfincs_hmt"].layer["mask_active"].set_data(gdf)
+        self.set_active_cell_layer()
 
     def generate_subgrid(self):
+        """Callback function for generating subgrid"""
+        # NOTE this is now "misused" as a build model for Flood Adapt, split up later
         model = app.model["sfincs_hmt"].domain
 
         dlg = app.gui.window.dialog_wait("Generating subgrid ...")
@@ -611,6 +662,23 @@ class Toolbox(GenericToolbox):
         self.setup_dict.update({"setup_subgrid": setup_subgrid})
 
         dlg.close()
+
+        # add tiles
+        value, okay = app.gui.window.dialog_string(
+            text = "Specify maximum zoom level (0-20) for tiles:",
+            title = "Create tiles. Press cancel to skip.")
+        if okay:
+            dlg = app.gui.window.dialog_wait("Writing tiles ...")
+            setup_tiles = {"zoom_range": int(value), "fmt": "png"}
+            model.setup_tiles(**setup_tiles)
+            self.setup_dict.update({"setup_tiles": setup_tiles})
+            dlg.close()
+
+        # add boundary points
+        okay = app.gui.window.dialog_yes_no("Do you want to automatically generate water level boundary points?")
+        if okay:
+            #TODO add to setup_dict
+            generate_boundary_points_from_msk()
 
         dlg = app.gui.window.dialog_wait("Writing SFINCS model ...")
         app.model["sfincs_hmt"].save()

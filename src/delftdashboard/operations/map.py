@@ -37,7 +37,9 @@ def map_ready(*args):
     app.background_topography_layer.update = update_background
 
     # Go to point
-    app.map.jump_to(-98.74, 39.22, 3)  # SHOULD WE MAKE THIS CONFIGURABLE (FG)?
+    if "map_center" in app.config:
+        lon, lat, zoom = app.config["map_center"]
+        app.map.jump_to(lon, lat, zoom)
 
     # Add layers to map (we can only do this after the map has finished loading)
     for name, model in app.model.items():
@@ -120,34 +122,25 @@ def update_background():
                     )
                 except:
                     print("Error loading hydromt background topo ...")
-            ## FREDERIQUE: I suggest to remove the part below as we're not going to use this data
-            # elif app.config["bathymetry_database"] is not None:
-            #     try:
-            #         dataset = bathymetry_database.get_dataset(app.background_topography)
-            #         dataset_list = [
-            #             {"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}
-            #         ]
-            #         z = bathymetry_database.get_bathymetry_on_grid(
-            #             xv,
-            #             yv,
-            #             CRS(4326),
-            #             dataset_list,
-            #             method=app.view["topography"]["interp_method"],
-            #         )
-            #         app.background_topography_layer.set_data(
-            #             x=xv, y=yv, z=z, colormap=app.color_map_earth, decimals=0
-            #         )
-            #     except:
-            #         print("Error loading ddb background topo ...")
-
-        # try:
-        #     x, y, z = bathymetry_database.get_data(app.background_topography,
-        #                                            xl,
-        #                                            yl,
-        #                                            maxcellsize)
-        #     app.background_topography_layer.set_data(x=x, y=y, z=z, colormap=app.color_map_earth, decimals=0)
-        # except:
-        #     print("Error loading background topo ...")
+            # TODO: FdG; I suggest to remove the part below as we're not going to use this data
+            elif app.config["bathymetry_database"] is not None:
+                try:
+                    dataset = bathymetry_database.get_dataset(app.background_topography)
+                    dataset_list = [
+                        {"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}
+                    ]
+                    z = bathymetry_database.get_bathymetry_on_grid(
+                        xv,
+                        yv,
+                        CRS(4326),
+                        dataset_list,
+                        method=app.view["topography"]["interp_method"],
+                    )
+                    app.background_topography_layer.set_data(
+                        x=xv, y=yv, z=z, colormap=app.color_map_earth, decimals=0
+                    )
+                except:
+                    print("Error loading ddb background topo ...")
 
 
 def update():

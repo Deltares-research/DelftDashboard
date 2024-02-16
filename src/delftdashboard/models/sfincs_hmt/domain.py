@@ -7,9 +7,7 @@ def select(*args):
     map.update()
     # Show the grid and mask
     app.map.layer["sfincs_hmt"].layer["grid"].activate()
-    app.map.layer["sfincs_hmt"].layer["mask_active"].activate()
-    app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].activate()
-    app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].activate()
+    app.map.layer["sfincs_hmt"].layer["mask"].activate()
 
 
 def set_variables(*args):
