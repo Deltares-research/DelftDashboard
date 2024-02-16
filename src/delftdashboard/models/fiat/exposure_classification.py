@@ -128,8 +128,8 @@ def add_classification(*args):
     new_occupancy_value = app.gui.getvar(
         model, "new_occupancy_type")
     
-    old_occupancy_value = [app.gui.getvar(
-        model, "old_occupancy_type")]
+    old_occupancy_value = app.gui.getvar(
+        model, "old_occupancy_type")
     
     app.active_model.domain.vulnerability_vm.update_user_linking_table(old_occupancy_value , new_occupancy_value)
 
