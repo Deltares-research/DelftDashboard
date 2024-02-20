@@ -1,0 +1,270 @@
+# SFINCS
+GEBCO 2022: # PRIVATE ? ADD META DATA
+  crs: 4326
+  data_type: RasterDataset
+  driver: raster
+  path: p:/11207949-dhs-phaseii-floodadapt/Data/TopoBathy/gebco_xyz/gebco_xyz_zl{zoom_level}.vrt
+  zoom_levels:
+    0: 0.004166666666662877
+    1: 0.008333333333325754
+    2: 0.01666666666665151
+    3: 0.03333333333330302
+    4: 0.06666666666663446
+    5: 0.1333333333332689
+    6: 0.2666666666665094
+    7: 0.5333333333330188
+  meta:
+    category: topography
+    source: Global
+    resolution: 450
+
+vito: # PUBLIC
+  crs: 4326
+  data_type: RasterDataset
+  driver: raster
+  kwargs:
+    chunks:
+      x: 3600
+      y: 3600  
+  meta:
+    category: landuse
+    paper_doi: 10.5281/zenodo.3939038
+    paper_ref: Buchhorn et al (2020)
+    source: copernicus
+    source_url: https://land.copernicus.eu/global/products/lc
+    source_version: v2.0.2
+  path: p:/wflow_global/hydromt/landuse/vito/ProbaV_LC100_epoch2015_global_v2.0.2_discrete-classification_EPSG-4326.tif
+
+esa_worldcover: # PUBLIC
+  crs: 4326
+  data_type: RasterDataset
+  driver: raster
+  kwargs:
+    chunks:
+      x: 36000
+      y: 36000
+  meta:
+    category: landuse
+    source: esa 
+    source_license: CC BY 4.0
+    source_url: https://doi.org/10.5281/zenodo.5571936
+    source_version: v100
+  path: p:/wflow_global/hydromt/landuse/esa_worldcover/esa-worldcover.vrt
+
+gcn250: # PUBLIC
+  alias: gcn250_v1
+gcn250_v1:
+  data_type: RasterDataset
+  driver: raster
+  kwargs:
+    chunks:
+      x: 3600
+      y: 3600  
+  meta:
+    category: soil
+    paper_doi: 10.1038/s41597-019-0155-x
+    paper_ref: Jaafar et al. (2019)
+    source: Other
+    source_license: CC BY 4.0
+    source_url: https://doi.org/10.6084/m9.figshare.7756202.v1
+    source_version: v1
+  nodata: 255
+  path: p:/wflow_global/hydromt/landuse/gcn250/GCN250_*.tif
+  rename:
+    GCN250_ARCI: cn_dry
+    GCN250_ARCII: cn_avg
+    GCN250_ARCIII: cn_wet
+
+watersheds: # PUBLIC
+  crs: 4326
+  data_type: GeoDataFrame
+  driver: vector
+  path: p:\11207949-dhs-phaseii-floodadapt\Data\WBD_National_GDB\Watersheds_US_lvl_12_crop_test_explode_crop2.gpkg
+  meta:
+    category: watersheds
+    source: USGS
+    url: https://www.usgs.gov/national-hydrography/watershed-boundary-dataset
+
+NLCD2019: # PRIVATE ? ADD META DATA
+  crs: 4326
+  data_type: RasterDataset
+  driver: raster
+  kwargs:
+    chunks:
+      x: 1000
+      y: 1000
+  path: p://11206085-onr-fhics//02_models//SFINCS_flooding//02_modelsetup//NLCD_landcover//final//NLCD2019.tif
+  meta:
+    category: landuse   
+
+ncei_ninth_TX: # PRIVATE ? I can access the full url, but if i go to https://chs.coast.noaa.gov/htdata/, it says I dont have permission
+  crs: 4326
+  data_type: RasterDataset
+  driver: raster
+  path: p://11206085-onr-fhics-data//delftdashboard//data//bathymetry//ncei_ninth_TX//zl{zoom_level:02d}.vrt
+  zoom_levels:
+    1: 3.0864199999986815e-05
+    2: 6.172840000000332e-05
+    3: 0.00012345679999999703
+    4: 0.00024691360000000945
+    5: 0.0004938271999999911
+    6: 0.0009876543999999545
+    7: 0.0019753087999999676
+    8: 0.0039506175999999065
+    9: 0.007901235199999813
+  kwargs:
+    chunks:
+      x: 1000
+      y: 1000    
+  meta:
+    category: topography
+    source: NOAA
+    url: https://chs.coast.noaa.gov/htdata/raster2/elevation/NCEI_ninth_Topobathy_2014_8483/urllist8483.txt
+    vertical_reference_level: NAVD88
+    vertical_units: m
+    
+ncei_ninth_FL: # PRIVATE ? I can access the full url, but if i go to https://chs.coast.noaa.gov/htdata/, it says I dont have permission
+  crs: 4269
+  data_type: RasterDataset
+  driver: raster
+  path: p://11206085-onr-fhics-data//delftdashboard//data//bathymetry//ncei_ninth_FL//zl{zoom_level:02d}.vrt
+  zoom_levels:
+    1: 3.08641987203373e-05
+    2: 6.17283974406746e-05
+    3: 0.00012345679486713834
+    4: 0.00024691358974848754
+    5: 0.0004938271794827642
+    6: 0.0009876543589797393
+    7: 0.0019753087179452677
+    8: 0.003950617435904746
+    9: 0.007901234871809493
+    10: 0.015802469743618985
+  kwargs:
+    chunks:
+      x: 3600
+      y: 3600    
+  meta:
+    category: topography
+    source: NOAA
+    url: https://chs.coast.noaa.gov/htdata/raster2/elevation/NCEI_ninth_Topobathy_2014_8483/urllist8483.txt
+    vertical_reference_level: NAVD88
+    vertical_units: m
+
+usgs_ned_coastal: # PRIVATE ? ADD META DATA
+  crs: 4326
+  data_type: RasterDataset
+  driver: raster
+  kwargs:
+    chunks:
+      x: 3600
+      y: 3600  
+  path: p://11206085-onr-fhics-data//delftdashboard//data//bathymetry//usgs_ned_coastal//zl{zoom_level:02d}.vrt
+  zoom_levels:
+    1: 9.259259259249478e-05
+    2: 0.0001851851851852038
+    3: 0.0003703703703704288
+    4: 0.0007407407407407492
+    5: 0.0014814814814814756
+    6: 0.0029629629629629273
+    7: 0.005925925925925898
+    8: 0.011851851851851815
+    9: 0.023703703703703706
+    10: 0.04740740740740742
+    11: 0.09481481481481481
+  meta:
+    category: topography
+    source: NOAA
+
+ngdc_crm: # PUBLIC ? ADD META DATA
+  crs: 4326
+  data_type: RasterDataset
+  driver: raster
+  path: p://11206085-onr-fhics-data//delftdashboard//data/bathymetry//ngdc_crm//zl{zoom_level:02d}.vrt
+  kwargs:
+    chunks:
+      x: 3600
+      y: 3600  
+  zoom_levels:
+    1: 0.0008333333333334092
+    2: 0.0016666666666666212
+    3: 0.0033333333333333557
+    4: 0.006666666666666703
+    5: 0.013333333333333322
+    6: 0.02666666666666666
+    7: 0.053333333333333344
+    8: 0.10666666666666669
+  meta:
+    category: topography    
+    source: NOAA
+
+# FIAT
+NSI: # PUBLIC. ADD META DATA
+  path: "https://nsi.sec.usace.army.mil/nsiapi/structures?fmt=fc"
+  data_type: GeoDataFrame
+  driver: vector
+  crs: 4326
+  translation_fn: "attribute_linking/NSI_attributes_to_FIAT.json"
+  meta:
+    category: exposure
+
+default_vulnerability_curves: # PUBLIC - 
+  path: damage_functions/flooding/Hazus_IWR_curves.csv
+  data_type: DataFrame
+  driver: csv
+  meta:
+    unit: ft
+    category: vulnerability
+    source: HAZUS SQL database, USACE-IWR and FEMA expert elicitation curves. The source of these curves is the Draft Report Nonresidential Flood Depth-Damage Functions Derived from Expert Elicitation, April 2009, Revised 2013. FEMA Contract Number HSFEHQ-06-D-0162. Task Order HSFEHQ-08-J-0014. Not for distribution, but data shared by USACE.
+
+jrc_vulnerability_curves: # PRIVATE ? ADD META DATA
+  path: damage_functions/flooding/JRC_damage_functions.xlsx
+  data_type: DataFrame
+  driver: xlsx
+  meta:
+    unit: m
+    category: vulnerability
+
+hazus_max_potential_damages: # PUBLIC ? ADD META DATA
+  path: max_potential_damages/damage_values_fema_hazus-inventory-technical-manual-4.2.3.xlsx
+  data_type: DataFrame
+  driver: xlsx
+  meta:
+    unit: ft
+    category: vulnerability
+
+social_vulnerability: # PUBLIC. ADD META DATA
+  path: social_vulnerability/census_vulnerability_data_codebook.xlsx
+  data_type: DataFrame
+  driver: xlsx
+  meta:
+    category: social_vulnerability
+
+us_states_counties: # PUBLIC. ADD META DATA
+  path: social_vulnerability/us_states_counties.csv
+  data_type: DataFrame
+  driver: csv
+  meta:
+    category: social_vulnerability
+
+default_hazus_iwr_linking: # PUBLIC. ADD META DATA
+  path: vulnerability_linking/default_hazus_iwr_curve_linking.csv
+  data_type: DataFrame
+  driver: csv
+  meta:
+    category: vulnerability
+
+default_road_max_potential_damages: # PUBLIC. ADD META DATA
+  path: max_potential_damages/us_road_damage.csv
+  data_type: DataFrame
+  driver: csv
+  meta:
+    unit: ft
+    category: exposure
+    source: Bouwer, Laurens & Haasnoot, Marjolijn & Wagenaar, Dennis & Roscoe, Kathryn. (2018). Assessment of alternative flood mitigation strategies for the C-7 Basin in Miami, Florida.
+
+hazus_iwr_occupancy_classes: # PUBLIC. ADD META DATA
+  path: vulnerability_linking/hazus_iwr_occupancy_classes.csv
+  data_type: DataFrame
+  driver: csv
+  meta:
+    category: vulnerability
