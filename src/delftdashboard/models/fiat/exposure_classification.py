@@ -98,31 +98,10 @@ def add_classification(*args):
     source = app.gui.getvar(model, "classification_source_path")
     object_type = app.gui.getvar(model, "object_type")
     attribute_name = app.gui.getvar(model, "classification_file_field_name")
-    app.active_model.domain.exposure_vm.update_occupancy_types(
-        source, attribute_name, object_type
-    )
 
     # Set the source
     source_name = Path(source).name
     app.gui.setvar(model, "source_classification", source_name)
-
-    # Get the new primary and secondary object classifications
-    prim, secon = app.active_model.domain.exposure_vm.get_object_types()
-    app.active_model.set_object_types(prim, secon)
-
-    # Set the exposure categories to link for the damage functions
-    #list_types = prim if prim is not None else secon
-    list_types = prim if prim is not None else secon
-    list_types.sort()
-    df = pd.DataFrame(
-        data={
-            object_type: list_types,
-            "Assigned: Structure": "",
-            "Assigned: Content": "",
-        }
-    )
-    ## TODO: add the nr of stories and the basement?
-    app.gui.setvar(model, "exposure_categories_to_link", df)
 
     # TODO: ge the variables that are changed!
     new_occupancy_value = app.gui.getvar(
@@ -131,7 +110,16 @@ def add_classification(*args):
     old_occupancy_value = app.gui.getvar(
         model, "old_occupancy_type")
     
-    app.active_model.domain.vulnerability_vm.update_user_linking_table(old_occupancy_value , new_occupancy_value)
+    
+    app.active_model.domain.exposure_vm.set_classification_config(
+            source = source,
+            attribute =  attribute_name,
+            type_add = object_type,
+            old_values= old_occupancy_value,
+            new_values= new_occupancy_value,
+            damage_types = ["structure", "content"],
+            remove_object_type = True
+        )
 
     app.gui.window.dialog_info(
         text="Standardized classification data was added to your model",
