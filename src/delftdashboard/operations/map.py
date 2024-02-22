@@ -110,7 +110,11 @@ def update_background():
                         zoom_level=(dxy, "degree"),
                     )
                     da = da.raster.reproject_like(da_dep, method="bilinear").load()
-                    da.raster.set_nodata(np.nan)
+                    # convert nodata into np.nan
+                    try:
+                        da = da.raster.mask_nodata()
+                    except:
+                        da.raster.set_nodata(np.nan)
 
                     # set data to background topography layer
                     app.background_topography_layer.set_data(
