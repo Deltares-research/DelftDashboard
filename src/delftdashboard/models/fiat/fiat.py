@@ -274,6 +274,7 @@ class Model(GenericModel):
         #User classification
         app.gui.setvar(group, "old_occupancy_type", "")
         app.gui.setvar(group, "new_occupancy_type", "")
+        app.gui.setvar(group, "remove_classification", False)
 
         ## Standardizing of occupancy categories ##
         self.default_dict_categories = {x: x for x in list(default_curves["Occupancy"])}
@@ -289,7 +290,7 @@ class Model(GenericModel):
         # Model type #
         app.gui.setvar(group, "model_type", "Start with NSI")
         app.gui.setvar(group, "include_osm_roads", False)
-
+        
         ## ROADS ##
         app.gui.setvar(group, "include_motorways", True)
         app.gui.setvar(group, "include_trunk", True)
@@ -1137,7 +1138,20 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, data=None)
         if not okay:
             return
-    
+    def overwrite_classification(self):
+        pop_win_config_path = str(
+        Path(
+            app.gui.config_path
+        ).parent  # TODO: replace with a variables config_path for the fiat model
+        / "models"
+        / self.name
+        / "config"
+        / "exposure_classification_settings_2.yml"
+        )
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            raise ValueError("The classification data will not be overwritten")
+
     def overwrite_damages(self):
         # get window config yaml path
         pop_win_config_path = str(
