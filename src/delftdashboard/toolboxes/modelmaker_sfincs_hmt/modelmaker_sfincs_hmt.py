@@ -502,12 +502,9 @@ class Toolbox(GenericToolbox):
 
             setup_mask_bounds = {
                 "btype": "waterlevel",
-                "include_mask": (
-                    app.toolbox[group].wlev_include_polygon
-                    if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
-                    else None
-                ),
-                "zmin": app.gui.getvar(group, "wlev_zmin"),
+                "include_mask": app.toolbox[group].wlev_include_polygon
+                if app.gui.getvar(group, "nr_wlev_include_polygons") > 0
+                else None,
                 "zmax": app.gui.getvar(group, "wlev_zmax"),
                 "reset_bounds": True,
             }
@@ -524,7 +521,6 @@ class Toolbox(GenericToolbox):
                     else None
                 ),
                 "zmin": app.gui.getvar(group, "outflow_zmin"),
-                "zmax": app.gui.getvar(group, "outflow_zmax"),
                 "reset_bounds": True,
             }
 
@@ -538,6 +534,7 @@ class Toolbox(GenericToolbox):
     def set_active_cell_layer(self):
         model = app.model["sfincs_hmt"].domain
         mask = model.mask
+        region = model.region
 
         # Set original mask as active
         gdf = mask2gdf(mask, option="active")
@@ -619,6 +616,8 @@ class Toolbox(GenericToolbox):
         app.map.layer["sfincs_hmt"].layer["mask"].set_data(
             data=gdf, color_by_attribute=paint_properties, legend_items=legend
         )
+        app.map.layer["sfincs_hmt"].layer["region"].set_data(region)
+
 
     def reset_mask_bounds(self, btype):
         model = app.model["sfincs_hmt"].domain

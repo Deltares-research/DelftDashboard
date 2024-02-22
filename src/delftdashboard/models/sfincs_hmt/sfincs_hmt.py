@@ -11,6 +11,7 @@ from .observation_points import add_observation_point
 from .observation_points import select_observation_point_from_map
 from .boundary_conditions_wlev import add_boundary_point
 from .boundary_conditions_wlev import select_boundary_point_from_map
+from .boundary_conditions_dis import select_discharge_point_from_map
 
 class Model(GenericModel):
     def __init__(self, name):
@@ -75,6 +76,15 @@ class Model(GenericModel):
             line_opacity_inactive=0.5,
         )
 
+        # TODO make this a PolygonLayer (but not yet proeprly implemented in Guitares)
+        layer.add_layer(
+            "region",
+            type="draw",
+            shape="polygon",
+            polygon_line_color="grey",
+            polygon_fill_opacity=0.3,
+        )
+
         bed_levels = layer.add_layer(
             "bed_levels",
             type="raster",
@@ -98,14 +108,29 @@ class Model(GenericModel):
             "boundary_points",
             type="circle_selector",
             select=select_boundary_point_from_map,
-            line_color="white",
+            line_color="black",
             line_opacity=1.0,
-            fill_color="blue",
+            fill_color="darkblue",
             fill_opacity=1.0,
-            circle_radius=3,
-            circle_radius_selected=4,
+            circle_radius=4,
+            circle_radius_selected=5,
             line_color_selected="white",
-            fill_color_selected="red",
+            fill_color_selected="darkblue",
+            hover_property="name",
+        )
+
+        layer.add_layer(
+            "discharge_points",
+            type="circle_selector",
+            select=select_discharge_point_from_map,
+            line_color="black",
+            line_opacity=1.0,
+            fill_color="darkgreen",
+            fill_opacity=1.0,
+            circle_radius=4,
+            circle_radius_selected=5,
+            line_color_selected="white",
+            fill_color_selected="darkgreen",
             hover_property="name",
         )
 
@@ -113,14 +138,14 @@ class Model(GenericModel):
             "observation_points",
             type="circle_selector",
             select=select_observation_point_from_map,
-            line_color="white",
+            line_color="black",
             line_opacity=1.0,
-            fill_color="blue",
+            fill_color="black",
             fill_opacity=1.0,
-            circle_radius=3,
-            circle_radius_selected=4,
+            circle_radius=4,
+            circle_radius_selected=5,
             line_color_selected="white",
-            fill_color_selected="red",
+            fill_color_selected="black",
             hover_property="name",
         )
 
@@ -141,6 +166,7 @@ class Model(GenericModel):
         if mode == "inactive":
             # Grid is made inactive
             app.map.layer["sfincs_hmt"].layer["grid"].deactivate()
+            app.map.layer["sfincs_hmt"].layer["region"].hide()
 
             # Bed levels are hidden
             app.map.layer["sfincs_hmt"].layer["bed_levels"].hide()
@@ -154,6 +180,8 @@ class Model(GenericModel):
 
             # Boundary points are made grey
             app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
+            app.map.layer["sfincs_hmt"].layer["discharge_points"].deactivate()
+
 
             # Observation points are made grey
             app.map.layer["sfincs_hmt"].layer["observation_points"].deactivate()
@@ -183,11 +211,20 @@ class Model(GenericModel):
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
 
         # Boundary conditions
+        # methods
         bc_wlev_methods = ["Click Points", "Generate along Boundary", "Select from Database", "Load from File"]
+        bc_wlev_timeseries_methods = ["Constant", "Synthetic", "Download"]
         app.gui.setvar(group, "bc_wlev_methods", bc_wlev_methods)
         app.gui.setvar(group, "bc_wlev_methods_index", 0)
+        app.gui.setvar(group, "bc_wlev_timeseries_methods", bc_wlev_timeseries_methods)
+        app.gui.setvar(group, "bc_wlev_timeseries_methods_index", 0)
+
+        # values
+        app.gui.setvar(group, "bc_wlev_value", 0.0)
         app.gui.setvar(group, "bc_dist_along_msk", 5e3)
         app.gui.setvar(group, "merge_bc_wlev", True)
+
+        # gui settings
         app.gui.setvar(group, "boundary_point_names", [])
         app.gui.setvar(group, "nr_boundary_points", 0)
         app.gui.setvar(group, "active_boundary_point", 0)
@@ -245,14 +282,14 @@ class Model(GenericModel):
         app.gui.setvar(group, "drainage_type", 0)
 
         # Physics
-        app.gui.setvar(group, "advection", False)
-        app.gui.setvar(group, "coriolis", False)
+        app.gui.setvar(group, "advection", 0)
+        app.gui.setvar(group, "coriolis", 0)
 
         # Output
-        app.gui.setvar(group, "storetwet", False)
-        app.gui.setvar(group, "storevelmax", False)
-        app.gui.setvar(group, "storecumprcp", False)
-        app.gui.setvar(group, "storemaxwind", False)
+        app.gui.setvar(group, "storetwet", 0)
+        app.gui.setvar(group, "storevelmax", 0)
+        app.gui.setvar(group, "storecumprcp", 0)
+        app.gui.setvar(group, "storemaxwind", 0)
 
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input
