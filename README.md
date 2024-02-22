@@ -16,17 +16,21 @@ In order to develop on the `FloodAdapt Model Builder GUI` locally, please follow
 conda init
 ```
 
+- Make sure you have `git` installed and added to your system's `PATH` environment variable. You can download a Windows installer [here](https://gitforwindows.org/).
+
+## Windows
+- If you are running on a different operating system, continue to creating environment.
+
 - Depending on your company settings, you might also have to run the following in a Powershell terminal as administrator:
 
 ```
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 ```
 
-- Make sure you have `git` installed and added to your system's `PATH` environment variable. You can download a Windows installer [here](https://gitforwindows.org/).
+- Older versions of windows need to run the following commands in a Powershell terminal with administrator rights (More information on why: [Windows](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry#enable-long-paths-in-windows-10-version-1607-and-later), [git](https://stackoverflow.com/questions/22575662/filename-too-long-in-git-for-windows)):
 
-- Depending on you operating system, you might need to run the following command as well:
-
-````
+```
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1- PropertyType DWORD -Force
 git config --global core.longpaths true
 ```
 
@@ -62,4 +66,13 @@ Then, in order to develop on the `FloodAdapt Model Builder GUI` locally and have
 
 ```
 python ./src/delftdashboard/install.py
+```
+
+## Running the FloodAdapt Model Builder GUI
+If you have followed all the steps above, you can start the gui by running the following in a terminal:
+
+```
+conda activate ddb_floodadapt
+cd <location of your repository clone of DelftDashboard>
+python ./src/delftdashboard/delftdashboard_gui.py
 ```
