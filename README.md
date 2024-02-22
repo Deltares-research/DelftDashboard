@@ -4,7 +4,7 @@ This repository contains the FloodAdapt Model Builder GUI, using the [Guitares](
 # Contributing
 
 
-## Setting up conda
+## Installation Guide
 
 In order to develop on the `FloodAdapt Model Builder GUI` locally, please follow the following steps:
 
@@ -24,13 +24,18 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 
 - Make sure you have `git` installed and added to your system's `PATH` environment variable. You can download a Windows installer [here](https://gitforwindows.org/).
 
+- Depending on you operating system, you might need to run the following command as well:
+
+````
+git config --global core.longpaths true
+```
 
 ## Creating (or updating) the environment
 
 - Create (or update) the environment by executing the following in your terminal:
 
 ```
-cd <location of your repository clone of DelftDashboard> 
+cd <location of your repository clone of DelftDashboard>
 mamba env create --file=./src/delftdashboard/env/ddb_floodadapt.yml --force
 ```
 
