@@ -1,0 +1,48 @@
+﻿name: ddb_floodadapt
+
+channels:
+  - conda-forge
+  - numba
+  - pyviz
+
+dependencies:
+  - python=3.11 # 3.12 removed deprecated code that a dependency still uses, so we cant use 3.12 yet
+  - black  
+  - build
+  - pyyaml>=5.1.1
+  - mypy
+  - pydata-sphinx-theme
+  - twine  
+  - cartopy>=0.20
+  - jupyterlab
+  - descartes 
+  - ffmpeg 
+  - pytest 
+  - pytest-cov
+  - hydromt_sfincs>=1.0.3 
+  - hydromt
+  - datashader
+  - pillow 
+  - scipy  
+  - numpy  
+  - openpyxl  
+  - xarray 
+  - xugrid 
+  - geopandas 
+  - rasterio  
+  - shapely
+  - geojson
+  - pandas 
+  - plotly 
+  - tomli  
+  - tomli-w
+  - pyproj 
+  - pip 
+  - pip:
+    - NDBC
+    - noaa-coops
+    - sphinx_design
+    - git+https://github.com/Deltares/cht_observations.git
+    - git+https://github.com/Deltares/hydromt_fiat.git
+    - git+https://github.com/Deltares/CoastalHazardsToolkit.git
+    - git+https://github.com/Deltares-research/Guitares.git

@@ -35,3 +35,11 @@ element:
     variable: method_gfh_string
   option_value:
     variable: method_gfh_value
+- style: pushbutton
+  position:
+    x: 20
+    y: 80
+    width: 20
+    height: 20
+  text: "\u2139"
+  method: open_info

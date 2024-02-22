@@ -11,6 +11,7 @@ from delftdashboard.app import app
 from delftdashboard.menu import file
 from pyproj import CRS
 
+
 def wgs84(option):
     new_crs = CRS(4326)
     if new_crs == app.crs:
@@ -18,20 +19,47 @@ def wgs84(option):
     update_crs(new_crs)
     app.map.fly_to(0.0, 0.0, 1)
 
+
 def other_geographic(option):
     print("Other")
 
+
 def utm_zone(option):
-    okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "select_utm_zone","utm_zone.yml"), id="utm_zone", data=None)
+    okay, data = app.gui.popup(
+        os.path.join(app.main_path, "misc", "select_utm_zone", "utm_zone.yml"),
+        id="utm_zone",
+        data=None,
+    )
     if not okay:
         return
-    letters = ['C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
+    letters = [
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "P",
+        "Q",
+        "R",
+        "S",
+        "T",
+        "U",
+        "V",
+        "W",
+        "X",
+    ]
     utm = data["utm_zone"]
     utm_letter = data["utm_letter"]
     utm_number = int(utm[0:-1])
     index = letters.index(utm_letter) + 1
-    lon = -180.0 + utm_number*6.0 - 3.0
-    lat = -80.0 + index*8.0 - 4.0
+    lon = -180.0 + utm_number * 6.0 - 3.0
+    lat = -80.0 + index * 8.0 - 4.0
     zoom = 6
     new_crs = CRS("WGS 84 / UTM zone " + utm)
     if new_crs == app.crs:
@@ -42,6 +70,7 @@ def utm_zone(option):
 
 def other_projected(option):
     print("Other")
+
 
 def update_crs(new_crs):
     app.crs = new_crs
@@ -62,5 +91,3 @@ def update_crs(new_crs):
 
     # Update GUI
     app.gui.window.update()
-
-

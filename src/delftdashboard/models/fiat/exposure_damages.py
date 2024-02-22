@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.operations import  update
 from pathlib import Path
 import fiona
 
@@ -8,6 +9,8 @@ import fiona
 def select(*args):
     # De-activate existing layers
     map.update()
+    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
+        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
 
 
 def set_variables(*args):
@@ -22,12 +25,18 @@ def select_damages_file(*args):
     fn_value = app.gui.getvar("fiat", "loaded_damages_files_value")
     if fn not in fn_value:
         fn_value.append(Path(fn))
+    
+    # Remove empty string if in list 
+    fn_value = [item for item in fn_value if item != Path('.')]
     app.gui.setvar("fiat", "loaded_damages_files_value", fn_value)
+
     name = Path(fn).name
     current_list_string = app.gui.getvar("fiat", "loaded_damages_files_string")
     if name not in current_list_string:
         current_list_string.append(name)
 
+    # Remove empty string if in list
+    current_list_string  = [item for item in current_list_string  if item != '']
     app.gui.setvar("fiat", "loaded_damages_files_string", current_list_string)
 
 
@@ -52,7 +61,7 @@ def load_damages_file(*args):
             app.gui.setvar("fiat", "method_damages", "nearest")
         elif geometry_type in ["polygon", "multipolygon"]:
             app.gui.setvar("fiat", "method_damages", "intersection")
-        
+
         app.gui.setvar("fiat", "damages_file_field_name_value", list_columns)
         app.gui.setvar("fiat", "damages_file_field_name_string", list_columns)
 
@@ -86,28 +95,91 @@ def adjust_damage_settings(*args):
 def add_to_model(*args):
     model = "fiat"
 
+    # Get the damage type
+    damage_type = app.gui.getvar("fiat", "damage_type")
+
+    if damage_type in app.gui.getvar(model, "damage_type_list"):
+        damage_index = app.gui.getvar(model, "damage_type_list").index(damage_type)
+
+        # Create pop-up and only continue if user presses ok
+        try:
+            app.active_model.overwrite_damages()
+        except ValueError as e:
+            return
+        replace_damage(damage_index)
+    else:
+        add_damages()
+
+
+def add_damages():
+    model = "fiat"
+
+    # Get the damage type
+    damage_type = app.gui.getvar("fiat", "damage_type")
+    app.gui.getvar(model, "damage_type_list").append(damage_type)
+    damage_types = app.gui.getvar(model, "damage_type_list")
+    app.gui.setvar(model, "damage_type_list", damage_types)
+    damage_types = app.gui.getvar(model, "damage_type_list")
+
     # Get the file path
-    idx = app.gui.getvar("fiat", "loaded_damages_files")
-    current_list_string = app.gui.getvar("fiat", "loaded_damages_files_string")
-    current_list_value = app.gui.getvar(model, "loaded_damages_files_value")
-    source_name = current_list_string[idx]
-    source_path = str(current_list_value[idx])
+    idx = app.gui.getvar(model, "loaded_damages_files")
+    current_list_value = app.gui.getvar(model, "loaded_damages_files_value")[idx]
+    current_list_string = app.gui.getvar(model, "loaded_damages_files_string")[idx]
+
+    app.gui.getvar(model, "loaded_damages_files_value_list").append(
+        str(current_list_value)
+    )
+    fn_damages = app.gui.getvar(model, "loaded_damages_files_value_list")
+    app.gui.setvar(model, "loaded_damages_files_value_list", fn_damages)
+    source_path = app.gui.getvar(model, "loaded_damages_files_value_list")
+
+    app.gui.getvar(model, "loaded_damages_files_string_list").append(
+        current_list_string
+    )
+    name_damages = app.gui.getvar(model, "loaded_damages_files_string_list")
+    app.gui.setvar(model, "loaded_damages_files_string_list", name_damages)
+
+    source_name = app.gui.getvar(model, "loaded_damages_files_string_list")
 
     # Get the attribute name
-    attribute_name_gfh = app.gui.getvar(model, "damages_file_field_name")
+    attribute_name_damage = app.gui.getvar(model, "damages_file_field_name")
+
+    app.gui.getvar(model, "damages_file_field_name_list").append(attribute_name_damage)
+    attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
+    app.gui.setvar(model, "damages_file_field_name_list", attribute_name_damages)
+    attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
+
+    # Empty field name parameter
+    #app.gui.setvar(model, "damages_file_field_name", 0)
 
     # Get the method
     method_damages = app.gui.getvar("fiat", "method_damages")
 
+    app.gui.getvar(model, "method_damages_list").append(method_damages)
+    method_damages = app.gui.getvar(model, "method_damages_list")
+    app.gui.setvar("fiat", "method_damages_list", method_damages)
+    method_damages = app.gui.getvar(model, "method_damages_list")
+
     # Get the max distance
     max_dist_damages = app.gui.getvar("fiat", "max_dist_damages")
 
+    app.gui.getvar(model, "max_dist_damages_list").append(max_dist_damages)
+    max_dist_damages = app.gui.getvar(model, "max_dist_damages_list")
+    app.gui.setvar(model, "max_dist_damages_list", max_dist_damages)
+    max_dist_damages = app.gui.getvar(model, "max_dist_damages_list")
+
     app.active_model.domain.exposure_vm.set_damages(
         source=source_path,
-        attribute_name=attribute_name_gfh,
-        method=method_damages,
+        attribute_name=attribute_name_damages,
+        method_damages=method_damages,
         max_dist=max_dist_damages,
+        damage_types=damage_types,
     )
+    # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
+    if app.active_model.domain.fiat_model.exposure is not None:
+        dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
+        update.update_parameters("Max Potential Damages")
+        dlg.close()
 
     # Set the source
     app.gui.setvar(model, "source_max_potential_damage", source_name)
@@ -116,3 +188,86 @@ def add_to_model(*args):
         text="Maximum potential damage data was added to your model",
         title="Added maximum potential damage data",
     )
+
+
+def replace_damage(damage_index):
+    model = "fiat"
+
+    # Replace Damage_type
+    damage_type = app.gui.getvar("fiat", "damage_type")
+    damage_type_list = app.gui.getvar(model, "damage_type_list")
+    damage_type_list[damage_index] = damage_type
+
+    app.gui.setvar(model, "damage_type_list", damage_type_list)
+    damage_types = app.gui.getvar(model, "damage_type_list")
+
+    # Replace file path
+    idx = app.gui.getvar(model, "loaded_damages_files")
+    current_list_value = app.gui.getvar(model, "loaded_damages_files_value")[idx]
+
+    damage_values_list = app.gui.getvar(model, "loaded_damages_files_value_list")
+
+    damage_values_list[damage_index] = str(current_list_value)
+    app.gui.setvar(model, "loaded_damages_files_value_list", damage_values_list)
+    source_path = app.gui.getvar(model, "loaded_damages_files_value_list")
+
+    # Replace file name
+    current_list_string = app.gui.getvar(model, "loaded_damages_files_string")[idx]
+
+    damage_string_list = app.gui.getvar(model, "loaded_damages_files_string_list")
+    damage_string_list[damage_index] = current_list_string
+    app.gui.setvar(model, "loaded_damages_files_string_list", damage_string_list)
+
+    source_name = app.gui.getvar(model, "loaded_damages_files_string_list")
+
+    # Get the attribute name
+    attribute_name_damage = app.gui.getvar(model, "damages_file_field_name")
+
+    damages_attribute_list = app.gui.getvar(model, "damages_file_field_name_list")
+    damages_attribute_list[damage_index] = attribute_name_damage
+
+    app.gui.setvar(model, "damages_file_field_name_list", damages_attribute_list)
+    attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
+    
+    # Empty field name parameter
+    #app.gui.setvar(model, "damages_file_field_name", 0)
+
+    # Get the method
+    method_damages = app.gui.getvar("fiat", "method_damages")
+
+    method_damages_list = app.gui.getvar(model, "method_damages_list")
+    method_damages_list[damage_index] = method_damages
+
+    app.gui.setvar("fiat", "method_damages_list", method_damages_list)
+    method_damages = app.gui.getvar(model, "method_damages_list")
+
+    # Get the max distance
+    max_dist_damages = app.gui.getvar("fiat", "max_dist_damages")
+
+    max_dist_list = app.gui.getvar(model, "max_dist_damages_list")
+    max_dist_list[damage_index] = max_dist_damages
+    app.gui.setvar(model, "max_dist_damages_list", max_dist_list)
+    max_dist_damages = app.gui.getvar(model, "max_dist_damages_list")
+
+    app.active_model.domain.exposure_vm.set_damages(
+        source=source_path,
+        attribute_name=attribute_name_damages,
+        method_damages=method_damages,
+        max_dist=max_dist_damages,
+        damage_types=damage_types,
+    )
+    
+    # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
+    if app.active_model.domain.fiat_model.exposure is not None:
+        dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
+        update.update_parameters("Max Potential Damages")
+        dlg.close()
+
+    # Set the source
+    app.gui.setvar(model, "source_max_potential_damage", source_name)
+
+    app.gui.window.dialog_info(
+        text="Maximum potential damage data was added to your model",
+        title="Added maximum potential damage data",
+    )
+

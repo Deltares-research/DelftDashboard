@@ -94,8 +94,9 @@ element:
       width: 200
       height: 20
     tooltip: Select method to determine model extent
-    select: index
-    variable: setup_grid_methods_index
+    variable: setup_grid_method
+    option_value:
+      variable: setup_grid_methods
     option_string:
       variable: setup_grid_methods
   - style: pushbutton
@@ -111,9 +112,9 @@ element:
     - action: visible
       checkfor: any
       check:
-      - variable: setup_grid_methods_index
+      - variable: setup_grid_method
         operator: eq
-        value: 0 
+        value: Draw Bounding Box 
   - style: pushbutton
     text: Start drawing
     tooltip: Draw a polygon describing the area of interest
@@ -127,9 +128,9 @@ element:
     - action: visible
       checkfor: any
       check:
-      - variable: setup_grid_methods_index
+      - variable: setup_grid_method
         operator: eq
-        value: 1
+        value: Draw Polygon
   - style: pushbutton
     text: Load
     tooltip: Load a polygon describing the area of interest
@@ -143,9 +144,28 @@ element:
     - action: visible
       checkfor: any
       check:
-      - variable: setup_grid_methods_index
-        operator: ge
-        value: 2
+      - variable: setup_grid_method
+        operator: eq
+        value: Load Watershed
+      - variable: setup_grid_method
+        operator: eq
+        value: Load ShapeFile
+  - style: pushbutton
+    text: Select
+    tooltip: Select a watershed from the available database
+    position:
+      x: 10
+      y: 15
+      width: 200
+      height: 20
+    method: open_watershed_selector
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: setup_grid_method
+        operator: eq
+        value: Select Watershed
 - style: panel
   title: "Define model resolution: "
   position:

@@ -6,6 +6,7 @@ from delftdashboard.operations import map
 
 import cht_observations.observation_stations as obs
 
+
 class Toolbox(GenericToolbox):
     def __init__(self, name, mapbox=None):
         super().__init__()
@@ -17,8 +18,10 @@ class Toolbox(GenericToolbox):
         self.gdf = gpd.GeoDataFrame()
 
         # add sources
-        self.sources = {"ndbc": "National Data Buoy Center (NDBC)",
-                   "noaa_coops": "NOAA Tides and Currents (CO-OPS)"}
+        self.sources = {
+            "ndbc": "National Data Buoy Center (NDBC)",
+            "noaa_coops": "NOAA Tides and Currents (CO-OPS)",
+        }
 
         # Set GUI variables
         group = "observation_stations"
@@ -70,7 +73,7 @@ class Toolbox(GenericToolbox):
     def select_source(self, index):
         group = "observation_stations"
         stnames, self.gdf = get_station_names(list(self.sources.keys())[index])
-    
+
         app.gui.setvar(group, "station_names", stnames)
         app.gui.setvar(group, "active_station_index", 0)
         self.map.layer["observation_stations"].layer["stations"].set_data(self.gdf, 0)
@@ -123,7 +126,7 @@ class Toolbox(GenericToolbox):
                 title="Failed",
             )
             return
-        
+
         # only keep stations within model extent
         gdf = gpd.sjoin(gdf.to_crs(gdf_model.crs), gdf_model, op='within')
 
@@ -168,21 +171,43 @@ class Toolbox(GenericToolbox):
 def select(*args):
     app.toolbox["observation_stations"].select_tab()
 
+
 def select_source(*args):
-    index= app.gui.getvar("observation_stations", "active_source_index")
+    index = app.gui.getvar("observation_stations", "active_source_index")
     app.toolbox["observation_stations"].select_source(index=index)
+
 
 def select_station(*args):
     app.toolbox["observation_stations"].select_station_from_list()
 
+
 def select_naming_option(*args):
     app.toolbox["observation_stations"].select_naming_option()
+
 
 def add_stations_to_model(*args):
     app.toolbox["observation_stations"].add_stations_to_model()
 
+
 def add_all_stations_to_model(*args):
     app.toolbox["observation_stations"].add_all_stations_to_model()
+
+
+def return_to_modelmaker(*args):
+    active_model = app.active_model
+
+    # are you sure you want to return to model maker?
+    ok = app.gui.window.dialog_yes_no("Do you want to return to the model maker?")
+    if not ok:
+        return
+    toolbox_name = "modelmaker_" + active_model.name
+
+    # back to model maker toolbox
+    app.active_toolbox = app.toolbox[toolbox_name]
+    app.active_toolbox.select()
+
+    # TODO back to observations model-tab
+    # app.active_toolbox.select_tab("observations")
 
 
 ##

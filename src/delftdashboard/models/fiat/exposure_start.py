@@ -7,8 +7,9 @@ import pandas as pd
 def select(*args):
     # De-activate existing layers
     map.update()
-    app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
-
+    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
+        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    app.gui.setvar("_main", "show_fiat_checkbox", True)
 
 def edit(*args):
     app.active_model.set_model_variables()
@@ -18,7 +19,11 @@ def select_model_type(*args):
     group = "fiat"
     model_type = app.gui.getvar(group, "model_type")
     if model_type == "Start with NSI":
-        app.gui.setvar(group, "selected_asset_locations_string", ["National Structure Inventory (NSI)"])
+        app.gui.setvar(
+            group,
+            "selected_asset_locations_string",
+            ["National Structure Inventory (NSI)"],
+        )
         app.gui.setvar(group, "selected_asset_locations", 0)
         # For classification the NSI data cannot be used because it is already used, you can only update it with other data.
         app.gui.setvar(group, "classification_source", "nsi_data")
@@ -27,7 +32,9 @@ def select_model_type(*args):
             "classification_source_string",
             ["National Structure Inventory (NSI)", "Upload data"],
         )
-        app.gui.setvar(group, "classification_source_value", ["nsi_data", "upload_data"])
+        app.gui.setvar(
+            group, "classification_source_value", ["nsi_data", "upload_data"]
+        )
     elif model_type == "Start from scratch":
         # NOTE: This option is currently not implemented
         app.gui.setvar(group, "selected_asset_locations_string", [])
@@ -85,6 +92,12 @@ def add_exposure_locations_to_model(*args):
     
     app.active_model.domain.exposure_vm.set_asset_data_source(selected_asset_locations)
 
+    # Set the unit for Exposure Data for visualization
+    view_tab_unit = app.active_model.domain.exposure_vm.exposure_buildings_model.unit
+    if hasattr(view_tab_unit, "value"):
+        view_tab_unit = view_tab_unit.value
+    app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
+    
     # Hide Boundary Box
     if app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")]:
         app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].hide() 
@@ -136,7 +149,13 @@ def build_nsi_exposure(*args):
 
         list_types = list(gdf["Secondary Object Type"].unique())
         list_types.sort()
-        df = pd.DataFrame(data={"Secondary Object Type": list_types, "Assigned: Structure": "", "Assigned: Content": ""})
+        df = pd.DataFrame(
+            data={
+                "Secondary Object Type": list_types,
+                "Assigned: Structure": "",
+                "Assigned: Content": "",
+            }
+        )
         ## TODO: add the nr of stories and the basement
 
         app.gui.setvar(model, "exposure_categories_to_link", df)
@@ -151,8 +170,12 @@ def build_nsi_exposure(*args):
         # Set the sources
         app.gui.setvar(model, "source_asset_locations", "National Structure Inventory")
         app.gui.setvar(model, "source_classification", "National Structure Inventory")
-        app.gui.setvar(model, "source_finished_floor_height", "National Structure Inventory")
-        app.gui.setvar(model, "source_max_potential_damage", "National Structure Inventory")
+        app.gui.setvar(
+            model, "source_finished_floor_height", "National Structure Inventory"
+        )
+        app.gui.setvar(
+            model, "source_max_potential_damage", "National Structure Inventory"
+        )
         app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
 
         dlg.close()
@@ -170,21 +193,23 @@ def build_nsi_exposure(*args):
 
         try:
             dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
-            
+
             # Get the roads to show in the map
-            gdf = app.active_model.domain.exposure_vm.get_osm_roads(road_types=road_types)
+            gdf = app.active_model.domain.exposure_vm.get_osm_roads(
+                road_types=road_types
+            )
 
             crs = app.gui.getvar("fiat", "selected_crs")
             gdf.set_crs(crs, inplace=True)
 
             app.map.layer["roads"].layer["exposure_lines"].crs = crs
-            app.map.layer["roads"].layer["exposure_lines"].set_data(
-                gdf
-            )
+            app.map.layer["roads"].layer["exposure_lines"].set_data(gdf)
 
             # Set the road damage threshold
             road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-            app.active_model.domain.vulnerability_vm.set_road_damage_threshold(road_damage_threshold)
+            app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
+                road_damage_threshold
+            )
 
             # Show the roads
             app.active_model.show_exposure_roads()
@@ -195,7 +220,10 @@ def build_nsi_exposure(*args):
 
             dlg.close()
         except KeyError:
-            app.gui.window.dialog_info(text="No OSM roads found in this area, try another or a larger area.", title="No OSM roads found")
+            app.gui.window.dialog_info(
+                text="No OSM roads found in this area, try another or a larger area.",
+                title="No OSM roads found",
+            )
             dlg.close()
 
 
@@ -217,21 +245,16 @@ def get_road_types():
 
     list_road_types = []
     if app.gui.getvar(model, "include_motorways"):
-        list_road_types.extend(["motorway",
-            "motorway_link"])
+        list_road_types.extend(["motorway", "motorway_link"])
     if app.gui.getvar(model, "include_trunk"):
-        list_road_types.extend(["trunk",
-            "trunk_link"])
+        list_road_types.extend(["trunk", "trunk_link"])
     if app.gui.getvar(model, "include_primary"):
-        list_road_types.extend(["primary",
-            "primary_link"])
+        list_road_types.extend(["primary", "primary_link"])
     if app.gui.getvar(model, "include_secondary"):
-        list_road_types.extend(["secondary",
-                "secondary_link"])
+        list_road_types.extend(["secondary", "secondary_link"])
     if app.gui.getvar(model, "include_tertiary"):
-        list_road_types.extend(["tertiary",
-                "tertiary_link"])
-    
+        list_road_types.extend(["tertiary", "tertiary_link"])
+
     return list_road_types
 
 
@@ -251,9 +274,19 @@ def display_asset_locations(*args):
         app.map.layer["buildings"].clear()
         app.gui.setvar("fiat", "show_primary_classification", False)
         app.gui.setvar("fiat", "show_secondary_classification", False)
-        app.map.layer["buildings"].layer["exposure_points"].crs = crs = app.gui.getvar("fiat", "selected_crs")
-        app.map.layer["buildings"].layer["exposure_points"].set_data(app.active_model.buildings)
+        app.map.layer["buildings"].layer["exposure_points"].crs = crs = app.gui.getvar(
+            "fiat", "selected_crs"
+        )
+        app.map.layer["buildings"].layer["exposure_points"].set_data(
+            app.active_model.buildings
+        )
 
         app.active_model.show_exposure_buildings()
     else:
         app.active_model.hide_exposure_buildings()
+
+def open_info(*args):
+    app.gui.window.dialog_info(
+    text="The threshold value indicates the water level at which a road is not accessible anymore." ,
+    title="Threshold value",
+    )

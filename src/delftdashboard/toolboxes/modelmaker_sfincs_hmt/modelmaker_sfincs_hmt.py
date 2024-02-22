@@ -62,9 +62,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(
             group,
             "setup_grid_methods",
-            ["Draw Bounding Box", "Draw Polygon", "Load Watershed", "Load ShapeFile"],
+            ["Draw Bounding Box", "Draw Polygon", "Load Watershed", "Select Watershed", "Load ShapeFile"],
         )
-        app.gui.setvar(group, "setup_grid_methods_index", 0)
+        app.gui.setvar(group, "setup_grid_method", "Draw Bounding Box")
 
         # Domain
         app.gui.setvar(group, "x0", 0.0)
@@ -460,15 +460,21 @@ class Toolbox(GenericToolbox):
         dlg = app.gui.window.dialog_wait("Generating active mask  ...")
         group = "modelmaker_sfincs_hmt"
         setup_mask_active = {
-            "mask": app.toolbox[group].mask_init_polygon
-            if not app.toolbox[group].mask_init_polygon.empty
-            else None,
-            "include_mask": app.toolbox[group].mask_include_polygon
-            if not app.toolbox[group].mask_include_polygon.empty
-            else None,
-            "exclude_mask": app.toolbox[group].mask_exclude_polygon
-            if not app.toolbox[group].mask_exclude_polygon.empty
-            else None,
+            "mask": (
+                app.toolbox[group].mask_init_polygon
+                if not app.toolbox[group].mask_init_polygon.empty
+                else None
+            ),
+            "include_mask": (
+                app.toolbox[group].mask_include_polygon
+                if not app.toolbox[group].mask_include_polygon.empty
+                else None
+            ),
+            "exclude_mask": (
+                app.toolbox[group].mask_exclude_polygon
+                if not app.toolbox[group].mask_exclude_polygon.empty
+                else None
+            ),
             "zmin": app.gui.getvar(group, "mask_active_zmin"),
             "zmax": app.gui.getvar(group, "mask_active_zmax"),
             "drop_area": app.gui.getvar(group, "mask_active_drop_area"),
@@ -509,9 +515,11 @@ class Toolbox(GenericToolbox):
             dlg = app.gui.window.dialog_wait("Generating outflow boundaries ...")
             setup_mask_bounds2 = {
                 "btype": "outflow",
-                "include_mask": app.toolbox[group].outflow_include_polygon
-                if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
-                else None,
+                "include_mask": (
+                    app.toolbox[group].outflow_include_polygon
+                    if app.gui.getvar(group, "nr_outflow_include_polygons") > 0
+                    else None
+                ),
                 "zmin": app.gui.getvar(group, "outflow_zmin"),
                 "reset_bounds": True,
             }

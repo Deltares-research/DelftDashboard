@@ -76,13 +76,31 @@ element:
       position:
         x: 10
         y: 35
-        width: 240
+        width: 200
         height: 55
       method: set_active_area_file
       variable: selected_model_boundary
       select: index
       option_string:
         variable: model_boundary_file_list
+      dependency:
+      - action: visible
+        checkfor: any
+        check:
+        - variable: selected_aoi_method
+          operator: eq
+          value: sfincs
+        - variable: selected_aoi_method
+          operator: eq
+          value: file
+    - style: pushbutton
+      position:
+        x: 220
+        y: 75
+        width: 15
+        height: 15
+      text: "\u0078"
+      method: remove_datasource
       dependency:
       - action: visible
         checkfor: any
@@ -120,7 +138,7 @@ element:
     - style: pushbutton
       position:
         x: 15
-        y: 65
+        y: 70
         width: 130
         height: 40
       text: "Create model\nwith NSI and OSM"

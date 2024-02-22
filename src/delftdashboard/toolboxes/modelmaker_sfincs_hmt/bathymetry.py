@@ -13,9 +13,10 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["bed_levels"].show()
     app.map.layer["sfincs_hmt"].layer["bed_levels"].activate()
 
+
 def select_bathymetry_source(*args):
     source = args[0]
-    
+
     dataset_names = []
     # Bathymetry
     if app.config["data_libs"] is not None:
@@ -30,14 +31,18 @@ def select_bathymetry_source(*args):
 
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_names", dataset_names)
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_index", 0)
-    
+
     name = dataset_names[0]
     meta = app.data_catalog[name].meta
     meta_str = yaml.dump(meta, default_flow_style=False)
-    app.gui.setvar("modelmaker_sfincs_hmt", "selected_bathymetry_dataset_meta", meta_str)
+    app.gui.setvar(
+        "modelmaker_sfincs_hmt", "selected_bathymetry_dataset_meta", meta_str
+    )
+
 
 def select_bathymetry_dataset(*args):
     pass
+
 
 def info_selected_dataset(*args):
     toolbox_name = "modelmaker_sfincs_hmt"
@@ -48,14 +53,15 @@ def info_selected_dataset(*args):
 
     meta = app.data_catalog[name].meta
     meta_str = yaml.dump(meta, default_flow_style=False)
-    app.gui.setvar(toolbox_name, "selected_bathymetry_dataset_meta", meta_str)    
+    app.gui.setvar(toolbox_name, "selected_bathymetry_dataset_meta", meta_str)
 
     path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
-    pop_win_config_path  = os.path.join(path, "bathymetry_info.yml")
-    okay, data = app.gui.popup(pop_win_config_path , None)
+    pop_win_config_path = os.path.join(path, "bathymetry_info.yml")
+    okay, data = app.gui.popup(pop_win_config_path, None)
     if not okay:
         return
-    
+
+
 def use_dataset(*args):
     group = "modelmaker_sfincs_hmt"
     names = app.gui.getvar(group, "bathymetry_dataset_names")
@@ -129,30 +135,31 @@ def move_down_selected_bathymetry_dataset(*args):
     app.gui.setvar(group, "selected_bathymetry_dataset_index", index + 1)
     update()
 
+
 def advanced_merge_options_bathymetry_dataset(*args):
     toolbox_name = "modelmaker_sfincs_hmt"
 
     path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
-    pop_win_config_path  = os.path.join(path, "bathymetry_merge.yml")
-    okay, data = app.gui.popup(pop_win_config_path , None)
+    pop_win_config_path = os.path.join(path, "bathymetry_merge.yml")
+    okay, data = app.gui.popup(pop_win_config_path, None)
     if not okay:
-        return    
+        return
 
 
 def edit_zmax_bathymetry_dataset(*args):
     group = "modelmaker_sfincs_hmt"
     index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
-    app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets[index][
-        "zmax"
-    ] = args[0]
+    app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets[index]["zmax"] = (
+        args[0]
+    )
 
 
 def edit_zmin_bathymetry_dataset(*args):
     group = "modelmaker_sfincs_hmt"
     index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
-    app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets[index][
-        "zmin"
-    ] = args[0]
+    app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets[index]["zmin"] = (
+        args[0]
+    )
 
 
 def edit_offset_bathymetry_dataset(*args):
@@ -204,6 +211,7 @@ def update():
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
         app.gui.setvar(group, "selected_bathymetry_dataset_offset", 0.0)
     app.gui.setvar(group, "nr_selected_bathymetry_datasets", nrd)
+
 
 def generate_bathymetry(*args):
     app.toolbox["modelmaker_sfincs_hmt"].generate_bathymetry()

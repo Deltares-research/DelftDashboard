@@ -1,0 +1,17 @@
+window:
+  title: Overwrite Damages 
+  width: 200
+  height: 80
+  variable_group: fiat
+  module: models.fiat.exposure_damages
+  modal: True
+  cancel: True
+  
+element:
+- style: text
+  position:
+    x: 10
+    y: 30
+    width: 180
+    height: 40
+  text: <center>You already added new data to this damage type. <br> Do you want to overwrite it?</center>
