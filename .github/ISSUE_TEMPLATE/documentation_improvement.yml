@@ -1,6 +1,6 @@
 name: Documentation Improvement
 description: Report wrong or missing documentation
-labels: [documentation]
+labels: documentation
 
 body:
   - type: dropdown
