@@ -1,8 +1,22 @@
-name: Bug Report - User
+name: Bug Report
 description: Report incorrect behavior 
-labels: [user bug]
+title: "[Bug]: "
+labels: ["bug"]
+projects:
+
 
 body:
+  - type: checkboxes
+    id: issue-check
+    attributes:
+      label: Preliminary Checklist
+      description: "Before submitting this bug report, please ensure the following criteria are met:"
+      options:
+        - label: "I have searched the existing issues list for similar reports and found none. If you did find a similar issue, please add a comment to the existing issue instead of opening a new one."
+        - label: "I have verified that the issue exists in the latest version of DelftDashboard and its dependencies. Please update to the latest version and check if the issue still exists."
+    validations:
+      required: true
+
   - type: markdown
     attributes:
       value: |

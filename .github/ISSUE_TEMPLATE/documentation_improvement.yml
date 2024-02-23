@@ -1,8 +1,18 @@
 name: Documentation Improvement
 description: Report wrong or missing documentation
-labels: [documentation]
+labels: ["documentation"]
 
 body:
+  - type: checkboxes
+    id: issue-check
+    attributes:
+      label: Preliminary Checklist
+      description: "Before submitting this documentation request, please ensure the following criteria are met:"
+      options:
+        - label: "I have searched the existing issues list for similar requests and found none. If you did find a similar requests, please add a comment to the existing requests instead of opening a new one."
+    validations:
+      required: true
+
   - type: dropdown
     id: kind
     attributes:
