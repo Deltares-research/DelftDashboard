@@ -1,6 +1,6 @@
-name: Bug Report - User
+name: Bug Report
 description: Report incorrect behavior 
-labels: [user bug]
+labels: bug
 
 body:
   - type: markdown
