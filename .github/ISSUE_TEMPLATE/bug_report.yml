@@ -1,9 +1,6 @@
 name: Bug Report
 description: Report incorrect behavior 
-title: "[Bug]: "
 labels: ["bug"]
-projects:
-
 
 body:
   - type: checkboxes
