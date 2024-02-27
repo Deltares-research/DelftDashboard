@@ -668,7 +668,11 @@ class Toolbox(GenericToolbox):
             title = "Create tiles. Press cancel to skip.")
         if okay:
             dlg = app.gui.window.dialog_wait("Writing tiles ...")
-            setup_tiles = {"zoom_range": int(value), "fmt": "png"}
+            setup_tiles = {
+                "datasets_dep": app.toolbox[group].selected_bathymetry_datasets,
+                "zoom_range": int(value),
+                "fmt": "png",
+                }
             model.setup_tiles(**setup_tiles)
             self.setup_dict.update({"setup_tiles": setup_tiles})
             dlg.close()
