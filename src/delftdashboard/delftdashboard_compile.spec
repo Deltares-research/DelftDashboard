@@ -154,3 +154,16 @@ coll = COLLECT(
     upx_exclude=[],
     name=project_name,
 )
+
+# tocopy = [
+#    hydromt-0.9.4.dist-info/,
+#    xarray_spatial-0.3.7.dist-info/,
+#    numpy-1.26.4.dist-info/,
+#    xrspatial/,
+#    xarray/,
+#    xugrid/,
+#    xarray-2024.2.0.dist-info/,
+#    xugrid-0.9.0.dist-info/
+# ]
+# TODO for folder in to_copy: paste into _internals
+# TODO set GDAL_DATA env var in ddb somewhere?
