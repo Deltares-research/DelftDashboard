@@ -6,7 +6,7 @@ channels:
   - pyviz
 
 dependencies:
-  - python=3.11 # 3.12 removed deprecated code that a dependency still uses, so we cant use 3.12 yet
+  - python<3.11 # 3.12 removed deprecated code that a dependency still uses, so we cant use 3.12 yet
   - black  
   - build
   - pyyaml>=5.1.1
@@ -37,6 +37,7 @@ dependencies:
   - tomli  
   - tomli-w
   - pyproj 
+  - xugrid
   - pip 
   - pip:
     - NDBC
