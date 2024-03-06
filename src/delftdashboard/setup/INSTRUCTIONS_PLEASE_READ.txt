@@ -1,0 +1,36 @@
+Welcome to the FloodAdapt Model Builder setup!
+
+Before you start, please ensure that your folder structure is as follows:
+(notation: <example1> is a directory, example2.any is a file)
+
+<YOUR-ROOT>
+   - FloodAdapt_ModelBuilder.exe
+   - <_internal>
+   - setup.bat
+   - <userFiles>
+   - INSTRUCTIONS_PLEASE_READ.txt
+
+The <userFiles> directory is where you should place your files.
+The following files are required:
+
+Deltares provides:
+1. Data.zip: This file contains all the necessary data for the model. 
+	Paste it as a .zip file, the setup will unzip it!
+2. delftdashboard.ini: This is the configuration file for the the FloodAdapt Model builder.
+3. data_catalog.yml: This file contains the data catalog for the model.
+
+You should provide:
+1. mapbox_token.txt: This file should contain your Mapbox token. 
+	create an account at: https://www.mapbox.com/
+	generate a personal token
+	Copy the token to a file, name it `mapbox_token.txt`, and paste the file in <userFiles>
+
+2. census_key.txt: This file should contain your Census key.
+	go to: https://api.census.gov/data/key_signup.html
+	enter your company name and email adress
+	Copy the token to a file, name it `census_key.txt`, and paste the file in <userFiles>
+
+Once you have placed all the necessary files in the <userFiles> directory, you can run the setup by double-clicking on the 'setup.bat' file.
+This will run a script that will initialize your setup. 
+
+Once setup has completed succesfully, you can run the FloodAdapt Model Builder by double-clicking on the 'FloodAdapt_ModelBuilder.exe' file.

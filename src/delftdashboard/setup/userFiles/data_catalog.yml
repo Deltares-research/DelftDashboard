@@ -1,0 +1,53 @@
+meta:
+  root: C:/Users/blom_lk/dev/Executable_Testing/_internal/data
+
+GEBCO 2020:
+  data_type: RasterDataset
+  path: TopoBathy/gebco.tif
+  driver: raster
+  filesystem: local
+  meta:
+    category: topography
+    paper_doi: 10.5285/a29c5465-b138-234d-e053-6c86abc040b9
+    paper_ref: Weatherall et al (2020)
+    source_license: https://www.gebco.net/data_and_products/gridded_bathymetry_data/#a1
+    source_url: https://www.bodc.ac.uk/data/open_download/gebco/gebco_2020/geotiff/
+    source_version: 2020
+    unit: m+MSL
+    source: Global
+    horizontal_resolution: 450 m
+  crs: 4326
+
+Chesapeake:
+  data_type: RasterDataset
+  path: TopoBathy/Chesapeake_Coned_16m.tif
+  driver: raster
+  filesystem: local
+  crs: 26918
+  meta:
+    category: topography
+    source: CONED
+    unit: m+NAVD88
+    horizontal_resolution: 16 m
+
+Charleston:
+  data_type: RasterDataset
+  path: TopoBathy/Charleston_14m_cog.tif
+  driver: raster
+  filesystem: local
+  crs: 4326
+  meta:
+    category: topography
+    source: CONED
+    unit: m+NAVD88
+    horizontal_resolution: 14 m
+
+watersheds:
+  crs: 4326
+  data_type: GeoDataFrame
+  driver: vector
+  path: WaterSheds\Watersheds_US_lvl_12_crop.gpkg
+  meta:
+    category: watersheds
+    source: USGS
+    url: https://www.usgs.gov/national-hydrography/watershed-boundary-dataset
