@@ -41,7 +41,7 @@
         height: 20
       text: Minimum elevation (m) for which this dataset is valid.
       text_position: right
-      variable: selected_bathymetry_dataset_zmax
+      variable: selected_bathymetry_dataset_zmin
       method: edit_zmin_bathymetry_dataset
     - style: text
       position:
