@@ -66,7 +66,7 @@ def add_boundary_point(gdf, merge=True):
             )
             return
     except ValueError as e:
-        app.gui.window.dialog_info(
+        app.gui.window.dialog_warning(
             text=e.args[0],
             title="Error",
         )

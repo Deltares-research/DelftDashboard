@@ -374,7 +374,15 @@ class Toolbox(GenericToolbox):
             "rotation": float(app.gui.getvar(group, "rotation")),
             "epsg": app.crs.to_epsg(),
         }
-        model.setup_grid(**setup_grid)
+        try:
+            model.setup_grid(**setup_grid)
+        except Exception as e:
+            dlg.close()
+            app.gui.window.dialog_warning(
+                title = "Error generating grid",
+                text = str(e)
+                )
+            return
         self.setup_dict.update({"setup_grid": setup_grid})
 
         group = "sfincs_hmt"
@@ -428,8 +436,15 @@ class Toolbox(GenericToolbox):
             "buffer_cells": app.gui.getvar(group, "bathymetry_dataset_buffer_cells"),
             "interp_method": app.gui.getvar(group, "bathymetry_dataset_interp_method"),
         }
-
-        model.setup_dep(**setup_dep)
+        try:
+            model.setup_dep(**setup_dep)
+        except Exception as e:
+            dlg.close()
+            app.gui.window.dialog_warning(
+                title = "Error generating bathymetry",
+                text = str(e)
+                )
+            return
         self.setup_dict.update({"setup_dep": setup_dep})
 
         # show merged bathymetry on map
@@ -451,7 +466,15 @@ class Toolbox(GenericToolbox):
         }
 
         # NOTE setup methods parse the dataset-names to xarray datasets
-        model.setup_manning_roughness(**setup_manning_roughness)
+        try:
+            model.setup_manning_roughness(**setup_manning_roughness)
+        except Exception as e:
+            dlg.close()
+            app.gui.window.dialog_warning(
+                title = "Error generating manning roughness",
+                text = str(e)
+                )
+            return
         self.setup_dict.update({"setup_manning_roughness": setup_manning_roughness})
 
         dlg.close()
@@ -484,7 +507,15 @@ class Toolbox(GenericToolbox):
             "reset_mask": app.gui.getvar(group, "mask_active_reset"),
         }
 
-        model.setup_mask_active(**setup_mask_active)
+        try:
+            model.setup_mask_active(**setup_mask_active)
+        except Exception as e:
+            dlg.close()
+            app.gui.window.dialog_warning(
+                title = "Error generating active mask",
+                text = str(e)
+                )
+            return
         self.setup_dict.update({"setup_mask_active": setup_mask_active})
 
         self.set_active_cell_layer()      
@@ -510,8 +541,15 @@ class Toolbox(GenericToolbox):
                 "zmax": app.gui.getvar(group, "wlev_zmax"),
                 "reset_bounds": True,
             }
-
-            model.setup_mask_bounds(**setup_mask_bounds)
+            try:
+                model.setup_mask_bounds(**setup_mask_bounds)
+            except Exception as e:
+                dlg.close()
+                app.gui.window.dialog_warning(
+                    title = "Error generating waterlevel boundaries",
+                    text = str(e)
+                    )
+                return
             self.setup_dict.update({"setup_mask_bounds": setup_mask_bounds})
         elif btype == "outflow":
             dlg = app.gui.window.dialog_wait("Generating outflow boundaries ...")
@@ -525,8 +563,15 @@ class Toolbox(GenericToolbox):
                 "zmin": app.gui.getvar(group, "outflow_zmin"),
                 "reset_bounds": True,
             }
-
-            app.model["sfincs_hmt"].domain.setup_mask_bounds(**setup_mask_bounds2)
+            try:
+                app.model["sfincs_hmt"].domain.setup_mask_bounds(**setup_mask_bounds2)
+            except Exception as e:
+                dlg.close()
+                app.gui.window.dialog_warning(
+                    title = "Error generating outflow boundaries",
+                    text = str(e)
+                    )
+                return
             self.setup_dict.update({"setup_mask_bounds2": setup_mask_bounds2})
 
         self.set_active_cell_layer()
@@ -659,31 +704,55 @@ class Toolbox(GenericToolbox):
             "write_man_tif": app.gui.getvar(group, "write_man_tif"),
         }
 
-        model.setup_subgrid(**setup_subgrid)
+        try:
+            model.setup_subgrid(**setup_subgrid)
+        except Exception as e:
+            dlg.close()
+            app.gui.window.dialog_warning(
+                title = "Error generating subgrid",
+                text = str(e)
+                )
+            return
         self.setup_dict.update({"setup_subgrid": setup_subgrid})
 
         dlg.close()
 
-        # add tiles
-        value, okay = app.gui.window.dialog_string(
-            text = "Specify maximum zoom level (0-20) for tiles:",
-            title = "Create tiles. Press cancel to skip.")
+        # ask whether user is making a Flood Adapt model
+        okay = app.gui.window.dialog_yes_no("Do you want to make a Flood Adapt model?")
         if okay:
-            dlg = app.gui.window.dialog_wait("Writing tiles ...")
-            setup_tiles = {
+            # add tiles
+            value, okay = app.gui.window.dialog_string(
+                text = "Specify maximum zoom level (0-20) for tiles:",
+                title = "Create tiles. Press cancel to skip.")
+            if okay:
+                dlg = app.gui.window.dialog_wait("Writing tiles ...")
+                setup_tiles = {
                 "datasets_dep": app.toolbox[group].selected_bathymetry_datasets,
                 "zoom_range": int(value),
                 "fmt": "png",
                 }
-            model.setup_tiles(**setup_tiles)
-            self.setup_dict.update({"setup_tiles": setup_tiles})
-            dlg.close()
+                try:
+                    model.setup_tiles(**setup_tiles)
+                except Exception as e:
+                    dlg.close()
+                    app.gui.window.dialog_warning(
+                        title = "Error generating tiles",
+                        text = str(e)
+                        )
+                self.setup_dict.update({"setup_tiles": setup_tiles})
+                dlg.close()
 
-        # add boundary points
-        okay = app.gui.window.dialog_yes_no("Do you want to automatically generate water level boundary points?")
-        if okay:
-            #TODO add to setup_dict
-            generate_boundary_points_from_msk()
+            # add boundary points
+            okay = app.gui.window.dialog_yes_no("Do you want to automatically generate water level boundary points?")
+            if okay:
+                #TODO add to setup_dict
+                try:
+                    generate_boundary_points_from_msk()
+                except Exception as e:
+                    app.gui.window.dialog_warning(
+                        title = "Error generating boundary points",
+                        text = str(e)
+                        )
 
         dlg = app.gui.window.dialog_wait("Writing SFINCS model ...")
         app.model["sfincs_hmt"].save()
