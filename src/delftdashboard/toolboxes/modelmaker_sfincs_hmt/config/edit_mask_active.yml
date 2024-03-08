@@ -74,7 +74,7 @@ element:
       y: 80
       width: 45
       height: 20
-    text: Maximum elevation (m) to include in your active domain
+    text: Maximum elevation (m+Ref) to include in your active domain
     text_position: right
     variable: mask_active_zmax
   - style: edit
@@ -83,7 +83,7 @@ element:
       y: 55
       width: 45
       height: 20
-    text: Minimum elevation (m) to include in your active domain
+    text: Minimum elevation (m+Ref) to include in your active domain
     text_position: right
     variable: mask_active_zmin
   - style: edit
