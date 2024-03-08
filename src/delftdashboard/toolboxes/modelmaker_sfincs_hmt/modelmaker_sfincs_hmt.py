@@ -380,7 +380,7 @@ class Toolbox(GenericToolbox):
             dlg.close()
             app.gui.window.dialog_warning(
                 title = "Error generating grid",
-                text = e.args[0]
+                text = str(e)
                 )
             return
         self.setup_dict.update({"setup_grid": setup_grid})
@@ -442,7 +442,7 @@ class Toolbox(GenericToolbox):
             dlg.close()
             app.gui.window.dialog_warning(
                 title = "Error generating bathymetry",
-                text = e.args[0]
+                text = str(e)
                 )
             return
         self.setup_dict.update({"setup_dep": setup_dep})
@@ -472,7 +472,7 @@ class Toolbox(GenericToolbox):
             dlg.close()
             app.gui.window.dialog_warning(
                 title = "Error generating manning roughness",
-                text = e.args[0]
+                text = str(e)
                 )
             return
         self.setup_dict.update({"setup_manning_roughness": setup_manning_roughness})
@@ -513,7 +513,7 @@ class Toolbox(GenericToolbox):
             dlg.close()
             app.gui.window.dialog_warning(
                 title = "Error generating active mask",
-                text = e.args[0]
+                text = str(e)
                 )
             return
         self.setup_dict.update({"setup_mask_active": setup_mask_active})
@@ -547,7 +547,7 @@ class Toolbox(GenericToolbox):
                 dlg.close()
                 app.gui.window.dialog_warning(
                     title = "Error generating waterlevel boundaries",
-                    text = e.args[0]
+                    text = str(e)
                     )
                 return
             self.setup_dict.update({"setup_mask_bounds": setup_mask_bounds})
@@ -569,7 +569,7 @@ class Toolbox(GenericToolbox):
                 dlg.close()
                 app.gui.window.dialog_warning(
                     title = "Error generating outflow boundaries",
-                    text = e.args[0]
+                    text = str(e)
                     )
                 return
             self.setup_dict.update({"setup_mask_bounds2": setup_mask_bounds2})
@@ -710,7 +710,7 @@ class Toolbox(GenericToolbox):
             dlg.close()
             app.gui.window.dialog_warning(
                 title = "Error generating subgrid",
-                text = e.args[0]
+                text = str(e)
                 )
             return
         self.setup_dict.update({"setup_subgrid": setup_subgrid})
@@ -737,7 +737,7 @@ class Toolbox(GenericToolbox):
                     dlg.close()
                     app.gui.window.dialog_warning(
                         title = "Error generating tiles",
-                        text = e.args[0]
+                        text = str(e)
                         )
                 self.setup_dict.update({"setup_tiles": setup_tiles})
                 dlg.close()
@@ -751,7 +751,7 @@ class Toolbox(GenericToolbox):
                 except Exception as e:
                     app.gui.window.dialog_warning(
                         title = "Error generating boundary points",
-                        text = e.args[0]
+                        text = str(e)
                         )
 
         dlg = app.gui.window.dialog_wait("Writing SFINCS model ...")
