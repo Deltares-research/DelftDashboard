@@ -9,9 +9,9 @@ element:
   - string: Weirs
     module: models.sfincs_hmt.structures.callbacks.weirs
     element: structures_weirs.yml
-  - string: Thin Dams
-    module: models.sfincs_hmt.structures.callbacks.dams
-    element: structures_thin_dams.yml
+  # - string: Thin Dams
+  #   module: models.sfincs_hmt.structures.callbacks.dams
+  #   element: structures_thin_dams.yml
   - string: Drainage 
     module: models.sfincs_hmt.structures.callbacks.drainage
     element: structures_drainage.yml
