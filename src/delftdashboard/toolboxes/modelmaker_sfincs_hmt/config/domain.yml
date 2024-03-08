@@ -75,14 +75,14 @@ element:
       y: 95
       width: 200
       height: 20
-    text: "When including (local) precipitation, it is recommended \nto use a watershed as extent."
+    text: "Are you modeling: "
   - style: checkbox
     position:
       x: 10
       y: 75
       width: 200
       height: 20
-    text: "Include precipitation"
+    text: "Local precipitation"
     text_position: right
     variable: include_precip
     tooltip: "When you want to include local precipitation, we recommend to delineate your model domain with watershed boundaries."

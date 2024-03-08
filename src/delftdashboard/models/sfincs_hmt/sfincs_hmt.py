@@ -46,12 +46,12 @@ class Model(GenericModel):
                 app.gui.setvar(group, "dx", 0.1)
                 app.gui.setvar(group, "dy", 0.1)
                 app.gui.setvar(group, "res", 0.1)
-                app.gui.setvar(group, "unit", " (in \u00B0)")
+                app.gui.setvar(group, "unit", " (\u00B0)")
             else:
                 app.gui.setvar(group, "dx", 500)
                 app.gui.setvar(group, "dy", 500)
                 app.gui.setvar(group, "res", 500)
-                app.gui.setvar(group, "unit", " (in m)")
+                app.gui.setvar(group, "unit", " (m)")
 
         # update map
         self.plot()
