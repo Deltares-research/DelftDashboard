@@ -1,5 +1,5 @@
 meta:
-  root: C:/Users/blom_lk/dev/Executable_Testing/_internal/data
+  root: <YOUR ROOT>/_internal/data
 
 GEBCO 2020:
   data_type: RasterDataset
