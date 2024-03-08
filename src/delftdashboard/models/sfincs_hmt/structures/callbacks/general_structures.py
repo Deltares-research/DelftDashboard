@@ -45,8 +45,6 @@ class FAMBNameConverter:
 def select(*args):
     # reset the map
     map.update()
-    app.map.layer["sfincs_hmt"].layer["bed_levels"].show()
-    app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
 
     model = app.model["sfincs_hmt"].domain
 
