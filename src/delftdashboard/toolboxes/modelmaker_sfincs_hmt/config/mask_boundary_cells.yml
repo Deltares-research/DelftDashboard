@@ -98,7 +98,7 @@ element:
       y: 90
       width: 45
       height: 20
-    text:  "Restrict to cells with a maximum elevation of (in m+MSL): "
+    text:  "Restrict to cells with a maximum elevation of (in m+Ref): "
     text_position: left
     variable: wlev_zmax  
 - style: panel
@@ -166,7 +166,7 @@ element:
       y: 90
       width: 45
       height: 20
-    text:  "Restrict to cells with a minimum elevation of (in m+MSL): "
+    text:  "Restrict to cells with a minimum elevation of (in m+Ref): "
     text_position: left
     variable: outflow_zmin        
 
