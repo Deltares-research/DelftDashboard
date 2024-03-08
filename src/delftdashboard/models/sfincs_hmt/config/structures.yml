@@ -6,7 +6,7 @@ element:
     width: -10
     height: 160
   tab:
-  - string: Weirs
+  - string: Line elements
     module: models.sfincs_hmt.structures.callbacks.weirs
     element: structures_weirs.yml
   # - string: Thin Dams
