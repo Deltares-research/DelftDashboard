@@ -110,6 +110,8 @@ class Toolbox(GenericToolbox):
                         source = app.data_catalog[key].meta["source"]
                         if source not in source_names:
                             source_names.append(source)
+            # Add a last entry for the user to add their own bathymetry
+            source_names.append("Add your own dataset")
 
         app.gui.setvar(group, "bathymetry_source_names", source_names)
         app.gui.setvar(group, "active_bathymetry_source", source_names[0])
@@ -724,7 +726,11 @@ class Toolbox(GenericToolbox):
                 title = "Create tiles. Press cancel to skip.")
             if okay:
                 dlg = app.gui.window.dialog_wait("Writing tiles ...")
-                setup_tiles = {"zoom_range": int(value), "fmt": "png"}
+                setup_tiles = {
+                "datasets_dep": app.toolbox[group].selected_bathymetry_datasets,
+                "zoom_range": int(value),
+                "fmt": "png",
+                }
                 try:
                     model.setup_tiles(**setup_tiles)
                 except Exception as e:

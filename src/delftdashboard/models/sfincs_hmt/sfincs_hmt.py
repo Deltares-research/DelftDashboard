@@ -211,9 +211,9 @@ class Model(GenericModel):
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
 
         # Boundary conditions
-        # methods
+        # Waterlevel boundary methods
         bc_wlev_methods = ["Click Points", "Generate along Boundary", "Select from Database", "Load from File"]
-        bc_wlev_timeseries_methods = ["Constant", "Synthetic", "Download"]
+        bc_wlev_timeseries_methods = ["Constant timeseries", "Guassian timeseries", "Download from database"]
         app.gui.setvar(group, "bc_wlev_methods", bc_wlev_methods)
         app.gui.setvar(group, "bc_wlev_methods_index", 0)
         app.gui.setvar(group, "bc_wlev_timeseries_methods", bc_wlev_timeseries_methods)
@@ -229,10 +229,19 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_boundary_points", 0)
         app.gui.setvar(group, "active_boundary_point", 0)
 
+        # Discharge methods
         bc_dis_methods = ["Click Points", "Load from File"]
+        bc_dis_timeseries_methods = ["Constant timeseries", "Guassian timeseries"]
         app.gui.setvar(group, "bc_dis_methods", bc_dis_methods)
         app.gui.setvar(group, "bc_dis_methods_index", 0)
+        app.gui.setvar(group, "bc_dis_timeseries_methods", bc_dis_timeseries_methods)
+        app.gui.setvar(group, "bc_dis_timeseries_methods_index", 0)
+
+        # values
+        app.gui.setvar(group, "bc_dis_value", 0.0)
         app.gui.setvar(group, "merge_bc_dis", True)
+
+        # gui settings
         app.gui.setvar(group, "discharge_point_names", [])
         app.gui.setvar(group, "nr_discharge_points", 0)
         app.gui.setvar(group, "active_discharge_point", 0)

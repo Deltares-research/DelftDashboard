@@ -110,6 +110,13 @@ class Toolbox(GenericToolbox):
         index = app.gui.getvar("observation_stations", "active_station_index")
         gdf = self.gdf.iloc[[index]]
 
+        # drop index column if it exists
+        if "index" in gdf.columns:
+            gdf = gdf.drop(columns=["index"])
+
+        # add source to gdf
+        gdf["source"] = list(self.sources.keys())[app.gui.getvar("observation_stations", "active_source_index")]
+
         app.active_model.add_stations(gdf, 
                                       naming_option=app.gui.getvar("observation_stations", "naming_option"),
                                       model_option=model_option)
@@ -130,6 +137,13 @@ class Toolbox(GenericToolbox):
         # only keep stations within model extent
         gdf = gpd.sjoin(gdf.to_crs(gdf_model.crs), gdf_model, op='within')
 
+        # drop index column if it exists
+        if "index" in gdf.columns:
+            gdf = gdf.drop(columns=["index"])
+
+        # add source to gdf
+        gdf["source"] = list(self.sources.keys())[app.gui.getvar("observation_stations", "active_source_index")]
+        
         app.active_model.add_stations(gdf, 
                                       naming_option=app.gui.getvar("observation_stations", "naming_option"),
                                       model_option=model_option)

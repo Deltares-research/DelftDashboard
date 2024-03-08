@@ -133,8 +133,9 @@ def toggle_attr_map(*args):
             )
             app.gui.setvar("fiat", "show_attributes", False)
         else:
+            label = ["Select"] + label
             app.gui.setvar("fiat", "aggregation_label_display_string", label)
-            app.gui.setvar("fiat", "aggregation_label_display_value", label)
+            app.gui.setvar("fiat", "aggregation_label_display_value",  label)
             attributes = [app.gui.getvar("fiat", "aggregation_label_display_name")]
             if len(attributes) > 0:
                 app.gui.setvar("fiat", "aggregation_label_display_name", 0)
