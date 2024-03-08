@@ -10,74 +10,116 @@ element:
 - style: panel
   position:
     x: 10
-    y: 140
+    y: 170
     width: 440
-    height: 100
+    height: 70
   title: Description
+  element:
+  - style: edit
+    position:
+      x: 80
+      y: 40
+      width: 70
+      height: 20
+    variable: name
+    text: Name
+    tooltip: Edit the name of the flood wall (no spaces allowed!).
+  - style: edit
+    position:
+      x: 80
+      y: 15
+      width: 200
+      height: 20
+    variable: description
+    text: Description
+    tooltip: Edit the description of the flood wall
 - style: panel
   position:
     x: 10
     y: 50
     width: 440
-    height: 80
+    height: 110
   title: Flood Wall Properties
-- style: edit
-  position:
-    x: 100
-    y: 200
-    width: 200
-    height: 20
-  variable: name
-  text: Name
-  tooltip: Edit the name of the flood wall (no spaces allowed!).
-- style: edit
-  position:
-    x: 100
-    y: 175
-    width: 200
-    height: 20
-  variable: description
-  text: Description
-  tooltip: Edit the description of the flood wall
-- style: edit
-  position:
-    x: 90
-    y: 100
-    width: 50
-    height: 20
-  variable: elevation
-  text: Elevation
-  tooltip: Edit the elevation
-- style: text
-  position:
-    x: 150
-    y: 100
-    width: 50
-    height: 20
-  variable: elev_ref
-- style: pushselectfile
-  position:
-    x: 90
-    y: 70
-    width: 130
-    height: 20
-  text: Import Line Coordinates
-  variable: geometry_file
-  showfilename: 'yes'
-  extension: '*.csv'
-  tooltip: Import coordinates
-  dependency:
-  - action: visible
-    checkfor: any
-    check:
-    - variable: selection_type
-      operator: eq
-      value: import_area
-- style: checkbox
-  position:
-    x: 210
-    y: 100
-    width: 100
-    height: 20
-  text: Absolute
-  variable: absolute_elevation
+  element:
+  - style: text
+    position:
+      x: 10
+      y: 85
+      width: 300
+      height: 20
+    text: "Select how you want to define the height of your flood wall: "
+  - style: popupmenu
+    position:
+      x: 10
+      y: 65
+      width: 120
+      height: 20
+    variable: absolute_elevation
+    tooltip: Specify how you want to define the elevation of the flood wall
+    option_string: ["m above datum", "m above ground level"]
+    option_value: [True, False]    
+  - style: edit
+    position:
+      x: 80
+      y: 30
+      width: 50
+      height: 20
+    variable: elevation
+    text: Elevation (m+Ref)
+    tooltip: Edit the elevation with respect to the datum. The datum is taken from the topobathy data of your model.
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: absolute_elevation
+        operator: eq
+        value: True
+  - style: edit
+    position:
+      x: 80
+      y: 30
+      width: 50
+      height: 20
+    variable: elevation
+    text: Height (m)
+    tooltip: Edit the height above ground level. Ground levels are taken from the topobathy data of your model.
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: absolute_elevation
+        operator: eq
+        value: False        
+  # - style: text
+  #   position:
+  #     x: 150
+  #     y: 100
+  #     width: 50
+  #     height: 20
+  #   variable: elev_ref
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 5
+      width: 120
+      height: 20
+    text: Import Line Coordinates
+    variable: geometry_file
+    showfilename: 'yes'
+    extension: '*.csv'
+    tooltip: Import coordinates
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: selection_type
+        operator: eq
+        value: import_area
+  # - style: checkbox
+  #   position:
+  #     x: 210
+  #     y: 100
+  #     width: 100
+  #     height: 20
+  #   text: Absolute
+  #   variable: absolute_elevation
