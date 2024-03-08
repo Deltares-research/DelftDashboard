@@ -39,7 +39,7 @@ element:
     y: 50
     width: 440
     height: 110
-  title: Flood Wall Properties
+  title: Line Element Properties
   element:
   - style: text
     position:
@@ -47,7 +47,7 @@ element:
       y: 85
       width: 300
       height: 20
-    text: "Select how you want to define the height of your flood wall: "
+    text: "Select how you want to define the height of your line element: "
   - style: popupmenu
     position:
       x: 10
@@ -55,7 +55,7 @@ element:
       width: 120
       height: 20
     variable: absolute_elevation
-    tooltip: Specify how you want to define the elevation of the flood wall
+    tooltip: Specify how you want to define the elevation of the line element
     option_string: ["m above datum", "m above ground level"]
     option_value: [True, False]    
   - style: edit

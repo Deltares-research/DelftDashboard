@@ -190,6 +190,10 @@ def make_geom_layer(geom_type: str, geom_list: list, layer, add_snapped: bool = 
         # Create geodataframe
         geom_gdf = gpd.GeoDataFrame(geometry=[geom["geometry"]])
 
+        # Convert MultiLineString to LineString
+        if geom_gdf["geometry"].iloc[0].geom_type == "MultiLineString":
+            geom_gdf = geom_gdf.explode()
+
         # Add layer to map
         layer.add_layer(
             str(geom["name"]),
