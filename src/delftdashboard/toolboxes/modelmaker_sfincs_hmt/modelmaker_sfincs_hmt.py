@@ -1,4 +1,5 @@
 import geopandas as gpd
+import pandas as pd
 from hydromt.config import configread, configwrite
 from hydromt_sfincs.utils import mask2gdf
 
@@ -586,11 +587,11 @@ class Toolbox(GenericToolbox):
         # Set original mask as active
         gdf = mask2gdf(mask, option="active")
 
-        # Add column for mask type ('active' is default)
-        gdf["mask_type"] = "Active"
         if gdf is None:
             # TODO: Can it also be that there are only boundary cells?
             raise ValueError("No active cells found")
+        # Add column for mask type ('active' is default)
+        gdf["mask_type"] = "Active"
         
         # GeoDataFrame with water level boundary cells
         gdf_wlev = mask2gdf(mask, option="wlev")
@@ -605,7 +606,7 @@ class Toolbox(GenericToolbox):
             assert set(gdf_wlev["geometry"]).isdisjoint(set(gdf["geometry"]))
 
             # Append geometries from gdf_wlev to gdf
-            gdf = gdf.append(gdf_wlev, ignore_index=True)           
+            gdf = pd.concat([gdf, gdf_wlev], ignore_index=True)
 
             include_waterlevels = True
 
@@ -622,7 +623,7 @@ class Toolbox(GenericToolbox):
             assert set(gdf_outflow["geometry"]).isdisjoint(set(gdf["geometry"]))
 
             # Append geometries from gdf_outflow to gdf
-            gdf = gdf.append(gdf_outflow, ignore_index=True)
+            gdf = pd.concat([gdf, gdf_outflow], ignore_index=True)
 
             include_outflow = True
 
