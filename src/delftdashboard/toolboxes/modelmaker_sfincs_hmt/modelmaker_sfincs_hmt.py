@@ -606,7 +606,7 @@ class Toolbox(GenericToolbox):
             assert set(gdf_wlev["geometry"]).isdisjoint(set(gdf["geometry"]))
 
             # Append geometries from gdf_wlev to gdf
-            gdf = pd.concat([gdf, gdf_wlev], ignore_index=True)        
+            gdf = pd.concat([gdf, gdf_wlev], ignore_index=True)
 
             include_waterlevels = True
 
@@ -622,8 +622,8 @@ class Toolbox(GenericToolbox):
             # Check if there are no overlapping geometries
             assert set(gdf_outflow["geometry"]).isdisjoint(set(gdf["geometry"]))
 
-            # Append geometries from gdf_wlev to gdf
-            gdf = pd.concat([gdf, gdf_outflow], ignore_index=True)     
+            # Append geometries from gdf_outflow to gdf
+            gdf = pd.concat([gdf, gdf_outflow], ignore_index=True)
 
             include_outflow = True
 
