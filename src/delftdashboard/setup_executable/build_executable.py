@@ -1,11 +1,9 @@
 import argparse
 import importlib
 import os
-import pkgutil
 import shutil
 import subprocess
 import sys
-from importlib.metadata import PackageNotFoundError
 from pathlib import Path
 from typing import Tuple
 
@@ -127,39 +125,70 @@ def get_hidden_imports(src_path, ddb_modules, packages):
         )
 
     for package_name in packages:
+        hidden_imports.append(package_name)
+
         full_package = importlib.import_module(package_name)
-        for package in pkgutil.iter_modules(
-            full_package.__path__, prefix=f"{full_package.__name__}."
-        ):
-            hidden_imports.append(package.name)
+        # for package in pkgutil.iter_modules(
+        #     full_package.__path__, prefix=f"{full_package.__name__}."
+        # ):
+        #     hidden_imports.append(package.name)
     return hidden_imports
 
 
-def get_datas(src_path) -> list[Tuple[Path, str]]:
+def get_datas(src_path, ddb_modules) -> list[Tuple[Path, str]]:
     """
     This function is used to get the datas to be included in the executable.
 
     Returns:
         list[Tuple[Path, str]]: A list of tuples containing the path to the data file or directory and the destination path within the executable.
     """
+
+    def add_ddb_data_files(source_folder, datas):
+        """
+        Recursively adds files from `source_folder` to the `datas` list, preserving the directory structure.
+
+        Args:
+            source_folder (str): The path to the source folder containing the files to be added.
+            datas (list): The list to which the file paths and their corresponding relative paths will be added.
+
+        Returns:
+            None
+
+        """
+        for root, dirs, files in os.walk(source_folder):
+            for file in files:
+                file_path = Path(root, file)
+                relative_path = file_path.relative_to(source_folder)
+                datas.append((str(file_path), str(Path(relative_path.parent))))
+
+    def add_ddb_modules(source_folder, datas, ddb_modules):
+        """
+        Add Delft Dashboard modules to the datas list.
+
+        Args:
+            source_folder (str): The source folder where the modules are located.
+            datas (list): The list of data files to be included in the executable.
+            ddb_modules (list): The list of Delft Dashboard modules to be added.
+
+        Returns:
+            None
+        """
+        for module in ddb_modules:
+            datas.append(
+                (
+                    os.path.normpath(Path(source_folder, module)),
+                    module,
+                )
+            )
+
     datas = []
+    add_ddb_data_files(src_path, datas)
+    add_ddb_modules(src_path, datas, ddb_modules)
+
     env_root_path = os.path.normpath(os.path.dirname(sys.executable))
     site_packages_path = os.path.normpath(
         Path(env_root_path, os.fspath("Lib/site-packages"))
     )
-
-    for module in os.listdir(src_path):
-        module_path = Path(src_path, module)
-        for root, dirs, files in os.walk(module_path):
-            for file in files:
-                if file.endswith((".yml", ".txt")):
-                    source_file_path = os.path.join(root, file)
-                    relative_path = os.path.relpath(root, module_path)
-                    destination_path = os.path.join(
-                        f"delftdashboard\\{module}",
-                        os.path.normpath(relative_path),
-                    )
-                    datas.append((os.path.normpath(source_file_path), destination_path))
 
     datas.append(
         (
