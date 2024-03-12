@@ -79,9 +79,9 @@ function Copy-File {
 
 # Check if the necessary files exist
 validateFileExists "$userFiles/Data.zip"
-validateFileExists "$userFiles/mapbox_token.txt"
-validateFileExists "$userFiles/census_key.txt"
 
+# validateFileExists "$setupFiles/mapbox_token.txt"
+# validateFileExists "$setupFiles/census_key.txt"
 validateFileExists "$setupFiles/delftdashboard.ini"
 validateFileExists "$setupFiles/data_catalog.yml"
 validateFileExists "$setupFiles/Hazus_IWR_curves.csv"
@@ -96,8 +96,8 @@ Copy-File "$setupFiles/delftdashboard.ini" "$ddbConfig/delftdashboard.ini"
 
 Copy-File "$setupFiles/Hazus_IWR_curves.csv" "$hydromt_fiat/data/damage_functions/flooding/Hazus_IWR_curves.csv"
 
-Copy-File "$userFiles/mapbox_token.txt" "$ddbConfig/mapbox_token.txt"
-Copy-File "$userFiles/census_key.txt" "$ddbConfig/census_key.txt"
+# Copy-File "$setupFiles/mapbox_token.txt" "$ddbConfig/mapbox_token.txt"
+# Copy-File "$setupFiles/census_key.txt" "$ddbConfig/census_key.txt"
 
 # Update paths
 Update-File "$ddbConfig/data_catalog.yml"

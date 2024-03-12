@@ -7,9 +7,10 @@ import shutil
 import importlib
 from pathlib import Path
 
+#### SETTINGS & VARIABLES #####
 sys.setrecursionlimit(sys.getrecursionlimit() * 10)
 block_cipher = None
-os.environ['GDAL_DATA'] = 'C:/OSGeo4W/apps/gdal/share/gdal'
+# os.environ['GDAL_DATA'] = 'C:/OSGeo4W/apps/gdal/share/gdal'
 
 if os.environ.get("PROJECT_ROOT") is None:
     print("PROJECT_ROOT environment variable not set. Please set before running building the executable")
@@ -32,7 +33,6 @@ src_path = Path(project_root, "src", "delftdashboard")
 #### HIDDEN IMPORTS #####
 hidden_imports = []
 
-# Functions
 def import_hidden_ddb_module(hidden_imports, module_path, module_parents):
     for node in os.listdir(module_path):
         full_path = Path(module_path, node)
@@ -55,24 +55,19 @@ def import_hidden_package(package_name):
 
 # Import hidden modules
 internal_dir = Path(exe_dir, '_internal')
-ddb_modules = ["config", "layers", "menu", "misc", "models", "operations", "toolboxes"]
+ddb_modules = ["layers", "menu", "misc", "models", "operations", "toolboxes"]
 
 for module in ddb_modules:
     module_path = Path(src_path, module)
     import_hidden_ddb_module(hidden_imports, module_path, module_parents=f"delftdashboard.{module}")
-
-    if os.path.isdir(module_path):
-        shutil.copytree(module_path, internal_dir, dirs_exist_ok=True)
-    else:
-        shutil.copy(module_path, internal_dir)
 
 import_hidden_package('numpy')
 import_hidden_package('xugrid')
 import_hidden_package('rasterio')
 import_hidden_package('guitares')
 import_hidden_package('pyogrio')
-
 hidden_imports.append('pyogrio._geometry')
+
 
 #### DATA FILES #####
 datas = []
@@ -81,11 +76,11 @@ datas = []
 env_root_path = os.path.normpath(os.path.dirname(sys.executable))
 site_packages_path = os.path.normpath(Path(env_root_path, os.fspath('Lib/site-packages')))
 
-# TODO copy gdal headers and set runtimehook GDAL_DATA env var
-gdal_bin_path = Path(env_root_path, "Library", "bin")
-
 datas.append( (os.path.normpath( Path(site_packages_path, "branca/templates/*.js")), "branca/templates") )
 datas.append( (os.path.normpath( Path(site_packages_path, "guitares/pyqt5/mapbox/server")), "guitares/pyqt5/mapbox/server") )
+
+
+#### PYINSTALLER #####
 
 a = Analysis(
     [Path(src_path, "delftdashboard_gui.py")],
@@ -122,6 +117,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
+
 coll = COLLECT(
     exe,
     a.binaries,

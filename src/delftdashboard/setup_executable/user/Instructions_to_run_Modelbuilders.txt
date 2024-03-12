@@ -1,45 +1,21 @@
-Welcome to the FloodAdapt Model Builder setup!
+## Welcome to the FloodAdapt Model Builder setup!
 
-Before you start, please ensure that your folder structure is as follows:
+# Before you start, please ensure that your folder structure is as follows:
+   (notation: <example1> is a directory, example2.any is a file)
+   
+   <YOUR-ROOT>
+      - <_internal>
+      - <userFiles>     <--- Paste Data.zip here
+      - FloodAdapt_ModelBuilder.exe
+      - Instructions_to_run_Modelbuilders.txt
+      - setup.bat
 
-<YOUR-ROOT>
-   - FloodAdapt_ModelBuilder.exe
-   - <_internal>
-   - setup.bat
-   - <userFiles>
-   - INSTRUCTIONS_PLEASE_READ.txt
-(notation: <example1> is a directory, example2.any is a file)
+# Deltares provides:
+      Data.zip: This file contains all the necessary data for the model. 
+      Paste it as a .zip file into <userFiles> (setup.bat will unzip it!)
 
-The <userFiles> directory is where you should place your files.
-The following files are required:
+# Running the modelbuilder for the first time:
+      Paste 'Data.zip' into the <userFiles> directory
+      double click 'setup.bat'
 
-Deltares provides:
-1. Data.zip: This file contains all the necessary data for the model. 
-	Paste it as a .zip file into <userFiles> (the setup will unzip it!)
-
-You should provide:
-1. mapbox_token.txt: This file should contain your Mapbox token. 
-	create an account at: https://www.mapbox.com/
-	generate a personal token
-	Copy the token to <userFiles>/mapbox_token.txt
-
-2. census_key.txt: This file should contain your Census key.
-	go to: https://api.census.gov/data/key_signup.html
-	enter your company name and email adress
-	Copy the token to <userFiles>/census_key.txt
-
-Your folder structure should look like this now:
-<YOUR-ROOT>
-   - FloodAdapt_ModelBuilder.exe
-   - <_internal>
-   - setup.bat
-   - <userFiles>
-	- mapbox_token.txt
-	- census_key.txt
-	- Data.zip
-   - Instructions_to_run_Modelbuilders.txt
-
-Once you have placed all the necessary files in the <userFiles> directory, you can run the setup by double-clicking on the 'setup.bat' file.
-This will run a script that will initialize your setup. 
-
-Once setup has completed succesfully, you can run the FloodAdapt Model Builder by double-clicking on the 'FloodAdapt_ModelBuilder.exe' file.
+After completing setup.bat once, you can run FloodAdapt_ModelBuilder.exe by double clicking
