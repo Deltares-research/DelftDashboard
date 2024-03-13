@@ -93,7 +93,6 @@ Unzip "$userFiles/Data.zip" $dataPath
 # Copy files
 Copy-File "$setupFiles/data_catalog.yml" "$ddbConfig/data_catalog.yml"
 Copy-File "$setupFiles/delftdashboard.ini" "$ddbConfig/delftdashboard.ini"
-
 Copy-File "$setupFiles/Hazus_IWR_curves.csv" "$hydromt_fiat/data/damage_functions/flooding/Hazus_IWR_curves.csv"
 
 # Copy-File "$setupFiles/mapbox_token.txt" "$ddbConfig/mapbox_token.txt"

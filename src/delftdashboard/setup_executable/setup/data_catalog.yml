@@ -1,9 +1,6 @@
-meta:
-  root: <YOUR ROOT>/_internal/data
-
 GEBCO 2020:
   data_type: RasterDataset
-  path: TopoBathy/gebco.tif
+  path: ../../../data/TopoBathy/gebco.tif
   driver: raster
   filesystem: local
   meta:
@@ -20,7 +17,7 @@ GEBCO 2020:
 
 Chesapeake:
   data_type: RasterDataset
-  path: TopoBathy/Chesapeake_Coned_16m.tif
+  path: ../../../data/TopoBathy/Chesapeake_Coned_16m.tif
   driver: raster
   filesystem: local
   crs: 26918
@@ -32,7 +29,7 @@ Chesapeake:
 
 Charleston:
   data_type: RasterDataset
-  path: TopoBathy/Charleston_14m_cog.tif
+  path: ../../../data/TopoBathy/Charleston_14m_cog.tif
   driver: raster
   filesystem: local
   crs: 4326
@@ -46,7 +43,7 @@ watersheds:
   crs: 4326
   data_type: GeoDataFrame
   driver: vector
-  path: WaterSheds\Watersheds_US_lvl_12_crop.gpkg
+  path: ../../../data/WaterSheds/Watersheds_US_lvl_12_crop.gpkg
   meta:
     category: watersheds
     source: USGS

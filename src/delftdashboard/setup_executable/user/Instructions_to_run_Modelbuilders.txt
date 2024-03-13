@@ -5,17 +5,22 @@
    
    <YOUR-ROOT>
       - <_internal>
-      - <userFiles>     <--- Paste Data.zip here
+      - <data>     <--- Unzip Data.zip here
       - FloodAdapt_ModelBuilder.exe
       - Instructions_to_run_Modelbuilders.txt
-      - setup.bat
 
 # Deltares provides:
       Data.zip: This file contains all the necessary data for the model. 
-      Paste it as a .zip file into <userFiles> (setup.bat will unzip it!)
+      
 
-# Running the modelbuilder for the first time:
-      Paste 'Data.zip' into the <userFiles> directory
-      double click 'setup.bat'
+# Before running the modelbuilder, make sure your folder structure looks like this:
+<YOUR-ROOT>
+      - <_internal>
+      - <data>
+            - <TopoBathy>
+            - <Watersheds>
+      - FloodAdapt_ModelBuilder.exe
+      - Instructions_to_run_Modelbuilders.txt
 
-After completing setup.bat once, you can run FloodAdapt_ModelBuilder.exe by double clicking
+# If it is the same, you can run the model builder!
+To do so, double click FloodAdapt_ModelBuilder.exe 

@@ -34,12 +34,6 @@ def parse_args():
         help="Do not open a console window when running the executable. By default, a console window is opened.",
     )
     parser.add_argument(
-        "--no-compile",
-        dest="compile",
-        action="store_false",
-        help="Skip running PyInstaller. Use this flag if you only want to update the internal folder with your current environment. By default, PyInstaller is run.",
-    )
-    parser.add_argument(
         "--no-deps",
         dest="update_deps",
         action="store_false",
@@ -99,10 +93,22 @@ def get_hidden_imports(src_path, ddb_modules, packages):
     def import_hidden_ddb_module(
         hidden_imports: list, module_path: Path, module_parents: str
     ) -> None:
+        """
+        Recursively imports hidden modules from the given module path and adds them to the hidden_imports list.
+
+        Args:
+            hidden_imports (list): The list to store the imported hidden modules.
+            module_path (Path): The path of the module to import hidden modules from.
+            module_parents (str): The parent module path.
+
+        Returns:
+            None
+        """
         for node in os.listdir(module_path):
             full_path = Path(module_path, node)
             basename = os.path.basename(node)
 
+            # If the node is a directory, import the hidden modules from the directory
             if os.path.isdir(full_path) and (not basename.startswith("_")):
                 import_hidden_ddb_module(
                     hidden_imports,
@@ -111,11 +117,11 @@ def get_hidden_imports(src_path, ddb_modules, packages):
                 )
 
             else:
-                if (not basename.endswith(".py")) or (basename.startswith("_")):
-                    continue
-                file = basename[:-3]
-                module = f"{module_parents}.{file}"
-                hidden_imports.append(module)
+                # If the node is a python file, add it to the hidden imports list
+                if (basename.endswith(".py")) and not basename.startswith("_"):
+                    file = basename[:-3]
+                    module = f"{module_parents}.{file}"
+                    hidden_imports.append(module)
 
     hidden_imports = []
     for module in ddb_modules:
@@ -126,76 +132,39 @@ def get_hidden_imports(src_path, ddb_modules, packages):
 
     for package_name in packages:
         hidden_imports.append(package_name)
-
-        full_package = importlib.import_module(package_name)
-        # for package in pkgutil.iter_modules(
-        #     full_package.__path__, prefix=f"{full_package.__name__}."
-        # ):
-        #     hidden_imports.append(package.name)
     return hidden_imports
 
 
 def get_datas(src_path, ddb_modules) -> list[Tuple[Path, str]]:
     """
-    This function is used to get the datas to be included in the executable.
+    This function is used to get the non-python files to be included in the executable.
 
     Returns:
         list[Tuple[Path, str]]: A list of tuples containing the path to the data file or directory and the destination path within the executable.
     """
 
-    def add_ddb_data_files(source_folder, datas):
-        """
-        Recursively adds files from `source_folder` to the `datas` list, preserving the directory structure.
-
-        Args:
-            source_folder (str): The path to the source folder containing the files to be added.
-            datas (list): The list to which the file paths and their corresponding relative paths will be added.
-
-        Returns:
-            None
-
-        """
-        for root, dirs, files in os.walk(source_folder):
-            for file in files:
-                file_path = Path(root, file)
-                relative_path = file_path.relative_to(source_folder)
-                datas.append((str(file_path), str(Path(relative_path.parent))))
-
-    def add_ddb_modules(source_folder, datas, ddb_modules):
-        """
-        Add Delft Dashboard modules to the datas list.
-
-        Args:
-            source_folder (str): The source folder where the modules are located.
-            datas (list): The list of data files to be included in the executable.
-            ddb_modules (list): The list of Delft Dashboard modules to be added.
-
-        Returns:
-            None
-        """
-        for module in ddb_modules:
-            datas.append(
-                (
-                    os.path.normpath(Path(source_folder, module)),
-                    module,
-                )
-            )
-
     datas = []
-    add_ddb_data_files(src_path, datas)
-    add_ddb_modules(src_path, datas, ddb_modules)
+    for module in ddb_modules:
+        # Add them directly to _internal
+        datas.append(
+            (
+                os.path.normpath(Path(src_path, module)),
+                module,
+            )
+        )
 
     env_root_path = os.path.normpath(os.path.dirname(sys.executable))
     site_packages_path = os.path.normpath(
         Path(env_root_path, os.fspath("Lib/site-packages"))
     )
-
+    # Add the branca templates folder
     datas.append(
         (
             os.path.normpath(Path(site_packages_path, "branca", "templates/*.js")),
             "branca/templates",
         )
     )
+    # Add the mapbox server folder
     datas.append(
         (
             os.path.normpath(
@@ -204,6 +173,7 @@ def get_datas(src_path, ddb_modules) -> list[Tuple[Path, str]]:
             "guitares/pyqt5/mapbox/server",
         )
     )
+    # Add the gdal_data folder from fiona
     datas.append(
         (
             os.path.normpath(Path(site_packages_path, "fiona", "gdal_data")),
@@ -211,6 +181,40 @@ def get_datas(src_path, ddb_modules) -> list[Tuple[Path, str]]:
         )
     )
 
+    # files that we want to take from 'src/delftdashboard/setup_executable/setup' instead of 'src/delftdashboard' before including in '_internal/delftdashboard/config'
+    _files_to_ddbconfig = [
+        "mapbox_token.txt",
+        "census_key.txt",
+        "data_catalog.yml",
+        "delftdashboard.ini",
+    ]
+
+    # Add all non-python files from 'src/delftdashboard/**' to '_internal/delftdashboard/**' keeping the same structure
+    for root, dirs, files in os.walk(src_path):
+        # For each file to include, append it to the datas list with the correct relative path
+        for file in files:
+            if file.endswith(".py") or file.endswith(".pyc"):
+                continue
+            full_file_path = os.path.join(root, file)
+            relative_path = os.path.relpath(full_file_path, str(src_path))
+            if file in _files_to_ddbconfig:
+                # Copy from setup folder
+                datas.append(
+                    (
+                        os.path.normpath(
+                            Path(src_path, "setup_executable", "setup", file)
+                        ),
+                        os.path.join("delftdashboard", os.path.dirname(relative_path)),
+                    )
+                )
+            else:
+                # Do the normal copy
+                datas.append(
+                    (
+                        full_file_path,
+                        os.path.join("delftdashboard", os.path.dirname(relative_path)),
+                    )
+                )
     return datas
 
 
@@ -240,28 +244,14 @@ def run_pyinstaller(
     Returns:
         None
     """
-
-    def check_pyinstaller() -> None:
-        """
-        Checks if Pyinstaller is installed and installs it if not found.
-
-        This function runs the command 'pyinstaller -v' to check if Pyinstaller is installed.
-        If Pyinstaller is not found, it prompts the user to install it.
-        If the user chooses to install it, the function runs the command 'pip install pyinstaller'.
-
-        Returns:
-            None
-        """
-        try:
-            subprocess.run(["pyinstaller", "-v"])
-        except Exception:
-            print("Could not find Pyinstaller. Do you want to install it? (y/n)")
-            if input().lower() == "y":
-                subprocess.run(["pip", "install", "pyinstaller"])
-            else:
-                exit()
-
-    check_pyinstaller()
+    try:
+        subprocess.run(["pyinstaller", "-v"])
+    except Exception:
+        print("Could not find Pyinstaller. Do you want to install it? (y/n)")
+        if input().lower() == "y":
+            subprocess.run(["pip", "install", "pyinstaller"])
+        else:
+            exit()
 
     entry_point = src_path / "delftdashboard_gui.py"
     spec_path = src_path / "setup_executable"
@@ -289,9 +279,7 @@ def run_pyinstaller(
         package = hidden_import.split(".")[0]
         if package not in added_packages:
             added_packages.append(package)
-            command.append(
-                f"--collect-all={package}"
-            )  # collects the package source code, submodules and data files
+            command.append(f"--collect-all={package}")
 
             if package in different_metadata_name:
                 package = different_metadata_name[package]
@@ -300,9 +288,7 @@ def run_pyinstaller(
                 command.append(f"--copy-metadata={package}")
 
     for data in datas:
-        command.append(
-            f"--add-data={data[0]}:{data[1]}"
-        )  # Explcitely adds the local data files (data[0]) to the dist folder in a specific location (data[1])
+        command.append(f"--add-data={data[0]}:{data[1]}")
 
     if args.clean:
         command.append("--clean")
@@ -319,9 +305,7 @@ def run_pyinstaller(
 def setup_executable(
     project_name: str,
     user_files: Path,
-    setup_folder: Path,
     exe_dir: Path,
-    internal_dir: Path,
 ) -> None:
     """
     Copies user files and setup folder to the executable directory, removes specific files,
@@ -337,23 +321,16 @@ def setup_executable(
     Returns:
         None
     """
+    # Copy instructions & other files to the executable directory
     shutil.copytree(user_files, exe_dir, dirs_exist_ok=True)
     print(f"Copied {user_files} to {exe_dir}")
 
-    setup_folder_dst = Path(internal_dir, "_setup")
-    shutil.copytree(setup_folder, setup_folder_dst, dirs_exist_ok=True)
-    print(f"Copied {setup_folder} to {setup_folder_dst}")
+    # Make an empty data directory
+    data_dir = exe_dir / "data"
+    os.makedirs(data_dir, exist_ok=True)
+    print(f"Created {data_dir}")
 
-    data_catalog_yml = internal_dir / "delftdashboard" / "config" / "data_catalog.yml"
-    delftdashboard_ini = (
-        internal_dir / "delftdashboard" / "config" / "delftdashboard.ini"
-    )
-
-    if data_catalog_yml.exists():
-        os.remove(data_catalog_yml)
-    if delftdashboard_ini.exists():
-        os.remove(delftdashboard_ini)
-
+    # Print location
     executable_path = Path(exe_dir, f"{project_name}.exe")
     print("\nFinished making the executable for DelftDashboard")
     print(f"\nExecutable can be found at: {executable_path}\n\n")
@@ -372,7 +349,12 @@ def main() -> None:
         7. compile the executable using PyInstaller if specified
         8. format the executable folder with user files, setup folder & instructions
 
-    Note: This function assumes that the necessary dependencies are already installed and that your environment is activated.
+    Note:
+        This function assumes that the necessary dependencies are already installed and that your environment is activated.
+        It is also important to NOT have editable installs of the dependent packages, as these do not have the package-metadata that pyinstaller requires.
+        So packages like hydromt, hydromt_sfincs, hydromt_fiat, flood_adapt and guitares should cloned next to DelftDashboard if you want to use commits more recent than the latest release.
+        Then you can install them using 'pip install .' and not 'pip install -e .', and provide --no-deps to this script.
+        Or you can clone them and run this script, which will do 'pip install .' for you!
 
     Args:
         None
@@ -399,13 +381,11 @@ def main() -> None:
     src_path = Path(project_root, "src", "delftdashboard")
     setup_exe_folder = Path(src_path, "setup_executable")
     user_files = Path(setup_exe_folder, "user")
-    setup_folder = Path(setup_exe_folder, "setup")
 
     # 5 set up distribution paths
     build_dir = Path(project_root, "build")
     dist_dir = Path(project_root, "dist")
     exe_dir = Path(dist_dir, project_name)
-    internal_dir = Path(exe_dir, "_internal")
 
     ddb_modules = [
         "layers",
@@ -440,25 +420,25 @@ def main() -> None:
         "cht_tiling",
         "fiona",  # This needs to be here for the gdal_data hook to work
     ]
+
     # 6. get hidden imports and data files
     hidden_imports = get_hidden_imports(src_path, ddb_modules, missing)
-    datas = get_datas(src_path)
+    datas = get_datas(src_path, ddb_modules)
 
-    # 7 compile the executable using PyInstaller if specified
-    if args.compile:
-        run_pyinstaller(
-            src_path,
-            project_name,
-            build_dir,
-            dist_dir,
-            hidden_imports,
-            datas,
-            icon_path,
-            args,
-        )
+    # 7 compile the executable using PyInstaller
+    run_pyinstaller(
+        src_path,
+        project_name,
+        build_dir,
+        dist_dir,
+        hidden_imports,
+        datas,
+        icon_path,
+        args,
+    )
 
     # 8 format the executable folder with user files, setup folder & instructions
-    setup_executable(project_name, user_files, setup_folder, exe_dir, internal_dir)
+    setup_executable(project_name, user_files, exe_dir)
 
 
 if __name__ == "__main__":
