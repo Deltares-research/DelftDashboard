@@ -6,6 +6,7 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 import os
+from pathlib import Path
 import yaml
 from matplotlib.colors import ListedColormap
 import importlib
@@ -75,6 +76,12 @@ def initialize():
     # Check if overlays folder exists in server
     if not os.path.exists(os.path.join(app.server_path,"overlays")):
         os.mkdir(os.path.join(app.server_path,"overlays"))
+
+
+    # Make temp file for data to show in GUI
+    app.temp_data_path = Path(app.config_path).parent.joinpath("temp_data")
+    if not app.temp_data_path.exists(): # if path does not exist make it
+        app.temp_data_path.mkdir()
 
     # Define some other variables
     app.crs = CRS(4326)
