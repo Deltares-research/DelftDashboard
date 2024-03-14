@@ -21,3 +21,4 @@ src/delftdashboard/config/census_key.txt
 *.spec
 dist
 build
+temp_data
