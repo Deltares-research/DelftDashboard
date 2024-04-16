@@ -1,5 +1,6 @@
 element:
 - style: panel
+  id: output_panel
   position:
     x: 10
     y: 10
@@ -40,6 +41,7 @@ element:
     variable: dthisout
     method: set_model_variables
   - style: edit
+    id: his_int
     position:
       x: 120
       y: 35
@@ -51,6 +53,7 @@ element:
     variable: dtrstout
     method: set_model_variables
   - style: popupmenu
+    id: output_format
     position:
       x: 120
       y: 10

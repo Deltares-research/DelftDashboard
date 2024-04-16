@@ -107,19 +107,23 @@ def redraw_rectangle():
     )
 
 def read_setup_yaml(*args):
-    fname = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
-    if fname[0]:
-        app.toolbox["modelmaker_sfincs_cht"].read_setup_yaml(fname[0])
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
+    if not full_name:
+        return
+    # This will automatically also read and plot the polygons    
+    app.toolbox["modelmaker_sfincs_cht"].read_setup_yaml(full_name)
 
 def write_setup_yaml(*args):
+    # This will automatically also write the polygons    
     app.toolbox["modelmaker_sfincs_cht"].write_setup_yaml()
-    app.toolbox["modelmaker_sfincs_cht"].write_include_polygon()
-    app.toolbox["modelmaker_sfincs_cht"].write_exclude_polygon()
-    app.toolbox["modelmaker_sfincs_cht"].write_boundary_polygon()
 
 def build_model(*args):
     app.toolbox["modelmaker_sfincs_cht"].build_model()
 
-def toggle_snapwave(*args):
-    group = "modelmaker_sfincs_cht"
-    app.model["sfincs_cht"].domain.snapwave = app.gui.getvar(group, "use_snapwave")
+def use_snapwave(*args):
+    # group = "modelmaker_sfincs_cht"
+    app.gui.setvar("sfincs_cht", "snapwave", app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"))
+    app.model["sfincs_cht"].domain.input.variables.snapwave = app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave")
+
+def use_subgrid(*args):
+    pass

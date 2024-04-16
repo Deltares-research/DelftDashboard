@@ -1,0 +1,47 @@
+element:
+- style: popupmenu
+  position:
+    x: 60
+    y: 250
+    width: 200
+    height: 20
+  variable: colormap
+  select: item
+  text: Color Map
+  option_string:
+    variable: colormaps
+  option_value:
+    variable: colormaps
+- style: checkbox
+  position:
+    x: 60
+    y: 220
+    width: 60
+    height: 20
+  variable: autoscaling
+  text: Auto Scaling
+- style: edit  
+  position:
+    x: 40
+    y: 80
+    width: 60
+    height: 20
+  variable: zmax
+  text: Zmax
+- style: edit  
+  position:
+    x: 150
+    y: 80
+    width: 60
+    height: 20
+  variable: zmin
+  text: Zmin
+- style: edit
+  position:
+    x: 40
+    y: 40
+    width: 60
+    height: 20
+  variable: opacity
+  text: Opacity
+  

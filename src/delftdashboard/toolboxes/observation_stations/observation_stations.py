@@ -28,18 +28,18 @@ class Toolbox(GenericToolbox):
         # Set variables
         self.gdf = gpd.GeoDataFrame()
 
-        ndbc = obs.source("ndbc")
-        ndbc.get_active_stations()
-        self.gdf = ndbc.gdf()
+        # ndbc = obs.source("ndbc")
+        # ndbc.get_active_stations()
+        # self.gdf = ndbc.gdf()
 
-        # Set GUI variables
-        group = "observation_stations"
-        app.gui.setvar(group, "active_station_index", 0)
-        stnames = []
-        for station in ndbc.active_stations:
-            stnames.append(station["name"])
-        app.gui.setvar(group, "station_names", stnames)
-        app.gui.setvar(group, "naming_option", "name")
+        # # Set GUI variables
+        # group = "observation_stations"
+        # app.gui.setvar(group, "active_station_index", 0)
+        # stnames = []
+        # for station in ndbc.active_stations:
+        #     stnames.append(station["name"])
+        # app.gui.setvar(group, "station_names", stnames)
+        # app.gui.setvar(group, "naming_option", "name")
 
     def select_tab(self):
         map.update()
