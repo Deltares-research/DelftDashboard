@@ -1039,15 +1039,11 @@ class Model(GenericModel):
         if not self.buildings.empty and "SVI" in self.buildings.columns:
             paint_properties = self.get_nsi_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
-            #color_items = paint_properties['circle-color'][2:-1]
-            #color_items.append('other')
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
-            #color_items.append(paint_properties['circle-color'][-1])
             labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["SVI"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["SVI"].legend_title = 'SVI'
-            #legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
             app.map.layer["buildings"].layer["SVI"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -1058,7 +1054,22 @@ class Model(GenericModel):
                 title="Additional attributes not found.",
             )
     def show_svi_key_domain(self, type="SVI_key_domain"):
-        
+        """Show SVI Key Domain"""  # str(Path(self.root) / "exposure" / "SVI")
+        if not self.buildings.empty and "SVI_key_domain" in self.buildings.columns:
+            paint_properties = self.get_nsi_paint_properties(type=type)
+            color_items = paint_properties['circle-color'][2:-1]
+            color_items.append('other')
+            color_items.append(paint_properties['circle-color'][-1])
+            legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
+            app.map.layer["buildings"].layer["SVI"].set_data(
+                self.buildings, paint_properties, legend
+            )
+            self.show_SVI_index()
+        else:
+            app.gui.window.dialog_info(
+                text="There are no SVI data in your model. Please add SVI data when you set up your model.",
+                title="Additional attributes not found.",
+            )
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
 
