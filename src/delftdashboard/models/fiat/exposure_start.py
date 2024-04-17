@@ -48,7 +48,16 @@ def select_model_type(*args):
             ["Upload data"],
         )
         app.gui.setvar(group, "classification_source_value", ["upload_data"])
+                
+        app.gui.window.dialog_info(
+            "This option is currently not implemented.",
+            "Method not implemented",
+        )
 
+def set_damage_unit(*args):
+    group = "fiat"
+    damage_unit = app.gui.getvar(group, "monetary_damage_unit")
+    app.active_model.set_monetary_damage_value(damage_unit)
 
 def include_all_road_types(*args):
     group = "fiat"
