@@ -672,9 +672,6 @@ class Model(GenericModel):
     def set_crs(self, crs):
         self.domain.crs = crs
     
-    def set_monetary_damage_unit(self, monetary_damage_unit):
-        self.domain.exposure_vm.exposure_damages_model.monetary_damage_unit = monetary_damage_unit
-
     def get_filtered_damage_function_database(
         self, filter: str, col: str = "Occupancy"
     ):
