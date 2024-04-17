@@ -95,7 +95,7 @@ def add_exposure_locations_to_model(*args):
         return
     
     app.active_model.domain.exposure_vm.set_asset_data_source(selected_asset_locations)
-    app.active_model.domain.exposure_vm.exposure_buildings_model.monetary_damage_unit = app.gui.getvar("fiat", "monetary_damage_unit")
+    app.active_model.domain.exposure_vm.exposure_buildings_model.damage_unit = app.gui.getvar("fiat", "damage_unit")
 
     # Set the unit for Exposure Data for visualization
     view_tab_unit = app.active_model.domain.exposure_vm.exposure_buildings_model.unit
@@ -151,7 +151,7 @@ def build_nsi_exposure(*args):
         )
 
         app.gui.setvar(model, "show_asset_locations", True)
-        app.gui.setvar(model, "monetary_damage_unit", "$")
+        app.gui.setvar(model, "damage_unit", "$")
 
         list_types = list(gdf["Secondary Object Type"].unique())
         list_types.sort()
