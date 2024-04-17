@@ -54,11 +54,6 @@ def select_model_type(*args):
             "Method not implemented",
         )
 
-def set_damage_unit(*args):
-    group = "fiat"
-    damage_unit = app.gui.getvar(group, "monetary_damage_unit")
-    app.active_model.set_monetary_damage_unit(damage_unit)
-
 def include_all_road_types(*args):
     group = "fiat"
     if app.gui.getvar(group, "include_all"):

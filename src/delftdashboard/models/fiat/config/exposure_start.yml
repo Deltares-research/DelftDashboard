@@ -32,7 +32,6 @@ element:
       height: 20
     text: Damage unit
     variable: monetary_damage_unit
-    method: set_damage_unit
     dependency:
     - action: visible
       checkfor: all
