@@ -1057,7 +1057,8 @@ class Model(GenericModel):
                 text="There are no SVI data in your model. Please add SVI data when you set up your model.",
                 title="Additional attributes not found.",
             )
-
+    def show_svi_key_domain(self, type="SVI_key_domain"):
+        
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
 
