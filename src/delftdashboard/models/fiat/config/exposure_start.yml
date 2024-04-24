@@ -4,17 +4,17 @@ element:
   position:
     x: 10
     y: 10
-    width: 170
+    width: 250
     height: 120
   element:
   - style: radiobuttongroup
     position:
       x: 10
-      y: 90
+      y: 70
       width: 150
     variable: model_type
-    option_string: ["Start with NSI"]  # , "Start from scratch" # NOTE: This is not yet implemented
-    option_value:  ["Start with NSI"]  # , "Start from scratch" # NOTE: This is not yet implemented
+    option_string: ["Start with NSI"   , "Start from scratch"] # NOTE: This is not yet implemented
+    option_value:  ["Start with NSI"   , "Start from scratch"] # NOTE: This is not yet implemented
     method: select_model_type
   - style: checkbox
     position:
@@ -24,11 +24,26 @@ element:
       height: 20
     text: Include OSM roads
     variable: include_osm_roads
+  - style: edit
+    position:
+      x: 180
+      y: 70
+      width: 50
+      height: 20
+    text: Damage unit
+    variable: damage_unit
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: model_type
+        operator: eq
+        value: Start from scratch
 
 - style: panel
   title: Road settings
   position:
-    x: 190
+    x: 270
     y: 10
     width: 170
     height: 120
@@ -115,7 +130,7 @@ element:
 
 - style: checkbox
   position:
-    x: 395
+    x: 630
     y: 60
     width: 100
     height: 20
@@ -124,7 +139,7 @@ element:
   method: display_asset_locations
 - style: checkbox
   position:
-    x: 395
+    x: 630
     y: 40
     width: 100
     height: 20
@@ -134,7 +149,7 @@ element:
 
 - style: pushbutton
   position:
-    x: 390
+    x: 630
     y: 10
     width: 95
     height: 20
