@@ -259,9 +259,9 @@ def build_osm_exposure(*args):
             model, "source_finished_floor_height", "Open Street Map"
         )
         app.gui.setvar(
-            model, "source_max_potential_damage", "Open Street Map"
+            model, "source_max_potential_damage", "JRC Damage Values"
         )
-        app.gui.setvar(model, "source_ground_elevation", "User input")
+        app.gui.setvar(model, "source_ground_elevation", "User Input")
         
         dlg.close()
 
