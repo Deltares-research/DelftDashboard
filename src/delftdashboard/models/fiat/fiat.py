@@ -505,6 +505,7 @@ class Model(GenericModel):
             "selected_secondary_classification_value",
             [""],
         )
+        app.gui.setvar(group, "osm_ground_floor_height", 0.1)
         app.gui.setvar(group, "loaded_aggregation_files", 0)
         app.gui.setvar(
             group,

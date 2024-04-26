@@ -13,8 +13,8 @@ element:
       y: 70
       width: 150
     variable: model_type
-    option_string: ["Start with NSI"   , "Start from scratch"] # NOTE: This is not yet implemented
-    option_value:  ["Start with NSI"   , "Start from scratch"] # NOTE: This is not yet implemented
+    option_string: ["Start with NSI"   , "Start with Open Street Map"] # NOTE: This is not yet implemented
+    option_value:  ["Start with NSI"   , "Start with Open Street Map"] # NOTE: This is not yet implemented
     method: select_model_type
   - style: checkbox
     position:
@@ -38,7 +38,7 @@ element:
       check:
       - variable: model_type
         operator: eq
-        value: Start from scratch
+        value: Start with Open Street Map
 
 - style: panel
   title: Road settings

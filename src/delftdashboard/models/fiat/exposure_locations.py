@@ -82,6 +82,12 @@ def add_exposure_locations_to_model(*args):
         build_nsi_exposure()
     elif (
         len(selected_asset_locations) == 1
+        and selected_asset_locations[0] != "Open Street Map (OSM)"
+    ):
+        selected_asset_locations = "OSM"
+        build_osm_exposure()   
+    elif (
+        len(selected_asset_locations) == 1
         and selected_asset_locations[0] != "National Structure Inventory (NSI)"
     ):
         app.gui.window.dialog_info(
@@ -160,6 +166,73 @@ def build_nsi_exposure(*args):
         app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
 
         dlg.close()
+
+    except FileNotFoundError:
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
+        dlg.close()
+
+def build_osm_exposure(*args):
+    model = "fiat"
+    checkbox_group = "_main"
+    try:
+        dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
+        # TODO Add all the code here
+        app.gui.setvar(
+            model, "text_feedback_create_asset_locations", "OSM assets created"
+        )
+
+        crs = app.gui.getvar(model, "selected_crs")
+        (
+            gdf,
+            unique_primary_types,
+            unique_secondary_types,
+        ) = app.active_model.domain.exposure_vm.set_asset_locations_source(
+            source="OSM", ground_floor_height="OSM", crs=crs
+        )
+        gdf.set_crs(crs, inplace=True)
+
+        # Set the primary and secondary object type lists
+        app.active_model.set_object_types(unique_primary_types, unique_secondary_types)
+
+        # Set the buildings attribute to gdf for easy visualization of the buildings
+        app.active_model.buildings = gdf
+
+        app.map.layer["buildings"].layer["exposure_points"].crs = crs
+        app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
+
+        app.gui.setvar(model, "show_asset_locations", True)
+
+        list_types = list(gdf["Secondary Object Type"].unique())
+        list_types.sort()
+        df = pd.DataFrame(
+            data={
+                "Secondary Object Type": list_types,
+                "Assigned: Structure": "",
+                "Assigned: Content": "",
+            }
+        )
+        ## TODO: add the nr of stories and the basement?
+        app.gui.setvar(model, "exposure_categories_to_link", df)
+
+        # Set the checkboxes checked
+        app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
+        app.gui.setvar(checkbox_group, "checkbox_classification", True)
+        app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
+        app.gui.setvar(checkbox_group, "checkbox_elevation", True)
+
+        # Set the sources
+        app.gui.setvar(model, "source_asset_locations", "Open Street Map")
+        app.gui.setvar(model, "source_classification", "Open Street Mapy")
+        app.gui.setvar(
+            model, "source_finished_floor_height", "Open Street Map"
+        )
+        app.gui.setvar(
+            model, "source_max_potential_damage", "Open Street Map"
+        )
+        app.gui.setvar(model, "source_ground_elevation", "Open Street Map")
 
     except FileNotFoundError:
         app.gui.window.dialog_info(

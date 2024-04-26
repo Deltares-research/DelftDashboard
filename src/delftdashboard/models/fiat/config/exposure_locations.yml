@@ -22,7 +22,7 @@ element:
       check:
       - variable: model_type
         operator: eq
-        value: "Start from scratch"
+        value: "Start with Open Street Map"
   - style: listbox
     position:
       x: 10
