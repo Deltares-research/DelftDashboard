@@ -261,7 +261,9 @@ def build_osm_exposure(*args):
         app.gui.setvar(
             model, "source_max_potential_damage", "Open Street Map"
         )
-        app.gui.setvar(model, "source_ground_elevation", "Open Street Map")
+        app.gui.setvar(model, "source_ground_elevation", "User input")
+        
+        dlg.close()
 
     except FileNotFoundError:
         app.gui.window.dialog_info(
