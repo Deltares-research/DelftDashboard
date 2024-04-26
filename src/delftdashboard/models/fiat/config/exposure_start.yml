@@ -4,7 +4,7 @@ element:
   position:
     x: 10
     y: 10
-    width: 250
+    width: 340
     height: 120
   element:
   - style: radiobuttongroup
@@ -28,10 +28,25 @@ element:
     position:
       x: 180
       y: 70
-      width: 50
+      width: 30
       height: 20
     text: Damage unit
     variable: damage_unit
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: model_type
+        operator: eq
+        value: Start with Open Street Map
+  - style: edit
+    position:
+      x: 300
+      y: 70
+      width: 30
+      height: 20
+    text: Ground Floor Height (ft)
+    variable: osm_ground_floor_height
     dependency:
     - action: visible
       checkfor: all

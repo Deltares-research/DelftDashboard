@@ -2,6 +2,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 import pandas as pd
+import geopandas as gpd
 
 
 def select(*args):
@@ -204,16 +205,16 @@ def build_osm_exposure(*args):
     checkbox_group = "_main"
     try:
         dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
-        # TODO Add all the code here
+        
         app.gui.setvar(
             model, "text_feedback_create_asset_locations", "OSM assets created"
         )
 
         crs = app.gui.getvar(model, "selected_crs")
-        country = "Germany" # Create variable to get country
-
-        ground_floor_height = app.gui.getvar(model, "osm_ground_floor_height") # Create variable to get country in GUI
         
+        country = get_country()
+
+        ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height")) 
         (
             gdf,
             unique_primary_types,
@@ -311,6 +312,13 @@ def build_osm_exposure(*args):
             )
             dlg.close()
 
+def get_country(*args):
+    region =  app.active_model.domain.exposure_vm.data_catalog.get_geodataframe("area_of_interest")
+    country_boundaries = app.active_model.domain.exposure_vm.data_catalog.get_geodataframe("country_boundaries")
+    country_overlay = gpd.overlay(region, country_boundaries, how ="intersection")
+    country = country_overlay["country"][0]
+
+    return country
 
 def get_road_types():
     model = "fiat"
