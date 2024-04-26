@@ -57,7 +57,7 @@ element:
       y: 60
       width: 130
       height: 20
-    method: load_observation_points_from_file
+    method: load
     tooltip: Load observation points from file
     dependency:
     - action: visible

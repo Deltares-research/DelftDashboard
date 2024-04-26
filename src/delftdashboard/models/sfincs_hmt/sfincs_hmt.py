@@ -7,6 +7,12 @@ from hydromt_sfincs import SfincsModel
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 
+from .observation_points import add_observation_point
+from .observation_points import select_observation_point_from_map
+from .boundary_conditions_wlev import add_boundary_point
+from .boundary_conditions_wlev import select_boundary_point_from_map
+from .boundary_conditions_dis import select_discharge_point_from_map
+
 class Model(GenericModel):
     def __init__(self, name):
         super().__init__()
@@ -40,13 +46,13 @@ class Model(GenericModel):
                 app.gui.setvar(group, "dx", 0.1)
                 app.gui.setvar(group, "dy", 0.1)
                 app.gui.setvar(group, "res", 0.1)
-                app.gui.setvar(group, "unit", " (in \u00B0)")
+                app.gui.setvar(group, "unit", " (\u00B0)")
             else:
                 app.gui.setvar(group, "dx", 500)
                 app.gui.setvar(group, "dy", 500)
                 app.gui.setvar(group, "res", 500)
-                app.gui.setvar(group, "unit", " (in m)")
-        
+                app.gui.setvar(group, "unit", " (m)")
+
         # update map
         self.plot()
 
@@ -63,15 +69,24 @@ class Model(GenericModel):
             "grid",
             type="line",
             circle_radius=0,
-            line_width=1,
+            line_width=0.5,
             line_color="black",
             line_width_inactive=0.5,
-            line_color_inactive="lightgrey",
+            line_color_inactive="lightgrey", #TODO fix this
             line_opacity_inactive=0.5,
         )
 
+        # TODO make this a PolygonLayer (but not yet proeprly implemented in Guitares)
+        layer.add_layer(
+            "region",
+            type="draw",
+            shape="polygon",
+            polygon_line_color="grey",
+            polygon_fill_opacity=0.3,
+        )
+
         bed_levels = layer.add_layer(
-            "bed_levels", 
+            "bed_levels",
             type="raster",
         )
 
@@ -79,57 +94,59 @@ class Model(GenericModel):
         bed_levels.update = update_map
 
         layer.add_layer(
-            "mask_active",
+            "mask",
             type="circle",
             circle_radius=3,
+            legend_position="top-right",
+            legend_title="Cell type",
             fill_color="yellow",
             line_color="transparent",
+            big_data=True,
         )
-
-        layer.add_layer(
-            "mask_bound_wlev",
-            type="circle",
-            circle_radius=3,
-            fill_color="blue",
-            line_color="transparent",
-        )
-
-        layer.add_layer(
-            "mask_bound_outflow",
-            type="circle",
-            circle_radius=3,
-            fill_color="red",
-            line_color="transparent",
-        )
-
-        # Move this to hurrywave.py
-        from .boundary_conditions_wlev import select_boundary_point_from_map
 
         layer.add_layer(
             "boundary_points",
             type="circle_selector",
             select=select_boundary_point_from_map,
-            line_color="white",
+            line_color="black",
             line_opacity=1.0,
-            fill_color="blue",
+            fill_color="darkblue",
             fill_opacity=1.0,
-            circle_radius=3,
-            circle_radius_selected=4,
+            circle_radius=4,
+            circle_radius_selected=5,
             line_color_selected="white",
-            fill_color_selected="red",
+            fill_color_selected="darkblue",
+            hover_property="name",
+        )
+
+        layer.add_layer(
+            "discharge_points",
+            type="circle_selector",
+            select=select_discharge_point_from_map,
+            line_color="black",
+            line_opacity=1.0,
+            fill_color="darkgreen",
+            fill_opacity=1.0,
+            circle_radius=4,
+            circle_radius_selected=5,
+            line_color_selected="white",
+            fill_color_selected="darkgreen",
+            hover_property="name",
         )
 
         layer.add_layer(
             "observation_points",
             type="circle_selector",
-            line_color="white",
+            select=select_observation_point_from_map,
+            line_color="black",
             line_opacity=1.0,
-            fill_color="blue",
+            fill_color="black",
             fill_opacity=1.0,
-            circle_radius=3,
-            circle_radius_selected=4,
+            circle_radius=4,
+            circle_radius_selected=5,
             line_color_selected="white",
-            fill_color_selected="red",
+            fill_color_selected="black",
+            hover_property="name",
         )
 
         layer.add_layer(
@@ -149,18 +166,23 @@ class Model(GenericModel):
         if mode == "inactive":
             # Grid is made inactive
             app.map.layer["sfincs_hmt"].layer["grid"].deactivate()
+            app.map.layer["sfincs_hmt"].layer["region"].hide()
 
             # Bed levels are hidden
             app.map.layer["sfincs_hmt"].layer["bed_levels"].hide()
 
             # Mask is made invisible
-            app.map.layer["sfincs_hmt"].layer["mask_active"].hide()
-            app.map.layer["sfincs_hmt"].layer["mask_bound_wlev"].hide()
-            app.map.layer["sfincs_hmt"].layer["mask_bound_outflow"].hide()
+            app.map.layer["sfincs_hmt"].layer["mask"].hide()
+
+            # Hide structure layers
+            if 'measures' in app.map.layer["sfincs_hmt"].layer:
+                app.map.layer["sfincs_hmt"].layer["measures"].hide()
 
             # Boundary points are made grey
             app.map.layer["sfincs_hmt"].layer["boundary_points"].deactivate()
-            
+            app.map.layer["sfincs_hmt"].layer["discharge_points"].deactivate()
+
+
             # Observation points are made grey
             app.map.layer["sfincs_hmt"].layer["observation_points"].deactivate()
             app.map.layer["sfincs_hmt"].layer["cross_sections"].deactivate()
@@ -189,32 +211,50 @@ class Model(GenericModel):
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
 
         # Boundary conditions
-        bc_wlev_methods = ["Click Points", "Generate along boundary", "Select from database", "Load from file"]
+        # Waterlevel boundary methods
+        bc_wlev_methods = ["Click Points", "Generate along Boundary", "Select from Database", "Load from File"]
+        bc_wlev_timeseries_methods = ["Constant timeseries", "Guassian timeseries", "Download from database"]
         app.gui.setvar(group, "bc_wlev_methods", bc_wlev_methods)
         app.gui.setvar(group, "bc_wlev_methods_index", 0)
+        app.gui.setvar(group, "bc_wlev_timeseries_methods", bc_wlev_timeseries_methods)
+        app.gui.setvar(group, "bc_wlev_timeseries_methods_index", 0)
+
+        # values
+        app.gui.setvar(group, "bc_wlev_value", 0.0)
         app.gui.setvar(group, "bc_dist_along_msk", 5e3)
         app.gui.setvar(group, "merge_bc_wlev", True)
+
+        # gui settings
         app.gui.setvar(group, "boundary_point_names", [])
         app.gui.setvar(group, "nr_boundary_points", 0)
         app.gui.setvar(group, "active_boundary_point", 0)
 
-        bc_dis_methods = ["Click Points", "Load from file"]
+        # Discharge methods
+        bc_dis_methods = ["Click Points", "Load from File"]
+        bc_dis_timeseries_methods = ["Constant timeseries", "Guassian timeseries"]
         app.gui.setvar(group, "bc_dis_methods", bc_dis_methods)
         app.gui.setvar(group, "bc_dis_methods_index", 0)
+        app.gui.setvar(group, "bc_dis_timeseries_methods", bc_dis_timeseries_methods)
+        app.gui.setvar(group, "bc_dis_timeseries_methods_index", 0)
+
+        # values
+        app.gui.setvar(group, "bc_dis_value", 0.0)
         app.gui.setvar(group, "merge_bc_dis", True)
+
+        # gui settings
         app.gui.setvar(group, "discharge_point_names", [])
         app.gui.setvar(group, "nr_discharge_points", 0)
         app.gui.setvar(group, "active_discharge_point", 0)
 
         # Observation points 
-        obs_methods = ["Click Points", "Select from database", "Load from file"]
+        obs_methods = ["Click Points", "Select from Database", "Load from File"]
         app.gui.setvar(group, "obs_methods", obs_methods)
         app.gui.setvar(group, "obs_methods_index", 0)
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
 
-        crs_methods = ["Draw LineString", "Load from file"]
+        crs_methods = ["Draw LineString", "Load from File"]
         app.gui.setvar(group, "crs_methods", crs_methods)
         app.gui.setvar(group, "crs_methods_index", 0)
         app.gui.setvar(group, "cross_section_names", [])
@@ -230,16 +270,35 @@ class Model(GenericModel):
         app.gui.setvar(group, "wind", True)
         app.gui.setvar(group, "rain", True)
 
+        # Structures
+        app.gui.setvar(group, "structure_weirs_methods", ["Draw LineString", "Load from file"])
+        app.gui.setvar(group, "structure_weirs_method_index", 0)
+        app.gui.setvar(group, "structure_weir_index", None)
+        app.gui.setvar(group, "structure_weir_list", [])
+        app.gui.setvar(group, "active_structure_weir", 0)
+
+        app.gui.setvar(group, "structure_thin_dam_methods", ["Draw LineString", "Load from file"])
+        app.gui.setvar(group, "structure_thin_dam_method_index", 0)
+        app.gui.setvar(group, "structure_thd_index", None)
+        app.gui.setvar(group, "structure_thd_list", [])
+        app.gui.setvar(group, "active_structure_thd", 0)
+
+        app.gui.setvar(group, "structure_drainage_methods", ["Draw LineString", "Load from file"])
+        app.gui.setvar(group, "structure_drainage_method_index", 0)
+        app.gui.setvar(group, "structure_drn_index", None)
+        app.gui.setvar(group, "structure_drn_list", [])
+        app.gui.setvar(group, "active_structure_drn", 0)
+        app.gui.setvar(group, "drainage_type", 0)
+
         # Physics
-        app.gui.setvar(group, "advection", False)
-        app.gui.setvar(group, "coriolis", False)
+        app.gui.setvar(group, "advection", 0)
+        app.gui.setvar(group, "coriolis", 0)
 
         # Output
-        app.gui.setvar(group, "storetwet", False)
-        app.gui.setvar(group, "storevelmax", False)
-        app.gui.setvar(group, "storecumprcp", False)
-        app.gui.setvar(group, "storemaxwind", False)
-
+        app.gui.setvar(group, "storetwet", 0)
+        app.gui.setvar(group, "storevelmax", 0)
+        app.gui.setvar(group, "storecumprcp", 0)
+        app.gui.setvar(group, "storemaxwind", 0)
 
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input
@@ -308,8 +367,6 @@ class Model(GenericModel):
         pass
 
     def add_stations(self, gdf, naming_option="name", model_option="obs"):
-        from .observation_points import add_observation_point
-        from .boundary_conditions_wlev import add_boundary_point
         # if id is used as naming option, rename column
         if naming_option == "id":
             gdf = gdf.rename(columns={"id": "name"})
@@ -325,6 +382,10 @@ def update_map():
     if not app.map.map_extent:
         print("Map extent not yet available ...")
         return
+    
+    # check if bed_levels layer is visible
+    if not app.map.layer["sfincs_hmt"].layer["bed_levels"].visible:
+        return
 
     # check if grid is already defined
     grid = app.model["sfincs_hmt"].domain.grid
@@ -334,9 +395,9 @@ def update_map():
             return
     else:
         return
-    
+
     if "msk" in grid:
-        da_dep = da_dep.where(grid["msk"] > 0) 
+        da_dep = da_dep.where(grid["msk"] > 0)
 
     coords = app.map.map_extent
     xl = [coords[0][0], coords[1][0]]
@@ -366,5 +427,6 @@ def update_map():
         y=yv,
         z=da_dep.values,
         colormap=app.color_map_earth,
-        decimals=0,
+        decimals=1,
+        legend_title="Bed levels [m+ref]",
     )

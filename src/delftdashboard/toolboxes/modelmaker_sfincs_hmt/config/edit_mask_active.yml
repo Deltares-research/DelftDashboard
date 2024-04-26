@@ -1,35 +1,80 @@
 window:
-  title: Change default settings for active domain
-  width: 400
-  height: 180
+  title: "To proceed and update the SFINCS mask, press 'OK'."
+  width: 420
+  height: 260
   variable_group: modelmaker_sfincs_hmt
   module: toolboxes.modelmaker_sfincs_hmt.mask_active_cells
   modal: True
   cancel: True
 element:
+- style: text
+  position:
+    x: 10
+    y: 230
+    width: 380
+    height: 20
+  text: "The default settings are based on the type of model you are making (domain tab). In case you used watershed
+    \ndata to define your domain, we recommend to include the entire watersched in the active domain."
 - style: panel
-  title: "Active domain settings"
+  title: "Active domain settings: "
   position:
     x: 10
     y: 40
-    width: 380
-    height: 130
+    width: 400
+    height: 175
   element:
   - style: text
     position:
       x: 10
-      y: 105
-      width: 360
+      y: 150
+      width: 380
       height: 20
-    text: "The default settings are based on the type of model you are making (domain tab). In case you used \n
-      watershed data to define your domain, we recommend to include the entire watersched in the active domain."
+    text: "Initial mask filename: "
+  - style: edit
+    position:
+      x: 10
+      y: 130
+      width: 330
+      height: 20
+    variable: mask_init_fname
+    enable: False 
+  - style: pushbutton
+    position:
+      x: 350
+      y: 130
+      width: 40
+      height: 20
+    text: Load
+    method: load_mask_init_polygon   
+  - style: pushbutton
+    position:
+      x: 350
+      y: 130
+      width: 40
+      height: 20
+    text: Delete
+    method: delete_mask_init_polygon
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: mask_init_fname
+        operator: ne
+        value: ""
+  - style: text
+    position:
+      x: 10
+      y: 100
+      width: 380
+      height: 20
+    text: "Other mask settings: "         
   - style: edit
     position:
       x: 10
       y: 80
       width: 45
       height: 20
-    text: Maximum elevation (m) to include in your active domain
+    text: Maximum elevation (m+Ref) to include in your active domain
     text_position: right
     variable: mask_active_zmax
   - style: edit
@@ -38,7 +83,7 @@ element:
       y: 55
       width: 45
       height: 20
-    text: Minimum elevation (m) to include in your active domain
+    text: Minimum elevation (m+Ref) to include in your active domain
     text_position: right
     variable: mask_active_zmin
   - style: edit

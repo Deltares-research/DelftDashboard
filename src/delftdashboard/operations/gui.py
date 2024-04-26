@@ -130,7 +130,7 @@ def build_gui_config():
         )
     app.gui.config["menu"].append(menu)
 
-    # NOTE: switched off for the FloodAdapt model builder purpose with only SFINCS and FIAT models inside that do not share toolboxes
+    # TODO: Hide in menu when only one toolbox is available (e.g. only the model-builder)
     # Toolbox
     menu = {}
     menu["text"] = "Toolbox"
@@ -193,10 +193,10 @@ def build_gui_config():
                             "action": "check",
                             "checkfor": "all",
                             "check": [
-                                { 
+                                {
                                     "variable": "active_topography_name",
                                     "operator": "eq",
-                                    "value": key
+                                    "value": key,
                                 }
                             ],
                         }

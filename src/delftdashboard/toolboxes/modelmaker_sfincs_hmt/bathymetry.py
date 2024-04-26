@@ -1,5 +1,8 @@
 import os
 import yaml
+import rasterio
+
+from hydromt import DataCatalog
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -13,9 +16,17 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["bed_levels"].show()
     app.map.layer["sfincs_hmt"].layer["bed_levels"].activate()
 
+
 def select_bathymetry_source(*args):
     source = args[0]
-    
+
+    if source == "Add your own dataset":
+        app.gui.setvar("modelmaker_sfincs_hmt", "add_topobathy_flag", True)
+        source = "User"
+
+    list_bathymetry_datasets(source)
+
+def list_bathymetry_datasets(source):
     dataset_names = []
     # Bathymetry
     if app.config["data_libs"] is not None:
@@ -30,14 +41,18 @@ def select_bathymetry_source(*args):
 
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_names", dataset_names)
     app.gui.setvar("modelmaker_sfincs_hmt", "bathymetry_dataset_index", 0)
-    
-    name = dataset_names[0]
-    meta = app.data_catalog[name].meta
-    meta_str = yaml.dump(meta, default_flow_style=False)
-    app.gui.setvar("modelmaker_sfincs_hmt", "selected_bathymetry_dataset_meta", meta_str)
+
+    if len(dataset_names) > 0:
+        name = dataset_names[0]
+        meta = app.data_catalog[name].meta
+        meta_str = yaml.dump(meta, default_flow_style=False)
+        app.gui.setvar(
+            "modelmaker_sfincs_hmt", "selected_bathymetry_dataset_meta", meta_str
+        )
 
 def select_bathymetry_dataset(*args):
     pass
+
 
 def info_selected_dataset(*args):
     toolbox_name = "modelmaker_sfincs_hmt"
@@ -48,14 +63,15 @@ def info_selected_dataset(*args):
 
     meta = app.data_catalog[name].meta
     meta_str = yaml.dump(meta, default_flow_style=False)
-    app.gui.setvar(toolbox_name, "selected_bathymetry_dataset_meta", meta_str)    
+    app.gui.setvar(toolbox_name, "selected_bathymetry_dataset_meta", meta_str)
 
     path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
-    pop_win_config_path  = os.path.join(path, "bathymetry_info.yml")
-    okay, data = app.gui.popup(pop_win_config_path , None)
+    pop_win_config_path = os.path.join(path, "bathymetry_info.yml")
+    okay, data = app.gui.popup(pop_win_config_path, None)
     if not okay:
         return
-    
+
+
 def use_dataset(*args):
     group = "modelmaker_sfincs_hmt"
     names = app.gui.getvar(group, "bathymetry_dataset_names")
@@ -72,6 +88,85 @@ def use_dataset(*args):
             len(app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets) - 1,
         )
         update()
+
+def add_dataset(*args):
+    """ Add a dataset to your data_catalog and add to the available datasets in the GUI
+    """
+
+    # select file to add
+    fn = app.gui.window.dialog_open_file(
+        "Select file with topobathy data ...", filter="*.tif"
+    )
+
+    if fn[0]:
+        # check the file format, it should be a cloud-optimized geotiff with overviews
+        # and a nodata value and a valid crs
+        with rasterio.open(fn[0]) as src:
+            if not src.driver == "GTiff":
+                app.gui.window.dialog_warning("File is not a GeoTiff")
+                return
+            if not src.overviews(1):
+                app.gui.window.dialog_warning(
+                    "File does not have overviews (i.e., reduced resolution versions of the dataset)" +
+                    "\nPlease create overviews using `rio overview`.`"
+                    )
+                return
+            if not src.nodata:
+                app.gui.window.dialog_warning("File does not have a nodata value")
+                return
+            if not src.crs:
+                app.gui.window.dialog_warning("File does not have a valid CRS")
+                return
+            else:
+                epsg = src.crs.to_epsg()
+
+        # ask for a name for the dataset
+        name, okay = app.gui.window.dialog_string("Provide a name for the dataset", "New dataset")
+        if not okay:
+            # Cancel was clicked
+            return
+        # check whether the name already exists in the data catalog
+        while name in app.data_catalog.sources.keys():
+            name, okay = app.gui.window.dialog_string("Dataset name already exists. Provide a different name", "New dataset")
+            if not okay:
+                # Cancel was clicked
+                return
+
+        # create data catalog entry
+        yml_str = f"""
+        {name}:
+            path: {fn[0]}
+            data_type: RasterDataset
+            driver: raster
+            crs: {epsg}
+            meta:
+                category: topography
+                source: User
+        """            
+
+        # check if my_data_catalog.yml exists
+        my_data_catalog = os.path.join(app.main_path, "config", "my_data_catalog.yml")
+        if not os.path.exists(my_data_catalog):
+            with open(my_data_catalog, "w") as f:
+                f.write(yml_str)
+            
+            # add to delft_dashboard.ini
+            app.config["data_libs"].append(my_data_catalog)
+
+            inifile = os.path.join(app.main_path, "config", "delftdashboard.ini")
+            with open(inifile, "r") as f:
+                config = yaml.safe_load(f)
+
+            with open(inifile, "w") as f:
+                config["data_libs"] = app.config["data_libs"]
+                yaml.dump(config, f)
+        else:
+            with open(my_data_catalog, "a") as f:
+                f.write(yml_str)
+        
+        # reload the data catalog
+        app.data_catalog = DataCatalog(data_libs=app.config["data_libs"])
+        list_bathymetry_datasets(source="User")
 
 
 def select_selected_bathymetry_dataset(*args):
@@ -129,30 +224,31 @@ def move_down_selected_bathymetry_dataset(*args):
     app.gui.setvar(group, "selected_bathymetry_dataset_index", index + 1)
     update()
 
+
 def advanced_merge_options_bathymetry_dataset(*args):
     toolbox_name = "modelmaker_sfincs_hmt"
 
     path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
-    pop_win_config_path  = os.path.join(path, "bathymetry_merge.yml")
-    okay, data = app.gui.popup(pop_win_config_path , None)
+    pop_win_config_path = os.path.join(path, "bathymetry_merge.yml")
+    okay, data = app.gui.popup(pop_win_config_path, None)
     if not okay:
-        return    
+        return
 
 
 def edit_zmax_bathymetry_dataset(*args):
     group = "modelmaker_sfincs_hmt"
     index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
-    app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets[index][
-        "zmax"
-    ] = args[0]
+    app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets[index]["zmax"] = (
+        args[0]
+    )
 
 
 def edit_zmin_bathymetry_dataset(*args):
     group = "modelmaker_sfincs_hmt"
     index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
-    app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets[index][
-        "zmin"
-    ] = args[0]
+    app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets[index]["zmin"] = (
+        args[0]
+    )
 
 
 def edit_offset_bathymetry_dataset(*args):
@@ -204,6 +300,7 @@ def update():
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
         app.gui.setvar(group, "selected_bathymetry_dataset_offset", 0.0)
     app.gui.setvar(group, "nr_selected_bathymetry_datasets", nrd)
+
 
 def generate_bathymetry(*args):
     app.toolbox["modelmaker_sfincs_hmt"].generate_bathymetry()

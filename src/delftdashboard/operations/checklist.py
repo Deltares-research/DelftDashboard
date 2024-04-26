@@ -17,7 +17,7 @@ def initialize_checklist():
         "Attributes (optional)",
     ]
     checklist_items.reverse()  # Reverse because guitares places items from the bottom
-    spacing = [5 + (y*20) for y in range(len(checklist_items))]
+    spacing = [5 + (y * 20) for y in range(len(checklist_items))]
 
     # get window config yaml path
     config_path_panel = str(
@@ -64,16 +64,16 @@ def initialize_checklist():
         item["position"]["width"] = 8
         item["position"]["height"] = 8
         item["text"] = "\u2610"
-        
+
         dependency = {}
         dependency["action"] = "visible"
         dependency["checkfor"] = "all"
-        
+
         check = {}
         check["variable"] = "checkbox" + "_" + i.lower().replace(" ", "_")
         check["operator"] = "eq"
         check["value"] = False
-        
+
         dependency["check"] = [check]
         item["dependency"] = [dependency]
 
@@ -88,11 +88,11 @@ def initialize_checklist():
         item["position"]["width"] = 8
         item["position"]["height"] = 8
         item["text"] = "\u2611"
-        
+
         dependency = {}
         dependency["action"] = "visible"
         dependency["checkfor"] = "all"
-        
+
         check = {}
         check["variable"] = "checkbox" + "_" + i.lower().replace(" ", "_")
         check["operator"] = "eq"
@@ -102,21 +102,22 @@ def initialize_checklist():
         item["dependency"] = [dependency]
 
         config_dict["element"].append(item)
-    
-        if i == 'Model boundary':
+
+        if i == "Model boundary":
             # Add the zoom to boundary button
             item = {}
             item["style"] = "pushbutton"
             item["position"] = {}
-            item["position"]["x"] = 90
+            item["position"]["x"] = 85
             item["position"]["y"] = space
-            item["position"]["width"] = 30
+            item["position"]["width"] = 16
             item["position"]["height"] = 16
-            item["text"] = 'zoom'
+            item["text"] = "\U0001F50E"
             item["method"] = "zoom_to_boundary"
             config_dict["element"].append(item)
 
     return config_dict
+
 
 def zoom_to_boundary(*args):
     active_layer = app.gui.getvar("modelmaker_fiat", "active_area_of_interest")

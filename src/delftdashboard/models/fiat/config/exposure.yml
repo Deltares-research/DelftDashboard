@@ -21,9 +21,6 @@ element:
   - string: Ground Elevation
     module: models.fiat.exposure_ground_elevation
     element: exposure_ground_elevation.yml
-  - string: Damage Values
+  - string: Max Potential Damages
     module: models.fiat.exposure_damages
     element: exposure_damages.yml
-  - string: Additional Attributes
-    module: models.fiat.exposure_aggregation
-    element: exposure_aggregation.yml

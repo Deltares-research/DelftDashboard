@@ -36,6 +36,23 @@ element:
   - style: pushbutton
     position:
       x: 170
+      y: 70
+      width: 20
+      height: 20
+    text: "\u002B"  
+    tooltip: "Add your own dataset to the list of available datasets. \n Note that
+      the dataset should be in the format of a cloud-optimized .tif file."
+    method: add_dataset
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: active_bathymetry_source
+        operator: eq
+        value: "Add your own dataset"
+  - style: pushbutton
+    position:
+      x: 170
       y: 10
       width: 20
       height: 20

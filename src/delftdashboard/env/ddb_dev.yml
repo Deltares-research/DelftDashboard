@@ -43,7 +43,7 @@ dependencies:
     - NDBC
     - noaa-coops
     - sphinx_design
-    - git+https://github.com/Deltares/cht_observations.git@add_ndb_coops    
+    - git+https://github.com/Deltares/cht_observations.git
     - git+https://github.com/Deltares/hydromt_fiat.git
     - git+https://github.com/Deltares/CoastalHazardsToolkit.git
-    - git+https://github.com/Deltares/Guitares.git@env_fix_custom_coloring_points
+    - git+https://github.com/Deltares/Guitares.git

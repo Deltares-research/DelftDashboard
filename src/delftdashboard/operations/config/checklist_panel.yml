@@ -10,6 +10,6 @@ dependency:
 - action: visible
   checkfor: all
   check:
-  - variable: fiat_active
+  - variable: show_fiat_checkbox
     operator: eq
     value: True

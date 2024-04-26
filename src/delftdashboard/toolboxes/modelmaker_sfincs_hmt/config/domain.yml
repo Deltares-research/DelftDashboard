@@ -4,7 +4,7 @@ element:
   position:
     x: 10
     y: 10
-    width: 120
+    width: 140
     height: 120
   dependency:
     - action: visible
@@ -18,48 +18,48 @@ element:
     position:
       x: 10
       y: 90
-      width: 100
+      width: 120
       height: 20
     select: index
     variable: model_type_index
     option_string:
-      variable: model_type  
-    method: select_model_type
+      variable: model_type
+    method: select_model_type    
   - style: text
     position:
       x: 10
-      y: 65
-      width: 100
+      y: 60
+      width: 120
       height: 20
-    text: "Are you modelling: "
+    text: "Would you like to: " 
   - style: checkbox
     position:
       x: 10
-      y: 45
-      width: 100
+      y: 40
+      width: 120
       height: 20
-    text: "Rainfall"
+    text: "Auto-rotate grid"
     text_position: right
-    variable: include_rainfall
-    tooltip: "When you want to rainfall, we recommend to delineate your model domain with watershed boundaries."
-    method: select_model_type   
-  # - style: checkbox
-  #   position:
-  #     x: 10
-  #     y: 25
-  #     width: 100
-  #     height: 20
-  #   text: "River discharge"
-  #   text_position: right
-  #   variable: include_rivers
-  #   tooltip: "When you want to river discharge, we recommend to delineate your model domain with watershed boundaries."
-  #   method: select_model_type     
+    variable: auto_rotate
+    tooltip: "When selected, a minimum rotated rectangle is determined around your area of interest. 
+    \n This limits the size of your computational grid."
+  - style: checkbox
+    position:
+      x: 10
+      y: 20
+      width: 120
+      height: 20
+    text: "Auto-select UTM zone"
+    text_position: right
+    variable: auto_select_utm
+    tooltip: "When selected, the UTM zone nearest to your area of interest is selected. 
+    \n This is recommended for overland models."
 - style: panel
   title: "Define model extent"
   position:
-    x: 140
+    x: 160
     y: 10
-    width: 160
+    width: 220
     height: 120
   dependency:
     - action: visible
@@ -69,16 +69,34 @@ element:
         operator: ge
         value: 0     
   element:
+  - style: text
+    position:
+      x: 10
+      y: 95
+      width: 200
+      height: 20
+    text: "Are you modeling: "
+  - style: checkbox
+    position:
+      x: 10
+      y: 75
+      width: 200
+      height: 20
+    text: "Local precipitation"
+    text_position: right
+    variable: include_precip
+    tooltip: "When you want to include local precipitation, we recommend to delineate your model domain with watershed boundaries."
+    method: select_setup_grid_method   
   - style: popupmenu
     position:
       x: 10
-      y: 90
-      width: 140
+      y: 40
+      width: 200
       height: 20
     tooltip: Select method to determine model extent
-    select: index
-    method: select_method
-    variable: setup_grid_methods_index
+    variable: setup_grid_method
+    option_value:
+      variable: setup_grid_methods
     option_string:
       variable: setup_grid_methods
   - style: pushbutton
@@ -86,53 +104,72 @@ element:
     tooltip: Draw a bounding box around the area of interest
     position:
       x: 10
-      y: 65
-      width: 140
+      y: 15
+      width: 200
       height: 20
     method: draw_bbox
     dependency:
     - action: visible
       checkfor: any
       check:
-      - variable: setup_grid_methods_index
+      - variable: setup_grid_method
         operator: eq
-        value: 0 
+        value: Draw Bounding Box 
   - style: pushbutton
     text: Start drawing
     tooltip: Draw a polygon describing the area of interest
     position:
       x: 10
-      y: 65
-      width: 140
+      y: 15
+      width: 200
       height: 20
     method: draw_aio
     dependency:
     - action: visible
       checkfor: any
       check:
-      - variable: setup_grid_methods_index
+      - variable: setup_grid_method
         operator: eq
-        value: 1
+        value: Draw Polygon
   - style: pushbutton
     text: Load
     tooltip: Load a polygon describing the area of interest
     position:
       x: 10
-      y: 65
-      width: 140
+      y: 15
+      width: 200
       height: 20
     method: load_aio
     dependency:
     - action: visible
       checkfor: any
       check:
-      - variable: setup_grid_methods_index
-        operator: ge
-        value: 2
+      - variable: setup_grid_method
+        operator: eq
+        value: Load Watershed
+      - variable: setup_grid_method
+        operator: eq
+        value: Load ShapeFile
+  - style: pushbutton
+    text: Select
+    tooltip: Select a watershed from the available database
+    position:
+      x: 10
+      y: 15
+      width: 200
+      height: 20
+    method: open_watershed_selector
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: setup_grid_method
+        operator: eq
+        value: Select Watershed
 - style: panel
   title: "Define model resolution: "
   position:
-    x: 310
+    x: 390
     y: 10
     width: 160
     height: 120

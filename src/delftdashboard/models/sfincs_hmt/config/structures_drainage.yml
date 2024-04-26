@@ -23,8 +23,8 @@ element:
     select: index
     tooltip: Select type of structure
     variable: drainage_type
-    option_value: [1,2,3]
-    option_string: ["Pump","Culvert","Valve"]
+    option_value: [0,1]
+    option_string: ["Pump","Culvert"]
   - style: text
     text: Select method
     position:
@@ -40,54 +40,31 @@ element:
       height: 20
     select: index
     tooltip: Select how you want to add observation cross sections
-    variable: crs_methods_index
+    variable: structure_drainage_method_index
     option_string: 
-      variable: crs_methods
+      variable: structure_drainage_methods
   - style: pushbutton
-    text: Add LineString on map
+    text: Add drainage structure
     position:
       x: 10
       y: 15
       width: 130
       height: 20
-    method: add_crs_on_map
+    method: click_add_structure
     tooltip: Add cross-section point on map
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: crs_methods_index
-        operator: eq
-        value: 0
-  - style: pushbutton
-    text: Load from file
-    position:
-      x: 10
-      y: 25
-      width: 130
-      height: 20
-    method: load_crs_from_file
-    tooltip: Load cross-sections from file
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: crs_methods_index
-        operator: eq
-        value: 1
 - style: listbox
   position:
     x: 170
     y: 10
     width: 300
     height: 110
-  method: select_crs_from_list
-  variable: active_crs_point
+  method: click_select_structure
+  variable: structure_drn_index
   select: index
   text: Drainage structures
   text_position: above
   option_string:
-    variable: cross_section_names
+    variable: structure_drn_list
   tooltip: Select cross-section
 - style: pushbutton
   text: Delete
@@ -96,15 +73,8 @@ element:
     y: 100
     width: 80
     height: 20
-  method: delete_crs_from_list
+  method: click_delete_structure
   tooltip: Delete observation point from list
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_cross_sections
-      operator: gt
-      value: 0
 - style: pushbutton
   text: Delete All
   position:
@@ -112,12 +82,5 @@ element:
     y: 75
     width: 80
     height: 20
-  method: delete_all_crs_from_list
+  method: click_delete_all_structures
   tooltip: Delete all observation points from list
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_cross_sections
-      operator: gt
-      value: 0
