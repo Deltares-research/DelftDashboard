@@ -315,6 +315,7 @@ QTabBar::tab:first:!selected
 }
 
 
+
 QTabBar::tab:!selected
 {
 	color: #b1b1b1;
@@ -335,6 +336,12 @@ QTabBar::tab:!selected:hover
 {
 	border-top-color: #b78620;
 
+}
+
+
+QTabBar::tab:disabled {
+  color: gray;
+  font-size: 7pt;
 }
 
 

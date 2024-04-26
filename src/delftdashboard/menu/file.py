@@ -63,8 +63,14 @@ def select_working_directory(option):
 
         for model in app.model:
             try:
-                app.model[model].select_working_directory()
-            except:
+                # TODO set a select_working_directory for all models!!
+                # Try using select_working_directory() method
+                if hasattr(app.model[model], 'select_working_directory'):
+                    app.model[model].select_working_directory()
+                else:
+                    # If method is not available, set domain.path directly
+                    app.model[model].domain.path = path
+            except Exception as e:
                 print("No method select_working_directory for model: ", model)
                 pass
 

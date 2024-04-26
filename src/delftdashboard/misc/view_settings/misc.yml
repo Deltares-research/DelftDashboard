@@ -1,0 +1,16 @@
+element:
+- style: edit  
+  position:
+    x: 20
+    y: 80
+    width: 60
+    height: 20
+  variable: zmax
+- style: edit  
+  position:
+    x: 20
+    y: 40
+    width: 60
+    height: 20
+  variable: zmin
+  

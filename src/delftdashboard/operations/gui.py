@@ -317,6 +317,7 @@ def build_gui_config():
 
     layer_style_menu = {}
     layer_style_menu["text"] = "Layer Style"
+    layer_style_menu["separator"] = True
     layer_style_menu["menu"] = []
     layer_style_menu["menu"].append(
         {
@@ -439,6 +440,9 @@ def build_gui_config():
         }
     )
     menu["menu"].append(layer_style_menu)
+
+    # View settings
+    menu["menu"].append({"variable_group": "menu", "id": "view.settings",  "text": "Settings ...", "method": "settings", "separator": True,  "checkable": False})
 
     app.gui.config["menu"].append(menu)
 

@@ -5,6 +5,8 @@ Created on Tue Jul  5 13:40:07 2022
 @author: ormondt
 """
 
+import os
+
 from delftdashboard.app import app
 
 
@@ -57,3 +59,39 @@ def terrain(option):
     app.map.set_terrain(
         app.view["terrain"]["visible"], app.view["terrain"]["exaggeration"]
     )
+
+def settings(option):
+
+    # A lot of copying here. Should we just use setvar and getvar for the settings ? No, because we want to be able to cancel the settings.
+    app.gui.setvar("topography_view_settings", "colormap", app.view["topography"]["colormap"])
+    app.gui.setvar("topography_view_settings", "autoscaling", app.view["topography"]["autoscaling"])
+    app.gui.setvar("topography_view_settings", "zmin", app.view["topography"]["zmin"])
+    app.gui.setvar("topography_view_settings", "zmax", app.view["topography"]["zmax"])
+    app.gui.setvar("topography_view_settings", "opacity", app.view["topography"]["opacity"])
+
+    # Open settings window
+    okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "view_settings","view_settings.yml"), id="view_settings")
+    if not okay:
+        return
+
+    # Okay was pressed, so update view settings
+    app.view["topography"]["colormap"] = app.gui.getvar("topography_view_settings", "colormap")
+    app.view["topography"]["autoscaling"] = app.gui.getvar("topography_view_settings", "autoscaling")
+    app.view["topography"]["zmin"] = app.gui.getvar("topography_view_settings", "zmin")
+    app.view["topography"]["zmax"] = app.gui.getvar("topography_view_settings", "zmax")
+    app.view["topography"]["opacity"]  = app.gui.getvar("topography_view_settings", "opacity")
+
+    # Updata topography layer
+    app.background_topography_layer.color_map = app.view["topography"]["colormap"]
+    app.background_topography_layer.color_scale_auto = app.view["topography"]["autoscaling"]
+    app.background_topography_layer.color_scale_cmin = app.view["topography"]["zmin"]
+    app.background_topography_layer.color_scale_cmax = app.view["topography"]["zmax"]
+    # app.background_topography_layer.color_scale_symmetric = app.view["topography"]["color_scale_symmetric"]
+    app.background_topography_layer.opacity = app.view["topography"]["opacity"]
+
+    # # Update view
+    # app.view["terrain"]["exaggeration"] = data["terrain_exaggeration"]
+    # app.view["terrain"]["visible"] = data["show_terrain"]
+    # app.view["topography"]["visible"] = data["show_topography"]
+    # app.view["layer_style"] = data["layer_style"]
+    # # Update GUI

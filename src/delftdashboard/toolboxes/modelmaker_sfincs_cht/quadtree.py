@@ -54,10 +54,10 @@ def delete_refinement_polygon(*args):
     update()
 
 def load_refinement_polygon(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select refinement polygon file ...", filter="*.geojson")
-    if not okay:
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select refinement polygon file ...", filter="*.geojson")
+    if not full_name:
         return
-    app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_file", fname[2])
+    app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_file", full_name)
     app.toolbox["modelmaker_sfincs_cht"].read_refinement_polygon()
     app.toolbox["modelmaker_sfincs_cht"].plot_refinement_polygon()
     update()
@@ -67,9 +67,9 @@ def save_refinement_polygon(*args):
 
 def select_refinement_polygon(*args):
     index = args[0]
-    feature_id = app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].get_feature_id(index)
+#    feature_id = app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].get_feature_id(index)
 #    feature_id = app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.loc[index, "id"]
-    app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].activate_feature(feature_id)
+    app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].activate_feature(index)
 
 def select_refinement_level(*args):
     level_index = args[0]
@@ -90,6 +90,7 @@ def refinement_polygon_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].refinement_polygon = gdf
 
 def refinement_polygon_selected(index):
+    app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_index", index)
     update()
 
 def update():

@@ -14,7 +14,7 @@ from pyproj import CRS
 
 from guitares.gui import GUI
 from cht.bathymetry.bathymetry_database import bathymetry_database
-from .colormap import read_colormap
+from guitares.colormap import read_color_maps
 from .gui import build_gui_config
 
 from delftdashboard.app import app
@@ -43,7 +43,11 @@ def initialize():
     app.config["working_directory"] = os.getcwd()
 
     # Read ini file and override stuff in default config dict
-    inifile = open(os.path.join(app.config_path, "delftdashboard.ini"), "r")
+    ini_file_name = os.path.join(app.config_path, "delftdashboard.ini")
+    # Check if there is also a local ini file
+    if os.path.exists(os.path.join(os.getcwd(), "delftdashboard.ini")):
+        ini_file_name = os.path.join(os.getcwd(), "delftdashboard.ini")
+    inifile = open(ini_file_name, "r")
     config = yaml.load(inifile, Loader=yaml.FullLoader)
     for key in config:
         # for window_icon and splash_file, convert to absolute path
@@ -87,7 +91,7 @@ def initialize():
     # Define some other variables
     app.crs = CRS(4326)
     app.auto_update_topography = True
-    app.background_topography = "gebco22"
+    app.background_topography = "gebco19"
     if app.config["bathymetry_database"] is not None:
         app.bathymetry_database_path = app.config["bathymetry_database"]
         bathymetry_database.initialize(app.bathymetry_database_path)
@@ -98,17 +102,24 @@ def initialize():
     # View
     app.view = {}
     app.view["projection"] = "mercator"
+
     app.view["topography"] = {}
-    app.view["topography"]["visible"] = True
-    app.view["topography"]["opacity"] = 0.5
-    app.view["topography"]["quality"] = "medium"
+    app.view["topography"]["visible"]  = True
+    app.view["topography"]["autoscaling"]  = True
+    app.view["topography"]["opacity"]  = 0.5
+    app.view["topography"]["quality"]  = "medium"
     app.view["topography"]["colormap"] = "earth"
     app.view["topography"]["interp_method"] = "nearest"
     app.view["topography"]["interp_method"] = "linear"
+    app.view["topography"]["zmin"] = -10.0
+    app.view["topography"]["zmax"] =  10.0
+
     app.view["layer_style"] = "streets-v12"
+
     app.view["terrain"] = {}
     app.view["terrain"]["visible"] = False
     app.view["terrain"]["exaggeration"] = 1.5
+
     app.view["interp_method"] = "nearest"
 
     # Initialize toolboxes
@@ -121,9 +132,11 @@ def initialize():
     app.active_model = app.model[list(app.model)[0]]
     app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
 
-    # Read color maps
-    rgb = read_colormap(os.path.join(app.config_path, "colormaps", "earth.txt"))
-    app.color_map_earth = ListedColormap(rgb)
+    # Read color maps (should be done in guitares)
+    cmps = read_color_maps(os.path.join(app.config_path, "colormaps"))
+    app.gui.setvar("topography_view_settings", "colormaps", cmps)
+    # app.color_map = "earth"
+    # app.color_map_earth = ListedColormap(rgb)
 
     # GUI variables
     app.gui.setvar("menu", "active_model_name", "")
@@ -170,7 +183,9 @@ def initialize_models():
         )
         app.model[model_name] = module.Model(model_name)
         if "exe_path" in mdl:
-            app.model[model_name].domain.exe_path = mdl["exe_path"]
+            app.model[model_name].exe_path = mdl["exe_path"]
+        else:
+            app.model[model_name].exe_path = ""    
         # Loop through toolboxes to see which ones should be activated for which model
         app.model[model_name].toolbox = []
         for tlb in app.config["toolbox"]:

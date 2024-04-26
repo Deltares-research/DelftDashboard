@@ -88,10 +88,11 @@ element:
   variable: use_snapwave
   method: use_snapwave
 - style: checkbox
+  id: sbg
   position:
     x: 400
     y: 85
-    width: 120
+    width: 20
     height: 20
   text: Sub-Grid Bathymetry
   variable: use_subgrid

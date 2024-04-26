@@ -352,7 +352,12 @@ class Toolbox(GenericToolbox):
         app.map.layer["sfincs_cht"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
         app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_data(mask.to_gdf(option="open"))
         app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_data(mask.to_gdf(option="outflow"))
-        grid.write() # Write new qtr file
+
+        if app.model["sfincs_cht"].domain.grid_type == "quadtree":
+            grid.write() # Write new qtr file
+        else:
+            mask.write() # Write mask, index and depth files    
+
         dlg.close()
 
     def update_mask_snapwave(self):

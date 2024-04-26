@@ -7,6 +7,7 @@ Created on Tue Jul  5 13:40:07 2022
 import numpy as np
 import traceback
 from pyproj import CRS
+import matplotlib as mpl
 
 from delftdashboard.app import app
 from cht.bathymetry.bathymetry_database import bathymetry_database
@@ -69,7 +70,11 @@ def update_background():
         print("Map extent not yet available ...")
         return
 
+
     if app.auto_update_topography and app.view["topography"]["visible"]:
+
+        print("Updating background topography ...")
+
         coords = app.map.map_extent
         xl = [coords[0][0], coords[1][0]]
         yl = [coords[0][1], coords[1][1]]
@@ -84,6 +89,8 @@ def update_background():
         dxy = (xl[1] - xl[0]) / npix
         xv = np.arange(xl[0], xl[1], dxy)
         yv = np.arange(yl[0], yl[1], dxy)
+
+        cmap = mpl.cm.get_cmap(app.view["topography"]["colormap"])
 
         # NOTE : we first check if hydromt data is initiated, if not we use the ddb data
         if app.config["data_libs"] is not None:
@@ -121,11 +128,12 @@ def update_background():
                         x=xv,
                         y=yv,
                         z=da.values,
-                        colormap=app.color_map_earth,
+                        colormap=cmap,
                         decimals=0,
                     )
                 except:
                     print("Error loading hydromt background topo ...")
+                    traceback.print_exc()
             # TODO: FdG; I suggest to remove the part below as we're not going to use this data
             elif app.config["bathymetry_database"] is not None:
                 try:
@@ -141,10 +149,11 @@ def update_background():
                         method=app.view["topography"]["interp_method"],
                     )
                     app.background_topography_layer.set_data(
-                        x=xv, y=yv, z=z, colormap=app.color_map_earth, decimals=0
+                        x=xv, y=yv, z=z, colormap=cmap, decimals=0
                     )
                 except:
                     print("Error loading ddb background topo ...")
+                    traceback.print_exc()
 
 
 def update():

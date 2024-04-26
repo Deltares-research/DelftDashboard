@@ -28,7 +28,7 @@ element:
     module: delftdashboard.toolboxes.modelmaker_sfincs_cht.mask_active_cells_snapwave
     element: mask_active_cells_snapwave.yml
     dependency:
-    - action: visible
+    - action: enable
       checkfor: all
       check:
       - variable: use_snapwave
