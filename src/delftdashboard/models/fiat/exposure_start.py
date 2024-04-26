@@ -190,7 +190,9 @@ def build_nsi_exposure(*args):
             model, "source_max_potential_damage", "National Structure Inventory"
         )
         app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
-
+        
+        get_roads(model)
+        
         dlg.close()
 
     except FileNotFoundError:
@@ -212,7 +214,7 @@ def build_osm_exposure(*args):
 
         crs = app.gui.getvar(model, "selected_crs")
         
-        country = get_country()
+        continent = get_continent()
 
         ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height")) 
         (
@@ -220,7 +222,7 @@ def build_osm_exposure(*args):
             unique_primary_types,
             unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
-            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country, max_potential_damage ='jrc_damage_values'
+            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = continent, max_potential_damage ='jrc_damage_values'
         )
         gdf.set_crs(crs, inplace=True)
 
@@ -264,6 +266,10 @@ def build_osm_exposure(*args):
         )
         app.gui.setvar(model, "source_ground_elevation", "User Input")
         
+        update_damage_curves()
+        
+        get_roads(model)
+        
         dlg.close()
 
     except FileNotFoundError:
@@ -273,6 +279,41 @@ def build_osm_exposure(*args):
         )
         dlg.close()
 
+def update_damage_curves(*args):
+    model = "fiat"
+    default_curves = app.data_catalog.get_dataframe("jrc_vulnerability_curves_linking")
+    app.gui.setvar(
+    "fiat",
+    "damage_curves_table",
+    default_curves[["Exposure Link", "Damage Type"]],
+    )
+    app.gui.setvar(
+    model, "selected_damage_curve_database", "jrc_vulnerability_curves"
+    )
+    app.gui.setvar(
+    model, "selected_damage_curve_linking_table", "jrc_vulnerability_curves_linking"
+    )
+
+    damage_functions_database = app.data_catalog.get_dataframe(
+        "jrc_vulnerability_curves"
+    )
+    damage_functions_database_info = damage_functions_database[
+        ["continent", "type"]
+    ]
+    app.damage_function_database = damage_functions_database_info
+    default_curves_table = default_curves[
+        ["type", "Damage Type"]
+    ]
+    default_curves_table.sort_values("type", inplace=True, ignore_index=True)
+
+    app.gui.setvar(
+        model, "damage_curves_standard_info_static", default_curves_table
+    )
+    app.gui.setvar(
+        model, "damage_curves_standard_info", damage_functions_database_info
+    )
+
+def get_roads(model):
     ## ROADS ##
     if app.gui.getvar(model, "include_osm_roads"):
         road_types = get_road_types()
@@ -312,13 +353,20 @@ def build_osm_exposure(*args):
             )
             dlg.close()
 
-def get_country(*args):
+def get_continent(*args): # add logger
     region =  app.active_model.domain.exposure_vm.data_catalog.get_geodataframe("area_of_interest")
     country_boundaries = app.active_model.domain.exposure_vm.data_catalog.get_geodataframe("country_boundaries")
     country_overlay = gpd.overlay(region, country_boundaries, how ="intersection")
     country = country_overlay["country"][0]
 
-    return country
+    continent_linking = app.active_model.domain.exposure_vm.data_catalog.get_dataframe("country_continent_linking") 
+    
+    #link the country with continent
+    country_index = continent_linking[continent_linking["country"] == country].index[0]
+    continent = continent_linking["continent"].iloc[country_index
+                                                    ]
+    return continent
+
 
 def get_road_types():
     model = "fiat"
