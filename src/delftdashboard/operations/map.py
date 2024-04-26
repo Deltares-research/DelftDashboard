@@ -134,7 +134,6 @@ def update_background():
                 except:
                     print("Error loading hydromt background topo ...")
                     traceback.print_exc()
-            # TODO: FdG; I suggest to remove the part below as we're not going to use this data
             elif app.config["bathymetry_database"] is not None:
                 try:
                     dataset = bathymetry_database.get_dataset(app.background_topography)

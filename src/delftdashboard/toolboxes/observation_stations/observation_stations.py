@@ -41,9 +41,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "model_options_index", 0)
 
         # add mapbox element to toolbox to enable map interaction
-        if mapbox is None:
-            self.map = app.map
-        else:
+        if mapbox is not None:
             self.map = mapbox
 
     def select_tab(self):
@@ -88,6 +86,8 @@ class Toolbox(GenericToolbox):
             app.map.layer["observation_stations"].hide()
 
     def add_layers(self):
+        if not hasattr(self, "map"):
+            self.map = app.map
         # Add Mapbox layers
         layer = self.map.add_layer("observation_stations")
         layer.add_layer("stations",

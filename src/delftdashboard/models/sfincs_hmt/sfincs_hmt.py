@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import matplotlib as mpl
 import xarray as xr
 
 from hydromt_sfincs import SfincsModel
@@ -422,11 +423,13 @@ def update_map():
 
     da_dep.raster.set_nodata(np.nan)
 
+    cmap = mpl.cm.get_cmap(app.view["topography"]["colormap"])
+
     app.map.layer["sfincs_hmt"].layer["bed_levels"].set_data(
         x=xv,
         y=yv,
         z=da_dep.values,
-        colormap=app.color_map_earth,
+        colormap=cmap,
         decimals=1,
         legend_title="Bed levels [m+ref]",
     )
