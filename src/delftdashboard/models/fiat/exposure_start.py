@@ -1,5 +1,6 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from .vulnerability_damage_curves import update_damage_curves
 
 import pandas as pd
 import geopandas as gpd
@@ -270,8 +271,10 @@ def build_osm_exposure(*args):
         )
         app.gui.setvar(model, "source_ground_elevation", "User Input")
         
+        # Update the damage curves to JRC Damage Curves
         update_damage_curves()
         
+        # Add OSM roads
         get_roads(model)
         
         dlg.close()
@@ -282,46 +285,6 @@ def build_osm_exposure(*args):
             title="No model boundary selected",
         )
         dlg.close()
-
-def update_damage_curves(*args):
-    model = "fiat"
-    default_curves = app.data_catalog.get_dataframe("jrc_vulnerability_curves_linking")
-    app.gui.setvar(
-    "fiat",
-    "damage_curves_table",
-    default_curves[["Exposure Link", "Damage Type"]],
-    )
-    app.gui.setvar(
-    model, "selected_damage_curve_database", "jrc_vulnerability_curves"
-    )
-    app.gui.setvar(
-    model, "selected_damage_curve_linking_table", "jrc_vulnerability_curves_linking"
-    )
-    
-    continent = app.gui.getvar(model, "OSM_continent")
-
-    damage_functions_database = app.data_catalog.get_dataframe(
-        "jrc_vulnerability_curves"
-    )
-    damage_functions_database_info = damage_functions_database[
-        ["continent", "type"]
-    ]
-    app.damage_function_database = damage_functions_database_info
-    default_curves_table = default_curves[
-        ["type", "Damage Type"]
-    ]
-    default_curves_table.rename(columns = {"type": "Occupancy"}, inplace = True)
-    default_curves_table.insert(0, "Continent", continent)
-    default_curves_table.insert(3,"Description", "European Commission JRC Global flood depth-damage functions database. April 2017")
-
-    default_curves_table.sort_values("Occupancy", inplace=True, ignore_index=True)
-
-    app.gui.setvar(
-        model, "damage_curves_standard_info_static", default_curves_table
-    )
-    app.gui.setvar(
-        model, "damage_curves_standard_info", damage_functions_database_info
-    )
 
 def get_roads(model):
     ## ROADS ##
