@@ -994,15 +994,17 @@ class Model(GenericModel):
     def show_classification(self, type="secondary"):
         """Show exposure layer(s)"""
         source = app.gui.getvar("fiat", "source_asset_locations")
-        if source == "Open Street Map":
+        if type == "primary" and source == "Open Street Map":
             type = "osm_primary"
+        elif type == "secondary" and source == "Open Street Map":
+            type = "osm_secondary"
         if not self.buildings.empty:
             paint_properties = self.get_paint_properties(type=type) # always paint according to primary
             color_items = paint_properties['circle-color'][2:-1]
             color_items.append('other')
             color_items.append(paint_properties['circle-color'][-1])
             legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
-            if type == "primary":
+            if type == "primary" or type == "osm_primary":
                 app.map.layer["buildings"].layer["primary_classification"].set_data(
                     self.buildings, paint_properties, legend
                 )
