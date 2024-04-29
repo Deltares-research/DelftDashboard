@@ -847,6 +847,10 @@ class Model(GenericModel):
                 "#4cf6ce",
                 "residential",
                 "#f55243",
+                "building averaged",
+                "#80f304",
+                "roads",
+                "#4aab4e",
                 "#000000",
             ]
 
@@ -868,6 +872,10 @@ class Model(GenericModel):
                 "#4cf6ce",
                 "residential",
                 "#f55243",
+                "building averaged",
+                "#80f304",
+                "roads",
+                "#4aab4e",
                 "#000000",
             ]
 
