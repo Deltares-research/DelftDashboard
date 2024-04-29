@@ -214,8 +214,12 @@ def build_osm_exposure(*args):
 
         crs = app.gui.getvar(model, "selected_crs")
         
+        # Set continent for damage curves
         continent = get_continent()
-
+        app.gui.setvar(
+            model, "OSM_continent", continent
+        )
+        
         ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height")) 
         (
             gdf,
@@ -357,14 +361,8 @@ def get_continent(*args): # add logger
     region =  app.active_model.domain.exposure_vm.data_catalog.get_geodataframe("area_of_interest")
     country_boundaries = app.active_model.domain.exposure_vm.data_catalog.get_geodataframe("country_boundaries")
     country_overlay = gpd.overlay(region, country_boundaries, how ="intersection")
-    country = country_overlay["country"][0]
+    continent = country_overlay["continent"][0]
 
-    continent_linking = app.active_model.domain.exposure_vm.data_catalog.get_dataframe("country_continent_linking") 
-    
-    #link the country with continent
-    country_index = continent_linking[continent_linking["country"] == country].index[0]
-    continent = continent_linking["continent"].iloc[country_index
-                                                    ]
     return continent
 
 

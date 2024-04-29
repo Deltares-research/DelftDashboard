@@ -184,6 +184,9 @@ class Model(GenericModel):
         group = "fiat"
 
         ## Damage curve tables ##
+        app.gui.setvar(
+            group, "OSM_continent", None
+        )
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         app.gui.setvar(
             group,
