@@ -297,6 +297,8 @@ def update_damage_curves(*args):
     app.gui.setvar(
     model, "selected_damage_curve_linking_table", "jrc_vulnerability_curves_linking"
     )
+    
+    continent = app.gui.getvar(model, "OSM_continent")
 
     damage_functions_database = app.data_catalog.get_dataframe(
         "jrc_vulnerability_curves"
@@ -308,7 +310,11 @@ def update_damage_curves(*args):
     default_curves_table = default_curves[
         ["type", "Damage Type"]
     ]
-    default_curves_table.sort_values("type", inplace=True, ignore_index=True)
+    default_curves_table.rename(columns = {"type": "Occupancy"}, inplace = True)
+    default_curves_table.insert(0, "Continent", continent)
+    default_curves_table.insert(3,"Description", "European Commission JRC Global flood depth-damage functions database. April 2017")
+
+    default_curves_table.sort_values("Occupancy", inplace=True, ignore_index=True)
 
     app.gui.setvar(
         model, "damage_curves_standard_info_static", default_curves_table
