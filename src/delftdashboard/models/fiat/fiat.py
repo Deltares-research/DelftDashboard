@@ -714,7 +714,7 @@ class Model(GenericModel):
             }
         return paint_properties
 
-    def get_nsi_paint_properties(self, type="secondary") -> dict:
+    def get_paint_properties(self, type="secondary") -> dict:
         """Get's NSI-specific paint properties to visualize NSI data
 
         Parameters
@@ -830,6 +830,47 @@ class Model(GenericModel):
                 "#665435",
                 "#000000",
             ]
+
+        if type == "osm_primary":
+            circle_color = [
+                "match",
+                ["get", "Primary Object Type"],
+                "commercial",
+                "#6590bb",
+                "infrastructure",
+                "#7665b1",
+                "transport",
+                "#710b60",
+                "industrial",
+                "#10f276",
+                "agriculture",
+                "#4cf6ce",
+                "residential",
+                "#f55243",
+                "#000000",
+            ]
+
+        if type == "osm_secondary":
+            circle_color = [
+                "match",
+                ["get", "Secondary Object Type"],
+                "retail",
+                "#009c99",
+                "commercial",
+                "#6590bb",
+                "infrastructure",
+                "#7665b1",
+                "transport",
+                "#710b60",
+                "industrial",
+                "#10f276",
+                "agriculture",
+                "#4cf6ce",
+                "residential",
+                "#f55243",
+                "#000000",
+            ]
+
         if type == "asset_height":
             circle_color = [
                 "step",
@@ -952,8 +993,11 @@ class Model(GenericModel):
 
     def show_classification(self, type="secondary"):
         """Show exposure layer(s)"""
+        source = app.gui.getvar("fiat", "source_asset_locations")
+        if source == "Open Street Map":
+            type = "osm_primary"
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type="primary") # always paint according to primary
+            paint_properties = self.get_paint_properties(type=type) # always paint according to primary
             color_items = paint_properties['circle-color'][2:-1]
             color_items.append('other')
             color_items.append(paint_properties['circle-color'][-1])
@@ -971,7 +1015,7 @@ class Model(GenericModel):
     
     def show_asset_height(self,type="asset_height"):
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -989,7 +1033,7 @@ class Model(GenericModel):
     def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -1006,7 +1050,7 @@ class Model(GenericModel):
     def show_max_potential_damage_cont(self, type="damage_cont"):
         """Show maximum potential damage: content layer(s)"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -1023,7 +1067,7 @@ class Model(GenericModel):
     def show_ground_elevation(self, type="ground_elevation"):
         """Show ground elevation"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -1041,7 +1085,7 @@ class Model(GenericModel):
     def show_svi(self, type="SVI"):
         """Show SVI Index"""  # str(Path(self.root) / "exposure" / "SVI")
         if not self.buildings.empty and "SVI" in self.buildings.columns:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
             labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
@@ -1060,7 +1104,7 @@ class Model(GenericModel):
     def show_svi_key_domain(self, type="SVI_key_domain"):
         """Show SVI Key Domain"""  # str(Path(self.root) / "exposure" / "SVI")
         if not self.buildings.empty and "SVI_key_domain" in self.buildings.columns:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:-1]
             color_items.append('other')
             color_items.append(paint_properties['circle-color'][-1])
