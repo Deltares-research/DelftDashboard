@@ -45,7 +45,7 @@ element:
       y: 70
       width: 30
       height: 20
-    text: Ground Floor Height (ft)
+    text: Ground Floor Height 
     variable: osm_ground_floor_height
     dependency:
     - action: visible
