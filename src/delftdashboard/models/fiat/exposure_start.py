@@ -268,12 +268,12 @@ def build_osm_exposure(*args):
         app.gui.setvar(model, "source_asset_locations", "Open Street Map")
         app.gui.setvar(model, "source_classification", "Open Street Mapy")
         app.gui.setvar(
-            model, "source_finished_floor_height", "Open Street Map"
+            model, "source_finished_floor_height", "User input"
         )
         app.gui.setvar(
             model, "source_max_potential_damage", "JRC Damage Values"
         )
-        app.gui.setvar(model, "source_ground_elevation", "User Input")
+        app.gui.setvar(model, "source_ground_elevation", "None")
         
         # Update the damage curves to JRC Damage Curves
         update_damage_curves()
