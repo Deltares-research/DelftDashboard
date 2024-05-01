@@ -628,16 +628,15 @@ class Model(GenericModel):
                 self.domain.input.variables, var_name, app.gui.getvar("fiat", var_name)
             )
 
-    def new(self):
-        fname = app.gui.window.dialog_select_path("Select an empty folder")
-        if fname:
-            app.gui.setvar("fiat", "selected_scenario", Path(fname).stem)
-            app.gui.setvar("fiat", "scenario_folder", fname)
-            self.domain = HydroMtViewModel(
-                app.config["working_directory"],
-                app.config["data_libs"],
-                fname,
-            )
+    def select_working_directory(self):
+        root = os.getcwd()           
+        app.gui.setvar("fiat", "selected_scenario", Path(root).stem)
+        app.gui.setvar("fiat", "scenario_folder", root)
+        self.domain = HydroMtViewModel(
+            app.config["working_directory"],
+            app.config["data_libs"],
+            root,
+        )
 
     def open(self):
         # Open input file, and change working directory

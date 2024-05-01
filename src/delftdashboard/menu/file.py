@@ -41,9 +41,6 @@ def new(option):
     # app.active_model = app.model[list(app.model)[0]]
     # app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
 
-    # Create a new model
-    app.active_model.new()
-
 
 def open(option):
     app.active_model.open()
@@ -67,7 +64,9 @@ def select_working_directory(option):
             except:
                 print("No method select_working_directory for model: ", model)
                 pass
-
+    
+    # Create a new model
+    # app.active_model.new()
 
 def exit(option):
     app.gui.quit()
