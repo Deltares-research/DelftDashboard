@@ -19,3 +19,6 @@ fiat_database
 cache
 src/delftdashboard/config/census_key.txt
 temp_data
+
+dist/
+build/
