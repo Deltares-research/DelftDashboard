@@ -64,9 +64,6 @@ def select_working_directory(option):
             except:
                 print("No method select_working_directory for model: ", model)
                 pass
-    
-    # Create a new model
-    # app.active_model.new()
 
 def exit(option):
     app.gui.quit()
