@@ -41,7 +41,7 @@ def new(option):
     new = app.gui.window.dialog_yes_no("Do you want to select a new working directory?")
     if not new:
         return
-    select_working_directory()
+    select_working_directory(None)
     
     ## FREDERIQUE: commented out below because it changes the active model
     # app.active_model = app.model[list(app.model)[0]]
