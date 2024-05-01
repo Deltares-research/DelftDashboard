@@ -6,6 +6,7 @@ from pathlib import Path
 from shapely.geometry import Polygon
 
 from delftdashboard.operations.toolbox import GenericToolbox
+from delftdashboard.menu.file import select_working_directory
 from delftdashboard.app import app
 from delftdashboard.operations import map
 from delftdashboard.operations.checklist import zoom_to_boundary
@@ -130,7 +131,7 @@ def draw_boundary(*args):
             "No FIAT model initiated yet",
         )
         # Initiate a new FIAT model
-        app.active_model.select_working_directory()
+        select_working_directory(None)
 
         # Load the file
         selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
@@ -178,7 +179,7 @@ def generate_boundary(*args):
         )
 
         # Initiate a new FIAT model
-        app.active_model.select_working_directory()
+        select_working_directory(None)
 
     gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
     app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
@@ -372,7 +373,7 @@ def quick_build(*args):
         )
 
         # Initiate a new FIAT model
-        app.active_model.select_working_directory()
+        select_working_directory(None)
 
     model = "fiat"
     checkbox_group = "_main"
