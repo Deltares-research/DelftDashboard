@@ -238,6 +238,9 @@ def build_osm_exposure(*args):
         # Set the primary and secondary object type lists
         app.active_model.set_object_types(unique_primary_types, unique_secondary_types)
 
+        # Set country
+        app.active_model.domain.exposure_vm.set_country(country)
+
         # Set the buildings attribute to gdf for easy visualization of the buildings
         app.active_model.buildings = gdf
 
