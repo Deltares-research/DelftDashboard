@@ -198,6 +198,9 @@ def build_nsi_exposure(*args):
         )
         app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
         
+        # Set country
+        app.active_model.domain.exposure_vm.set_country("United States")
+        
         get_roads(model)
         
         dlg.close()
