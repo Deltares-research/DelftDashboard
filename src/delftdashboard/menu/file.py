@@ -44,6 +44,7 @@ def new(option):
     # app.active_model = app.model[list(app.model)[0]]
     # app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
 
+    app.active_model.select_working_directory()
 
 def open(option):
     app.active_model.open()
