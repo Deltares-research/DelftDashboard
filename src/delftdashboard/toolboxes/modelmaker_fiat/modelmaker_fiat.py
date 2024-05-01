@@ -130,7 +130,7 @@ def draw_boundary(*args):
             "No FIAT model initiated yet",
         )
         # Initiate a new FIAT model
-        app.active_model.new()
+        app.active_model.select_working_directory()
 
         # Load the file
         selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
@@ -372,7 +372,7 @@ def quick_build(*args):
         )
 
         # Initiate a new FIAT model
-        app.active_model.new()
+        app.active_model.select_working_directory()
 
     model = "fiat"
     checkbox_group = "_main"

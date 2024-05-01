@@ -37,6 +37,12 @@ def new(option):
     if app.active_model.name in app.model.keys():
         app.active_model.add_layers()
 
+    #  Select new working directory
+    new = app.gui.window.dialog_yes_no("Do you want to select a new working directory?")
+    if not new:
+        return
+    select_working_directory()
+    
     ## FREDERIQUE: commented out below because it changes the active model
     # app.active_model = app.model[list(app.model)[0]]
     # app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
