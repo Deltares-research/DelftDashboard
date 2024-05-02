@@ -27,15 +27,22 @@ def new(option):
     # Initialize toolboxes
     initialize_toolboxes()
 
-    # Initialize models
-    initialize_models()
+    # Initialize SFINCS models
+    if app.active_model.name != 'fiat':
+        initialize_models()
 
     # Add layers
     for toolbox in app.toolbox:
         app.toolbox[toolbox].add_layers()
         
     if app.active_model.name in app.model.keys():
-        app.active_model.add_layers()       
+        app.active_model.add_layers()
+
+    app.gui.window.dialog_info(
+    "Please select a new working directory",
+    "Select working directory",
+    )
+    select_working_directory(option)       
     ## FREDERIQUE: commented out below because it changes the active model
     # app.active_model = app.model[list(app.model)[0]]
     # app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
