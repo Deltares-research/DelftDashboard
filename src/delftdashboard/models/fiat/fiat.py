@@ -287,6 +287,10 @@ class Model(GenericModel):
         app.gui.setvar(group, "include_osm_roads", False)
         app.gui.setvar(group, "damage_unit", "Euro")
 
+        # Units
+        app.gui.setvar(group, "ground_floor_height_unit", "Finished Floor Height")
+        app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
+
         ## ROADS ##
         app.gui.setvar(group, "include_motorways", True)
         app.gui.setvar(group, "include_trunk", True)

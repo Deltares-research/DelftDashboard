@@ -41,12 +41,14 @@ element:
         value: Start with Open Street Map
   - style: edit
     position:
-      x: 360
+      x: 350
       y: 70
       width: 30
       height: 20
-    text: Ground Floor Height 
-    variable: osm_ground_floor_height
+    text: 
+      variable: ground_floor_height_unit
+      width: 100
+    variable: osm_ground_floor_height 
     dependency:
     - action: visible
       checkfor: all
@@ -76,7 +78,8 @@ element:
       y: 90
       width: 25
       height: 18
-    text: "Threshold value (ft)"
+    text: 
+      variable: osm_roads_threshold_unit
     variable: road_damage_threshold
   - style: text
     position:
@@ -111,7 +114,7 @@ element:
     variable: include_primary
   - style: pushbutton
     position:
-      x: 10
+      x: 140
       y: 92
       width: 15
       height: 15
