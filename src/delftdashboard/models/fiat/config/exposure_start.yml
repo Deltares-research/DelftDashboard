@@ -41,7 +41,7 @@ element:
         value: Start with Open Street Map
   - style: edit
     position:
-      x: 350
+      x: 360
       y: 70
       width: 30
       height: 20
