@@ -179,7 +179,7 @@ def generate_boundary(*args):
         )
 
         # Initiate a new FIAT model
-        select_working_directory()
+        select_working_directory(None)
 
     gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
     app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
