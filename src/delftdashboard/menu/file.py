@@ -35,8 +35,7 @@ def new(option):
         app.toolbox[toolbox].add_layers()
         
     if app.active_model.name in app.model.keys():
-        app.active_model.add_layers()
-       
+        app.active_model.add_layers()       
     ## FREDERIQUE: commented out below because it changes the active model
     # app.active_model = app.model[list(app.model)[0]]
     # app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
