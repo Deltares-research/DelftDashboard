@@ -36,10 +36,7 @@ def new(option):
         
     if app.active_model.name in app.model.keys():
         app.active_model.add_layers()
-    
-    #select_working_directory(option)
-
-    
+       
     ## FREDERIQUE: commented out below because it changes the active model
     # app.active_model = app.model[list(app.model)[0]]
     # app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
