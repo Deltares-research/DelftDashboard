@@ -32,6 +32,13 @@ class Model(GenericModel):
         # Set GUI variables
         self.set_gui_variables()
 
+    def initialize_domain(self,root):
+        self.domain = HydroMtViewModel(
+            app.config["working_directory"],
+            app.config["data_libs"],
+            root 
+        )
+
     def add_layers(self):
         # Add main DDB layer
         layer = app.map.add_layer("buildings")
@@ -629,24 +636,12 @@ class Model(GenericModel):
             )
 
     def select_working_directory(self):
-        fname = app.gui.window.dialog_select_path("Select an empty folder")
-        if fname:
-            app.gui.setvar("fiat", "selected_scenario", Path(fname).stem)
-            app.gui.setvar("fiat", "scenario_folder", fname)
-            self.domain = HydroMtViewModel(
-                app.config["working_directory"],
-                app.config["data_libs"],
-                fname,
-            )
-        
-        #root = os.getcwd()           
-        #app.gui.setvar("fiat", "selected_scenario", Path(root).stem)
-        #app.gui.setvar("fiat", "scenario_folder", root)
-        #self.domain = HydroMtViewModel(
-        #    app.config["working_directory"],
-        #    app.config["data_libs"],
-        #    root,
-        #)
+        root = os.getcwd()
+        self.initialize_domain(root)  
+        if self.domain.fiat_model.root != root:
+            self.domain.fiat_model.set_root(root, mode='w+') 
+        app.gui.setvar("fiat", "selected_scenario", Path(root).stem)
+        app.gui.setvar("fiat", "scenario_folder", Path(root))
 
     def open(self):
         # Open input file, and change working directory

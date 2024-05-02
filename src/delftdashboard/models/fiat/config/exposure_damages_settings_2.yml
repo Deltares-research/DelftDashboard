@@ -14,4 +14,4 @@ element:
     y: 30
     width: 180
     height: 40
-  text: <center>You already added new data to this damage type. <br> Do you want to overwrite it?</center>
+  text: <center>Do you want to overwrite the existing model?</center>

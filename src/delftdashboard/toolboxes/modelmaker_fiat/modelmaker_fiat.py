@@ -179,7 +179,7 @@ def generate_boundary(*args):
         )
 
         # Initiate a new FIAT model
-        select_working_directory(None)
+        select_working_directory()
 
     gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
     app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
@@ -191,6 +191,7 @@ def generate_boundary(*args):
     app.active_model.domain.exposure_vm.create_interest_area(
         fpath=str(app.active_model.domain.database.drive / "aoi.geojson")
     )
+
 
     app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
     time.sleep(0.5)
