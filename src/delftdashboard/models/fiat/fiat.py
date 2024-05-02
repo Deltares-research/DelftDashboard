@@ -637,11 +637,12 @@ class Model(GenericModel):
 
     def select_working_directory(self):
         root = os.getcwd()
+        app.gui.setvar("fiat", "selected_scenario", Path(root).stem)
+        app.gui.setvar("fiat", "scenario_folder", Path(root))
         self.initialize_domain(root)  
         if self.domain.fiat_model.root != root:
             self.domain.fiat_model.set_root(root, mode='w+') 
-        app.gui.setvar("fiat", "selected_scenario", Path(root).stem)
-        app.gui.setvar("fiat", "scenario_folder", Path(root))
+
 
     def open(self):
         # Open input file, and change working directory
