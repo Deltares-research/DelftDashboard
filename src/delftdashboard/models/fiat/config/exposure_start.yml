@@ -45,9 +45,7 @@ element:
       y: 70
       width: 30
       height: 20
-    text: 
-      variable: ground_floor_height_unit
-      width: 100
+    text: Finished Floor Height (m) 
     variable: osm_ground_floor_height 
     dependency:
     - action: visible

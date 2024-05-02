@@ -46,9 +46,6 @@ def select_model_type(*args):
         )
     elif model_type == "Start with Open Street Map":
         # NOTE: This option is currently not implemented
-        app.gui.setvar(
-        group, "ground_floor_height_unit", "Finished Floor Height (m)"
-        )
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (m)")
 
         app.gui.setvar(group, "selected_asset_locations_string", ["Open Street Map (OSM)"])
