@@ -275,7 +275,7 @@ def build_osm_exposure(*args):
 
         # Set the sources
         app.gui.setvar(model, "source_asset_locations", "Open Street Map")
-        app.gui.setvar(model, "source_classification", "Open Street Mapy")
+        app.gui.setvar(model, "source_classification", "Open Street Map")
         app.gui.setvar(
             model, "source_finished_floor_height", "User input"
         )
