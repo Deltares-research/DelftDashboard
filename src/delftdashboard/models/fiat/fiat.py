@@ -7,6 +7,7 @@ import pandas as pd
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
+from hydromt_fiat.api.exposure_vm import ExposureVector
 import copy
 from .utils import make_labels
 
@@ -1325,4 +1326,12 @@ class Model(GenericModel):
             model, "selected_secondary_classification_value", unique_secondary_types
         )
 
-
+    def get_continent(self):
+        self.exposure= ExposureVector(
+                data_catalog=self.domain.data_catalog,
+                logger=self.domain.fiat_model.logger,
+                region=self.domain.fiat_model.region,
+                crs=self.domain.fiat_model.crs,
+            )
+        country, continent = self.exposure.get_continent()
+        return country, continent

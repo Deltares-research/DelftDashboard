@@ -38,9 +38,7 @@ dependencies:
   - tomli-w
   - pyproj 
   - pip 
-  - pycountry-convert
-  - tqdm
-  - geopy
+
   - pip:
     - NDBC
     - noaa-coops

@@ -2,12 +2,6 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 from .vulnerability_damage_curves import update_damage_curves
 
-from geopy.geocoders import Nominatim
-from geopy.extra.rate_limiter import RateLimiter
-from typing import Tuple
-from tqdm import tqdm
-
-import pycountry_convert as pc
 import pandas as pd
 import geopandas as gpd
 
@@ -228,7 +222,7 @@ def build_osm_exposure(*args):
         crs = app.gui.getvar(model, "selected_crs")
         
        # Set continent for damage curves
-        country, continent = get_continent()
+        country, continent = app.active_model.get_continent()
         app.gui.setvar("fiat", "OSM_continent", continent)
 
         ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height")) 
@@ -338,45 +332,6 @@ def get_roads(model):
                 title="No OSM roads found",
             )
             dlg.close()
-
-
-def get_continent(*args):
-    region =  app.active_model.domain.exposure_vm.data_catalog.get_geodataframe("area_of_interest")
-    lon = region.geometry[0].centroid.x
-    lat = region.geometry[0].centroid.y
-
-    geolocator = Nominatim(user_agent="<APP_NAME>", timeout=10)
-    geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1)
-
-    location = geocode(f"{lat}, {lon}", language="en")
-
-    # for cases where the location is not found, coordinates are antarctica
-    if location is None:
-        return "global", "global"
-
-    # extract country code
-    address = location.raw["address"]
-    country_code = address["country_code"].upper()
-    country_name = address["country"]
-
-    # get continent code from country code
-    continent_code = pc.country_alpha2_to_continent_code(country_code)
-    continent_name = get_continent_name(continent_code)
-    
-    return country_name, continent_name
-
-def get_continent_name(continent_code: str) -> str:
-    continent_dict = {
-        "NA": "north america",
-        "SA": "south america",
-        "AS": "asia",
-        "AF": "africa",
-        "OC": "oceania",
-        "EU": "europe",
-        "AQ" : "antarctica"
-    }
-    return continent_dict[continent_code]
-
 
 def get_road_types():
     model = "fiat"
