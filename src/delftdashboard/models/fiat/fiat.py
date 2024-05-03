@@ -7,6 +7,7 @@ import pandas as pd
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
+from hydromt_fiat.api.exposure_vm import ExposureVector
 import copy
 from .utils import make_labels
 
@@ -191,6 +192,9 @@ class Model(GenericModel):
         group = "fiat"
 
         ## Damage curve tables ##
+        app.gui.setvar(
+            group, "OSM_continent", None
+        )
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         app.gui.setvar(
             group,
@@ -289,7 +293,10 @@ class Model(GenericModel):
         # Model type #
         app.gui.setvar(group, "model_type", "Start with NSI")
         app.gui.setvar(group, "include_osm_roads", False)
-        app.gui.setvar(group, "damage_unit", "$")
+        app.gui.setvar(group, "damage_unit", "Euro")
+
+        # Units
+        app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
 
         ## ROADS ##
         app.gui.setvar(group, "include_motorways", True)
@@ -512,6 +519,7 @@ class Model(GenericModel):
             "selected_secondary_classification_value",
             [""],
         )
+        app.gui.setvar(group, "osm_ground_floor_height", 0.2)
         app.gui.setvar(group, "loaded_aggregation_files", 0)
         app.gui.setvar(
             group,
@@ -715,7 +723,7 @@ class Model(GenericModel):
             }
         return paint_properties
 
-    def get_nsi_paint_properties(self, type="secondary") -> dict:
+    def get_paint_properties(self, type="secondary") -> dict:
         """Get's NSI-specific paint properties to visualize NSI data
 
         Parameters
@@ -831,6 +839,55 @@ class Model(GenericModel):
                 "#665435",
                 "#000000",
             ]
+
+        if type == "osm_primary":
+            circle_color = [
+                "match",
+                ["get", "Primary Object Type"],
+                "commercial",
+                "#6590bb",
+                "infrastructure",
+                "#7665b1",
+                "transport",
+                "#710b60",
+                "industrial",
+                "#10f276",
+                "agriculture",
+                "#4cf6ce",
+                "residential",
+                "#f55243",
+                "building averaged",
+                "#80f304",
+                "roads",
+                "#4aab4e",
+                "#000000",
+            ]
+
+        if type == "osm_secondary":
+            circle_color = [
+                "match",
+                ["get", "Secondary Object Type"],
+                "retail",
+                "#009c99",
+                "commercial",
+                "#6590bb",
+                "infrastructure",
+                "#7665b1",
+                "transport",
+                "#710b60",
+                "industrial",
+                "#10f276",
+                "agriculture",
+                "#4cf6ce",
+                "residential",
+                "#f55243",
+                "building averaged",
+                "#80f304",
+                "roads",
+                "#4aab4e",
+                "#000000",
+            ]
+
         if type == "asset_height":
             circle_color = [
                 "step",
@@ -953,13 +1010,18 @@ class Model(GenericModel):
 
     def show_classification(self, type="secondary"):
         """Show exposure layer(s)"""
+        source = app.gui.getvar("fiat", "source_asset_locations")
+        if type == "primary" and source == "Open Street Map":
+            type = "osm_primary"
+        elif type == "secondary" and source == "Open Street Map":
+            type = "osm_secondary"
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type="primary") # always paint according to primary
+            paint_properties = self.get_paint_properties(type=type) # always paint according to primary
             color_items = paint_properties['circle-color'][2:-1]
             color_items.append('other')
             color_items.append(paint_properties['circle-color'][-1])
             legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
-            if type == "primary":
+            if type == "primary" or type == "osm_primary":
                 app.map.layer["buildings"].layer["primary_classification"].set_data(
                     self.buildings, paint_properties, legend
                 )
@@ -972,7 +1034,7 @@ class Model(GenericModel):
     
     def show_asset_height(self,type="asset_height"):
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -990,7 +1052,7 @@ class Model(GenericModel):
     def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -1007,7 +1069,7 @@ class Model(GenericModel):
     def show_max_potential_damage_cont(self, type="damage_cont"):
         """Show maximum potential damage: content layer(s)"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -1024,7 +1086,7 @@ class Model(GenericModel):
     def show_ground_elevation(self, type="ground_elevation"):
         """Show ground elevation"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -1042,7 +1104,7 @@ class Model(GenericModel):
     def show_svi(self, type="SVI"):
         """Show SVI Index"""  # str(Path(self.root) / "exposure" / "SVI")
         if not self.buildings.empty and "SVI" in self.buildings.columns:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
             labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
@@ -1061,7 +1123,7 @@ class Model(GenericModel):
     def show_svi_key_domain(self, type="SVI_key_domain"):
         """Show SVI Key Domain"""  # str(Path(self.root) / "exposure" / "SVI")
         if not self.buildings.empty and "SVI_key_domain" in self.buildings.columns:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:-1]
             color_items.append('other')
             color_items.append(paint_properties['circle-color'][-1])
@@ -1269,4 +1331,12 @@ class Model(GenericModel):
             model, "selected_secondary_classification_value", unique_secondary_types
         )
 
-
+    def get_continent(self):
+        self.exposure= ExposureVector(
+                data_catalog=self.domain.data_catalog,
+                logger=self.domain.fiat_model.logger,
+                region=self.domain.fiat_model.region,
+                crs=self.domain.fiat_model.crs,
+            )
+        country, continent = self.exposure.get_continent()
+        return country, continent

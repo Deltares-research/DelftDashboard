@@ -1,7 +1,9 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from .vulnerability_damage_curves import update_damage_curves
 
 import pandas as pd
+import geopandas as gpd
 
 
 def select(*args):
@@ -24,6 +26,7 @@ def select_model_type(*args):
             "selected_asset_locations_string",
             ["National Structure Inventory (NSI)"],
         )
+        app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
         app.gui.setvar(group, "selected_asset_locations", 0)
         # For classification the NSI data cannot be used because it is already used, you can only update it with other data.
         app.gui.setvar(group, "classification_source", "nsi_data")
@@ -35,9 +38,11 @@ def select_model_type(*args):
         app.gui.setvar(
             group, "classification_source_value", ["nsi_data", "upload_data"]
         )
-    elif model_type == "Start from scratch":
+    elif model_type == "Start with Open Street Map":
         # NOTE: This option is currently not implemented
-        app.gui.setvar(group, "selected_asset_locations_string", [])
+        app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (m)")
+
+        app.gui.setvar(group, "selected_asset_locations_string", ["Open Street Map (OSM)"])
         app.gui.setvar(group, "selected_asset_locations", 0)
 
         # When starting from scratch only user-input data can be used for classification
@@ -47,12 +52,12 @@ def select_model_type(*args):
             "classification_source_string",
             ["Upload data"],
         )
-        app.gui.setvar(group, "classification_source_value", ["upload_data"])
-                
-        app.gui.window.dialog_info(
-            "This option is currently not implemented.",
-            "Method not implemented",
-        )
+        app.gui.setvar(group, "classification_source_value", ["osm_data", "upload_data"])
+
+    #    app.gui.window.dialog_info(
+    #        "This option is currently not implemented.",
+    #        "Method not implemented",
+    #    )
 
 def include_all_road_types(*args):
     group = "fiat"
@@ -78,6 +83,12 @@ def add_exposure_locations_to_model(*args):
     ):
         selected_asset_locations = "NSI"
         build_nsi_exposure()
+    elif (
+        len(selected_asset_locations) == 1
+        and selected_asset_locations[0] == "Open Street Map (OSM)"
+    ):
+        selected_asset_locations = "OSM"
+        build_osm_exposure() 
     elif (
         len(selected_asset_locations) == 1
         and selected_asset_locations[0] != "National Structure Inventory (NSI)"
@@ -183,7 +194,12 @@ def build_nsi_exposure(*args):
             model, "source_max_potential_damage", "National Structure Inventory"
         )
         app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
-
+        
+        # Set country
+        app.active_model.domain.exposure_vm.set_country("United States")
+        
+        get_roads(model)
+        
         dlg.close()
 
     except FileNotFoundError:
@@ -193,6 +209,91 @@ def build_nsi_exposure(*args):
         )
         dlg.close()
 
+def build_osm_exposure(*args):
+    model = "fiat"
+    checkbox_group = "_main"
+    try:
+        dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
+        
+        app.gui.setvar(
+            model, "text_feedback_create_asset_locations", "OSM assets created"
+        )
+
+        crs = app.gui.getvar(model, "selected_crs")
+        
+       # Set continent for damage curves
+        country, continent = app.active_model.get_continent()
+        app.gui.setvar("fiat", "OSM_continent", continent)
+
+        ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height")) 
+        (
+            gdf,
+            unique_primary_types,
+            unique_secondary_types,
+        ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
+            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values'
+        )
+        gdf.set_crs(crs, inplace=True)
+
+        # Set the primary and secondary object type lists
+        app.active_model.set_object_types(unique_primary_types, unique_secondary_types)
+
+        # Set country
+        app.active_model.domain.exposure_vm.set_country(country)
+
+        # Set the buildings attribute to gdf for easy visualization of the buildings
+        app.active_model.buildings = gdf
+
+        app.map.layer["buildings"].layer["exposure_points"].crs = crs
+        app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
+
+        app.gui.setvar(model, "show_asset_locations", True)
+
+        list_types = list(gdf["Secondary Object Type"].unique())
+        list_types.sort()
+        df = pd.DataFrame(
+            data={
+                "Secondary Object Type": list_types,
+                "Assigned: Structure": "",
+                "Assigned: Content": "",
+            }
+        )
+        ## TODO: add the nr of stories and the basement?
+        app.gui.setvar(model, "exposure_categories_to_link", df)
+
+        # Set the checkboxes checked
+        app.gui.setvar(checkbox_group, "checkbox_asset_locations", True)
+        app.gui.setvar(checkbox_group, "checkbox_classification", True)
+        app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
+        app.gui.setvar(checkbox_group, "checkbox_elevation", True)
+
+        # Set the sources
+        app.gui.setvar(model, "source_asset_locations", "Open Street Map")
+        app.gui.setvar(model, "source_classification", "Open Street Map")
+        app.gui.setvar(
+            model, "source_finished_floor_height", "User input"
+        )
+        app.gui.setvar(
+            model, "source_max_potential_damage", "JRC Damage Values"
+        )
+        app.gui.setvar(model, "source_ground_elevation", "None")
+        
+        # Update the damage curves to JRC Damage Curves
+        update_damage_curves()
+        
+        # Add OSM roads
+        get_roads(model)
+        
+        dlg.close()
+
+    except FileNotFoundError:
+        app.gui.window.dialog_info(
+            text="Please first select a model boundary.",
+            title="No model boundary selected",
+        )
+        dlg.close()
+
+def get_roads(model):
     ## ROADS ##
     if app.gui.getvar(model, "include_osm_roads"):
         road_types = get_road_types()
@@ -231,7 +332,6 @@ def build_nsi_exposure(*args):
                 title="No OSM roads found",
             )
             dlg.close()
-
 
 def get_road_types():
     model = "fiat"

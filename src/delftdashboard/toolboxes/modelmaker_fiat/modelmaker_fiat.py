@@ -389,7 +389,8 @@ def quick_build(*args):
     app.active_model.domain.exposure_vm.set_asset_locations_source(
         source="NSI", ground_floor_height="NSI", crs=crs
     )
-
+    app.active_model.domain.exposure_vm.set_country("United States")
+    
     # Set the damage curves
     selected_damage_curve_database = "default_vulnerability_curves"
     selected_link_table = "default_hazus_iwr_linking"
