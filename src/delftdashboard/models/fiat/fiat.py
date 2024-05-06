@@ -457,6 +457,12 @@ class Model(GenericModel):
             ["sfincs_data", "upload_data"],
         )
         app.gui.setvar(
+            group, "ground_elevation_unit", None),
+        app.gui.setvar(
+            group, "ground_elevation_unit_feet", False)
+        app.gui.setvar(
+            group, "ground_elevation_unit_meters", False)
+        app.gui.setvar(
             group,
             "loaded_ground_elevation_files_string",
             [],

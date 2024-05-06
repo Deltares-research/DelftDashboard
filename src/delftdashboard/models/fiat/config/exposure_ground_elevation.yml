@@ -27,6 +27,50 @@ element:
       height: 20
     text: "Select source"
     method: select_ground_elevation_file
+  - style: checkbox
+    position:
+      x: 10
+      y: 40
+      width: 50
+    text: "meters"
+    variable: ground_elevation_unit_meters
+    method: select_ground_elevation_unit_meters
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable:  update_source_ground_elevation
+        operator: eq
+        value: upload_data
+  - style: checkbox
+    position:
+      x: 80
+      y: 40
+      width: 50
+    text: "feet"
+    variable: ground_elevation_unit_feet
+    method: select_ground_elevation_unit_feet
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: update_source_ground_elevation
+        operator: eq
+        value: upload_data
+  - style: text
+    position:
+      x: 10
+      y: 55
+      width: 100
+      height: 20
+    text: "Elevation Unit:"
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: update_source_ground_elevation
+        operator: eq
+        value: upload_data
 
 - style: panel
   title: Uploaded ground elevation sources
