@@ -97,7 +97,7 @@ def add_to_model(*args):
     # Set the source
     app.gui.setvar(model, "source_ground_elevation", name_ground_elevation_source)
 
-    if app.gui.getvar("fiat", "ground_elevation_unit_feet") is False and app.gui.getvar("fiat", "ground_elevation_unit_meters") is False:
+    if not app.gui.getvar("fiat", "ground_elevation_unit_feet") and not app.gui.getvar("fiat", "ground_elevation_unit_meters") and app.gui.getvar("fiat", "update_source_ground_elevation") == "upload_data":
         app.gui.window.dialog_warning(
             "Please select an elevation unit",
             "No elevation unit",
