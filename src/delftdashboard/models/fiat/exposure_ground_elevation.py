@@ -17,9 +17,18 @@ def select(*args):
 def set_variables(*args):
     app.active_model.set_input_variables()
 
-
+def select_ground_elevation_unit_feet(*args):
+    if app.gui.getvar("fiat", "ground_elevation_unit_feet"):
+        app.gui.setvar("fiat", "ground_elevation_unit_meters", False)
+        app.gui.setvar("fiat", "ground_elevation_unit", "feet")
+def select_ground_elevation_unit_meters(*args):
+    if app.gui.getvar("fiat", "ground_elevation_unit_meters"):
+        app.gui.setvar("fiat", "ground_elevation_unit_feet", False)
+        app.gui.setvar("fiat", "ground_elevation_unit", "meters")
+        
 def select_ground_elevation_file(*args):
     if app.gui.getvar("fiat", "update_source_ground_elevation") == "sfincs_data":
+        app.gui.setvar("fiat", "ground_elevation_unit", "meters")
         load_sfincs_ground_elevation()
     elif app.gui.getvar("fiat", "update_source_ground_elevation") == "upload_data":
         fn = app.gui.window.dialog_open_file(
@@ -83,13 +92,21 @@ def add_to_model(*args):
     current_list_value = app.gui.getvar(model, "loaded_ground_elevation_files_value")
     name_ground_elevation_source = current_list_string[idx]
     path_ground_elevation_source = str(current_list_value[idx])
+    unit = app.gui.getvar(model, "ground_elevation_unit")
 
     # Set the source
     app.gui.setvar(model, "source_ground_elevation", name_ground_elevation_source)
 
+    if not app.gui.getvar("fiat", "ground_elevation_unit_feet") and not app.gui.getvar("fiat", "ground_elevation_unit_meters") and app.gui.getvar("fiat", "update_source_ground_elevation") == "upload_data":
+        app.gui.window.dialog_warning(
+            "Please select an elevation unit",
+            "No elevation unit",
+        )
+        return
+    
     # Set the settings in HydroMT-FIAT
     app.active_model.domain.exposure_vm.set_ground_elevation(
-        source=path_ground_elevation_source
+        source=path_ground_elevation_source, unit = unit
     )
 
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
