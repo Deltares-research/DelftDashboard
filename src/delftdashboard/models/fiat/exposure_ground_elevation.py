@@ -31,7 +31,6 @@ def select_ground_elevation_file(*args):
         app.gui.setvar("fiat", "ground_elevation_unit", "meters")
         load_sfincs_ground_elevation()
     elif app.gui.getvar("fiat", "update_source_ground_elevation") == "upload_data":
-        unit = app.gui.getvar("fiat", "ground_elevation_unit")
         fn = app.gui.window.dialog_open_file(
             "Select raster", filter="Raster (*.tif)"
         )
