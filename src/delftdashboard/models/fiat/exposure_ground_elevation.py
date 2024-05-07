@@ -28,8 +28,8 @@ def select_ground_elevation_unit_meters(*args):
         
 def select_ground_elevation_file(*args):
     if app.gui.getvar("fiat", "update_source_ground_elevation") == "sfincs_data":
-        unit = app.gui.setvar("fiat", "ground_elevation_unit", "meters")
-        load_sfincs_ground_elevation(unit)
+        app.gui.setvar("fiat", "ground_elevation_unit", "meters")
+        load_sfincs_ground_elevation()
     elif app.gui.getvar("fiat", "update_source_ground_elevation") == "upload_data":
         unit = app.gui.getvar("fiat", "ground_elevation_unit")
         fn = app.gui.window.dialog_open_file(
@@ -48,9 +48,8 @@ def select_ground_elevation_file(*args):
         current_list_string = [item for item in current_list_string if item != '']
         app.gui.setvar("fiat", "loaded_ground_elevation_files_string", current_list_string)
 
-def load_sfincs_ground_elevation(unit: str, *args):
+def load_sfincs_ground_elevation(*args):
     fname = app.gui.window.dialog_select_path("Select the SFINCS model folder")
-    app.gui.setvar("fiat", "ground_elevation_unit", "meters")
     if fname:
         path_to_sfincs_domain = Path(fname) / "subgrid" / "dep_subgrid.tif"
         if path_to_sfincs_domain.exists():
