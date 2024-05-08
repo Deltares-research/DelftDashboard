@@ -27,6 +27,7 @@ def select_model_type(*args):
             ["National Structure Inventory (NSI)"],
         )
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
+        app.gui.setvar(group, "ground_elevation_unit", "feet")
         app.gui.setvar(group, "selected_asset_locations", 0)
         # For classification the NSI data cannot be used because it is already used, you can only update it with other data.
         app.gui.setvar(group, "classification_source", "nsi_data")
@@ -41,7 +42,7 @@ def select_model_type(*args):
     elif model_type == "Start with Open Street Map":
         # NOTE: This option is currently not implemented
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (m)")
-
+        app.gui.setvar(group, "ground_elevation_unit", "meters")
         app.gui.setvar(group, "selected_asset_locations_string", ["Open Street Map (OSM)"])
         app.gui.setvar(group, "selected_asset_locations", 0)
 
@@ -220,7 +221,7 @@ def build_osm_exposure(*args):
         )
 
         crs = app.gui.getvar(model, "selected_crs")
-        
+        ground_elevation_unit = app.gui.getvar(model, "ground_elevation_unit")
        # Set continent for damage curves
         country, continent = app.active_model.get_continent()
         app.gui.setvar("fiat", "OSM_continent", continent)
@@ -231,7 +232,7 @@ def build_osm_exposure(*args):
             unique_primary_types,
             unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
-            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values'
+            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values', ground_elevation_unit = ground_elevation_unit
         )
         gdf.set_crs(crs, inplace=True)
 
