@@ -49,7 +49,7 @@ def read_classification(*args):
             f"Please standardize your classification so the correct damage curves can be assigned.",
             "Please standardize",
         )
-            # Create pop-up and only continue if user presses ok
+        standarize_classification()
 
 def load_upload_classification_source(*args):
     model = "fiat"
