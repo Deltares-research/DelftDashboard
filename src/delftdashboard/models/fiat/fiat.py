@@ -234,7 +234,9 @@ class Model(GenericModel):
             "Occupancy Class", inplace=True, ignore_index=True
         )
         default_occupancy_df.fillna("", inplace=True)
+        default_occupancy_df_adjusted = default_occupancy_df[default_occupancy_df["Occupancy Class"] != "RES1"]
         app.gui.setvar(group, "hazus_iwr_occupancy_classes", default_occupancy_df)
+        app.gui.setvar(group, "hazus_iwr_occupancy_classes_adjusted", default_occupancy_df_adjusted)
 
         cols = [
             "-9",
