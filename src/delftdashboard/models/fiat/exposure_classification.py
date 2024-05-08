@@ -21,14 +21,13 @@ def set_variables(*args):
 def add_classification_field(*args):
     model = "fiat"
     existing_exposure_cat = app.gui.getvar(model, "exposure_categories_to_standardize")
-    if not existing_exposure_cat.values.any():
-        read_classification()
-    else:
-        try:
+    if existing_exposure_cat.values.any():
+        try: 
             app.active_model.overwrite_classification()
         except ValueError as e:
+            #show dialog
             return
-        read_classification()
+    read_classification()
 
 def read_classification(*args):
         model = "fiat"
