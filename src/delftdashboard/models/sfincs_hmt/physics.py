@@ -1,8 +1,15 @@
 from delftdashboard.app import app
+from delftdashboard.operations import map
 
 
 def select(*args):
-    pass
+    map.update()
+    app.map.layer["sfincs_hmt"].layer["region"].show()
+    app.map.layer["sfincs_hmt"].layer["region"].deactivate()
+    app.map.layer["sfincs_hmt"].layer["boundary_points"].activate()
+    app.map.layer["sfincs_hmt"].layer["discharge_points"].activate()
+    app.map.layer["sfincs_hmt"].layer["observation_points"].activate()    
+    # app.map.layer["sfincs_hmt"].layer["measures"].activate()s
 
 
 def set_variables(*args):

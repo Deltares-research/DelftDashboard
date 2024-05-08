@@ -46,7 +46,7 @@ element:
     width: 50
     height: 20
   variable: discharge
-  text: Discharge
+  text: Discharge (m3/s)
   tooltip: Edit the discharge
 - style: pushselectfile
   position:

@@ -14,7 +14,7 @@ element:
       width: 130
       height: 20
     select: index
-    tooltip: Select how you want to add weirs/flood walls
+    tooltip: Select how you want to add line elements
     variable: structure_weirs_method_index
     option_string: 
       variable: structure_weirs_methods

@@ -80,7 +80,7 @@ element:
       y: 90
       width: 180
       height: 20
-    method: load_discharge_points_from_file
+    method: load_from_file
     tooltip: Load discharge points from file
 - style: panel
   title: Add timeseries
@@ -97,16 +97,142 @@ element:
       operator: ge
       value: 1
   element:
+  - style: popupmenu
+    position:
+      x: 10
+      y: 90
+      width: 180
+      height: 20
+    select: index
+    tooltip: Select method to specify timeseries
+    variable: bc_dis_timeseries_methods_index
+    option_string:
+      variable: bc_dis_timeseries_methods
+  - style: text
+    text: "Constant discharge (m3/s): "
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_dis_timeseries_methods_index
+        operator: eq
+        value: 0      
   - style: edit
-    text: Constant discharge (m3/s)
     position:
       x: -10
-      y: 90
-      width: 45
+      y: 65
+      width: 60
       height: 20
-    tooltip: Add constant discharge
+    tooltip: Specify constant discharge
+    variable: bc_dis_value
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_dis_timeseries_methods_index
+        operator: eq
+        value: 0
+  - style: pushbutton
+    text: Add
+    position:
+      x: -10
+      y: 40
+      width: 60
+      height: 20
+    method: add_constant_discharge
+    tooltip: Add timeseries
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_dis_timeseries_methods_index
+        operator: eq
+        value: 0
+  - style: text
+    text: "Peak discharge (m3/s): "
+    position:
+      x: 10
+      y: 65
+      width: 100
+      height: 20
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_dis_timeseries_methods_index
+        operator: eq
+        value: 1
+  - style: edit
+    position:
+      x: -10
+      y: 65
+      width: 60
+      height: 20
+    tooltip: Specify peak discharge for Guassian shaped timeseries
+    variable: bc_dis_value
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_dis_timeseries_methods_index
+        operator: eq
+        value: 1
+  - style: pushbutton
+    text: Add
+    position:
+      x: -10
+      y: 40
+      width: 60
+      height: 20
+    method: add_synthetical_discharge
+    tooltip: Add timeseries
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: bc_dis_timeseries_methods_index
+        operator: eq
+        value: 1
+  - style: pushbutton
+    position:
+      x: -10
+      y: 10
+      width: 85
+      height: 20
+    text: Copy to All
+    method: copy_to_all
+    tooltip: Copy timeseries to all points
+    dependency:
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_boundary_points
+        operator: gt
+        value: 1
+  - style: pushbutton
+    position:
+      x: 10
+      y: 10
+      width: 85
+      height: 20
+    text: Visualize
+    method: show_timeseries
+    tooltip: "NOT YET IMPLEMENTED: Visualize timeseries for all points"
+    enable: False
+    # dependency:
+    # - action: enable
+    #   checkfor: any
+    #   check:
+    #   - variable: nr_boundary_points
+    #     operator: gt
+    #     value: 1            
 - style: text
-  text: "discharge points: "
+  text: "Discharge points: "
   position:
     x: -10
     y: 125
@@ -115,9 +241,9 @@ element:
 - style: listbox
   position:
     x: -10
-    y: 40
+    y: 45
     width: 120
-    height: 80
+    height: 75
   method: select_discharge_point_from_list
   variable: active_discharge_point
   select: index
@@ -125,10 +251,34 @@ element:
     variable: discharge_point_names
   tooltip: Select discharge point
 - style: pushbutton
-  text: Delete all
+  text: Delete All
   position:
     x: -10
-    y: 10
+    y: 5
     width: 120
-    height: 20
+    height: 15
   method: delete_all_points_from_list
+  tooltip: Delete all discharge points
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_discharge_points
+      operator: gt
+      value: 0  
+- style: pushbutton
+  text: Delete Point
+  position:
+    x: -10
+    y: 25
+    width: 120
+    height: 15
+  method: delete_point_from_list
+  tooltip: Delete discharge point from model
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_discharge_points
+      operator: gt
+      value: 0

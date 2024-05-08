@@ -4,17 +4,17 @@ element:
   position:
     x: 10
     y: 10
-    width: 170
+    width: 400
     height: 120
   element:
   - style: radiobuttongroup
     position:
       x: 10
-      y: 90
+      y: 70
       width: 150
     variable: model_type
-    option_string: ["Start with NSI"]  # , "Start from scratch" # NOTE: This is not yet implemented
-    option_value:  ["Start with NSI"]  # , "Start from scratch" # NOTE: This is not yet implemented
+    option_string: ["Start with NSI"   , "Start with Open Street Map"] # NOTE: This is not yet implemented
+    option_value:  ["Start with NSI"   , "Start with Open Street Map"] # NOTE: This is not yet implemented
     method: select_model_type
   - style: checkbox
     position:
@@ -24,11 +24,41 @@ element:
       height: 20
     text: Include OSM roads
     variable: include_osm_roads
+  - style: edit
+    position:
+      x: 210
+      y: 70
+      width: 30
+      height: 20
+    text: Damage unit
+    variable: damage_unit
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: model_type
+        operator: eq
+        value: Start with Open Street Map
+  - style: edit
+    position:
+      x: 360
+      y: 70
+      width: 30
+      height: 20
+    text: Finished Floor Height (m) 
+    variable: osm_ground_floor_height 
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: model_type
+        operator: eq
+        value: Start with Open Street Map
 
 - style: panel
   title: Road settings
   position:
-    x: 190
+    x: 430
     y: 10
     width: 170
     height: 120
@@ -46,7 +76,8 @@ element:
       y: 90
       width: 25
       height: 18
-    text: "Threshold value (ft)"
+    text: 
+      variable: osm_roads_threshold_unit
     variable: road_damage_threshold
   - style: text
     position:
@@ -81,7 +112,7 @@ element:
     variable: include_primary
   - style: pushbutton
     position:
-      x: 10
+      x: 140
       y: 92
       width: 15
       height: 15
@@ -115,7 +146,7 @@ element:
 
 - style: checkbox
   position:
-    x: 395
+    x: 630
     y: 60
     width: 100
     height: 20
@@ -124,7 +155,7 @@ element:
   method: display_asset_locations
 - style: checkbox
   position:
-    x: 395
+    x: 630
     y: 40
     width: 100
     height: 20
@@ -134,7 +165,7 @@ element:
 
 - style: pushbutton
   position:
-    x: 390
+    x: 630
     y: 10
     width: 95
     height: 20

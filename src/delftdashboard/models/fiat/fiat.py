@@ -7,6 +7,7 @@ import pandas as pd
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
+from hydromt_fiat.api.exposure_vm import ExposureVector
 import copy
 from .utils import make_labels
 
@@ -31,6 +32,13 @@ class Model(GenericModel):
 
         # Set GUI variables
         self.set_gui_variables()
+
+    def initialize_domain(self,root):
+        self.domain = HydroMtViewModel(
+            app.config["working_directory"],
+            app.config["data_libs"],
+            root 
+        )
 
     def add_layers(self):
         # Add main DDB layer
@@ -93,13 +101,12 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title="Max. potential damage: Structure [$]",
+            legend_title= f'Max. potential damage: Structure [{app.gui.getvar("fiat", "damage_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Max Potential Damage: Structure",
             big_data=True,
             min_zoom=10,
-            unit="$",
         )
 
         layer.add_layer(
@@ -107,13 +114,12 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title="Max. potential damage: Content [$]",
+            legend_title= f'Max. potential damage: Content [{app.gui.getvar("fiat", "damage_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Max Potential Damage: Content",
             big_data=True,
             min_zoom=10,
-            unit="$",
         )
         layer.add_layer(
             "ground_elevation",
@@ -121,7 +127,6 @@ class Model(GenericModel):
             circle_radius=3,
             legend_position="top-right",
             legend_title=f'Ground elevation [{app.gui.getvar("fiat", "view_tab_unit")}]',
-            # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Ground Elevation",
             big_data=True,
@@ -135,7 +140,7 @@ class Model(GenericModel):
             legend_title="Social Vulnerability Index",
             fill_color="purple",
             line_color="transparent",
-            hover_property="SVI_key_domain",
+            hover_property="SVI",
             big_data=True,
             min_zoom=10,
         )
@@ -187,6 +192,9 @@ class Model(GenericModel):
         group = "fiat"
 
         ## Damage curve tables ##
+        app.gui.setvar(
+            group, "OSM_continent", None
+        )
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         app.gui.setvar(
             group,
@@ -290,7 +298,11 @@ class Model(GenericModel):
         # Model type #
         app.gui.setvar(group, "model_type", "Start with NSI")
         app.gui.setvar(group, "include_osm_roads", False)
-        
+        app.gui.setvar(group, "damage_unit", "Euro")
+
+        # Units
+        app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
+
         ## ROADS ##
         app.gui.setvar(group, "include_motorways", True)
         app.gui.setvar(group, "include_trunk", True)
@@ -450,6 +462,12 @@ class Model(GenericModel):
             ["sfincs_data", "upload_data"],
         )
         app.gui.setvar(
+            group, "ground_elevation_unit", None),
+        app.gui.setvar(
+            group, "ground_elevation_unit_feet", False)
+        app.gui.setvar(
+            group, "ground_elevation_unit_meters", False)
+        app.gui.setvar(
             group,
             "loaded_ground_elevation_files_string",
             [],
@@ -512,6 +530,7 @@ class Model(GenericModel):
             "selected_secondary_classification_value",
             [""],
         )
+        app.gui.setvar(group, "osm_ground_floor_height", 0.2)
         app.gui.setvar(group, "loaded_aggregation_files", 0)
         app.gui.setvar(
             group,
@@ -635,16 +654,14 @@ class Model(GenericModel):
                 self.domain.input.variables, var_name, app.gui.getvar("fiat", var_name)
             )
 
-    def new(self):
-        fname = app.gui.window.dialog_select_path("Select an empty folder")
-        if fname:
-            app.gui.setvar("fiat", "selected_scenario", Path(fname).stem)
-            app.gui.setvar("fiat", "scenario_folder", fname)
-            self.domain = HydroMtViewModel(
-                app.config["working_directory"],
-                app.config["data_libs"],
-                fname,
-            )
+    def select_working_directory(self):
+        root = os.getcwd()
+        app.gui.setvar("fiat", "selected_scenario", Path(root).stem)
+        app.gui.setvar("fiat", "scenario_folder", Path(root))
+        self.initialize_domain(root)  
+        if self.domain.fiat_model.root != root:
+            self.domain.fiat_model.set_root(root, mode='w+') 
+
 
     def open(self):
         # Open input file, and change working directory
@@ -678,7 +695,7 @@ class Model(GenericModel):
 
     def set_crs(self, crs):
         self.domain.crs = crs
-
+    
     def get_filtered_damage_function_database(
         self, filter: str, col: str = "Occupancy"
     ):
@@ -717,7 +734,7 @@ class Model(GenericModel):
             }
         return paint_properties
 
-    def get_nsi_paint_properties(self, type="secondary") -> dict:
+    def get_paint_properties(self, type="secondary") -> dict:
         """Get's NSI-specific paint properties to visualize NSI data
 
         Parameters
@@ -833,6 +850,55 @@ class Model(GenericModel):
                 "#665435",
                 "#000000",
             ]
+
+        if type == "osm_primary":
+            circle_color = [
+                "match",
+                ["get", "Primary Object Type"],
+                "commercial",
+                "#6590bb",
+                "infrastructure",
+                "#7665b1",
+                "transport",
+                "#710b60",
+                "industrial",
+                "#10f276",
+                "agriculture",
+                "#4cf6ce",
+                "residential",
+                "#f55243",
+                "building averaged",
+                "#80f304",
+                "roads",
+                "#4aab4e",
+                "#000000",
+            ]
+
+        if type == "osm_secondary":
+            circle_color = [
+                "match",
+                ["get", "Secondary Object Type"],
+                "retail",
+                "#009c99",
+                "commercial",
+                "#6590bb",
+                "infrastructure",
+                "#7665b1",
+                "transport",
+                "#710b60",
+                "industrial",
+                "#10f276",
+                "agriculture",
+                "#4cf6ce",
+                "residential",
+                "#f55243",
+                "building averaged",
+                "#80f304",
+                "roads",
+                "#4aab4e",
+                "#000000",
+            ]
+
         if type == "asset_height":
             circle_color = [
                 "step",
@@ -891,7 +957,7 @@ class Model(GenericModel):
                 "#00211D", 15, 
                 "#001615",                                    
                 ]
-        if type == "SVI":
+        if type == "SVI_key_domain":
             circle_color = [
                 "match",
                 ["get", "SVI_key_domain"],
@@ -925,6 +991,23 @@ class Model(GenericModel):
                 "#4cf6ce",
                 "#000000",
             ]
+        if type == "SVI":
+            circle_color = [
+                "step",
+                ["get", "SVI"],
+                "#000080 ", -2, 
+                "#0000FF", -1.5, 
+                "#0080FF", -1, 
+                "#00FFFF", -0.5, 
+                "#80FF80", 0, 
+                "#FFFF00", 0.5, 
+                "#FFD700", 1, 
+                "#FFA500", 1.5, 
+                "#FF4500", 2.0, 
+                "#FF0000", 2.5, 
+                "#800000", 3, 
+                "#8B0000",                                    
+                ]
 
         paint_properties = {
             "circle-color": circle_color,
@@ -938,13 +1021,18 @@ class Model(GenericModel):
 
     def show_classification(self, type="secondary"):
         """Show exposure layer(s)"""
+        source = app.gui.getvar("fiat", "source_asset_locations")
+        if type == "primary" and source == "Open Street Map":
+            type = "osm_primary"
+        elif type == "secondary" and source == "Open Street Map":
+            type = "osm_secondary"
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type="primary") # always paint according to primary
+            paint_properties = self.get_paint_properties(type=type) # always paint according to primary
             color_items = paint_properties['circle-color'][2:-1]
             color_items.append('other')
             color_items.append(paint_properties['circle-color'][-1])
             legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
-            if type == "primary":
+            if type == "primary" or type == "osm_primary":
                 app.map.layer["buildings"].layer["primary_classification"].set_data(
                     self.buildings, paint_properties, legend
                 )
@@ -957,7 +1045,7 @@ class Model(GenericModel):
     
     def show_asset_height(self,type="asset_height"):
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -975,7 +1063,7 @@ class Model(GenericModel):
     def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -983,6 +1071,7 @@ class Model(GenericModel):
             
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["max_potential_damage_struct"].unit = app.gui.getvar("fiat", "damage_unit")
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -991,14 +1080,15 @@ class Model(GenericModel):
     def show_max_potential_damage_cont(self, type="damage_cont"):
         """Show maximum potential damage: content layer(s)"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
             labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
             
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
-            app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"]   
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"] 
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].unit = app.gui.getvar("fiat", "damage_unit")  
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
                 self.buildings, paint_properties, legend, 
             )
@@ -1007,7 +1097,7 @@ class Model(GenericModel):
     def show_ground_elevation(self, type="ground_elevation"):
         """Show ground elevation"""
         if not self.buildings.empty:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
             
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
@@ -1024,8 +1114,27 @@ class Model(GenericModel):
 
     def show_svi(self, type="SVI"):
         """Show SVI Index"""  # str(Path(self.root) / "exposure" / "SVI")
+        if not self.buildings.empty and "SVI" in self.buildings.columns:
+            paint_properties = self.get_paint_properties(type=type)
+            color_items = paint_properties['circle-color'][2:]
+            colors = [color_items[i] for i in range(0, len(color_items), 2)]
+            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
+            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
+            app.map.layer["buildings"].layer["SVI"].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer["SVI"].legend_title = 'SVI'
+            app.map.layer["buildings"].layer["SVI"].set_data(
+                self.buildings, paint_properties, legend
+            )
+            self.show_SVI_index()
+        else:
+            app.gui.window.dialog_info(
+                text="There are no SVI data in your model. Please add SVI data when you set up your model.",
+                title="Additional attributes not found.",
+            )
+    def show_svi_key_domain(self, type="SVI_key_domain"):
+        """Show SVI Key Domain"""  # str(Path(self.root) / "exposure" / "SVI")
         if not self.buildings.empty and "SVI_key_domain" in self.buildings.columns:
-            paint_properties = self.get_nsi_paint_properties(type=type)
+            paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:-1]
             color_items.append('other')
             color_items.append(paint_properties['circle-color'][-1])
@@ -1039,7 +1148,6 @@ class Model(GenericModel):
                 text="There are no SVI data in your model. Please add SVI data when you set up your model.",
                 title="Additional attributes not found.",
             )
-
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
 
@@ -1247,4 +1355,12 @@ class Model(GenericModel):
             model, "selected_secondary_classification_value", unique_secondary_types
         )
 
-
+    def get_continent(self):
+        self.exposure= ExposureVector(
+                data_catalog=self.domain.data_catalog,
+                logger=self.domain.fiat_model.logger,
+                region=self.domain.fiat_model.region,
+                crs=self.domain.fiat_model.crs,
+            )
+        country, continent = self.exposure.get_continent()
+        return country, continent

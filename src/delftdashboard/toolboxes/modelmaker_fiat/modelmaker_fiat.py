@@ -6,6 +6,7 @@ from pathlib import Path
 from shapely.geometry import Polygon
 
 from delftdashboard.operations.toolbox import GenericToolbox
+from delftdashboard.menu.file import select_working_directory
 from delftdashboard.app import app
 from delftdashboard.operations import map
 from delftdashboard.operations.checklist import zoom_to_boundary
@@ -130,7 +131,7 @@ def draw_boundary(*args):
             "No FIAT model initiated yet",
         )
         # Initiate a new FIAT model
-        app.active_model.new()
+        select_working_directory(None)
 
         # Load the file
         selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
@@ -178,7 +179,7 @@ def generate_boundary(*args):
         )
 
         # Initiate a new FIAT model
-        app.active_model.new()
+        select_working_directory(None)
 
     gdf = app.map.layer["modelmaker_fiat"].layer[active_layer].get_gdf()
     app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
@@ -190,6 +191,7 @@ def generate_boundary(*args):
     app.active_model.domain.exposure_vm.create_interest_area(
         fpath=str(app.active_model.domain.database.drive / "aoi.geojson")
     )
+
 
     app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
     time.sleep(0.5)
@@ -372,7 +374,7 @@ def quick_build(*args):
         )
 
         # Initiate a new FIAT model
-        app.active_model.new()
+        select_working_directory(None)
 
     model = "fiat"
     checkbox_group = "_main"
@@ -387,7 +389,8 @@ def quick_build(*args):
     app.active_model.domain.exposure_vm.set_asset_locations_source(
         source="NSI", ground_floor_height="NSI", crs=crs
     )
-
+    app.active_model.domain.exposure_vm.set_country("United States")
+    
     # Set the damage curves
     selected_damage_curve_database = "default_vulnerability_curves"
     selected_link_table = "default_hazus_iwr_linking"
