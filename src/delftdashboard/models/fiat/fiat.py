@@ -234,7 +234,9 @@ class Model(GenericModel):
             "Occupancy Class", inplace=True, ignore_index=True
         )
         default_occupancy_df.fillna("", inplace=True)
+        default_occupancy_df_adjusted = default_occupancy_df[default_occupancy_df["Occupancy Class"] != "RES1"]
         app.gui.setvar(group, "hazus_iwr_occupancy_classes", default_occupancy_df)
+        app.gui.setvar(group, "hazus_iwr_occupancy_classes_adjusted", default_occupancy_df_adjusted)
 
         cols = [
             "-9",
@@ -278,6 +280,11 @@ class Model(GenericModel):
             damage_functions_database[["ID", "Description"] + cols],
         )
         app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
+
+        #User classification
+        app.gui.setvar(group, "old_occupancy_type", "")
+        app.gui.setvar(group, "new_occupancy_type", "")
+        app.gui.setvar(group, "remove_classification", False)
 
         ## Standardizing of occupancy categories ##
         self.default_dict_categories = {x: x for x in list(default_curves["Occupancy"])}
@@ -1241,7 +1248,20 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, data=None)
         if not okay:
             return
-    
+    def overwrite_classification(self):
+        pop_win_config_path = str(
+        Path(
+            app.gui.config_path
+        ).parent  # TODO: replace with a variables config_path for the fiat model
+        / "models"
+        / self.name
+        / "config"
+        / "exposure_classification_settings_2.yml"
+        )
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            raise ValueError("The classification data will not be overwritten")
+
     def overwrite_damages(self):
         # get window config yaml path
         pop_win_config_path = str(

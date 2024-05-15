@@ -20,21 +20,36 @@ def set_variables(*args):
 
 def add_classification_field(*args):
     model = "fiat"
-    dlg = app.gui.window.dialog_wait("\nReading classification data...")
-    path = app.gui.getvar(model, "classification_source_path")
-    object_type = app.gui.getvar(model, "object_type")
-    attribute_name = app.gui.getvar(model, "classification_file_field_name")
+    existing_exposure_cat = app.gui.getvar(model, "exposure_categories_to_standardize")
+    if existing_exposure_cat.values.any():
+        try: 
+            app.active_model.overwrite_classification()
+        except ValueError as e:
+            #show dialog
+            return
+    read_classification()
 
-    # Reset the self.updated_dict_categories dict
-    app.active_model.updated_dict_categories = app.active_model.default_dict_categories
+def read_classification(*args):
+        model = "fiat"
+        dlg = app.gui.window.dialog_wait("\nReading classification data...")
+        path = app.gui.getvar(model, "classification_source_path")
+        object_type = app.gui.getvar(model, "object_type")
+        attribute_name = app.gui.getvar(model, "classification_file_field_name")
 
-    # Read the vector file and update the table for standardization
-    gdf = gpd.read_file(path)
-    df = pd.DataFrame({object_type: list(gdf[attribute_name].unique()), "Assigned": ""})
-    df.sort_values(object_type, inplace=True, ignore_index=True)
-    app.gui.setvar(model, "exposure_categories_to_standardize", df)
-    dlg.close()
+        # Reset the self.updated_dict_categories dict
+        app.active_model.updated_dict_categories = app.active_model.default_dict_categories
 
+        # Read the vector file and update the table for standardization
+        gdf = gpd.read_file(path)
+        df = pd.DataFrame({object_type: list(gdf[attribute_name].unique()), "Assigned": ""})
+        df.sort_values(object_type, inplace=True, ignore_index=True)
+        app.gui.setvar(model, "exposure_categories_to_standardize", df)
+        dlg.close()
+        app.gui.window.dialog_info(
+            f"Please standardize your classification so the correct damage curves can be assigned.",
+            "Please standardize",
+        )
+        standarize_classification()
 
 def load_upload_classification_source(*args):
     model = "fiat"
@@ -92,40 +107,46 @@ def standarize_classification(*args):
 
 
 def add_classification(*args):
+
     model = "fiat"
 
     # Get the source, object type and attribute name
     source = app.gui.getvar(model, "classification_source_path")
     object_type = app.gui.getvar(model, "object_type")
     attribute_name = app.gui.getvar(model, "classification_file_field_name")
-    app.active_model.domain.exposure_vm.update_occupancy_types(
-        source, attribute_name, object_type
-    )
+    remove_object_type = app.gui.getvar(model, "remove_classification")
 
     # Set the source
     source_name = Path(source).name
     app.gui.setvar(model, "source_classification", source_name)
 
-    # Get the new primary and secondary object classifications
-    prim, secon = app.active_model.domain.exposure_vm.get_object_types()
-    app.active_model.set_object_types(prim, secon)
+    # TODO: ge the variables that are changed!
+    new_occupancy_value = app.gui.getvar(
+        model, "new_occupancy_type")
+    
+    old_occupancy_value = app.gui.getvar(
+        model, "old_occupancy_type")
+    
+    if not new_occupancy_value:
+        app.gui.window.dialog_info(
+        f"You need to standardize your classification before you can proceed.",
+        "Please standardize",
+        )
+        exit()
 
-    # Set the exposure categories to link for the damage functions
-    list_types = prim if prim is not None else secon
-    list_types.sort()
-    df = pd.DataFrame(
-        data={
-            object_type: list_types,
-            "Assigned: Structure": "",
-            "Assigned: Content": "",
-        }
-    )
-    ## TODO: add the nr of stories and the basement?
-    app.gui.setvar(model, "exposure_categories_to_link", df)
-
-    # TODO: replace the exposure categories in the vulnerability linking table
+    # Initiate classification model    
+    app.active_model.domain.exposure_vm.set_classification_config(
+            source = source,
+            attribute =  attribute_name,
+            type_add = object_type,
+            old_values= old_occupancy_value,
+            new_values= new_occupancy_value,
+            damage_types = ["structure", "content"],
+            remove_object_type = remove_object_type
+        )
 
     app.gui.window.dialog_info(
         text="Standardized classification data was added to your model",
         title="Added standardized classification data",
     )
+
