@@ -301,6 +301,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "model_type", "Start with NSI")
         app.gui.setvar(group, "include_osm_roads", False)
         app.gui.setvar(group, "damage_unit", "Euro")
+        app.gui.setvar(group, "bf_conversion", False)
 
         # Units
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
@@ -1366,3 +1367,21 @@ class Model(GenericModel):
             )
         country, continent = self.exposure.get_continent()
         return country, continent
+   
+    def convert_bf_to_points(self):
+        group = "fiat"
+    # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "exposure_start_settings.yml"
+        )
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            print("building footprints will not be converted into point data.")
+            return
+        app.gui.setvar(group, "bf_conversion", True)
