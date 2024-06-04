@@ -89,7 +89,12 @@ def add_exposure_locations_to_model(*args):
         and selected_asset_locations[0] == "Open Street Map (OSM)"
     ):
         selected_asset_locations = "OSM"
-        build_osm_exposure() 
+        # If OSM data open pop-up to check whether to keep BF or convert
+        app.active_model.convert_bf_to_points() 
+
+        # Build OSM exposure
+        build_osm_exposure()     
+         
     elif (
         len(selected_asset_locations) == 1
         and selected_asset_locations[0] != "National Structure Inventory (NSI)"
@@ -117,9 +122,7 @@ def add_exposure_locations_to_model(*args):
     
     # Hide Boundary Box
     if app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")]:
-        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].hide() 
-
-
+        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].hide()   
 
 def build_nsi_exposure(*args):
     model = "fiat"
@@ -221,6 +224,7 @@ def build_osm_exposure(*args):
         )
 
         crs = app.gui.getvar(model, "selected_crs")
+        bf_conversion = app.gui.getvar(model, "bf_conversion")
         ground_elevation_unit = app.gui.getvar(model, "ground_elevation_unit")
        # Set continent for damage curves
         country, continent = app.active_model.get_continent()
@@ -232,7 +236,7 @@ def build_osm_exposure(*args):
             unique_primary_types,
             unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
-            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values', ground_elevation_unit = ground_elevation_unit
+            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values', ground_elevation_unit = ground_elevation_unit, bf_conversion = bf_conversion
         )
         gdf.set_crs(crs, inplace=True)
 
