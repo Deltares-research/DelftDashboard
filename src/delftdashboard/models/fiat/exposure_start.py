@@ -91,6 +91,8 @@ def add_exposure_locations_to_model(*args):
         selected_asset_locations = "OSM"
         # If OSM data open pop-up to check whether to keep BF or convert
         app.active_model.convert_bf_to_points() 
+        # If OSM data open pop-up to check whether to re-classify unclassified buildings as "residential" or remove them. 
+        app.active_model.classify_assets_without_classification()
 
         # Build OSM exposure
         build_osm_exposure()     
@@ -225,6 +227,7 @@ def build_osm_exposure(*args):
 
         crs = app.gui.getvar(model, "selected_crs")
         bf_conversion = app.gui.getvar(model, "bf_conversion")
+        occupancy_keep_all = app.gui.getvar(model, "classification_unclassified_assets")
         ground_elevation_unit = app.gui.getvar(model, "ground_elevation_unit")
        # Set continent for damage curves
         country, continent = app.active_model.get_continent()
@@ -236,7 +239,9 @@ def build_osm_exposure(*args):
             unique_primary_types,
             unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
-            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values', ground_elevation_unit = ground_elevation_unit, bf_conversion = bf_conversion
+            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values',
+            ground_elevation_unit = ground_elevation_unit, bf_conversion = bf_conversion,
+            occupancy_keep_all = occupancy_keep_all 
         )
         gdf.set_crs(crs, inplace=True)
 

@@ -302,6 +302,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "include_osm_roads", False)
         app.gui.setvar(group, "damage_unit", "Euro")
         app.gui.setvar(group, "bf_conversion", False)
+        app.gui.setvar(group, "classification_unclassified_assets", True)
 
         # Units
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
@@ -1385,3 +1386,22 @@ class Model(GenericModel):
             print("building footprints will not be converted into point data.")
             return
         app.gui.setvar(group, "bf_conversion", True)
+    
+    def classify_assets_without_classification(self):
+        group = "fiat"
+    # get window config yaml path
+        pop_win_config_path = str(
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "exposure_start_settings_2.yml"
+        )
+        okay, data = app.gui.popup(pop_win_config_path, data=None)
+        if not okay:
+            print("Unclassified assets will be removed.")
+            app.gui.setvar(group, "classification_unclassified_assets", False)
+            return
+        app.gui.setvar(group, "classification_unclassified_assets", True)
