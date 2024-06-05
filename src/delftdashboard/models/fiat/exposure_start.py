@@ -202,6 +202,8 @@ def build_nsi_exposure(*args):
         # Set country
         app.active_model.domain.exposure_vm.set_country("United States")
         
+        update_damage_curves()
+        
         get_roads(model)
         
         dlg.close()
