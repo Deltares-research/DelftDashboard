@@ -89,10 +89,6 @@ def add_exposure_locations_to_model(*args):
         and selected_asset_locations[0] == "Open Street Map (OSM)"
     ):
         selected_asset_locations = "OSM"
-        # If OSM data open pop-up to check whether to keep BF or convert
-        app.active_model.convert_bf_to_points() 
-        # If OSM data open pop-up to check whether to re-classify unclassified buildings as "residential" or remove them. 
-        app.active_model.classify_assets_without_classification()
 
         # Build OSM exposure
         build_osm_exposure()     
