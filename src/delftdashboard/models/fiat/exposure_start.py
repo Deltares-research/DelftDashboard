@@ -225,7 +225,7 @@ def build_osm_exposure(*args):
 
         crs = app.gui.getvar(model, "selected_crs")
         bf_conversion = app.gui.getvar(model, "bf_conversion")
-        occupancy_keep_all = app.gui.getvar(model, "classification_unclassified_assets")
+        keep_unclassified = app.gui.getvar(model, "classification_unclassified_assets")
         ground_elevation_unit = app.gui.getvar(model, "ground_elevation_unit")
        # Set continent for damage curves
         country, continent = app.active_model.get_continent()
@@ -239,7 +239,7 @@ def build_osm_exposure(*args):
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
             source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values',
             ground_elevation_unit = ground_elevation_unit, bf_conversion = bf_conversion,
-            occupancy_keep_all = occupancy_keep_all 
+            keep_unclassified = keep_unclassified 
         )
         gdf.set_crs(crs, inplace=True)
 
