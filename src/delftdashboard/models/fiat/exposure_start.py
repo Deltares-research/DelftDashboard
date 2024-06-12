@@ -274,6 +274,7 @@ def build_osm_exposure(*args):
         app.gui.setvar(checkbox_group, "checkbox_classification", True)
         app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
         app.gui.setvar(checkbox_group, "checkbox_elevation", True)
+        app.gui.setvar(checkbox_group, "checkbox_finished_floor_height", True)
 
         # Set the sources
         app.gui.setvar(model, "source_asset_locations", "Open Street Map")
