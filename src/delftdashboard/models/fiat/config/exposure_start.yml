@@ -4,7 +4,7 @@ element:
   position:
     x: 10
     y: 10
-    width: 400
+    width: 200
     height: 120
   element:
   - style: radiobuttongroup
@@ -24,11 +24,27 @@ element:
       height: 20
     text: Include OSM roads
     variable: include_osm_roads
+
+- style: panel
+  title: OSM Settings
+  position:
+    x: 220
+    y: 10
+    width: 200
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: model_type
+      operator: eq
+      value: Start with Open Street Map
+  element:
   - style: edit
     position:
-      x: 210
-      y: 70
-      width: 30
+      x: 110
+      y: 75
+      width: 85
       height: 20
     text: Damage unit
     variable: damage_unit
@@ -41,12 +57,43 @@ element:
         value: Start with Open Street Map
   - style: edit
     position:
-      x: 360
-      y: 70
-      width: 30
+      x: 110
+      y: 50
+      width: 85
       height: 20
     text: Finished Floor Height (m) 
     variable: osm_ground_floor_height 
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: model_type
+        operator: eq
+        value: Start with Open Street Map
+  - style: checkbox
+    position:
+      x: 20
+      y: 25
+      width: 200
+      height: 20
+    text: "Convert building footprint polygons to points"
+    variable: bf_conversion
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: model_type
+        operator: eq
+        value: Start with Open Street Map
+  - style: checkbox
+    position:
+      x: 20
+      y: 5
+      width: 200
+      height: 20
+    text: Classify non-classified buildings to "residential"
+    tooltip: If not selected, non-classified buildings will be removed. 
+    variable: classification_unclassified_assets
     dependency:
     - action: visible
       checkfor: all

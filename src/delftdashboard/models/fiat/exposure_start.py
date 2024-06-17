@@ -89,8 +89,6 @@ def add_exposure_locations_to_model(*args):
         and selected_asset_locations[0] == "Open Street Map (OSM)"
     ):
         selected_asset_locations = "OSM"
-        # If OSM data open pop-up to check whether to keep BF or convert
-        app.active_model.convert_bf_to_points() 
 
         # Build OSM exposure
         build_osm_exposure()     
@@ -227,6 +225,7 @@ def build_osm_exposure(*args):
 
         crs = app.gui.getvar(model, "selected_crs")
         bf_conversion = app.gui.getvar(model, "bf_conversion")
+        keep_unclassified = app.gui.getvar(model, "classification_unclassified_assets")
         ground_elevation_unit = app.gui.getvar(model, "ground_elevation_unit")
        # Set continent for damage curves
         country, continent = app.active_model.get_continent()
@@ -238,7 +237,9 @@ def build_osm_exposure(*args):
             unique_primary_types,
             unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
-            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values', ground_elevation_unit = ground_elevation_unit, bf_conversion = bf_conversion
+            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values',
+            ground_elevation_unit = ground_elevation_unit, bf_conversion = bf_conversion,
+            keep_unclassified = keep_unclassified 
         )
         gdf.set_crs(crs, inplace=True)
 
@@ -273,6 +274,7 @@ def build_osm_exposure(*args):
         app.gui.setvar(checkbox_group, "checkbox_classification", True)
         app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
         app.gui.setvar(checkbox_group, "checkbox_elevation", True)
+        app.gui.setvar(checkbox_group, "checkbox_finished_floor_height", True)
 
         # Set the sources
         app.gui.setvar(model, "source_asset_locations", "Open Street Map")

@@ -1,5 +1,5 @@
 window:
-  title: Convert building footprints into point data
+  title: Classify unclassified building footprints
   width: 200
   height: 80
   variable_group: fiat
@@ -14,4 +14,4 @@ element:
     y: 30
     width: 180
     height: 40
-  text: <center>Do you want to convert building footprints <br> into point data?</center>
+  text: <center>Do you want to classify unclassified <br> assets as "residential"? If not, they will be removed.</center>
