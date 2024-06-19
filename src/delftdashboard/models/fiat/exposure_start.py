@@ -165,7 +165,7 @@ def build_nsi_exposure(*args):
 
         app.gui.setvar(model, "show_asset_locations", True)
         app.gui.setvar(model, "damage_unit", "$")
-
+        app.gui.setvar(model, "OSM_continent", None)
         list_types = list(gdf["Secondary Object Type"].unique())
         list_types.sort()
         df = pd.DataFrame(
