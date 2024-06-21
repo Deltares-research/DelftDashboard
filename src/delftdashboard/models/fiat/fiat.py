@@ -300,7 +300,7 @@ class Model(GenericModel):
         # Model type #
         app.gui.setvar(group, "model_type", "Start with National Structure Inventory (NSI)")
         app.gui.setvar(group, "include_osm_roads", False)
-        app.gui.setvar(group, "damage_unit", "Euro")
+        app.gui.setvar(group, "damage_unit", "€")
         app.gui.setvar(group, "bf_conversion", False)
         app.gui.setvar(group, "classification_unclassified_assets", True)
 

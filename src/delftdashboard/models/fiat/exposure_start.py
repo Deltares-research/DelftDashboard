@@ -29,6 +29,7 @@ def select_model_type(*args):
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
         app.gui.setvar(group, "ground_elevation_unit", "feet")
         app.gui.setvar(group, "selected_asset_locations", 0)
+        app.gui.setvar(group, "damage_unit", "$")
         # For classification the NSI data cannot be used because it is already used, you can only update it with other data.
         app.gui.setvar(group, "classification_source", "nsi_data")
         app.gui.setvar(
@@ -45,7 +46,7 @@ def select_model_type(*args):
         app.gui.setvar(group, "ground_elevation_unit", "meters")
         app.gui.setvar(group, "selected_asset_locations_string", ["Open Street Map (OSM)"])
         app.gui.setvar(group, "selected_asset_locations", 0)
-        app.gui.setvar(group, "damage_unit", "Euro")
+        app.gui.setvar(group, "damage_unit", "€")
         # When starting from scratch only user-input data can be used for classification
         app.gui.setvar(group, "classification_source", "upload_data")
         app.gui.setvar(
@@ -231,7 +232,7 @@ def build_osm_exposure(*args):
        # Set continent for damage curves
         country, continent = app.active_model.get_continent()
         app.gui.setvar("fiat", "OSM_continent", continent)
-        app.gui.setvar(model, "damage_unit", "Euro")
+        app.gui.setvar(model, "damage_unit", "€")
         app.gui.setvar(model, "ground_elevation_unit", "meters")
 
         ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height")) 
