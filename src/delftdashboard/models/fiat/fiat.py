@@ -298,7 +298,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "source_ground_elevation", "")
 
         # Model type #
-        app.gui.setvar(group, "model_type", "Start with NSI")
+        app.gui.setvar(group, "model_type", "Start with National Structure Inventory (NSI)")
         app.gui.setvar(group, "include_osm_roads", False)
         app.gui.setvar(group, "damage_unit", "Euro")
         app.gui.setvar(group, "bf_conversion", False)
@@ -1066,6 +1066,12 @@ class Model(GenericModel):
 
     def show_max_potential_damage_struct(self, type="damage_struct"):
         """Show maximum potential damage: structure layer(s)"""
+        self.exposure= ExposureVector(
+        data_catalog=self.domain.data_catalog,
+        logger=self.domain.fiat_model.logger,
+        region=self.domain.fiat_model.region,
+        crs=self.domain.fiat_model.crs,
+        )
         if not self.buildings.empty:
             paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
@@ -1076,7 +1082,7 @@ class Model(GenericModel):
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].unit = app.gui.getvar("fiat", "damage_unit")
-            app.map.layer["buildings"].layer["max_potential_damage_struct"].legend_title = f'Max. potential damage: Structure [{app.gui.getvar("fiat", "damage_unit")}]'
+            app.map.layer["buildings"].layer["max_potential_damage_struct"].legend_title = f'Max. potential damage: Structure [{self.exposure.damage_unit}]'
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -1084,6 +1090,12 @@ class Model(GenericModel):
 
     def show_max_potential_damage_cont(self, type="damage_cont"):
         """Show maximum potential damage: content layer(s)"""
+        self.exposure= ExposureVector(
+        data_catalog=self.domain.data_catalog,
+        logger=self.domain.fiat_model.logger,
+        region=self.domain.fiat_model.region,
+        crs=self.domain.fiat_model.crs,
+        )
         if not self.buildings.empty:
             paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties['circle-color'][2:]
@@ -1094,7 +1106,7 @@ class Model(GenericModel):
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"] 
             app.map.layer["buildings"].layer["max_potential_damage_cont"].unit = app.gui.getvar("fiat", "damage_unit")  
-            app.map.layer["buildings"].layer["max_potential_damage_cont"].legend_title = f'Max. potential damage: Content [{app.gui.getvar("fiat", "damage_unit")}]'
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].legend_title = f'Max. potential damage: Content [{self.exposure.damage_unit}]'
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
                 self.buildings, paint_properties, legend, 
             )

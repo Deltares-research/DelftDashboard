@@ -11,10 +11,10 @@ element:
     position:
       x: 10
       y: 70
-      width: 150
+      width: 180
     variable: model_type
-    option_string: ["Start with NSI"   , "Start with Open Street Map"] # NOTE: This is not yet implemented
-    option_value:  ["Start with NSI"   , "Start with Open Street Map"] # NOTE: This is not yet implemented
+    option_string: ["Start with National Structure Inventory (NSI)"   , "Start with Open Street Map (OSM)"] # NOTE: This is not yet implemented
+    option_value:  ["Start with National Structure Inventory (NSI)"   , "Start with Open Street Map (OSM)"] # NOTE: This is not yet implemented
     method: select_model_type
   - style: checkbox
     position:
@@ -38,7 +38,7 @@ element:
     check:
     - variable: model_type
       operator: eq
-      value: Start with Open Street Map
+      value: Start with Open Street Map (OSM)
   element:
   - style: edit
     position:
@@ -54,7 +54,7 @@ element:
       check:
       - variable: model_type
         operator: eq
-        value: Start with Open Street Map
+        value: Start with Open Street Map (OSM)
   - style: edit
     position:
       x: 110
@@ -69,7 +69,7 @@ element:
       check:
       - variable: model_type
         operator: eq
-        value: Start with Open Street Map
+        value: Start with Open Street Map (OSM)
   - style: checkbox
     position:
       x: 20
@@ -84,7 +84,7 @@ element:
       check:
       - variable: model_type
         operator: eq
-        value: Start with Open Street Map
+        value: Start with Open Street Map (OSM)
   - style: checkbox
     position:
       x: 20
@@ -100,7 +100,7 @@ element:
       check:
       - variable: model_type
         operator: eq
-        value: Start with Open Street Map
+        value: Start with Open Street Map (OSM)
 
 - style: panel
   title: Road settings

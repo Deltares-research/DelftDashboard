@@ -20,7 +20,7 @@ def edit(*args):
 def select_model_type(*args):
     group = "fiat"
     model_type = app.gui.getvar(group, "model_type")
-    if model_type == "Start with NSI":
+    if model_type == "Start with National Structure Inventory (NSI)":
         app.gui.setvar(
             group,
             "selected_asset_locations_string",
@@ -39,13 +39,13 @@ def select_model_type(*args):
         app.gui.setvar(
             group, "classification_source_value", ["nsi_data", "upload_data"]
         )
-    elif model_type == "Start with Open Street Map":
+    elif model_type == "Start with Open Street Map (OSM)":
         # NOTE: This option is currently not implemented
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (m)")
         app.gui.setvar(group, "ground_elevation_unit", "meters")
         app.gui.setvar(group, "selected_asset_locations_string", ["Open Street Map (OSM)"])
         app.gui.setvar(group, "selected_asset_locations", 0)
-
+        app.gui.setvar(group, "damage_unit", "Euro")
         # When starting from scratch only user-input data can be used for classification
         app.gui.setvar(group, "classification_source", "upload_data")
         app.gui.setvar(
@@ -165,6 +165,7 @@ def build_nsi_exposure(*args):
 
         app.gui.setvar(model, "show_asset_locations", True)
         app.gui.setvar(model, "damage_unit", "$")
+        app.gui.setvar(model, "ground_elevation_unit", "feet")
         app.gui.setvar(model, "OSM_continent", None)
         list_types = list(gdf["Secondary Object Type"].unique())
         list_types.sort()
@@ -230,6 +231,8 @@ def build_osm_exposure(*args):
        # Set continent for damage curves
         country, continent = app.active_model.get_continent()
         app.gui.setvar("fiat", "OSM_continent", continent)
+        app.gui.setvar(model, "damage_unit", "Euro")
+        app.gui.setvar(model, "ground_elevation_unit", "meters")
 
         ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height")) 
         (

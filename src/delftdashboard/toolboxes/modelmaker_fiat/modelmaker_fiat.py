@@ -152,6 +152,9 @@ def draw_boundary(*args):
             )
             load_aoi_file()
     else:
+        # Hide layers
+        for layer in app.map.layer["buildings"].layer:
+            app.map.layer["buildings"].layer[layer].hide()
         selected_method = app.gui.getvar("modelmaker_fiat", "selected_aoi_method")
         if selected_method == "polygon":
             draw_polygon()
