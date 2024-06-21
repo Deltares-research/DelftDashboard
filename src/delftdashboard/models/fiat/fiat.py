@@ -1076,6 +1076,7 @@ class Model(GenericModel):
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].unit = app.gui.getvar("fiat", "damage_unit")
+            app.map.layer["buildings"].layer["max_potential_damage_struct"].legend_title = f'Max. potential damage: Structure [{app.gui.getvar("fiat", "damage_unit")}]'
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -1093,6 +1094,7 @@ class Model(GenericModel):
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"] 
             app.map.layer["buildings"].layer["max_potential_damage_cont"].unit = app.gui.getvar("fiat", "damage_unit")  
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].legend_title = f'Max. potential damage: Content [{app.gui.getvar("fiat", "damage_unit")}]'
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
                 self.buildings, paint_properties, legend, 
             )
