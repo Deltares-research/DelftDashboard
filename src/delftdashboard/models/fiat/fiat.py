@@ -298,9 +298,9 @@ class Model(GenericModel):
         app.gui.setvar(group, "source_ground_elevation", "")
 
         # Model type #
-        app.gui.setvar(group, "model_type", "Start with NSI")
+        app.gui.setvar(group, "model_type", "Start with National Structure Inventory (NSI)")
         app.gui.setvar(group, "include_osm_roads", False)
-        app.gui.setvar(group, "damage_unit", "Euro")
+        app.gui.setvar(group, "damage_unit", "€")
         app.gui.setvar(group, "bf_conversion", False)
         app.gui.setvar(group, "classification_unclassified_assets", True)
 
@@ -1075,7 +1075,8 @@ class Model(GenericModel):
             
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
-            app.map.layer["buildings"].layer["max_potential_damage_struct"].unit = app.gui.getvar("fiat", "damage_unit")
+            app.map.layer["buildings"].layer["max_potential_damage_struct"].unit = self.domain.exposure_vm.exposure_buildings_model.damage_unit
+            app.map.layer["buildings"].layer["max_potential_damage_struct"].legend_title = f'Max. potential damage: Structure [{self.domain.exposure_vm.exposure_buildings_model.damage_unit}]'
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -1092,7 +1093,8 @@ class Model(GenericModel):
             
             legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
             app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"] 
-            app.map.layer["buildings"].layer["max_potential_damage_cont"].unit = app.gui.getvar("fiat", "damage_unit")  
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].unit = self.domain.exposure_vm.exposure_buildings_model.damage_unit
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].legend_title = f'Max. potential damage: Content [{self.domain.exposure_vm.exposure_buildings_model.damage_unit}]'
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
                 self.buildings, paint_properties, legend, 
             )
@@ -1368,3 +1370,21 @@ class Model(GenericModel):
             )
         country, continent = self.exposure.get_continent()
         return country, continent
+    
+    def convert_bf_into_centroids(self, gdf_bf, crs):
+        list_centroid = []
+        list_object_id = []
+        for index, row in gdf_bf.iterrows():
+            centroid = row["geometry"].centroid
+            list_centroid.append(centroid)
+            list_object_id.append(row["Object ID"])
+        data = {"Object ID": list_object_id, "geometry": list_centroid}
+        gdf_centroid = gpd.GeoDataFrame(data, columns=["Object ID", "geometry"])
+        gdf = gdf_bf.merge(gdf_centroid, on="Object ID", suffixes=("_gdf1", "_gdf2"))
+        gdf.drop(columns="geometry_gdf1", inplace=True)
+        gdf.rename(columns={"geometry_gdf2": "geometry"}, inplace=True)
+        gdf.drop_duplicates(inplace = True)
+        gdf = gpd.GeoDataFrame(gdf, geometry=gdf["geometry"])
+        gdf.crs = crs
+        
+        return gdf

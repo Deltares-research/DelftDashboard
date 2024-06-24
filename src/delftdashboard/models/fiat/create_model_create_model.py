@@ -6,9 +6,8 @@ Created on Mon May 10 12:18:09 2021
 """
 
 from delftdashboard.app import app
+import geopandas as gpd
 from delftdashboard.operations import map
-
-
 
 def select(*args):
     # De-activate existing layers
@@ -74,7 +73,18 @@ def display_asset_locations(*args):
     app.map.layer["buildings"].layer["exposure_points"].crs = crs = app.gui.getvar(
         "fiat", "selected_crs"
     )
-    app.map.layer["buildings"].layer["exposure_points"].set_data(
-        app.active_model.buildings
-    )
+
+    if not app.gui.getvar("fiat", "bf_conversion"):
+        point_buildings = app.active_model.convert_bf_into_centroids(app.active_model.buildings, app.gui.getvar(
+        "fiat", "selected_crs"
+        ))
+        app.map.layer["buildings"].layer["exposure_points"].set_data(
+            point_buildings
+        )
+        app.active_model.buildings = point_buildings
+    else:
+        app.map.layer["buildings"].layer["exposure_points"].set_data(
+            app.active_model.buildings
+        )
     app.active_model.show_exposure_buildings()
+

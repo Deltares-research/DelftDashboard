@@ -9,9 +9,14 @@ import geopandas as gpd
 def select(*args):
     # De-activate existing layers
     map.update()
-    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
-        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    if all(
+        values.data is None for key, values in app.map.layer["buildings"].layer.items()
+    ):
+        app.map.layer["modelmaker_fiat"].layer[
+            app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+        ].show()
     app.gui.setvar("_main", "show_fiat_checkbox", True)
+
 
 def edit(*args):
     app.active_model.set_model_variables()
@@ -20,7 +25,7 @@ def edit(*args):
 def select_model_type(*args):
     group = "fiat"
     model_type = app.gui.getvar(group, "model_type")
-    if model_type == "Start with NSI":
+    if model_type == "Start with National Structure Inventory (NSI)":
         app.gui.setvar(
             group,
             "selected_asset_locations_string",
@@ -29,6 +34,7 @@ def select_model_type(*args):
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
         app.gui.setvar(group, "ground_elevation_unit", "feet")
         app.gui.setvar(group, "selected_asset_locations", 0)
+        app.gui.setvar(group, "damage_unit", "$")
         # For classification the NSI data cannot be used because it is already used, you can only update it with other data.
         app.gui.setvar(group, "classification_source", "nsi_data")
         app.gui.setvar(
@@ -39,13 +45,15 @@ def select_model_type(*args):
         app.gui.setvar(
             group, "classification_source_value", ["nsi_data", "upload_data"]
         )
-    elif model_type == "Start with Open Street Map":
+    elif model_type == "Start with Open Street Map (OSM)":
         # NOTE: This option is currently not implemented
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (m)")
         app.gui.setvar(group, "ground_elevation_unit", "meters")
-        app.gui.setvar(group, "selected_asset_locations_string", ["Open Street Map (OSM)"])
+        app.gui.setvar(
+            group, "selected_asset_locations_string", ["Open Street Map (OSM)"]
+        )
         app.gui.setvar(group, "selected_asset_locations", 0)
-
+        app.gui.setvar(group, "damage_unit", "€")
         # When starting from scratch only user-input data can be used for classification
         app.gui.setvar(group, "classification_source", "upload_data")
         app.gui.setvar(
@@ -53,12 +61,15 @@ def select_model_type(*args):
             "classification_source_string",
             ["Upload data"],
         )
-        app.gui.setvar(group, "classification_source_value", ["osm_data", "upload_data"])
+        app.gui.setvar(
+            group, "classification_source_value", ["osm_data", "upload_data"]
+        )
 
     #    app.gui.window.dialog_info(
     #        "This option is currently not implemented.",
     #        "Method not implemented",
     #    )
+
 
 def include_all_road_types(*args):
     group = "fiat"
@@ -91,8 +102,8 @@ def add_exposure_locations_to_model(*args):
         selected_asset_locations = "OSM"
 
         # Build OSM exposure
-        build_osm_exposure()     
-         
+        build_osm_exposure()
+
     elif (
         len(selected_asset_locations) == 1
         and selected_asset_locations[0] != "National Structure Inventory (NSI)"
@@ -108,19 +119,23 @@ def add_exposure_locations_to_model(*args):
             title="Not yet implemented",
         )
         return
-    
+
     app.active_model.domain.exposure_vm.set_asset_data_source(selected_asset_locations)
-    app.active_model.domain.exposure_vm.exposure_buildings_model.damage_unit = app.gui.getvar("fiat", "damage_unit")
 
     # Set the unit for Exposure Data for visualization
     view_tab_unit = app.active_model.domain.exposure_vm.exposure_buildings_model.unit
     if hasattr(view_tab_unit, "value"):
         view_tab_unit = view_tab_unit.value
     app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
-    
+
     # Hide Boundary Box
-    if app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")]:
-        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].hide()   
+    if app.map.layer["modelmaker_fiat"].layer[
+        app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+    ]:
+        app.map.layer["modelmaker_fiat"].layer[
+            app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+        ].hide()
+
 
 def build_nsi_exposure(*args):
     model = "fiat"
@@ -164,7 +179,7 @@ def build_nsi_exposure(*args):
         )
 
         app.gui.setvar(model, "show_asset_locations", True)
-        app.gui.setvar(model, "damage_unit", "$")
+        app.gui.setvar(model, "ground_elevation_unit", "feet")
         app.gui.setvar(model, "OSM_continent", None)
         list_types = list(gdf["Secondary Object Type"].unique())
         list_types.sort()
@@ -196,14 +211,14 @@ def build_nsi_exposure(*args):
             model, "source_max_potential_damage", "National Structure Inventory"
         )
         app.gui.setvar(model, "source_ground_elevation", "National Structure Inventory")
-        
+
         # Set country
         app.active_model.domain.exposure_vm.set_country("United States")
-        
+
         update_damage_curves()
-        
+
         get_roads(model)
-        
+
         dlg.close()
 
     except FileNotFoundError:
@@ -213,12 +228,13 @@ def build_nsi_exposure(*args):
         )
         dlg.close()
 
+
 def build_osm_exposure(*args):
     model = "fiat"
     checkbox_group = "_main"
     try:
         dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
-        
+
         app.gui.setvar(
             model, "text_feedback_create_asset_locations", "OSM assets created"
         )
@@ -227,20 +243,27 @@ def build_osm_exposure(*args):
         bf_conversion = app.gui.getvar(model, "bf_conversion")
         keep_unclassified = app.gui.getvar(model, "classification_unclassified_assets")
         ground_elevation_unit = app.gui.getvar(model, "ground_elevation_unit")
-       # Set continent for damage curves
+        # Set continent for damage curves
         country, continent = app.active_model.get_continent()
         app.gui.setvar("fiat", "OSM_continent", continent)
+        app.gui.setvar(model, "ground_elevation_unit", "meters")
 
-        ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height")) 
+        ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height"))
         (
             gdf,
             unique_primary_types,
             unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
-            source="OSM", ground_floor_height=ground_floor_height, crs=crs, country = country,  max_potential_damage ='jrc_damage_values',
-            ground_elevation_unit = ground_elevation_unit, bf_conversion = bf_conversion,
-            keep_unclassified = keep_unclassified 
+            source="OSM",
+            ground_floor_height=ground_floor_height,
+            crs=crs,
+            country=country,
+            max_potential_damage="jrc_damage_values",
+            ground_elevation_unit=ground_elevation_unit,
+            bf_conversion=bf_conversion,
+            keep_unclassified=keep_unclassified,
         )
+
         gdf.set_crs(crs, inplace=True)
 
         # Set the primary and secondary object type lists
@@ -252,8 +275,17 @@ def build_osm_exposure(*args):
         # Set the buildings attribute to gdf for easy visualization of the buildings
         app.active_model.buildings = gdf
 
-        app.map.layer["buildings"].layer["exposure_points"].crs = crs
-        app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
+        # Create point data for display 
+        if not bf_conversion:
+            point_buildings = app.active_model.convert_bf_into_centroids(app.active_model.buildings, app.gui.getvar(
+            "fiat", "selected_crs"
+            ))
+
+            app.map.layer["buildings"].layer["exposure_points"].crs = crs
+            app.map.layer["buildings"].layer["exposure_points"].set_data(point_buildings)
+        else:
+            app.map.layer["buildings"].layer["exposure_points"].crs = crs
+            app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
 
         app.gui.setvar(model, "show_asset_locations", True)
 
@@ -279,20 +311,16 @@ def build_osm_exposure(*args):
         # Set the sources
         app.gui.setvar(model, "source_asset_locations", "Open Street Map")
         app.gui.setvar(model, "source_classification", "Open Street Map")
-        app.gui.setvar(
-            model, "source_finished_floor_height", "User input"
-        )
-        app.gui.setvar(
-            model, "source_max_potential_damage", "JRC Damage Values"
-        )
+        app.gui.setvar(model, "source_finished_floor_height", "User input")
+        app.gui.setvar(model, "source_max_potential_damage", "JRC Damage Values")
         app.gui.setvar(model, "source_ground_elevation", "None")
-        
+
         # Update the damage curves to JRC Damage Curves
         update_damage_curves()
-        
+
         # Add OSM roads
         get_roads(model)
-        
+
         dlg.close()
 
     except FileNotFoundError:
@@ -301,6 +329,7 @@ def build_osm_exposure(*args):
             title="No model boundary selected",
         )
         dlg.close()
+
 
 def get_roads(model):
     ## ROADS ##
@@ -341,6 +370,7 @@ def get_roads(model):
                 title="No OSM roads found",
             )
             dlg.close()
+
 
 def get_road_types():
     model = "fiat"
@@ -400,8 +430,9 @@ def display_asset_locations(*args):
     else:
         app.active_model.hide_exposure_buildings()
 
+
 def open_info(*args):
     app.gui.window.dialog_info(
-    text="The threshold value indicates the water level at which a road is not accessible anymore." ,
-    title="Threshold value",
+        text="The threshold value indicates the water level at which a road is not accessible anymore.",
+        title="Threshold value",
     )
