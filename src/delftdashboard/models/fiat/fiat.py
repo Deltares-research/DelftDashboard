@@ -1370,3 +1370,21 @@ class Model(GenericModel):
             )
         country, continent = self.exposure.get_continent()
         return country, continent
+    
+    def convert_bf_into_centroids(self, gdf_bf, crs):
+        list_centroid = []
+        list_object_id = []
+        for index, row in gdf_bf.iterrows():
+            centroid = row["geometry"].centroid
+            list_centroid.append(centroid)
+            list_object_id.append(row["Object ID"])
+        data = {"Object ID": list_object_id, "geometry": list_centroid}
+        gdf_centroid = gpd.GeoDataFrame(data, columns=["Object ID", "geometry"])
+        gdf = gdf_bf.merge(gdf_centroid, on="Object ID", suffixes=("_gdf1", "_gdf2"))
+        gdf.drop(columns="geometry_gdf1", inplace=True)
+        gdf.rename(columns={"geometry_gdf2": "geometry"}, inplace=True)
+        gdf.drop_duplicates(inplace = True)
+        gdf = gpd.GeoDataFrame(gdf, geometry=gdf["geometry"])
+        gdf.crs = crs
+        
+        return gdf
