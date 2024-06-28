@@ -1,6 +1,7 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
 from .vulnerability_damage_curves import update_damage_curves
+from hydromt_fiat.api.data_types import Currency
 
 import pandas as pd
 import geopandas as gpd
@@ -34,7 +35,7 @@ def select_model_type(*args):
         app.gui.setvar(group, "osm_roads_threshold_unit", "Threshold value (ft)")
         app.gui.setvar(group, "ground_elevation_unit", "feet")
         app.gui.setvar(group, "selected_asset_locations", 0)
-        app.gui.setvar(group, "damage_unit", "$")
+        app.gui.setvar(group, "damage_unit", Currency.dollar.value)
         # For classification the NSI data cannot be used because it is already used, you can only update it with other data.
         app.gui.setvar(group, "classification_source", "nsi_data")
         app.gui.setvar(
@@ -53,7 +54,7 @@ def select_model_type(*args):
             group, "selected_asset_locations_string", ["Open Street Map (OSM)"]
         )
         app.gui.setvar(group, "selected_asset_locations", 0)
-        app.gui.setvar(group, "damage_unit", "€")
+        app.gui.setvar(group, "damage_unit", Currency.euro.value)
         # When starting from scratch only user-input data can be used for classification
         app.gui.setvar(group, "classification_source", "upload_data")
         app.gui.setvar(
