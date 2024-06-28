@@ -7,6 +7,7 @@ import pandas as pd
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
+from hydromt_fiat.api.data_types import Currency
 from hydromt_fiat.api.exposure_vm import ExposureVector
 import copy
 from .utils import make_labels
@@ -300,7 +301,7 @@ class Model(GenericModel):
         # Model type #
         app.gui.setvar(group, "model_type", "Start with National Structure Inventory (NSI)")
         app.gui.setvar(group, "include_osm_roads", False)
-        app.gui.setvar(group, "damage_unit", "€")
+        app.gui.setvar(group, "damage_unit", Currency.euro.value)
         app.gui.setvar(group, "bf_conversion", False)
         app.gui.setvar(group, "classification_unclassified_assets", True)
 
