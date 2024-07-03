@@ -415,7 +415,20 @@ def quick_build(*args):
     # "primary_link",
     # "secondary",
     # "secondary_link",
-    app.active_model.domain.exposure_vm.set_roads_settings()
+    # Use all roads for quick build
+    road_types = [
+            "motorway",
+            "motorway_link",
+            "primary",
+            "primary_link",
+            "secondary",
+            "secondary_link",
+            "tertiary",
+            "tertiary_link",
+            "residential",
+            "unclassified",
+        ]
+    app.active_model.domain.exposure_vm.set_roads_settings(road_types)
 
     # Set the road damage threshold
     road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
