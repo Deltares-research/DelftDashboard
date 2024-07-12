@@ -433,7 +433,7 @@ def quick_build(*args):
     census_key = census_key[0]
     year_data = 2021  ## default
 
-    app.active_model.domain.svi_vm.set_svi_settings(census_key, year_data)
+    #app.active_model.domain.svi_vm.set_svi_settings(census_key, year_data)
     app.active_model.domain.svi_vm.set_equity_settings(census_key, year_data)
 
     # Set the checkboxes checked
@@ -447,7 +447,7 @@ def quick_build(*args):
     app.gui.setvar(checkbox_group, "checkbox_classification", True)
     app.gui.setvar(checkbox_group, "checkbox_damage_values", True)
     app.gui.setvar(checkbox_group, "checkbox_finished_floor_height", True)
-    app.gui.setvar(checkbox_group, "checkbox_svi_(optional)", True)
+    app.gui.setvar(checkbox_group, "checkbox_equity_(optional)", True)
     app.gui.setvar("_main", "checkbox_roads_(optional)", True)
 
     # Set the sources

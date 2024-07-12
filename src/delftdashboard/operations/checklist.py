@@ -12,7 +12,7 @@ def initialize_checklist():
         "Damage values",
         "Finished floor height",
         "Vulnerability",
-        "SVI (optional)",
+        "Equity (optional)",
         "Roads (optional)",
         "Attributes (optional)",
     ]

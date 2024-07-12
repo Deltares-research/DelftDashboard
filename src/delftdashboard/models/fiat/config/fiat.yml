@@ -13,9 +13,9 @@ element:
   - string: Vulnerability
     element: vulnerability.yml
     module:  models.fiat.vulnerability_damage_curves
-  - string: SVI + Equity
-    element: svi.yml
-    module: models.fiat.svi
+  - string: Equity
+    element: equity.yml
+    module: models.fiat.equity
   - string: Additional Attributes
     element: exposure_aggregation.yml
     module: models.fiat.exposure_aggregation

@@ -186,7 +186,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "checkbox_finished_floor_height", False)
         app.gui.setvar(group, "checkbox_attributes_(optional)", False)
         app.gui.setvar(group, "checkbox_vulnerability", False)
-        app.gui.setvar(group, "checkbox_svi_(optional)", False)
+        app.gui.setvar(group, "checkbox_equity_(optional)", False)
         app.gui.setvar(group, "checkbox_roads_(optional)", False)
         app.gui.setvar(group, "show_fiat_checkbox", False)
 
@@ -361,7 +361,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "list_of_census_years", ["2020", "2021"])
         app.gui.setvar(group, "selected_year", "2020")
 
-        app.gui.setvar(group, "use_svi", True)
+        app.gui.setvar(group, "use_svi", False)
         app.gui.setvar(group, "use_equity", True)
 
         app.gui.setvar(group, "extraction_method_string", ["Area", "Centroid"])

@@ -15,8 +15,8 @@ element:
       width: 200
     text: "Display properties"
     variable: properties_to_display
-    option_string: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation", "Social Vulnerability Index (SVI)"]
-    option_value: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation", "Social Vulnerability Index (SVI)"]
+    option_string: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation",] #"Social Vulnerability Index (SVI)"]
+    option_value: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation",] #"Social Vulnerability Index (SVI)"]
     method: display_properties
   - style: popupmenu
     position:
@@ -111,11 +111,11 @@ element:
       height: 20
     text: "Exposure output"
     method: open_exposure_results
-  - style: pushbutton
-    position:
-      x: 10
-      y: 10
-      width: 90
-      height: 20
-    text: "SVI data"
-    method: open_svi_results
+ # - style: pushbutton
+ #   position:
+ #     x: 10
+ #     y: 10
+ #     width: 90
+ #     height: 20
+ #   text: "SVI data"
+ #   method: open_svi_results
