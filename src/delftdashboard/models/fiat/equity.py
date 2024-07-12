@@ -37,9 +37,9 @@ def add_svi(*args):
         app.active_model.domain.svi_vm.set_equity_settings(census_key, year_data)
 
     if app.gui.getvar(group, "use_svi") or app.gui.getvar(group, "use_equity"):
-        app.gui.setvar("_main", "checkbox_svi_(optional)", True)
+        app.gui.setvar("_main", "checkbox_equity_(optional)", True)
 
     app.gui.window.dialog_info(
-        text="\nSVI and/or equity information were added to the model",
-        title="Added SVI and/or equity",
+        text="Equity information were added to the model",
+        title="Added Equity",
     )

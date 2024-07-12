@@ -8,6 +8,13 @@ element:
     width: 300
     height: 165
   element:
+  - style: text
+    position:
+      x: 10
+      y: 130
+      width: 100
+      height: 20
+    text: "<u>Spatial output</u>:"
   - style: radiobuttongroup
     position:
       x: 30
@@ -15,8 +22,8 @@ element:
       width: 200
     text: "Display properties"
     variable: properties_to_display
-    option_string: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation", "Social Vulnerability Index (SVI)"]
-    option_value: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation", "Social Vulnerability Index (SVI)"]
+    option_string: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation",] #"Social Vulnerability Index (SVI)"]
+    option_value: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation",] #"Social Vulnerability Index (SVI)"]
     method: display_properties
   - style: popupmenu
     position:
@@ -57,65 +64,80 @@ element:
       - variable: properties_to_display
         operator: eq
         value: Max potential damages
-  - style: checkbox
+  - style: text
     position:
-      x: 30
-      y: 25
+      x: 10
+      y: 30
       width: 100
       height: 20
-    text: Display roads
-    variable: show_roads
-    method: display_roads
-  - style: checkbox
+    text: "<u>File output</u>:"
+  - style: pushbutton
     position:
       x: 30
       y: 5
-      width: 120
-      height: 25
-    text: Display attributes
-    variable: show_attributes
-    method: toggle_attr_map  
-  - style: popupmenu
-    position:
-      x: 150
-      y: 10
       width: 100
-      height: 15
-    text: ""
-    variable: aggregation_label_display_name
-    option_string:
-      variable: aggregation_label_display_string
-    option_value:
-      variable: aggregation_label_display_value
-    method: display_attribute
-    dependency:
-    - action: visible
-      checkfor: all
-      check:
-      - variable: show_attributes
-        operator: eq
-        value: True
-- style: panel
-  title: File ouput
-  position:
-    x: 330
-    y: 10
-    width: 200
-    height: 75
-  element:
-  - style: pushbutton
-    position:
-      x: 10
-      y: 40
-      width: 90
-      height: 20
-    text: "Exposure output"
+      height: 25
+    text: "Exposure csv output"
     method: open_exposure_results
-  - style: pushbutton
-    position:
-      x: 10
-      y: 10
-      width: 90
-      height: 20
-    text: "SVI data"
-    method: open_svi_results
+- style: popupmenu
+  position:
+    x: 440
+    y: 5
+    width: 100
+    height: 15
+  text: ""
+  variable: aggregation_label_display_name
+  option_string:
+    variable: aggregation_label_display_string
+  option_value:
+    variable: aggregation_label_display_value
+  method: display_attribute
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: show_attributes
+      operator: eq
+      value: True
+- style: checkbox
+  position:
+    x: 320
+    y: 20
+    width: 100
+    height: 20
+  text: Display roads
+  variable: show_roads
+  method: display_roads
+- style: checkbox
+  position:
+    x: 320
+    y: 0
+    width: 120
+    height: 25
+  text: Display attributes
+  variable: show_attributes
+  method: toggle_attr_map  
+#- style: panel
+#  title: File ouput
+#  position:
+#    x: 330
+#    y: 5
+#    width: 150
+#    height: 165
+#  element:
+#  - style: pushbutton
+#    position:
+#      x: 10
+#      y: 10
+#      width: 90
+#      height: 20
+#    text: "Exposure output"
+#    method: open_exposure_results
+ # - style: pushbutton
+ #   position:
+ #     x: 10
+ #     y: 10
+ #     width: 90
+ #     height: 20
+ #   text: "SVI data"
+ #   method: open_svi_results
