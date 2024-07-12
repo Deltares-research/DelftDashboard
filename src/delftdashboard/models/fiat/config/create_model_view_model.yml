@@ -82,7 +82,7 @@ element:
 - style: popupmenu
   position:
     x: 440
-    y: 10
+    y: 5
     width: 100
     height: 15
   text: ""
