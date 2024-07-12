@@ -352,10 +352,10 @@ def get_roads(model):
             app.map.layer["roads"].layer["exposure_lines"].set_data(gdf)
 
             # Set the road damage threshold
-            road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-            app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
-                road_damage_threshold
-            )
+            #road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
+            #app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
+            #    road_damage_threshold
+            #)
 
             # Show the roads
             app.active_model.show_exposure_roads()
