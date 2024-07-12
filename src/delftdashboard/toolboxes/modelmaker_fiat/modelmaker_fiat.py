@@ -431,10 +431,10 @@ def quick_build(*args):
     app.active_model.domain.exposure_vm.set_roads_settings(road_types)
 
     # Set the road damage threshold
-    road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-    app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
-        road_damage_threshold
-    )
+    #road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
+    #app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
+    #    road_damage_threshold
+    #)
 
     # Set SVI and equity
     census_key_path = Path(app.config_path) / "census_key.txt"
