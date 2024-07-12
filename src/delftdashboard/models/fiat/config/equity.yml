@@ -36,15 +36,15 @@ element:
     #  text: Social Vulnerability Index
     #  tooltip: Toggle to save the SVI score in the exposure data
     #  variable: use_svi
-    - style: checkbox
-      position:
-        x: 40
-        y: 45
-        width: 120
-        height: 20
-      text: Equity
-      tooltip: Toggle to save the equity data in the exposure data
-      variable: use_equity
+    #- style: checkbox
+    #  position:
+    #    x: 40
+    #    y: 45
+    #    width: 120
+    #    height: 20
+    #  text: Equity
+    #  tooltip: Toggle to save the equity data in the exposure data
+    #  variable: use_equity
 
   - style: pushbutton
     position:
