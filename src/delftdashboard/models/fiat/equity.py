@@ -40,6 +40,6 @@ def add_svi(*args):
         app.gui.setvar("_main", "checkbox_equity_(optional)", True)
 
     app.gui.window.dialog_info(
-        text="\nSVI and/or equity information were added to the model",
-        title="Added SVI and/or equity",
+        text="Equity information were added to the model",
+        title="Added Equity",
     )
