@@ -117,15 +117,15 @@ element:
         operator: eq
         value: True
   element:
-  - style: edit
-    position:
-      x: 100
-      y: 90
-      width: 25
-      height: 18
-    text: 
-      variable: osm_roads_threshold_unit
-    variable: road_damage_threshold
+  #- style: edit
+  #  position:
+  #    x: 100
+  #    y: 90
+  #    width: 25
+  #    height: 18
+  #  text: 
+  #    variable: osm_roads_threshold_unit
+  #  variable: road_damage_threshold
   - style: text
     position:
       x: 10
@@ -157,14 +157,14 @@ element:
       height: 20
     text: "Primary"
     variable: include_primary
-  - style: pushbutton
-    position:
-      x: 140
-      y: 92
-      width: 15
-      height: 15
-    text: "\u2139"
-    method: open_info
+  #- style: pushbutton
+  #  position:
+  #    x: 140
+  #    y: 92
+  #    width: 15
+  #    height: 15
+  #  text: "\u2139"
+  #  method: open_info
   - style: checkbox
     position:
       x: 80
