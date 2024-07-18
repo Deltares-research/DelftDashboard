@@ -98,7 +98,7 @@ where = ["src"]
 include = ["delftdashboard*"]
 
 [tool.setuptools.package-data]
-"delftdashboard" = ["config/**"]
+"delftdashboard" = ["**/**.yml", "**/**.ini"]
 
 [tool.ruff]
 line-length = 88

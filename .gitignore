@@ -20,6 +20,7 @@ cache
 src/delftdashboard/config/census_key.txt
 temp_data
 
+*/**.egg-info**
 /dist/
 /build/
 */**.exe
