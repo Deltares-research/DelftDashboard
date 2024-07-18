@@ -3,7 +3,7 @@ window:
   width: 200
   height: 80
   variable_group: fiat
-  module: models.fiat.exposure_damages
+  module: delftdashboard.models.fiat.exposure_damages
   modal: True
   cancel: True
   

@@ -3,7 +3,7 @@ window:
   width: 460
   height: 300
   variable_group: measure
-  module: models.sfincs_hmt.structures
+  module: delftdashboard.models.sfincs_hmt.structures
   modal: True
   cancel: True
 element:

@@ -7,11 +7,11 @@ element:
     height: 160
   tab:
   - string: Output
-    module: models.sfincs_hmt.output
+    module: delftdashboard.models.sfincs_hmt.output
     element: output.yml
   - string: Numerics
-    module: models.sfincs_hmt.numerics
+    module: delftdashboard.models.sfincs_hmt.numerics
     element: numerics.yml
   - string: Physics
-    module: models.sfincs_hmt.physics
+    module: delftdashboard.models.sfincs_hmt.physics
     element: physics.yml

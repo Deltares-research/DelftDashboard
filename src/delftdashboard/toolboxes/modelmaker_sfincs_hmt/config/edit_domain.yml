@@ -3,7 +3,7 @@
     width: 320
     height: 150
     variable_group: modelmaker_sfincs_hmt
-    module: toolboxes.modelmaker_sfincs_hmt.domain
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.domain
     modal: True
     cancel: True
   element:

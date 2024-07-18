@@ -7,5 +7,5 @@ element:
     height: 160
   tab:
   - string: Create Model
-    module: models.fiat.create_model_create_model
+    module: delftdashboard.models.fiat.create_model_create_model
     element: create_model_create_model.yml

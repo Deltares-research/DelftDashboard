@@ -7,15 +7,15 @@ element:
     height: 160
   tab:
   - string: Line elements
-    module: models.sfincs_hmt.structures.callbacks.weirs
+    module: delftdashboard.models.sfincs_hmt.structures.callbacks.weirs
     element: structures_weirs.yml
   # - string: Thin Dams
-  #   module: models.sfincs_hmt.structures.callbacks.dams
+  #   module: delftdashboard.models.sfincs_hmt.structures.callbacks.dams
   #   element: structures_thin_dams.yml
   - string: Drainage 
-    module: models.sfincs_hmt.structures.callbacks.drainage
+    module: delftdashboard.models.sfincs_hmt.structures.callbacks.drainage
     element: structures_drainage.yml
   # - string: Green infra
-    # module: models.sfincs_hmt.observation_cross_sections
+    # module: delftdashboard.models.sfincs_hmt.observation_cross_sections
     # element: structures_green_infra.yml
 

@@ -3,7 +3,7 @@ window:
   width: 730
   height: 310
   variable_group: fiat
-  module: models.fiat.exposure_classification_standarize
+  module: delftdashboard.models.fiat.exposure_classification_standarize
   modal: True
   cancel: True
 
