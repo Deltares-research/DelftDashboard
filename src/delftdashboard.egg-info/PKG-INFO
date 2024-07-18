@@ -2,13 +2,16 @@ Metadata-Version: 2.1
 Name: delftdashboard
 Version: 0.1.0
 Author-email: Maarten van Ormondt <maarten.vanormondt@deltares-usa.us>, Roel de Goede <roel.degoede@deltares.nl>, Kees Nederhoff <kees.nederhoff@deltares-usa.us>, Tim Leijnse <tim.leijnse@deltares.nl>, Panos Athanasiou <panos.athanasiou@deltares.nl>
+Project-URL: Source, https://github.com/Deltares-research/FloodAdapt
 Requires-Python: >=3.10
 License-File: LICENSE
+Requires-Dist: guitares
 Requires-Dist: geopandas>=0.8
 Requires-Dist: numpy
 Requires-Dist: pandas
 Requires-Dist: pyproj
 Requires-Dist: plotly
+Requires-Dist: dask<2024.7.0
 Requires-Dist: rasterio
 Requires-Dist: shapely
 Requires-Dist: scipy
@@ -23,3 +26,39 @@ Requires-Dist: metpy
 Requires-Dist: tabulate
 Requires-Dist: xugrid
 Requires-Dist: datashader
+Requires-Dist: pyyaml>=5.1.1
+Requires-Dist: mypy
+Requires-Dist: pyyaml>=5.1.1
+Requires-Dist: cartopy>=0.20
+Requires-Dist: jupyterlab
+Requires-Dist: descartes
+Requires-Dist: ffmpeg
+Requires-Dist: hydromt_sfincs>=1.0.3
+Requires-Dist: hydromt
+Requires-Dist: openpyxl
+Requires-Dist: tomli
+Requires-Dist: tomli-w
+Requires-Dist: NDBC
+Requires-Dist: cht-observations@ git+https://github.com/deltares/cht_observations.git
+Requires-Dist: hydromt-fiat@ git+https://github.com/deltares/hydromt_fiat.git
+Requires-Dist: hydromt-sfincs@ git+https://github.com/deltares/hydromt_sfincs.git@FA_quadtree
+Requires-Dist: deltares-coastalhazardstoolkit@ git+https://github.com/Deltares/CoastalHazardsToolkit.git
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: black==24.1.1; extra == "dev"
+Requires-Dist: pre-commit==3.7.1; extra == "dev"
+Requires-Dist: ruff==0.4.8; extra == "dev"
+Requires-Dist: typos==1.22.7; extra == "dev"
+Provides-Extra: build
+Requires-Dist: build; extra == "build"
+Requires-Dist: twine; extra == "build"
+Provides-Extra: docs
+Requires-Dist: jupyter; extra == "docs"
+Requires-Dist: jupyter-cache; extra == "docs"
+Requires-Dist: matplotlib; extra == "docs"
+Requires-Dist: quartodoc; extra == "docs"
+Requires-Dist: regex; extra == "docs"
+Requires-Dist: pydata-sphinx-theme; extra == "docs"
+Provides-Extra: all
+Requires-Dist: delftdashboard[build,dev,docs]; extra == "all"

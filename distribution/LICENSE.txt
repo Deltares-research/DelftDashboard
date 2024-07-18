@@ -1,0 +1,68 @@
+Please read this Demonstration software license agreement.
+
+This is a legal agreement between the prospective evaluator, either an individual or an entity, (hereafter: 'Evaluator') and Deltares USA Inc. (hereafter 'Deltares USA') to license to Evaluator the Demonstration version of FloodAdapt software (hereafter 'Demonstration Software').
+
+By marking the 'I Accept' checkbox:
+
+1.  You expressly declare you are authorized to act on behalf of Evaluator for the purposes of accepting this Demonstration software license agreement (hereafter 'License Agreement');
+2.  You expressly accept on behalf of Evaluator this License Agreement and accept being legally bound by the terms and conditions contained herein.
+
+If you are not authorized to act on behalf of Evaluator to accept the terms of this  License Agreement, or if Evaluator does not agree with the terms of this License Agreement, please do not mark the 'I agree' checkbox and click the 'Cancel' checkbox.
+
+You are not allowed to copy, distribute, install or use the Demonstration Software without an agreement with Deltares USA. If you do not agree to the terms of this agreement, you must promptly stop installing this Demonstration Software and/or do not download the Demonstration Software from our site. Any further actions with respect to the Demonstration Software without an agreement with Deltares USA are in violation of copyright law.  Downloading, installation and/or use of the Demonstration Software  implies acceptance of this agreement.
+WHEREAS
+1.  Deltares USA, Inc. is a not-for-profit organization with the mission of expanding the scientific knowledge of inland and coastal water systems and to distribute that knowledge as widely as possible within the USA and Canada;
+2.  The foundation Stichting Deltares lawfully established under the laws of the Netherlands, hereinafter referred to as 'Deltares Netherlands', is a not-for-profit independent institute for applied water resources research;
+3.  Deltares Netherlands owns the intellectual property of the computer programs developed by Deltares Netherlands, as described below, hereinafter referred to as 'Demonstration Software';
+4.  Deltares USA is licensed to use, to modify and to sublicense the Demonstration Software;
+5.  The Demonstration Software is under development by Deltares Netherlands and is not allowed to be used for any use besides internal review, testing and evaluation;
+6.  Evaluator wishes to acquire an non-exclusive and non-transferable license without the right of dissemination, to use internally within the organization of Evaluator, the Demonstration Software for review, testing and evaluation of functionality of the Demonstration Software;
+7.  Deltares USA grants Evaluator a Demonstration Software license  for review, testing and evaluation of Demonstration Software under the following conditions.
+
+Article 1.  Definitions:
+1.  Demonstration Software: The computer program or the computer programs under development as described below under 'FloodAdapt' and the Documentation and later versions of said computer program and Documentation.
+2.  FloodAdapt – an adaptation planning tool is a tool for conceptual planning to assist local, state or federal governments with their planning choices at a conceptual level regarding flood management under the effect of compound flooding, including the effects of climate change (e.g. sea level rise) and economic growth. With the FloodAdapt the likelihood of an increase or decrease of damages resulting from compound flooding is estimated as a function of flood management measures.
+3.  Documentation: The manual or manuals and other documents that correspond to the Demonstration Software.
+4.  License Agreement: This Demonstration Software License Agreement.
+
+Article 2.  Transfer of Demonstration Software:
+1.  Deltares USA grants Evaluator for the period starting on the date this License Agreement is signed and until the official release of a maintenance and support version of the Demonstration Software that includes all required functionality, without a monetary charge, the non-exclusive, non-transferable, non-sublicensable license to use the Demonstration Software for the purpose and with the limitations specified in Article 3, within the organization of Evaluator.
+
+Article 3.  Use of Demonstration Software and the Documentation:
+1.  Evaluator shall only use the Demonstration Software within its own organization, for its own use and for review, testing and evaluation of functionality of the Demonstration Software. Evaluator shall not make any other use of Demonstration Software or to make available or grant access to Demonstration Software to any third party, subject to article 5 paragraph 1 under b.
+2.  Evaluator shall not modify and/or adjust Demonstration Software and/or carry out alterations to it and/or integrate Demonstration Software in other software, unless and only in so far as Evaluator has obtained express prior written permission to that effect from Deltares USA.
+3.  Evaluator shall not (or have others) copy Demonstration Software in any manner whatsoever or (have others) multiply it (in any other way), except for backup purposes.
+4.  Evaluator shall not provide the Demonstration Software or access to the Demonstration Software to any other person within their organization or outside their organization. Any additional person who should like to evaluate the Demonstration Software will be required to access the Demonstration Software and obtain their own license agreement.
+
+Article 4.  Intellectual Property Rights, Ownership:
+1.  Deltares Netherlands owns the copyright to Demonstration Software. With the License Agreement Deltares USA only grants Evaluator the right to use of Demonstration Software as described in Article 2. Evaluator acknowledges and agrees that with this user right granted no transfer of ownership whatsoever, including the transfer of the intellectual property rights, is made to Evaluator.
+
+Article 5.  Confidentiality:
+1.  Evaluator shall keep confidential Demonstration Software which Evaluator has obtained and/or obtains, in any manner, from Deltares under or in connection with the License Agreement. This effort shall at any rate include:
+2.  treating of Demonstration Software confidentially in keeping with 18 U.S.C. § 1905, The Trade Secrets Act;
+3.  releasing copies of Demonstration Software solely to those employees of Evaluator or a third party acting on behalf of Evaluator under the conditions of this License Agreement who require access to Demonstration Software, whereby Evaluator will oblige these employees and third parties to the same confidentiality as Evaluator;
+4.  the non-disclosure of information and/or data related to the License Agreement to third parties and/or refraining from making such information and/or data public in any other way without the prior express and written consent of Deltares USA, to be obtained for each separate event.
+5.  using information and/or data obtained solely for the purposes for which they were obtained.
+6.  Evaluator's obligation of confidentiality referred to in Article 5.1 shall not apply to information and/or data that were already at Evaluator's free disposal, or were part of the public domain, or were already included in generally accessible literature at the time when they were obtained by Evaluator, or that were obtained by Evaluator from a third party or third parties who was or were free to disclose the relevant information and/or data and who had not obtained the information and/or data from Deltares USA or Deltares Netherlands.
+7.  The provisions in this article and article 8 shall remain in full force after termination of the License Agreement, as set forth in Article 7, as well.
+
+Article 6.  No guarantee, no warranty:
+1.  The Demonstration Software is under development by Deltares Netherlands. Evaluator acknowledges and agrees that the Demonstration Software may contain bugs, defects, errors and may not be expected to function fully upon installation nor that results obtained with the Demonstration Software are correct or of proper quality. Evaluator also acknowledges that neither Deltares USA nor Deltares Netherlands is under any obligation to correct any bugs, defects, or errors in the Demonstration Software or to otherwise support or maintain the Demonstration Software.
+
+Article 7.  Duration, Termination:
+1.  The License Agreement concluded for the period starting on the moment Deltares USA has confirmed your acceptance of this License Agreement in the webportal, until the official release of a maintenance and support version of the Demonstration Software that includes all required functionality, subject to termination in accordance with the provisions of article 7.2.
+2.  Parties are entitled without cause being required, to terminate the License Agreement in writing with immediate effect, without judicial intervention being required.
+3.  In the event of termination of the License Agreement, Evaluator shall immediately return to Deltares USA all copies of Demonstration Software.
+4.  In addition, in the event of termination of the License Agreement, Evaluator shall furthermore immediately cease using (additional copies of) Demonstration Software and delete Demonstration Software from (all) their computer(s).
+5.  "In writing" as mentioned in this article shall also be an email message.
+
+Article 8.  Liability:
+1.  Evaluator agrees that Deltares USA and Deltares Netherlands (including its personnel and non-employees who (have) undertake(n) activities for Deltares USA and/or Deltares Netherlands) shall not be responsible to Evaluator for any loss-of-profit, direct, indirect, incidental, special or consequential damages arising out of the License Agreement or the use of Demonstration Software, except for damages caused by willful misconduct or gross negligence (Defined as: any act or failure to act (whether sole, joint or concurrent) which seriously and substantially deviates from a diligent course of action or which is in reckless disregard of or indifference to the harmful consequences) of Deltares USA, Deltares Netherlands or its personnel.
+
+Article 9.  Other provisions:
+1.  Changes in and/or deviations to the License Agreement are valid only if they are explicitly agreed between the parties in writing.
+2.  In the event that any of the terms and conditions of this License Agreement are declared null and void or otherwise not binding, the unaffected terms and conditions will remain unimpaired, and Deltares USA shall replace the ineffective term by a provision that, as far as is legally possible, closely approximates the original provision.
+3.  The parties are not allowed to assign any rights and/or obligations under the License Agreement, entirely or in part, to third parties without the prior written consent of the other party.
+4.  The legal relationship of Deltares USA towards the Evaluator under this License Agreement shall be that of an independent contractor. This License Agreement shall in no way be deemed to construe a joint-venture or legal entity or a legal relationship of agency or employment.
+5.  Maryland Law shall apply to the License Agreement.
+6.  All disputes arising pursuant to the License Agreement or derived agreements shall be determined as follows: Deltares USA and Evaluator will negotiate in good faith to reach an agreement. If negotiations are unsuccessful, Deltares USA and Evaluator agree the dispute shall be settled by mediation. In the event the dispute or any issues remain unresolved after the above steps, the disagreement shall be submitted solely to the competent court in the State of Maryland.
