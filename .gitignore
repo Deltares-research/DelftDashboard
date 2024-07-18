@@ -20,5 +20,9 @@ cache
 src/delftdashboard/config/census_key.txt
 temp_data
 
-dist/
-build/
+/dist/
+/build/
+*/**.exe
+*/mapbox_token**
+*/**.zip
+/distribution/FloodAdaptModelbuilders
