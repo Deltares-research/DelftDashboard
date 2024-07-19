@@ -168,8 +168,6 @@ def get_datas(datas: list = None) -> list:
 
     # Add the delftdashboard folder to _internal/delftdashboard
     datas.append((SRC_DIR, "delftdashboard"))
-    datas.append((PROJECT_ROOT / "distribution" / "data_catalog.yml", "delftdashboard/config"))
-    datas.append((PROJECT_ROOT / "distribution" / "delftdashboard.ini", "delftdashboard/config"))
 
     # Add the branca templates folder to _internal/branca/templates
     datas.append(
@@ -241,6 +239,23 @@ def copy_datadir():
         return
     shutil.copytree(datadir, DIST_DIR / PROJECT_NAME / "data")
 
+def copy_distribution_files():
+    distribution_files = [
+        "data_catalog.yml",
+        "delftdashboard.ini",
+    ]
+    src_paths = [ SRC_DIR / "config" / file for file in distribution_files]
+    dst_paths = [ DIST_DIR / PROJECT_NAME / "delftdashboard" / "config" / file for file in distribution_files]
+    
+    for src, dst in zip(src_paths, dst_paths):
+        if not src.exists():
+            print(f"File not found at {src}, continuing without copying file")
+            continue
+        if not dst.parent.exists():
+            dst.parent.mkdir(parents=True)
+        shutil.copy(src, dst)
+
+
 def run_pyinstaller(
     hidden_imports: list[str],
     datas: list[str],
@@ -304,6 +319,7 @@ def run_pyinstaller(
     PyInstaller.__main__.run(command)
 
     copy_datadir()
+    copy_distribution_files()
 
     print("\nFinished making the executable for delftdashboard")
     print(f"\nExecutable can be found at: {DIST_DIR / PROJECT_NAME}\n\n")
