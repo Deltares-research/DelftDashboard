@@ -244,15 +244,23 @@ def copy_distribution_files():
         "data_catalog.yml",
         "delftdashboard.ini",
     ]
-    src_paths = [ SRC_DIR / "config" / file for file in distribution_files]
-    dst_paths = [ DIST_DIR / PROJECT_NAME / "delftdashboard" / "config" / file for file in distribution_files]
     
+    dst_prefix = DIST_DIR / PROJECT_NAME / "_internal" / "delftdashboard" / "config"
+    src_paths = [ DIST_DIR / file for file in distribution_files]
+    dst_paths = [ dst_prefix / file for file in distribution_files]
+    
+    # Remove existing data catalogs and ini files
+    for file in os.listdir(dst_prefix):
+        if "data_catalog" in file:
+            os.remove(dst_prefix / file)
+        elif "delftdashboard" in file:
+            os.remove(dst_prefix / file)
+
+    # Copy new data catalogs and ini files prepared for the current distribution
     for src, dst in zip(src_paths, dst_paths):
         if not src.exists():
             print(f"File not found at {src}, continuing without copying file")
             continue
-        if not dst.parent.exists():
-            dst.parent.mkdir(parents=True)
         shutil.copy(src, dst)
 
 
