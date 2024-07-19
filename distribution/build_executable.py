@@ -168,6 +168,8 @@ def get_datas(datas: list = None) -> list:
 
     # Add the delftdashboard folder to _internal/delftdashboard
     datas.append((SRC_DIR, "delftdashboard"))
+    datas.append((PROJECT_ROOT / "distribution" / "data_catalog.yml", "delftdashboard/config"))
+    datas.append((PROJECT_ROOT / "distribution" / "delftdashboard.ini", "delftdashboard/config"))
 
     # Add the branca templates folder to _internal/branca/templates
     datas.append(
@@ -232,6 +234,12 @@ def copy_shapely_libs():
             raise FileNotFoundError(f"{dll} not found in shapely")
         shutil.copy(src=dll, dst=shapely_libs_dir)
 
+def copy_datadir():
+    datadir = DIST_DIR / "data"
+    if not datadir.exists():
+        print(f"Data directory not found at {datadir}, continuing without copying data")
+        return
+    shutil.copytree(datadir, DIST_DIR / PROJECT_NAME / "data")
 
 def run_pyinstaller(
     hidden_imports: list[str],
@@ -294,6 +302,8 @@ def run_pyinstaller(
         command.append("--onefile")
 
     PyInstaller.__main__.run(command)
+
+    copy_datadir()
 
     print("\nFinished making the executable for delftdashboard")
     print(f"\nExecutable can be found at: {DIST_DIR / PROJECT_NAME}\n\n")
