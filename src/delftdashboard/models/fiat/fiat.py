@@ -659,8 +659,8 @@ class Model(GenericModel):
                 self.domain.input.variables, var_name, app.gui.getvar("fiat", var_name)
             )
 
-    def select_working_directory(self):
-        root = os.getcwd()
+    def select_working_directory(self, path=None):
+        root = path or os.getcwd()
         app.gui.setvar("fiat", "selected_scenario", Path(root).stem)
         app.gui.setvar("fiat", "scenario_folder", Path(root))
         self.initialize_domain(root)  

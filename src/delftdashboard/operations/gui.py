@@ -136,7 +136,7 @@ def build_gui_config():
     # Topography
     menu = {}
     menu["text"] = "Topography"
-    menu["module"] = "menu.topography"
+    menu["module"] = "delftdashboard.menu.topography"
     menu["menu"] = []
     if app.config["bathymetry_database"] is not None:
         source_names, sources = bathymetry_database.sources()

@@ -56,8 +56,8 @@ class Model(GenericModel):
         # update map
         self.plot()
 
-    def select_working_directory(self):
-        root = os.getcwd()
+    def select_working_directory(self, path=None):
+        root = path or os.getcwd()
         if self.domain.root != root:
             self.domain.set_root(root=root, mode="w+")
 

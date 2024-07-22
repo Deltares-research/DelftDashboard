@@ -61,14 +61,16 @@ def select_working_directory(option):
         "Select working directory", path=os.getcwd()
     )
     if path:
-        os.chdir(path)
+        # os.chdir(path)
         app.gui.config["working_directory"] = path
 
         try:
-            app.model[app.active_model.name].select_working_directory()
-        except:
+            app.model[app.active_model.name].select_working_directory(path)
+        except Exception as e:
+            print(e)
+            # print(os.getcwd())
             print("No method select_working_directory for model: ", app.active_model.name)
-            pass
+
 
 def exit(option):
     app.gui.quit()

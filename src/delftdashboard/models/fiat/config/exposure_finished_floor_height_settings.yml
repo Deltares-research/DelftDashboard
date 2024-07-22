@@ -3,7 +3,7 @@ window:
   width: 200
   height: 120
   variable_group: fiat
-  module: models.fiat.exposure_finished_floor_height_settings
+  module: delftdashboard.models.fiat.exposure_finished_floor_height_settings
   modal: True
   cancel: True
 

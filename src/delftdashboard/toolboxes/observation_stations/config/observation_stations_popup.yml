@@ -2,7 +2,7 @@ window:
   title: Select Observation Stations ...
   width: 800
   height: 500
-  module: toolboxes.observation_stations.observation_stations_popup
+  module: delftdashboard.toolboxes.observation_stations.observation_stations_popup
   variable_group: observation_stations
   modal: True
   cancel: True

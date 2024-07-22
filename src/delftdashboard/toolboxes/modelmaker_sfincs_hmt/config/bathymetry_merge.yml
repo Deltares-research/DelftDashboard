@@ -3,7 +3,7 @@
     width: 450
     height: 300
     variable_group: modelmaker_sfincs_hmt
-    module: toolboxes.modelmaker_sfincs_hmt.bathymetry
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.bathymetry
     modal: True
     cancel: True
   element:

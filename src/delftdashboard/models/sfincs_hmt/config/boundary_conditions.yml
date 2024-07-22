@@ -7,11 +7,11 @@ element:
     height: 160
   tab:
   - string: Water levels
-    module: models.sfincs_hmt.boundary_conditions_wlev
+    module: delftdashboard.models.sfincs_hmt.boundary_conditions_wlev
     element: boundary_conditions_wlev.yml
   - string: Discharge
-    module: models.sfincs_hmt.boundary_conditions_dis
+    module: delftdashboard.models.sfincs_hmt.boundary_conditions_dis
     element: boundary_conditions_dis.yml
   # - string: Meteo
-  #   module: models.sfincs_hmt.boundary_conditions_meteo
+  #   module: delftdashboard.models.sfincs_hmt.boundary_conditions_meteo
   #   element: boundary_conditions_meteo.yml

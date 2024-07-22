@@ -1,4 +1,4 @@
-module: toolboxes.modelmaker_fiat.domain
+module: delftdashboard.toolboxes.modelmaker_fiat.domain
 element:
 - style: panel
   id: modelmaker_fiat

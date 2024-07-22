@@ -9,7 +9,7 @@ element:
   variable_group: sfincs_hmt
   tab:
   - string: Time Frame
-    module: models.sfincs_hmt.timeframe
+    module: delftdashboard.models.sfincs_hmt.timeframe
     element: timeframe.yml
   - string: Boundary Conditions
     element: boundary_conditions.yml

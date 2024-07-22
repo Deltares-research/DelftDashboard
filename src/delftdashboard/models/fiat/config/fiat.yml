@@ -12,15 +12,15 @@ element:
     element: exposure.yml
   - string: Vulnerability
     element: vulnerability.yml
-    module:  models.fiat.vulnerability_damage_curves
+    module: delftdashboard.models.fiat.vulnerability_damage_curves
   - string: Equity
     element: equity.yml
-    module: models.fiat.equity
+    module: delftdashboard.models.fiat.equity
   - string: Additional Attributes
     element: exposure_aggregation.yml
-    module: models.fiat.exposure_aggregation
+    module: delftdashboard.models.fiat.exposure_aggregation
   - string: Create Model
     element: create_model.yml
   - string: View Model
     element: create_model_view_model.yml
-    module: models.fiat.create_model_view_model
+    module: delftdashboard.models.fiat.create_model_view_model

@@ -124,8 +124,9 @@ def update_background():
                         colormap=app.color_map_earth,
                         decimals=0,
                     )
-                except:
+                except Exception as e:
                     print("Error loading hydromt background topo ...")
+                    print(e)
             # TODO: FdG; I suggest to remove the part below as we're not going to use this data
             elif app.config["bathymetry_database"] is not None:
                 try:
@@ -143,8 +144,9 @@ def update_background():
                     app.background_topography_layer.set_data(
                         x=xv, y=yv, z=z, colormap=app.color_map_earth, decimals=0
                     )
-                except:
+                except Exception as e:
                     print("Error loading ddb background topo ...")
+                    print(e)
 
 
 def update():

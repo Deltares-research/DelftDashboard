@@ -3,7 +3,7 @@ window:
   width: 800
   height: 620
   variable_group: fiat
-  module: models.fiat.view_tab_exposure_table
+  module: delftdashboard.models.fiat.view_tab_exposure_table
   modal: True
   cancel: True
 

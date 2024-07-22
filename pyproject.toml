@@ -1,24 +1,27 @@
 [build-system]
-requires = ["setuptools>=42"]
+requires = [
+    "setuptools>=61",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.1.0"
 name = "delftdashboard"
 authors = [
     {name = "Maarten van Ormondt", email = "maarten.vanormondt@deltares-usa.us"},
     {name = "Roel de Goede", email = "roel.degoede@deltares.nl"},
     {name = "Kees Nederhoff", email = "kees.nederhoff@deltares-usa.us"},
     {name = "Tim Leijnse", email = "tim.leijnse@deltares.nl"},
-    {name = "Panos Athanasiou", email = "panos.athanasiou@deltares.nl"},
+    {name = "Panos Athanasiou", email = "panos.athanasiou@deltares.nl"}
 ]
 requires-python = ">=3.10"
 dependencies = [
+    "guitares",
     "geopandas >=0.8",
     "numpy",
     "pandas",
     "pyproj",
     "plotly",
+    "dask<2024.7.0",# The last version that still supports pandas 1.x, which we need until fiat-toolbox and noaa_cops become compatible with pandas 2.x
     "rasterio",
     "shapely",
     "scipy",
@@ -32,5 +35,121 @@ dependencies = [
     "metpy",
     "tabulate",
     "xugrid",
-    "datashader"
+    "datashader",
+    "pyyaml >= 5.1.1",
+    "mypy",   
+    "pyyaml>=5.1.1",
+    "cartopy>=0.20",
+    "jupyterlab",
+    "descartes",
+    "ffmpeg",
+    "hydromt_sfincs>=1.0.3",
+    "hydromt",
+    "openpyxl",
+    "tomli",
+    "tomli-w",
+    "NDBC",
+    "cht-observations@ git+https://github.com/deltares/cht_observations.git",
+    "hydromt-fiat@ git+https://github.com/deltares/hydromt_fiat.git@floodadapt",
+    "hydromt-sfincs@ git+https://github.com/deltares/hydromt_sfincs.git@FA_quadtree",
+    "deltares-coastalhazardstoolkit@ git+https://github.com/Deltares/CoastalHazardsToolkit.git"
 ]
+dynamic = [
+    "version",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black      == 24.1.1",
+    "pre-commit == 3.7.1",
+    "ruff       == 0.4.8",
+    "typos      == 1.22.7",
+]
+build = [
+    "build",
+    "twine",
+
+]
+docs = [
+    "jupyter",
+    "jupyter-cache",
+    "matplotlib",
+    "quartodoc",
+    "regex",
+    "pydata-sphinx-theme"
+]
+all = [
+    "delftdashboard[build,dev,docs]",
+]
+
+[project.urls]
+Source = "https://github.com/Deltares-research/FloodAdapt"
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.setuptools.dynamic]
+version = { attr = "delftdashboard.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["delftdashboard*"]
+
+[tool.setuptools.package-data]
+"delftdashboard" = ["**/**.yml", "**/**.ini"]
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+
+[tool.ruff.format]
+docstring-code-format = true
+indent-style = "space"
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/rules/
+select = [
+    "D",
+    "E",
+    "F",
+    "NPY",
+    "PD",
+    "C4",
+    "I",
+]
+ignore = [
+    "D10",
+    "D417",
+
+    "PD010",
+    "PD013",
+    "PD901",
+
+    "E501",
+    "E741",
+]
+fixable = [
+    "I",
+    "F",
+    "D"
+]
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.black]
+line-length = 88
+target-version = [
+    "py311",
+]
+
+[tool.pyright]
+reportDeprecated = true
+
+[tool.typos]
+files.extend-exclude = [
+    "*.js",
+    "*.css",
+]
+files.ignore-hidden = true

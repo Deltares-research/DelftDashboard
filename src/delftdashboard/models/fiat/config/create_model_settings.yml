@@ -3,7 +3,7 @@ window:
   width: 200
   height: 80
   variable_group: fiat
-  module: models.fiat.create_model_create_model
+  module: delftdashboard.models.fiat.create_model_create_model
   modal: True
   cancel: True
   

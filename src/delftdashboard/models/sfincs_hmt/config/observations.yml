@@ -7,8 +7,8 @@ element:
     height: 160
   tab:
   - string: Observation Points
-    module: models.sfincs_hmt.observation_points
+    module: delftdashboard.models.sfincs_hmt.observation_points
     element: observation_points.yml  
   # - string: Cross Sections
-  #   module: models.sfincs_hmt.observation_cross_sections
+  #   module: delftdashboard.models.sfincs_hmt.observation_cross_sections
   #   element: observation_cross_sections.yml
