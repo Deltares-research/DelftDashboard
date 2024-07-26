@@ -50,7 +50,7 @@ dependencies = [
     "NDBC",
     "cht-observations@ git+https://github.com/deltares/cht_observations.git",
     "hydromt-fiat@ git+https://github.com/deltares/hydromt_fiat.git@floodadapt",
-    "hydromt-sfincs@ git+https://github.com/deltares/hydromt_sfincs.git@v1.0.3",
+    "hydromt-sfincs@ git+https://github.com/deltares/hydromt_sfincs.git",
     "deltares-coastalhazardstoolkit@ git+https://github.com/Deltares/CoastalHazardsToolkit.git"
 ]
 dynamic = [
