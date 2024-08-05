@@ -1,7 +1,7 @@
 
 element:
 - style: panel
-  title: Display model ouput
+  title: Display model data
   position:
     x: 10
     y: 5
