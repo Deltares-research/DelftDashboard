@@ -20,6 +20,7 @@ def select(*args):
     if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
         app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
     app.gui.setvar("_main", "show_fiat_checkbox", False)
+    app.gui.setvar("fiat", "show_asset_locations", True)
 
 
 def edit(*args):
@@ -31,7 +32,6 @@ def display_properties(*args):
     properties_to_display = app.gui.getvar("fiat", "properties_to_display")
     app.gui.setvar("fiat", "show_primary_classification", False)
     app.gui.setvar("fiat", "show_secondary_classification", False)
-    app.gui.setvar("fiat", "show_asset_locations", False)
     if properties_to_display == "Classification":
         app.gui.setvar(model, "classification_display_string", ["Primary", "Secondary"])
         app.gui.setvar(model, "classification_display_value", ["Primary", "Secondary"])
@@ -51,37 +51,42 @@ def display_properties(*args):
 
 
 def display_classification(*args):
-    app.map.layer["buildings"].clear()
-    if app.gui.getvar("fiat", "classification_display_name") == "Primary":
-        app.map.layer["buildings"].layer[
-            "exposure_points"
-        ].hover_property = "Primary Object Type"
-        app.active_model.show_classification(type="primary")
-    else:
-        app.map.layer["buildings"].layer[
-            "exposure_points"
-        ].hover_property = "Secondary Object Type"
-        app.active_model.show_classification(type="secondary")
+    if app.gui.getvar("fiat", "show_asset_locations"):
+        app.map.layer["buildings"].clear()
+        if app.gui.getvar("fiat", "classification_display_name") == "Primary":
+            app.map.layer["buildings"].layer[
+                "exposure_points"
+            ].hover_property = "Primary Object Type"
+            app.active_model.show_classification(type="primary")
+        else:
+            app.map.layer["buildings"].layer[
+                "exposure_points"
+            ].hover_property = "Secondary Object Type"
+            app.active_model.show_classification(type="secondary")
 
 
 def display_damage(*args):
-    app.map.layer["buildings"].clear()
-    if app.gui.getvar("fiat", "max_potential_damage_name") == "Structure":
-        app.active_model.show_max_potential_damage_struct()
-    else:
-        app.active_model.show_max_potential_damage_cont()
+    if app.gui.getvar("fiat", "show_asset_locations"):
+        app.map.layer["buildings"].clear()
+        if app.gui.getvar("fiat", "max_potential_damage_name") == "Structure":
+            app.active_model.show_max_potential_damage_struct()
+        else:
+            app.active_model.show_max_potential_damage_cont()
 
 def display_asset_height(*args):
-    app.map.layer["buildings"].clear()
-    app.active_model.show_asset_height()
+    if app.gui.getvar("fiat", "show_asset_locations"):
+        app.map.layer["buildings"].clear()
+        app.active_model.show_asset_height()
 
 def display_ground_elevation(*args):
-    app.map.layer["buildings"].clear()
-    app.active_model.show_ground_elevation()
+    if app.gui.getvar("fiat", "show_asset_locations"):
+        app.map.layer["buildings"].clear()
+        app.active_model.show_ground_elevation()
 
-def display_svi(*args):
-    app.map.layer["buildings"].clear()
-    app.active_model.show_svi()
+def display_svi(*args):    
+    if app.gui.getvar("fiat", "show_asset_locations"):
+        app.map.layer["buildings"].clear()
+        app.active_model.show_svi()
 
 def display_roads(*args):
     """Show/hide roads layer"""
@@ -91,6 +96,13 @@ def display_roads(*args):
     else:
         app.active_model.hide_exposure_roads()
 
+def display_asset_location(*args):
+    """Show/hide asset layer"""
+    app.gui.setvar("fiat", "show_asset_locations", args[0])
+    if args[0]:
+        app.map.layer["buildings"].show()
+    else:
+        app.map.layer["buildings"].hide()
 
 def display_attribute(*args):
     label_to_visualize = app.gui.getvar("fiat", "aggregation_label_display_name")
