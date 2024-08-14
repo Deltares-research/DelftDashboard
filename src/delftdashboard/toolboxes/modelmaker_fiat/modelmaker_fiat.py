@@ -519,6 +519,9 @@ def quick_build(*args):
     app.map.layer["roads"].layer["exposure_lines"].set_data(app.active_model.roads)
     app.active_model.show_exposure_roads()
 
+    #TODO Save GUI variables and write as configuration for GUI
+    app.active_model.save_gui_variables()
+
     dlg.close()
 
     app.gui.window.dialog_info(

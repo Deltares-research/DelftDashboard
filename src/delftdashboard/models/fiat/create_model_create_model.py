@@ -57,6 +57,9 @@ def create_model(*args):
     # Show exposure buildings
     display_asset_locations()
 
+    #TODO Save GUI variables and write as configuration for GUI
+    app.active_model.save_gui_variables()
+    
     dlg.close()
         
     app.gui.window.dialog_info(

@@ -3,12 +3,14 @@ from pathlib import Path
 import random
 import geopandas as gpd
 import pandas as pd
+import pickle
 
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 from hydromt_fiat.api.data_types import Currency
 from hydromt_fiat.api.exposure_vm import ExposureVector
+
 import copy
 from .utils import make_labels
 
@@ -682,15 +684,26 @@ class Model(GenericModel):
 
             # TODO: read in the variables of the FIAT model
             # to the GUI
-            self.set_gui_variables()
+            #self.set_gui_variables()
+
+            # Set main variables to old model
+            with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_main.pkl', 'rb') as f:
+                variables_main = pickle.load(f)
+            app.gui.variables["_main"] = variables_main
+
+            # Set fiat variables to old model
+            with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data.pkl', 'rb') as f:
+                variables = pickle.load(f)
+            app.gui.variables["fiat"] = variables
 
             # Change working directory
             os.chdir(fname)
 
             # Change CRS
-            app.crs = self.domain.crs
-            self.plot()
+            app.crs = self.domain.fiat_model.config["global"]["crs"]
+
             dlg.close()
+            print("model")
 
     def save(self):
         self.domain.write()
@@ -1389,3 +1402,15 @@ class Model(GenericModel):
         gdf.crs = crs
         
         return gdf
+    
+    def save_gui_variables(self):
+        # Save main variables
+        dic_variables_main = app.gui.variables["_main"]
+        with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_main.pkl', 'wb') as f:
+            pickle.dump(dic_variables_main, f)
+        
+        # Save fiat variables
+        dic_variables = app.gui.variables["fiat"]
+        with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data.pkl', 'wb') as f:
+            pickle.dump(dic_variables, f)
+        
