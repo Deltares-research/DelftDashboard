@@ -675,6 +675,8 @@ class Model(GenericModel):
         fname = app.gui.window.dialog_select_path("Select an existing model folder")
         if fname:
             dlg = app.gui.window.dialog_wait("Loading fiat model ...")
+            
+            # Old way of reading in model
             self.domain = HydroMtViewModel(
                 app.config["working_directory"],
                 app.config["data_libs"],
@@ -682,16 +684,23 @@ class Model(GenericModel):
             )
             self.domain.read()
 
-            # TODO: read in the variables of the FIAT model
-            # to the GUI
-            #self.set_gui_variables()
+            # need to set exposure models
+            #exposure 
+            #exposure_buildings_model 
+            #exposure_damages_model 
+            #exposure_ground_elevation_model 
+            #exposure_ground_floor_height_model 
+            #exposure_occupancy_type_model 
+            #exposure_roads_model
 
-            # Set main variables to old model
+            # Set main variables from existing model
+            #TODO: Fix path to relative path
             with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_main.pkl', 'rb') as f:
                 variables_main = pickle.load(f)
             app.gui.variables["_main"] = variables_main
 
             # Set fiat variables to old model
+            #TODO: Fix path to relative path
             with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data.pkl', 'rb') as f:
                 variables = pickle.load(f)
             app.gui.variables["fiat"] = variables
