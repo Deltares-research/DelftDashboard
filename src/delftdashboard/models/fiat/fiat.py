@@ -684,31 +684,6 @@ class Model(GenericModel):
         if fname:
             dlg = app.gui.window.dialog_wait("Loading fiat model ...")
             
-            # Get region
-            #TODO: Fix path to relative path
-            fpath = str(r"C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\exposure\region.gpkg")
-
-            # Set main variables from existing model
-            #TODO: Fix path to relative path
-            with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_main.pkl', 'rb') as f:
-                variables_main = pickle.load(f)
-            app.gui.variables["_main"] = variables_main
-
-            # Set fiat variables from existing model
-            #TODO: Fix path to relative path
-            with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data.pkl', 'rb') as f:
-                variables = pickle.load(f)
-            app.gui.variables["fiat"] = variables
-            app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
-
-            # Set modelmaker variables from existing model
-            #TODO: Fix path to relative path
-            with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_model_maker.pkl', 'rb') as f:
-                variables_modelmaker_fiat = pickle.load(f)
-            app.gui.variables["modelmaker_fiat"] = variables_modelmaker_fiat
-            app.gui.setvar("modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file")
-            app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fpath)
-
             # Reading in model
             self.domain = HydroMtViewModel(
                 app.config["working_directory"],
@@ -716,6 +691,27 @@ class Model(GenericModel):
                 fname,
             )
             self.domain.read()
+
+            # Get region
+            fpath = str(Path(os.path.abspath("")) / self.domain.fiat_model.root / "exposure" / "region.gpkg")
+
+            # Set main variables from existing model
+            with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'data_main.pkl', 'rb') as f:
+                variables_main = pickle.load(f)
+            app.gui.variables["_main"] = variables_main
+
+            # Set fiat variables from existing model
+            with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'data.pkl', 'rb') as f:
+                variables = pickle.load(f)
+            app.gui.variables["fiat"] = variables
+            app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
+
+            # Set modelmaker variables from existing model
+            with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'data_model_maker.pkl', 'rb') as f:
+                variables_modelmaker_fiat = pickle.load(f)
+            app.gui.variables["modelmaker_fiat"] = variables_modelmaker_fiat
+            app.gui.setvar("modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file")
+            app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fpath)
 
             # Select filepath through self.domain output exposure
             self.domain.exposure_vm.create_interest_area(
