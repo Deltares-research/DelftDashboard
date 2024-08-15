@@ -243,6 +243,7 @@ def build_osm_exposure(*args):
         # Set continent for damage curves
         country, continent = app.active_model.get_continent()
         app.gui.setvar("fiat", "OSM_continent", continent)
+        app.gui.setvar("fiat", "OSM_country", country)
         app.gui.setvar(model, "ground_elevation_unit", "meters")
 
         ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height"))
@@ -330,26 +331,19 @@ def build_osm_exposure(*args):
 def build_user_exposure(*args):
     model = "fiat"
     checkbox_group = "_main"
-
     try:
         crs = app.gui.getvar(model, "selected_crs")
-
         source = app.gui.getvar(model, "source_asset_locations")
         
-        if 'ground floor height' in app.active_model.domain.fiat_model.config: 
-            ground_floor_height = app.active_model.domain.fiat_model.config['ground floor height']
-        else: 
-            if source == "National Structure Inventory":
-                ground_floor_height = "NSI"
-            elif source == "Open Street Map":
-                ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height"))
+        ## TODO: Check if user model uses own data for parameters
         if source == "National Structure Inventory":
             country = "United States"  
             max_potential_damage = "NSI"
-
+            ground_floor_height = "NSI"    
         elif source == "Open Street Map":
-            country = app.gui.getvar(model, "osm_country")
+            country = app.gui.getvar(model, "OSM_country")
             max_potential_damage = "jrc_damage_values"
+            ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height"))
         
         # Set exposure buildings model
         (
@@ -368,7 +362,6 @@ def build_user_exposure(*args):
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
         app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
       
-
     except FileNotFoundError:
         app.gui.window.dialog_info(
             text="Something went wrong",

@@ -203,6 +203,9 @@ class Model(GenericModel):
         app.gui.setvar(
             group, "OSM_continent", None
         )
+        app.gui.setvar(
+            group, "OSM_country", None
+        )
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         app.gui.setvar(
             group,
@@ -725,13 +728,15 @@ class Model(GenericModel):
             
             #exposure_buildings_model  
             add_exposure_locations_to_model()  
-            
+
             ## may not need any of the following
              
             #exposure_damages_model - 
             #exposure_ground_elevation_model 
             #exposure_ground_floor_height_model 
             #exposure_occupancy_type_model 
+
+            #TODO: Roads model
             #exposure_roads_model
 
             # need vulnerability models
