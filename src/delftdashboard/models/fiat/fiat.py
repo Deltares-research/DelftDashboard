@@ -695,21 +695,14 @@ class Model(GenericModel):
             # Get region
             fpath = str(Path(os.path.abspath("")) / self.domain.fiat_model.root / "exposure" / "region.gpkg")
 
-            # Set main variables from existing model
-            with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'data_main.pkl', 'rb') as f:
-                variables_main = pickle.load(f)
-            app.gui.variables["_main"] = variables_main
-
-            # Set fiat variables from existing model
-            with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'data.pkl', 'rb') as f:
+            # Set variables from existing model
+            with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'variables.pkl', 'rb') as f:
                 variables = pickle.load(f)
-            app.gui.variables["fiat"] = variables
-            app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
+            app.gui.variables["_main"] = variables['main']
+            app.gui.variables["fiat"] = variables['fiat']
+            app.gui.variables["modelmaker_fiat"] = variables['modelmaker_fiat']
 
-            # Set modelmaker variables from existing model
-            with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'data_model_maker.pkl', 'rb') as f:
-                variables_modelmaker_fiat = pickle.load(f)
-            app.gui.variables["modelmaker_fiat"] = variables_modelmaker_fiat
+            app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
             app.gui.setvar("modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file")
             app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fpath)
 
@@ -1447,17 +1440,11 @@ class Model(GenericModel):
         return gdf
     
     def save_gui_variables(self):
-        # Save main variables
+        # Save model variables
         dic_variables_main = app.gui.variables["_main"]
-        with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_main.pkl', 'wb') as f:
-            pickle.dump(dic_variables_main, f)
-        
-        # Save fiat variables
-        dic_variables = app.gui.variables["fiat"]
-        with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data.pkl', 'wb') as f:
-            pickle.dump(dic_variables, f)
-
-        # Save modelmaker_fiat variables
+        dic_variables_fiat = app.gui.variables["fiat"]
         dic_variables_model_maker = app.gui.variables["modelmaker_fiat"]
-        with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_model_maker.pkl', 'wb') as f:
-            pickle.dump(dic_variables_model_maker , f)
+        
+        dic_variables = {'main': dic_variables_main, 'fiat': dic_variables_fiat, 'modelmaker_fiat': dic_variables_model_maker}
+        with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'variables.pkl', 'wb') as f:
+            pickle.dump(dic_variables , f)
