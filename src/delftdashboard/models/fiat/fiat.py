@@ -7,9 +7,13 @@ import pickle
 
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
+from delftdashboard.models.fiat.exposure_start import add_exposure_locations_to_model
+from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import generate_boundary
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 from hydromt_fiat.api.data_types import Currency
 from hydromt_fiat.api.exposure_vm import ExposureVector
+from hydromt_fiat.fiat import FiatModel
+from hydromt.log import setuplog
 
 import copy
 from .utils import make_labels
@@ -676,23 +680,6 @@ class Model(GenericModel):
         if fname:
             dlg = app.gui.window.dialog_wait("Loading fiat model ...")
             
-            # Old way of reading in model
-            self.domain = HydroMtViewModel(
-                app.config["working_directory"],
-                app.config["data_libs"],
-                fname,
-            )
-            self.domain.read()
-
-            # need to set exposure models
-            #exposure 
-            #exposure_buildings_model 
-            #exposure_damages_model 
-            #exposure_ground_elevation_model 
-            #exposure_ground_floor_height_model 
-            #exposure_occupancy_type_model 
-            #exposure_roads_model
-
             # Set main variables from existing model
             #TODO: Fix path to relative path
             with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_main.pkl', 'rb') as f:
@@ -704,6 +691,38 @@ class Model(GenericModel):
             with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data.pkl', 'rb') as f:
                 variables = pickle.load(f)
             app.gui.variables["fiat"] = variables
+
+            # Set modelmaker variables to old model
+            #TODO: Fix path to relative path
+            with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_model_maker.pkl', 'rb') as f:
+                variables_modelmaker_fiat = pickle.load(f)
+            app.gui.variables["modelmaker_fiat"] = variables_modelmaker_fiat
+
+            # Reading in model
+            self.domain = HydroMtViewModel(
+                app.config["working_directory"],
+                app.config["data_libs"],
+                fname,
+            )
+            self.domain.read()
+
+            # need to set exposure models
+            #exposure 
+            # Select filepath through self.domain output exposure
+            self.domain.exposure_vm.create_interest_area(
+                fpath=str(r"C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\exposure\region.gpkg"))
+            #exposure_buildings_model  
+            add_exposure_locations_to_model()
+            print("done")
+            #exposure_damages_model 
+            #exposure_ground_elevation_model 
+            #exposure_ground_floor_height_model 
+            #exposure_occupancy_type_model 
+            #exposure_roads_model
+
+            # need vulnerability models
+            #vulnerability_buildings_model
+            #vulnerability_roads_model
 
             # Change working directory
             os.chdir(fname)
@@ -1422,4 +1441,8 @@ class Model(GenericModel):
         dic_variables = app.gui.variables["fiat"]
         with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data.pkl', 'wb') as f:
             pickle.dump(dic_variables, f)
-        
+
+        # Save modelmaker_fiat variables
+        dic_variables_model_maker = app.gui.variables["modelmaker_fiat"]
+        with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_model_maker.pkl', 'wb') as f:
+            pickle.dump(dic_variables_model_maker , f)
