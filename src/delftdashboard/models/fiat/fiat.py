@@ -8,7 +8,8 @@ import pickle
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from delftdashboard.models.fiat.exposure_start import add_exposure_locations_to_model
-from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import generate_boundary
+from delftdashboard.operations.checklist import zoom_to_boundary
+from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import generate_boundary, set_active_area_file
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 from hydromt_fiat.api.data_types import Currency
 from hydromt_fiat.api.exposure_vm import ExposureVector
@@ -697,6 +698,7 @@ class Model(GenericModel):
             with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_model_maker.pkl', 'rb') as f:
                 variables_modelmaker_fiat = pickle.load(f)
             app.gui.variables["modelmaker_fiat"] = variables_modelmaker_fiat
+            app.gui.setvar("modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file")
 
             # Reading in model
             self.domain = HydroMtViewModel(
@@ -706,15 +708,24 @@ class Model(GenericModel):
             )
             self.domain.read()
 
-            # need to set exposure models
-            #exposure 
             # Select filepath through self.domain output exposure
+            fpath = str(r"C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\exposure\region.gpkg")
             self.domain.exposure_vm.create_interest_area(
-                fpath=str(r"C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\exposure\region.gpkg"))
+                fpath=fpath)
+            app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fpath)
+            gdf = gpd.read_file(fpath)
+            gdf.to_crs(app.crs, inplace=True)
+            layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
+            layer.set_data(gdf)
+            app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
+            
             #exposure_buildings_model  
             add_exposure_locations_to_model()
-            print("done")
-            #exposure_damages_model 
+            zoom_to_boundary()
+
+            ## may not need any of the following
+             
+            #exposure_damages_model - 
             #exposure_ground_elevation_model 
             #exposure_ground_floor_height_model 
             #exposure_occupancy_type_model 
@@ -731,7 +742,6 @@ class Model(GenericModel):
             app.crs = self.domain.fiat_model.config["global"]["crs"]
 
             dlg.close()
-            print("model")
 
     def save(self):
         self.domain.write()
