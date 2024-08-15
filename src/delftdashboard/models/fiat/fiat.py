@@ -681,24 +681,30 @@ class Model(GenericModel):
         if fname:
             dlg = app.gui.window.dialog_wait("Loading fiat model ...")
             
+            # Get region
+            #TODO: Fix path to relative path
+            fpath = str(r"C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\exposure\region.gpkg")
+
             # Set main variables from existing model
             #TODO: Fix path to relative path
             with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_main.pkl', 'rb') as f:
                 variables_main = pickle.load(f)
             app.gui.variables["_main"] = variables_main
 
-            # Set fiat variables to old model
+            # Set fiat variables from existing model
             #TODO: Fix path to relative path
             with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data.pkl', 'rb') as f:
                 variables = pickle.load(f)
             app.gui.variables["fiat"] = variables
+            app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
 
-            # Set modelmaker variables to old model
+            # Set modelmaker variables from existing model
             #TODO: Fix path to relative path
             with open(r'C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\data_model_maker.pkl', 'rb') as f:
                 variables_modelmaker_fiat = pickle.load(f)
             app.gui.variables["modelmaker_fiat"] = variables_modelmaker_fiat
             app.gui.setvar("modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file")
+            app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fpath)
 
             # Reading in model
             self.domain = HydroMtViewModel(
@@ -709,10 +715,8 @@ class Model(GenericModel):
             self.domain.read()
 
             # Select filepath through self.domain output exposure
-            fpath = str(r"C:\Users\rautenba\OneDrive - Stichting Deltares\Documents\Projects\test_output\exposure\region.gpkg")
             self.domain.exposure_vm.create_interest_area(
                 fpath=fpath)
-            app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fpath)
             gdf = gpd.read_file(fpath)
             gdf.to_crs(app.crs, inplace=True)
             layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
@@ -720,9 +724,8 @@ class Model(GenericModel):
             app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
             
             #exposure_buildings_model  
-            add_exposure_locations_to_model()
-            zoom_to_boundary()
-
+            add_exposure_locations_to_model()  
+            
             ## may not need any of the following
              
             #exposure_damages_model - 
@@ -741,6 +744,7 @@ class Model(GenericModel):
             # Change CRS
             app.crs = self.domain.fiat_model.config["global"]["crs"]
 
+            zoom_to_boundary()
             dlg.close()
 
     def save(self):
