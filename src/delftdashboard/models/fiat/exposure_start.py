@@ -361,6 +361,8 @@ def build_user_exposure(*args):
         app.active_model.buildings = gdf
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
         app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
+        app.map.layer["roads"].layer["exposure_lines"].crs = crs
+        app.map.layer["roads"].layer["exposure_lines"].set_data(gdf)
       
     except FileNotFoundError:
         app.gui.window.dialog_info(

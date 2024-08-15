@@ -235,5 +235,6 @@ def get_road_types():
         list_road_types.extend(["secondary", "secondary_link"])
     if app.gui.getvar(model, "include_tertiary"):
         list_road_types.extend(["tertiary", "tertiary_link"])
-
+    
+    app.gui.setvar(model, "list_road_types", list_road_types)
     return list_road_types

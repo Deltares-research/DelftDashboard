@@ -11,7 +11,7 @@ from delftdashboard.models.fiat.exposure_start import add_exposure_locations_to_
 from delftdashboard.operations.checklist import zoom_to_boundary
 from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import generate_boundary, set_active_area_file
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
-from hydromt_fiat.api.data_types import Currency
+from hydromt_fiat.api.data_types import Currency, Units, ExposureRoadsSettings
 from hydromt_fiat.api.exposure_vm import ExposureVector
 from hydromt_fiat.fiat import FiatModel
 from hydromt.log import setuplog
@@ -657,6 +657,7 @@ class Model(GenericModel):
                 ]
             ),
         )
+        app.gui.setvar(group, "list_road_types", [])
 
     @staticmethod
     def set_dict_inverted(dictionary):
@@ -715,10 +716,21 @@ class Model(GenericModel):
             layer.set_data(gdf)
             app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
             
+
+            # roads model
+            if (Path(os.path.abspath("")) / self.domain.fiat_model.root / "exposure" / "roads.gpkg").is_file():
+                self.domain.exposure_vm.exposure_roads_model = ExposureRoadsSettings(
+                roads_fn="OSM",
+                road_types=app.gui.getvar('fiat', "list_road_types"),
+                road_damage= None,
+                unit=Units.feet.value,
+            )
+            
             #exposure_buildings_model  
             add_exposure_locations_to_model()  
 
-            ## may not need any of the following
+            
+            ## may not need any of the following (at least ont for a basic model)
              
             #exposure_damages_model - 
             #exposure_ground_elevation_model 
