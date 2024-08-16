@@ -729,6 +729,15 @@ class Model(GenericModel):
             #exposure_buildings_model  
             add_exposure_locations_to_model()  
 
+            # need vulnerability models
+            #vulnerability_buildings_model
+            selected_damage_curve_database = app.gui.getvar('fiat', "selected_damage_curve_database")
+            selected_link_table = app.gui.getvar('fiat', "selected_damage_curve_linking_table")
+            self.domain.vulnerability_vm.add_vulnerability_curves_to_model(selected_damage_curve_database, selected_link_table)
+    
+            #vulnerability_roads_model
+
+
             
             ## may not need any of the following (at least ont for a basic model)
              
@@ -736,13 +745,6 @@ class Model(GenericModel):
             #exposure_ground_elevation_model 
             #exposure_ground_floor_height_model 
             #exposure_occupancy_type_model 
-
-            #TODO: Roads model
-            #exposure_roads_model
-
-            # need vulnerability models
-            #vulnerability_buildings_model
-            #vulnerability_roads_model
 
             # Change working directory
             os.chdir(fname)
