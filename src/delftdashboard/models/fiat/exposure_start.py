@@ -359,7 +359,7 @@ def build_user_exposure(*args):
         
         # Set the buildings attribute to gdf for easy visualization of the buildings
         app.active_model.buildings = gdf[gdf['geometry'].geom_type == 'Point']
-        app.active_model.roads = gdf[gdf['geometry'].geom_type == 'MultiLineString']
+        app.active_model.roads = gdf[gdf['geometry'].geom_type.isin(['MultiLineString', 'LineString'])]
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
         app.map.layer["buildings"].layer["exposure_points"].set_data(app.active_model.buildings)
         app.map.layer["roads"].layer["exposure_lines"].crs = crs
