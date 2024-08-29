@@ -5,3 +5,4 @@ __pycache__
 /src/mapbox_token.txt
 /src/.vscode
 mapbox_token.txt
+/src/delftdashboard/server
