@@ -1,0 +1,71 @@
+name: Bug Report
+description: Report incorrect behavior 
+labels: ["bug"]
+
+body:
+  - type: checkboxes
+    id: issue-check
+    attributes:
+      label: Preliminary Checklist
+      description: "Before submitting this bug report, please ensure the following criteria are met:"
+      options:
+        - label: "I have searched the existing issues list for similar reports and found none. If you did find a similar issue, please add a comment to the existing issue instead of opening a new one."
+        - label: "I have verified that the issue exists in the latest version of DelftDashboard and its dependencies. Please update to the latest version and check if the issue still exists."
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report Guide
+        Thank you for taking the time to report a bug. Your contribution is essential to improve FloodAdapt. Please provide as much detail as possible to help us understand and address the issue. Complete all the required fields and consider attaching screenshots or logs if they can help explain the problem.
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity Level
+      description: >
+        Please select the severity level of the bug.
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+  
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      description: >
+        Please provide a list of steps to reproduce the bug, starting from the initial state of the application.
+      label: Steps to reproduce
+    validations:
+      required: true
+  
+  - type: textarea
+    id: current-behaviour
+    attributes:
+      description: >
+        Please provide a description or screenshots of the incorrect behaviour achieved by following the steps to reproduce
+      label: Current behaviour
+    validations:
+      required: true
+  
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      description: >
+        Please provide a description of what you think the behaviour should be
+      label: Desired behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Please add any other context, logs, code or screenshots about the bug here. You can select the textbox and 'Paste, drop or click to add files' to attach them to this bug report.
+    validations:
+      required: false
+

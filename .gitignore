@@ -12,4 +12,3 @@ src/delftdashboard.egg-info/SOURCES.txt
 src/delftdashboard.egg-info/top_level.txt
 *.whl
 *.gz
-src/delftdashboard/sfincs.nc
