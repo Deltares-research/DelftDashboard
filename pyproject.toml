@@ -11,6 +11,7 @@ authors = [
     {name = "Kees Nederhoff", email = "kees.nederhoff@deltares-usa.us"},
     {name = "Tim Leijnse", email = "tim.leijnse@deltares.nl"},
     {name = "Panos Athanasiou", email = "panos.athanasiou@deltares.nl"},
+    {name = "Floortje Roelvink", email = "floortje.roelvink@deltares.nl"},
 ]
 requires-python = ">=3.10"
 dependencies = [
@@ -33,4 +34,3 @@ dependencies = [
 "delftdashboard.toolboxes.tropical_cyclone.config"    = ["*.yml"]
 "delftdashboard.layers.config"    = ["*.yml"]
 "delftdashboard"    = ["*.yml"]
-
