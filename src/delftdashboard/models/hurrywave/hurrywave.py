@@ -5,11 +5,11 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 import os
-from PyQt5.QtWidgets import QFileDialog
+#from PyQt5.QtWidgets import QFileDialog
 
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
-from cht.hurrywave.hurrywave import HurryWave
+from cht_hurrywave.hurrywave import HurryWave
 
 class Model(GenericModel):
     def __init__(self, name):

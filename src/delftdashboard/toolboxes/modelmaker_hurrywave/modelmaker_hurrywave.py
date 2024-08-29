@@ -5,19 +5,19 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 
-import math
-import numpy as np
+# import math
+# import numpy as np
 import geopandas as gpd
-import shapely
-import json
+# import shapely
+# import json
 from pyproj import CRS
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 
-from cht.bathymetry.bathymetry_database import bathymetry_database
-from cht.misc.misc_tools import dict2yaml
-from cht.misc.misc_tools import yaml2dict
+from cht_bathymetry.bathymetry_database import bathymetry_database
+from cht_utils.misc_tools import dict2yaml
+from cht_utils.misc_tools import yaml2dict
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):

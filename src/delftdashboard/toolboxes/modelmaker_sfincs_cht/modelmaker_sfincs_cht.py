@@ -12,10 +12,10 @@ from pyproj import CRS
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 
-from cht.bathymetry.bathymetry_database import bathymetry_database
-from cht.misc.misc_tools import dict2yaml
-from cht.misc.misc_tools import yaml2dict
-from cht.sfincs2.quadtree_grid_snapwave import snapwave_quadtree2mesh
+from cht_bathymetry.bathymetry_database import bathymetry_database
+from cht_utils.misc_tools import dict2yaml
+from cht_utils.misc_tools import yaml2dict
+from cht_sfincs.quadtree_grid_snapwave import snapwave_quadtree2mesh
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):

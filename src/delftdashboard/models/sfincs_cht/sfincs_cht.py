@@ -4,13 +4,13 @@ Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
 """
-import datetime
+# import datetime
 import os
 
 from delftdashboard.operations.model import GenericModel
 from delftdashboard.app import app
 
-from cht.sfincs2.sfincs import SFINCS
+from cht_sfincs.sfincs import SFINCS
 
 #from hydromt_sfincs import SfincsModel
 

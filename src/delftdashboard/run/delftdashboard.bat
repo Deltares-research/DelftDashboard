@@ -1,7 +1,7 @@
 @echo OFF
 set CONDAPATH=c:\work\miniconda3
 set DDBPATH=c:\work\checkouts\git\DelftDashboard\src\delftdashboard
-set ENVNAME=delftdashboard
+set ENVNAME=ddbtest
 
 rem The following command activates the base environment.
 rem call C:\ProgramData\Miniconda3\Scripts\activate.bat C:\ProgramData\Miniconda3
@@ -12,10 +12,14 @@ rem Using call is required here, see: https://stackoverflow.com/questions/246781
 call %CONDAPATH%\Scripts\activate.bat %ENVPATH%
 
 rem Run a python script in that environment
-python %DDBPATH%\delftdashboard_gui.py
+echo import delftdashboard > _start_ddb.py
+echo delftdashboard.start() >> _start_ddb.py
+python start_delftdashboard.py
+rem python %DDBPATH%\start_delftdashboard.py
 
 rem Deactivate the environment
 call conda deactivate
+del _start_ddb.py
 
 rem If conda is directly available from the command line then the following code works.
 rem call activate someenv

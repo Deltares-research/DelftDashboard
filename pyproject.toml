@@ -15,7 +15,23 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-	"deltares-coastalhazardstoolkit",
+    "geopandas",
+    "numpy",
+    "pandas",
+    "pyproj",
+    "shapely",
+    "scipy",
+    "xarray",
+    "matplotlib",
+    "pyyaml",
+	"xugrid",
+    "toml",
+	"cht-sfincs",
+	"cht-hurrywave",
+	"cht-utils",
+	"cht-bathymetry",
+	"cht-cyclones",
+	"cht-observations",
 	"guitares"
 ]
 

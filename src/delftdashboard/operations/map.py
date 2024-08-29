@@ -10,8 +10,8 @@ from pyproj import CRS
 import matplotlib as mpl
 
 from delftdashboard.app import app
-from cht.bathymetry.bathymetry_database import bathymetry_database
-from cht.misc.geometry import RegularGrid
+from cht_bathymetry.bathymetry_database import bathymetry_database
+# from cht_utils.geometry import RegularGrid
 
 def map_ready(*args):
 

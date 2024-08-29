@@ -9,7 +9,7 @@ import os
 import importlib
 
 from delftdashboard.app import app
-from cht.bathymetry.bathymetry_database import bathymetry_database
+from cht_bathymetry.bathymetry_database import bathymetry_database
 
 
 def build_gui_config():

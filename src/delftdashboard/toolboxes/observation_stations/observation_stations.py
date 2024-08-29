@@ -5,18 +5,18 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 
-import math
-import numpy as np
+# import math
+# import numpy as np
 import geopandas as gpd
-import shapely
-import json
-from pyproj import CRS
+# import shapely
+# import json
+# from pyproj import CRS
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-import cht.observation_stations.observation_stations as obs
+import cht_observations.observation_stations as obs
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):

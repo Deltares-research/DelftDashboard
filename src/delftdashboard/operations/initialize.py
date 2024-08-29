@@ -12,7 +12,7 @@ import importlib
 from pyproj import CRS
 
 from guitares.gui import GUI
-from cht.bathymetry.bathymetry_database import bathymetry_database
+from cht_bathymetry.bathymetry_database import bathymetry_database
 from guitares.colormap import read_color_maps
 from .gui import build_gui_config
 

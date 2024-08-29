@@ -11,8 +11,8 @@ import geopandas as gpd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
-from cht.bathymetry.utils import get_isobaths, add_buffer
-from cht.bathymetry.bathymetry_database import bathymetry_database
+from cht_bathymetry.utils import get_isobaths, add_buffer
+from cht_bathymetry.bathymetry_database import bathymetry_database
 
 def select(*args):
     # De-activate existing layers

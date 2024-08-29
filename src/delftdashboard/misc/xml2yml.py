@@ -6,8 +6,8 @@ Created on Fri Jan 20 10:04:20 2023
 """
 
 import os
-from cht.misc import fileops as fo
-import cht.misc.xmlkit as xml
+from cht_utils import fileops as fo
+import cht_utils.xmlkit as xml
 import yaml
 
 def dict2yaml(file_name, dct, sort_keys=False):
