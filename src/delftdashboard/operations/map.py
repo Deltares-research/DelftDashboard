@@ -62,23 +62,28 @@ def update_background():
         print("Map extent not yet available ...")
         return
 
-    if app.auto_update_topography and app.view["topography"]["visible"]:
-        coords = app.map.map_extent
-        xl = [coords[0][0], coords[1][0]]
-        yl = [coords[0][1], coords[1][1]]
-        wdt = app.map.view.geometry().width()
-        if app.view["topography"]["quality"] == "high":
-            npix = wdt
-        elif app.view["topography"]["quality"] == "medium":
-            npix = int(wdt*0.5)
-        else:
-            npix = int(wdt*0.25)
+    try:
 
-        dxy = (xl[1] - xl[0])/npix
-        xv = np.arange(xl[0], xl[1], dxy)
-        yv = np.arange(yl[0], yl[1], dxy)
-        dataset = bathymetry_database.get_dataset(app.background_topography)
-        dataset_list = [{"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}]
+        if app.auto_update_topography and app.view["topography"]["visible"]:
+
+            print("Updating background topography ...")
+
+            coords = app.map.map_extent
+            xl = [coords[0][0], coords[1][0]]
+            yl = [coords[0][1], coords[1][1]]
+            wdt = app.map.view.geometry().width()
+            if app.view["topography"]["quality"] == "high":
+                npix = wdt
+            elif app.view["topography"]["quality"] == "medium":
+                npix = int(wdt*0.5)
+            else:
+                npix = int(wdt*0.25)
+
+            dxy = (xl[1] - xl[0])/npix
+            xv = np.arange(xl[0], xl[1], dxy)
+            yv = np.arange(yl[0], yl[1], dxy)
+            dataset = bathymetry_database.get_dataset(app.background_topography)
+            dataset_list = [{"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}]
 
         try:
             cmap = mpl.cm.get_cmap(app.view["topography"]["colormap"])
@@ -89,14 +94,11 @@ def update_background():
             print("Error loading background topo ...")
             traceback.print_exc()
 
-        # try:
-        #     x, y, z = bathymetry_database.get_data(app.background_topography,
-        #                                            xl,
-        #                                            yl,
-        #                                            maxcellsize)
-        #     app.background_topography_layer.set_data(x=x, y=y, z=z, colormap=app.color_map_earth, decimals=0)
-        # except:
-        #     print("Error loading background topo ...")
+            print("Updating background topography done.")
+
+    except:
+        print("Error updating background topo ...")
+        traceback.print_exc()
 
 def update():
     reset_cursor()

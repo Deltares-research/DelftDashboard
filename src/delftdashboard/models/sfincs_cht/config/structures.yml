@@ -1,20 +1,14 @@
 element:
-- style: panel
+- style: tabpanel
   position:
     x: 10
     y: 10
     width: -10
-    height: 140
-  element:
-  - style: pushselectfile
-    position:
-      x: 10
-      y: 110
-      width: 130
-      height: 20
-    text: Thin Dam File
-    variable: thdfile
-    showfilename: True
-    extension: "*.thd"
-    selectiontext: Select thin dam file
-    tooltipstring: Select thin dam file
+    height: 160
+  tab:
+  - string: Thin Dams
+    module: delftdashboard.models.sfincs_cht.structures_thin_dams
+    element: structures_thin_dams.yml
+  - string: Weirs
+    module: delftdashboard.models.sfincs_cht.structures_weirs
+    element: structures_weirs.yml

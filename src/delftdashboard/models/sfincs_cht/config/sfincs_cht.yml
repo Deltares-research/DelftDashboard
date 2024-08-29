@@ -31,7 +31,6 @@ element:
     module: delftdashboard.models.sfincs_cht.observation_points
     element: observation_points.yml
   - string: Structures
-    module: delftdashboard.models.sfincs_cht.structures
     element: structures.yml
   - string: Output
     module: delftdashboard.models.sfincs_cht.output

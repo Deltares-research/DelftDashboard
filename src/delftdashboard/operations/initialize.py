@@ -181,7 +181,9 @@ def initialize_models():
         module = importlib.import_module("delftdashboard.models." + model_name + "." + model_name)
         app.model[model_name] = module.Model(model_name)
         if "exe_path" in mdl:
-            app.model[model_name].domain.exe_path = mdl["exe_path"]
+            app.model[model_name].exe_path = mdl["exe_path"]
+        else:
+            app.model[model_name].exe_path = ""    
         # Loop through toolboxes to see which ones should be activated for which model
         app.model[model_name].toolbox = []
         for tlb in app.config["toolbox"]:
