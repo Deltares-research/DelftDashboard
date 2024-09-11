@@ -61,7 +61,9 @@ def load_upload_classification_source(*args):
     with fiona.open(fn[0]) as src:
         # Access the schema to get the column names
         schema = src.schema
-        list_columns = list(schema["properties"].keys())
+        list_columns = ['Select']
+        for i in list(schema["properties"].keys()):
+            list_columns.append(i)
 
     app.gui.setvar(model, "classification_file_field_name_string", list_columns)
     app.gui.setvar(model, "classification_file_field_name_value", list_columns)
