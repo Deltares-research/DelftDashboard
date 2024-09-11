@@ -3,12 +3,19 @@ from pathlib import Path
 import random
 import geopandas as gpd
 import pandas as pd
+import pickle
 
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
+from delftdashboard.models.fiat.exposure_start import add_exposure_locations_to_model
+from delftdashboard.operations.checklist import zoom_to_boundary
+from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import generate_boundary, set_active_area_file
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
-from hydromt_fiat.api.data_types import Currency
+from hydromt_fiat.api.data_types import Currency, Units, ExposureRoadsSettings
 from hydromt_fiat.api.exposure_vm import ExposureVector
+from hydromt_fiat.fiat import FiatModel
+from hydromt.log import setuplog
+
 import copy
 from .utils import make_labels
 
@@ -195,6 +202,9 @@ class Model(GenericModel):
         ## Damage curve tables ##
         app.gui.setvar(
             group, "OSM_continent", None
+        )
+        app.gui.setvar(
+            group, "OSM_country", None
         )
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         app.gui.setvar(
@@ -647,6 +657,7 @@ class Model(GenericModel):
                 ]
             ),
         )
+        app.gui.setvar(group, "list_road_types", [])
 
     @staticmethod
     def set_dict_inverted(dictionary):
@@ -673,6 +684,8 @@ class Model(GenericModel):
         fname = app.gui.window.dialog_select_path("Select an existing model folder")
         if fname:
             dlg = app.gui.window.dialog_wait("Loading fiat model ...")
+            
+            # Reading in model
             self.domain = HydroMtViewModel(
                 app.config["working_directory"],
                 app.config["data_libs"],
@@ -680,16 +693,54 @@ class Model(GenericModel):
             )
             self.domain.read()
 
-            # TODO: read in the variables of the FIAT model
-            # to the GUI
-            self.set_gui_variables()
+            # Get region
+            fpath = str(Path(os.path.abspath("")) / self.domain.fiat_model.root / "exposure" / "region.gpkg")
+
+            # Set variables from existing model
+            with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'variables.pkl', 'rb') as f:
+                variables = pickle.load(f)
+            app.gui.variables["_main"] = variables['main']
+            app.gui.variables["fiat"] = variables['fiat']
+            app.gui.variables["modelmaker_fiat"] = variables['modelmaker_fiat']
+
+            app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
+            app.gui.setvar("modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file")
+            app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fpath)
+
+            # Select filepath through self.domain output exposure
+            self.domain.exposure_vm.create_interest_area(
+                fpath=fpath)
+            gdf = gpd.read_file(fpath)
+            gdf.to_crs(app.crs, inplace=True)
+            layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
+            layer.set_data(gdf)
+            app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
+            
+
+            # roads model
+            if (Path(os.path.abspath("")) / self.domain.fiat_model.root / "exposure" / "roads.gpkg").is_file():
+                self.domain.exposure_vm.exposure_roads_model = ExposureRoadsSettings(
+                roads_fn="OSM",
+                road_types=app.gui.getvar('fiat', "list_road_types"),
+                road_damage= None,
+                unit=Units.feet.value,
+            )
+            
+            #exposure_buildings_model  
+            add_exposure_locations_to_model()  
+
+            #vulnerability_buildings_model
+            selected_damage_curve_database = app.gui.getvar('fiat', "selected_damage_curve_database")
+            selected_link_table = app.gui.getvar('fiat', "selected_damage_curve_linking_table")
+            self.domain.vulnerability_vm.add_vulnerability_curves_to_model(selected_damage_curve_database, selected_link_table)
 
             # Change working directory
             os.chdir(fname)
 
             # Change CRS
-            app.crs = self.domain.crs
-            self.plot()
+            app.crs = self.domain.fiat_model.config["global"]["crs"]
+
+            zoom_to_boundary()
             dlg.close()
 
     def save(self):
@@ -1389,3 +1440,13 @@ class Model(GenericModel):
         gdf.crs = crs
         
         return gdf
+    
+    def save_gui_variables(self):
+        # Save model variables
+        dic_variables_main = app.gui.variables["_main"]
+        dic_variables_fiat = app.gui.variables["fiat"]
+        dic_variables_model_maker = app.gui.variables["modelmaker_fiat"]
+        
+        dic_variables = {'main': dic_variables_main, 'fiat': dic_variables_fiat, 'modelmaker_fiat': dic_variables_model_maker}
+        with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'variables.pkl', 'wb') as f:
+            pickle.dump(dic_variables , f)

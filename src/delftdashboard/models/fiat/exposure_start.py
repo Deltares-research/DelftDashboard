@@ -106,14 +106,10 @@ def add_exposure_locations_to_model(*args):
         build_osm_exposure()
 
     elif (
-        len(selected_asset_locations) == 1
-        and selected_asset_locations[0] != "National Structure Inventory (NSI)"
+        selected_asset_locations == "User model"
     ):
-        app.gui.window.dialog_info(
-            text="Coming soon!",
-            title="Not yet implemented",
-        )
-        return
+        # Build User exposure
+        build_user_exposure()
     else:
         app.gui.window.dialog_info(
             text="The option to have multiple asset location sources is not yet implemented.",
@@ -247,6 +243,7 @@ def build_osm_exposure(*args):
         # Set continent for damage curves
         country, continent = app.active_model.get_continent()
         app.gui.setvar("fiat", "OSM_continent", continent)
+        app.gui.setvar("fiat", "OSM_country", country)
         app.gui.setvar(model, "ground_elevation_unit", "meters")
 
         ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height"))
@@ -331,6 +328,48 @@ def build_osm_exposure(*args):
         )
         dlg.close()
 
+def build_user_exposure(*args):
+    model = "fiat"
+    checkbox_group = "_main"
+    try:
+        crs = app.gui.getvar(model, "selected_crs")
+        source = app.gui.getvar(model, "source_asset_locations")
+        
+        ## TODO: Check if user model uses own data for parameters
+        if source == "National Structure Inventory":
+            country = "United States"  
+            max_potential_damage = "NSI"
+            ground_floor_height = "NSI"    
+        elif source == "Open Street Map":
+            country = app.gui.getvar(model, "OSM_country")
+            max_potential_damage = "jrc_damage_values"
+            ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height"))
+        
+        # Set exposure buildings model
+        (
+            gdf
+        ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
+            source="User Model",
+            ground_floor_height=ground_floor_height,
+            crs=crs,
+            country=country,
+            max_potential_damage=max_potential_damage,
+            ground_elevation_unit=app.gui.getvar(model, "ground_elevation_unit")
+        )
+        
+        # Set the buildings attribute to gdf for easy visualization of the buildings
+        app.active_model.buildings = gdf[gdf['geometry'].geom_type == 'Point']
+        app.active_model.roads = gdf[gdf['geometry'].geom_type.isin(['MultiLineString', 'LineString'])]
+        app.map.layer["buildings"].layer["exposure_points"].crs = crs
+        app.map.layer["buildings"].layer["exposure_points"].set_data(app.active_model.buildings)
+        app.map.layer["roads"].layer["exposure_lines"].crs = crs
+        app.map.layer["roads"].layer["exposure_lines"].set_data(app.active_model.roads)
+      
+    except FileNotFoundError:
+        app.gui.window.dialog_info(
+            text="Something went wrong",
+            title="Error",
+        )
 
 def get_roads(model):
     ## ROADS ##
