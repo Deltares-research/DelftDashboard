@@ -10,8 +10,12 @@ import pandas as pd
 def select(*args):
     # De-activate existing layers
     map.update()
-    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
-        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    if all(
+        values.data is None for key, values in app.map.layer["buildings"].layer.items()
+    ):
+        app.map.layer["modelmaker_fiat"].layer[
+            app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+        ].show()
 
 
 def set_variables(*args):
@@ -22,41 +26,61 @@ def add_classification_field(*args):
     model = "fiat"
     existing_exposure_cat = app.gui.getvar(model, "exposure_categories_to_standardize")
     if existing_exposure_cat.values.any():
-        try: 
+        try:
             app.active_model.overwrite_classification()
         except ValueError as e:
-            #show dialog
+            # show dialog
             return
     read_classification()
 
+
 def read_classification(*args):
-        model = "fiat"
-        dlg = app.gui.window.dialog_wait("\nReading classification data...")
-        path = app.gui.getvar(model, "classification_source_path")
-        object_type = app.gui.getvar(model, "object_type")
-        attribute_name = app.gui.getvar(model, "classification_file_field_name")
+    model = "fiat"
+    dlg = app.gui.window.dialog_wait("\nReading classification data...")
+    path = app.gui.getvar(model, "classification_source_path")
+    object_type = app.gui.getvar(model, "object_type")
+    attribute_name = app.gui.getvar(model, "classification_file_field_name")
 
-        # Reset the self.updated_dict_categories dict
-        app.active_model.updated_dict_categories = app.active_model.default_dict_categories
+    # Reset the self.updated_dict_categories dict
+    app.active_model.updated_dict_categories = app.active_model.default_dict_categories
 
-        # Read the vector file and update the table for standardization
-        gdf = gpd.read_file(path)
-        df = pd.DataFrame({object_type: list(gdf[attribute_name].unique()), "Assigned": ""})
-        df.sort_values(object_type, inplace=True, ignore_index=True)
-        app.gui.setvar(model, "exposure_categories_to_standardize", df)
-        dlg.close()
-        if object_type == "Primary Object Type":
-            app.gui.window.dialog_info(
-                f"Updating the primary classification, will cause the secondary classification to automatically be updated, too. This ensures that primary and secondary classification are consistent. If you wish to only update the name of the primary classification, and not the damage curve, please do so manually.<br><p>Please standardize your classification so the correct damage curves can be assigned.</p>",
-                "Please standardize",)
-        elif object_type == "Secondary Object Type":
-            app.gui.window.dialog_info(
+    # Read the vector file and update the table for standardization
+    gdf = gpd.read_file(path)
+    df = pd.DataFrame({object_type: list(gdf[attribute_name].unique()), "Assigned": ""})
+    df.sort_values(object_type, inplace=True, ignore_index=True)
+    app.gui.setvar(model, "exposure_categories_to_standardize", df)
+    dlg.close()
+    if object_type == "Primary Object Type":
+        app.gui.window.dialog_info(
+            f"Updating the primary classification, will cause the secondary classification to automatically be updated, too. This ensures that primary and secondary classification are consistent. If you wish to only update the name of the primary classification, and not the damage curve, please do so manually.<br><p>Please standardize your classification so the correct damage curves can be assigned.</p>",
+            "Please standardize",
+        )
+    elif object_type == "Secondary Object Type":
+        app.gui.window.dialog_info(
             f"Please standardize your classification so the correct damage curves can be assigned.",
-            "Please standardize",)
-        standarize_classification()
+            "Please standardize",
+        )
+    standarize_classification()
+
+    # Set list variables
+    app.gui.getvar(model, "classification_source_path_list").append(path)
+    app.gui.getvar(model, "object_type_list").append(object_type)
+    app.gui.getvar(model, "classification_file_field_name_list").append(attribute_name)
+    app.gui.getvar(model, "old_occupancy_type_list").append(
+        app.gui.getvar(model, "old_occupancy_type")
+    )
+    app.gui.getvar(model, "new_occupancy_type_list").append(
+        app.gui.getvar(model, "new_occupancy_type")
+    )
+
 
 def load_upload_classification_source(*args):
     model = "fiat"
+
+    # Reset variables
+    app.gui.setvar(model, "classification_file_field_name", 0)
+
+    # Get the source
     fn = app.gui.window.dialog_open_file(
         "Select geometry", filter="Geometry (*.shp *.gpkg *.geojson)"
     )
@@ -65,7 +89,7 @@ def load_upload_classification_source(*args):
     with fiona.open(fn[0]) as src:
         # Access the schema to get the column names
         schema = src.schema
-        list_columns = ['Select']
+        list_columns = ["Select"]
         for i in list(schema["properties"].keys()):
             list_columns.append(i)
 
@@ -117,9 +141,9 @@ def add_classification(*args):
     model = "fiat"
 
     # Get the source, object type and attribute name
-    source = app.gui.getvar(model, "classification_source_path")
-    object_type = app.gui.getvar(model, "object_type")
-    attribute_name = app.gui.getvar(model, "classification_file_field_name")
+    source = app.gui.getvar(model, "classification_source_path_list")
+    object_type = app.gui.getvar(model, "object_type_list")
+    attribute_name = app.gui.getvar(model, "classification_file_field_name_list")
     remove_object_type = app.gui.getvar(model, "remove_classification")
 
     # Set the source
@@ -127,36 +151,29 @@ def add_classification(*args):
     app.gui.setvar(model, "source_classification", source_name)
 
     # TODO: ge the variables that are changed!
-    new_occupancy_value = app.gui.getvar(
-        model, "new_occupancy_type")
-    
-    old_occupancy_value = app.gui.getvar(
-        model, "old_occupancy_type")
-    
+    new_occupancy_value = app.gui.getvar(model, "new_occupancy_type_list")
+
+    old_occupancy_value = app.gui.getvar(model, "old_occupancy_type_list")
+
     if not new_occupancy_value:
         app.gui.window.dialog_info(
-        f"You need to standardize your classification before you can proceed.",
-        "Please standardize",
+            f"You need to standardize your classification before you can proceed.",
+            "Please standardize",
         )
         exit()
 
-    # Initiate classification model    
+    # Initiate classification model
     app.active_model.domain.exposure_vm.set_classification_config(
-            source = source,
-            attribute =  attribute_name,
-            type_add = object_type,
-            old_values= old_occupancy_value,
-            new_values= new_occupancy_value,
-            damage_types = ["structure", "content"],
-            remove_object_type = remove_object_type
-        )
+        source=source,
+        attribute=attribute_name,
+        type_add=object_type,
+        old_values=old_occupancy_value,
+        new_values=new_occupancy_value,
+        damage_types=["structure", "content"],
+        remove_object_type=remove_object_type,
+    )
 
-    # Reset variables
-    app.gui.setvar(model, "classification_file_field_name", 0)
-
-    
     app.gui.window.dialog_info(
         text="Standardized classification data was added to your model",
         title="Added standardized classification data",
     )
-

@@ -294,7 +294,9 @@ class Model(GenericModel):
 
         #User classification
         app.gui.setvar(group, "old_occupancy_type", "")
+        app.gui.setvar(group, "old_occupancy_type_list", [])
         app.gui.setvar(group, "new_occupancy_type", "")
+        app.gui.setvar(group, "new_occupancy_type_list", [])
         app.gui.setvar(group, "remove_classification", False)
 
         ## Standardizing of occupancy categories ##
@@ -401,6 +403,7 @@ class Model(GenericModel):
             group, "classification_source_value", ["nsi_data", "upload_data"]
         )
         app.gui.setvar(group, "classification_source_path", "")
+        app.gui.setvar(group, "classification_source_path_list", [])
         app.gui.setvar(
             group,
             "object_type_string",
@@ -416,6 +419,9 @@ class Model(GenericModel):
             group, "object_type", "Primary Object Type"
         )  # Make sure this is capitalized
         app.gui.setvar(
+            group, "object_type_list", []
+        )
+        app.gui.setvar(
             group,
             "classification_file_field_name_string",
             [],
@@ -426,6 +432,7 @@ class Model(GenericModel):
             [],
         )
         app.gui.setvar(group, "classification_file_field_name", 0)
+        app.gui.setvar(group, "classification_file_field_name_list", [])
         app.gui.setvar(
             group,
             "selected_primary_classification_string",
