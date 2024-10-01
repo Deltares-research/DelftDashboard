@@ -305,7 +305,7 @@ class Model(GenericModel):
 
         # Source names #
         app.gui.setvar(group, "source_asset_locations", "")
-        app.gui.setvar(group, "source_classification", "")
+        app.gui.setvar(group, "source_classification", [])
         app.gui.setvar(group, "source_finished_floor_height", "")
         app.gui.setvar(group, "source_max_potential_damage", "")
         app.gui.setvar(group, "source_ground_elevation", "")

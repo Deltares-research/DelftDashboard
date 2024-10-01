@@ -67,12 +67,11 @@ def read_classification(*args):
     app.gui.getvar(model, "object_type_list").append(object_type)
     app.gui.getvar(model, "classification_file_field_name_list").append(attribute_name)
     app.gui.getvar(model, "old_occupancy_type_list").append(
-        app.gui.getvar(model, "old_occupancy_type")
+        app.gui.getvar(model, "old_occupancy_type")[0]
     )
     app.gui.getvar(model, "new_occupancy_type_list").append(
-        app.gui.getvar(model, "new_occupancy_type")
+        app.gui.getvar(model, "new_occupancy_type")[0]
     )
-
 
 def load_upload_classification_source(*args):
     model = "fiat"
@@ -147,10 +146,13 @@ def add_classification(*args):
     remove_object_type = app.gui.getvar(model, "remove_classification")
 
     # Set the source
-    source_name = Path(source).name
+    source_name = []
+    for i in source:
+        path = Path(i).name
+        source_name.append(path)
     app.gui.setvar(model, "source_classification", source_name)
 
-    # TODO: ge the variables that are changed!
+    # TODO: get the variables that are changed!
     new_occupancy_value = app.gui.getvar(model, "new_occupancy_type_list")
 
     old_occupancy_value = app.gui.getvar(model, "old_occupancy_type_list")
