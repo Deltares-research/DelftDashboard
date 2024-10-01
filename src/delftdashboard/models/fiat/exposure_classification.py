@@ -164,6 +164,8 @@ def add_classification(*args):
         )
         exit()
 
+    assert len(source) <= 2
+    
     # Initiate classification model
     app.active_model.domain.exposure_vm.set_classification_config(
         source=source,
