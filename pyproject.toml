@@ -48,6 +48,7 @@ dependencies = [
     "tomli",
     "tomli-w",
     "NDBC",
+    "flood_adapt@ git+https://github.com/deltares/FloodAdapt.git",
     "cht-observations@ git+https://github.com/deltares/cht_observations.git",
     "hydromt-fiat@ git+https://github.com/deltares/hydromt_fiat.git@floodadapt",
     "hydromt-sfincs@ git+https://github.com/deltares/hydromt_sfincs.git@d7e1d26a58b6f5687ef47da320ea3b95faaba75a",
@@ -68,8 +69,9 @@ dev = [
 ]
 build = [
     "build",
+    "pyinstaller==6.7",
+    "pefile<2024.8.26", # This version introduces a significant slowdown in binary vs data reclassification step of pyinstaller. Pyinstaller is aware. https://github.com/pyinstaller/pyinstaller/issues/8762
     "twine",
-
 ]
 docs = [
     "jupyter",
@@ -97,7 +99,16 @@ where = ["src"]
 include = ["delftdashboard*"]
 
 [tool.setuptools.package-data]
-"delftdashboard" = ["**/**.yml", "**/**.ini"]
+"delftdashboard" = ["**/**.yml", "**/**.ini", "**/**.qss", "config/images/**", "config/colormaps/**"]
+
+[tool.setuptools.exclude-package-data]
+"delftdashboard" = [
+    "**/mapbox_token.txt",
+    "**/census_key.txt",
+    "**/data_catalog.yml",
+    "**/data_catalog_USA.yml",
+    "/env",
+    ]
 
 [tool.ruff]
 line-length = 88

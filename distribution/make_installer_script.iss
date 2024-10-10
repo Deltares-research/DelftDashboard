@@ -13,22 +13,22 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={userappdata}\{#MyAppName}
-LicenseFile="{#MyAppRootSourceDir}\distribution\LICENSE.txt"
-SetupIconFile="{#MyAppRootSourceDir}\distribution\icons\deltares_logo.jpeg"
+LicenseFile={#MyAppLicense}
+SetupIconFile={#MyAppIcon}
 
 PrivilegesRequired=lowest
-OutputBaseFilename=ModelBuilderInstaller
+OutputBaseFilename="{#MyAppName}_Installer"
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 
 DisableWelcomePage=no
 DisableDirPage=no
-;InfoBeforeFile="{#MyAppRootSourceDir}\README.md"
 DisableProgramGroupPage=no
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\_internal"
+Type: filesandordirs; Name: "{app}\data"
 Type: files; Name: "{app}\{#MyAppExeName}"
 Type: dirifempty; Name: "{app}"
 
@@ -39,8 +39,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "{#MyAppRootSourceDir}\dist\{#MyAppExeName}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyAppRootSourceDir}\dist\{#MyAppExeName}\_internal\*"; DestDir: "{app}\_internal"; Excludes: "__pycache__\*,tests\*"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "{#MyAppExeDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyAppExeDir}\data\*"; DestDir: "{app}\data"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "{#MyAppExeDir}\_internal\*"; DestDir: "{app}\_internal"; Excludes: "__pycache__\*,tests\*"; Flags: ignoreversion recursesubdirs createallsubdirs;
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -49,50 +50,3 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-
-[Code]
-var
-  InputDirWizardPage: TInputDirWizardPage;
-  InputQueryWizardPage: TInputQueryWizardPage;
-
-procedure InitializeWizard;
-var
-  AfterID: Integer;
-begin
-
-  WizardForm.LicenseAcceptedRadio.Checked := False;
-  AfterID := wpWelcome;
-
-  InputDirWizardPage := CreateInputDirPage(AfterID,
-    'Data selection:',
-    'Please select the path to the folder containing bathymetry and watershed data:',
-    'IMPORTANT: Choose a location where you DO NOT need administrative rights to edit files!',
-    False,
-    '');
-  InputDirWizardPage.Add('Select the data directory:');
-  InputDirWizardPage.Values[0] := ExpandConstant('{userdesktop}');
-  AfterID := InputDirWizardPage.ID;
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-var
-  ConfigFileName, ConfigData, temp: String;
-begin
-  if CurStep = ssPostInstall then
-  begin
-    ConfigFileName := ExpandConstant('{app}\_internal\delftdashboard\delftdashboard.ini');
-    temp := InputDirWizardPage.Values[0];
-    StringChangeEx(temp, '\', '/', True);
-
-    ConfigData := 'DATABASE_ROOT=''' + temp + '''' + #13#10 +
-                  'DATABASE_NAME=''' + InputQueryWizardPage.Values[0] + '''' + #13#10 +
-                  'SYSTEM_FOLDER=''../system''';
-
-    if not ForceDirectories(ExtractFilePath(ConfigFileName)) or
-       not SaveStringToFile(ConfigFileName, ConfigData, False) then
-    begin
-      MsgBox('Failed to save configuration to ' + ConfigFileName + '. Installation cannot proceed.' , mbError, MB_OK);
-      Abort;
-    end;
-  end;
-end;
