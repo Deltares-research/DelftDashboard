@@ -26,8 +26,11 @@ temp_data
 /build/
 */**.exe
 */mapbox_token**
+*/census_key**
 */**.spec
 */**.zip
 /distribution/FloodAdaptModelbuilders
 /distribution/data
 /distribution/spec
+/distribution/InnoSetup6
+/distribution/Output

@@ -1,37 +1,14 @@
 import argparse
 import subprocess
-from pathlib import Path
 
-from floodadapt_gui import __version__
-
-ROOT_PATH = Path(__file__).resolve().parent.parent
-ISCC_PATH = ROOT_PATH / "distribution" / "InnoSetup6" / "iscc.exe"
-SCRIPT_PATH = ROOT_PATH / "distribution" / "make_installer_script.iss"
-if not ISCC_PATH.exists():
-    raise FileNotFoundError(
-        f"Could not find Inno Setup Compiler at {ISCC_PATH}. Please copy it from the Database to <distribution>."
-    )
-
-APPLICATION_INFO = {
-    "MyAppName": "FloodAdaptModelBuilders",
-    "MyAppVersion": f"{__version__}",
-    "MyAppPublisher": "Deltares",
-    "MyAppURL": "https://www.deltares.nl/software-en-data/producten/floodadapt",
-    "MyAppExeName": "FloodAdaptModelBuilders.exe",
-    "MyAppRootSourceDir": Path.as_posix(ROOT_PATH),
-}
-
-
-def create_installer_command_args(quiet=False):
-    command = [f"{ISCC_PATH.as_posix()}"]
-    for key, value in APPLICATION_INFO.items():
-        command.append(f"/D{key}={value}")
-
-    if quiet:
-        command.append("/Qp")
-
-    command.append(f"{SCRIPT_PATH.as_posix()}")
-    return command
+from config import (
+    EXPECTED_STRUCTURE_MSG_INSTALLER,
+    INNOSETUP_DEFINES,
+    INSTALLER_SCRIPT_PATH,
+    ISCC_PATH,
+    SPEC_DIR,
+    _validate_path,
+)
 
 
 def parse_args():
@@ -49,36 +26,49 @@ def parse_args():
 
 def main():
     """
-    Create an installer for the ModelBuilder application using Inno Setup Compiler.
-
-    INSTALLER CHECKS:
-        1. Make sure the <system> folder to the <_internal> folder.
-        2. Make sure you can run the created executable without any issues.
-        3. Update the '#define' statements at the top of the script 'make_installer_script.iss' (version, name, paths, etc.)
+    Create an installer for the FloodAdapt application using Inno Setup Compiler.
 
     BUILDING THE INSTALLER:
-        1. Download InnoSetup from SVN: https://repos.deltares.nl/repos/FloodAdapt-Database/InnoSetup6 and copy it to the 'distribution' folder.
-        2. Verify the 'APPLICATION_INFO' statements at the top of this file script (version, name, paths, etc.)
-        3. Install the created installer on your machine to verify that it works as expected.
+        1. Make sure you can run the created executable without any issues.
+        2. Download InnoSetup from SVN: https://repos.deltares.nl/repos/FloodAdapt-Database/InnoSetup6 and copy it to the 'distribution' folder. See EXPECTED_STRUCTURE_MSG_INSTALLER for more information.
+        3. Verify the contents of 'INNOSETUP_DEFINES' in distribution/config.py (version, name, paths, etc.)
+        4. Install the created installer on your machine to verify that it works as expected.
     """
     args = parse_args()
 
-    args_list = create_installer_command_args(quiet=args.quiet)
+    # Validate before running Inno Setup Compiler
+    _validate_path("ISCC_PATH", ISCC_PATH, EXPECTED_STRUCTURE_MSG_INSTALLER)
 
-    print("Running command with each line as an arg:")
-    [print(arg) for arg in args_list]
+    # Create the command
+    app_args = [f"/D{key}={value}" for key, value in INNOSETUP_DEFINES.items()]
 
+    cmd_args = [
+        f"{ISCC_PATH}",
+        f"{INSTALLER_SCRIPT_PATH}",
+        *app_args,
+    ]
+    if args.quiet:
+        cmd_args.append("/Qp")
+
+    print("\n".join(cmd_args))
+    # Run
     try:
-        process = subprocess.run(
-            args=args_list,
+        process = subprocess.Popen(
+            args=" ".join(cmd_args),
             shell=True,
-            check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
-        print(process.stdout)
-        print(f"Installer created at {SCRIPT_PATH.parent / 'Output'}")
+        while process.poll() is None and process.stdout:
+            print(process.stdout.readline(), end="")
+        
+        if process.returncode != 0:
+            if process.stderr:
+                print(process.stderr.readlines())
+            exit(process.returncode)
+       
+        print(f"Installer created at {SPEC_DIR / 'Output'}")
 
     except subprocess.CalledProcessError as e:
         print(f"Command '{e.cmd}' returned non-zero exit status {e.returncode}.")

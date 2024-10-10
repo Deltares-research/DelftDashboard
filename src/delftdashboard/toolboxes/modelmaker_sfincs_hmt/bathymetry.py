@@ -1,4 +1,5 @@
 import os
+import subprocess
 import yaml
 import rasterio
 
@@ -106,11 +107,23 @@ def add_dataset(*args):
                 app.gui.window.dialog_warning("File is not a GeoTiff")
                 return
             if not src.overviews(1):
-                app.gui.window.dialog_warning(
+                ok = app.gui.window.dialog_yes_no(
                     "File does not have overviews (i.e., reduced resolution versions of the dataset)" +
-                    "\nPlease create overviews using `rio overview`.`"
+                    "\nYou can create them manually using the command: `rio overview --build auto <your_dataset.tif>" +
+                    "\nDo you want to automatically create the overviews?" + 
+                    "\nNote that this will edit the file directly and increase its size significantly." +
+                    "\nThere is no undo for this, so please make a backup before pressing ok."
                     )
-                return
+                if not ok:
+                    return
+                else:
+                    process = subprocess.run(["rio", "overview", "--build", "auto", fn[0]])
+                    if process.returncode == 0:
+                        app.gui.window.dialog_info("Overviews created successfully")
+                    else:
+                        app.gui.window.dialog_warning("Failed to create overviews")
+                        return
+                
             if not src.nodata:
                 app.gui.window.dialog_warning("File does not have a nodata value")
                 return
@@ -167,6 +180,9 @@ def add_dataset(*args):
         # reload the data catalog
         app.data_catalog = DataCatalog(data_libs=app.config["data_libs"])
         list_bathymetry_datasets(source="User")
+
+        # reloading doesnt work yet, so we need to restart the app
+        app.gui.window.dialog_warning("To use and view the dataset you just added, restart the app and go to menu -> Topgraphy -> User.")
 
 
 def select_selected_bathymetry_dataset(*args):
