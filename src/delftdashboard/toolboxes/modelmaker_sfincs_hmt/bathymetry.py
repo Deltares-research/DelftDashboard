@@ -2,6 +2,7 @@ import os
 import subprocess
 import yaml
 import rasterio
+from rasterio.enums import Resampling
 
 from hydromt import DataCatalog
 
@@ -102,7 +103,7 @@ def add_dataset(*args):
     if fn[0]:
         # check the file format, it should be a cloud-optimized geotiff with overviews
         # and a nodata value and a valid crs
-        with rasterio.open(fn[0]) as src:
+        with rasterio.open(fn[0], mode="r+") as src:
             if not src.driver == "GTiff":
                 app.gui.window.dialog_warning("File is not a GeoTiff")
                 return
@@ -110,18 +111,25 @@ def add_dataset(*args):
                 ok = app.gui.window.dialog_yes_no(
                     "File does not have overviews (i.e., reduced resolution versions of the dataset)" +
                     "\nYou can create them manually using the command: `rio overview --build auto <your_dataset.tif>" +
-                    "\nDo you want to automatically create the overviews?" + 
-                    "\nNote that this will edit the file directly and increase its size significantly." +
-                    "\nThere is no undo for this, so please make a backup before pressing ok."
+                    "\nFor more information see: https://rasterio.readthedocs.io/en/latest/topics/overviews.html" +
+
+                    "\n\nNote that this will edit the file directly and increase its size significantly." +
+                    "\nThere is no undo for this, so please make a backup before pressing ok." +
+                    "\n\nDo you want to automatically create the overviews?"
                     )
                 if not ok:
                     return
                 else:
-                    process = subprocess.run(["rio", "overview", "--build", "auto", fn[0]])
-                    if process.returncode == 0:
+                    try:
+                        # create new overviews, resampling with average method
+                        src.build_overviews([2, 4, 8, 16, 32, 64], Resampling.average)
+                    
+                        # update dataset tags
+                        src.update_tags(ns='rio_overview', resampling='average')
+
                         app.gui.window.dialog_info("Overviews created successfully")
-                    else:
-                        app.gui.window.dialog_warning("Failed to create overviews")
+                    except Exception as e:
+                        app.gui.window.dialog_warning(f"Failed to create overviews: {e}")
                         return
                 
             if not src.nodata:
@@ -182,7 +190,7 @@ def add_dataset(*args):
         list_bathymetry_datasets(source="User")
 
         # reloading doesnt work yet, so we need to restart the app
-        app.gui.window.dialog_warning("To use and view the dataset you just added, restart the app and go to menu -> Topgraphy -> User.")
+        app.gui.window.dialog_warning("Adding your own datasets is beta functionality. To use and view the dataset you just added, restart the app and go to menu -> Topgraphy -> User.")
 
 
 def select_selected_bathymetry_dataset(*args):
