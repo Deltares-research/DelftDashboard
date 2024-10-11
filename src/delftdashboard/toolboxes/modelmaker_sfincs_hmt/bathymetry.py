@@ -108,7 +108,6 @@ def add_dataset(*args):
                 return
             if not src.overviews(1):
                 ok = app.gui.window.dialog_yes_no(
-                ok = app.gui.window.dialog_yes_no(
                     "File does not have overviews (i.e., reduced resolution versions of the dataset)" +
                     "\nYou can create them manually using the command: `rio overview --build auto <your_dataset.tif>" +
                     "\nFor more information see: https://rasterio.readthedocs.io/en/latest/topics/overviews.html" +
