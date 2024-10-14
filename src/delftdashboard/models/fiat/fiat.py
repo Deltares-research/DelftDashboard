@@ -658,7 +658,6 @@ class Model(GenericModel):
                 ]
             ),
         )
-        app.gui.setvar(group, "list_road_types", [])
 
     @staticmethod
     def set_dict_inverted(dictionary):
@@ -729,24 +728,8 @@ class Model(GenericModel):
             layer.set_data(gdf)
             app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
 
-            # roads model
-            if (
-                Path(os.path.abspath(""))
-                / self.domain.fiat_model.root
-                / "exposure"
-                / "roads.gpkg"
-            ).is_file():
-                self.domain.exposure_vm.exposure_roads_model = ExposureRoadsSettings(
-                    roads_fn="OSM",
-                    road_types=app.gui.getvar("fiat", "list_road_types"),
-                    road_damage=None,
-                    unit=Units.feet.value,
-                )
-
             # exposure_buildings_model
             add_exposure_locations_to_model()
-
-            # add exposure roads to model
 
             # vulnerability_buildings_model
             selected_damage_curve_database = app.gui.getvar(
@@ -769,15 +752,6 @@ class Model(GenericModel):
 
             # Show exposure buildings
             self.show_exposure_buildings()
-
-            # Show exposure roads
-            #if (
-            ##    Path(os.path.abspath(""))
-             #   / self.domain.fiat_model.root
-             #   / "exposure"
-             #   / "roads.gpkg"
-            #).is_file():
-            #    self.show_exposure_roads()
 
             dlg.close()
 

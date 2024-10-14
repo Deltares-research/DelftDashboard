@@ -1,10 +1,12 @@
 from delftdashboard.app import app
 from delftdashboard.operations import map
 from .vulnerability_damage_curves import update_damage_curves
-from hydromt_fiat.api.data_types import Currency
+from hydromt_fiat.api.data_types import Currency, Units,  ExposureRoadsSettings
 
 import pandas as pd
 import geopandas as gpd
+from pathlib import Path
+import os
 
 
 def select(*args):
@@ -373,7 +375,18 @@ def build_user_exposure(*args):
         ]
 
         # get roads and set layer
-        if source == "OSM" or source == "NSI":
+        if (
+            Path(os.path.abspath(""))
+            / app.active_model.domain.fiat_model.root
+            / "exposure"
+            / "roads.gpkg"
+        ).is_file():
+            app.active_model.domain.exposure_vm.exposure_roads_model = ExposureRoadsSettings(
+                roads_fn= 'OSM',
+                road_types = get_road_types(),
+                road_damage=None,
+                unit=Units.feet.value,
+            )
             get_roads(model)
 
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
@@ -428,6 +441,7 @@ def get_roads(model):
                 title="No OSM roads found",
             )
             dlg.close()
+          
 
 
 def get_road_types():
