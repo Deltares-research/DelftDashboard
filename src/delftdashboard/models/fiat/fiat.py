@@ -8,6 +8,7 @@ import pickle
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from delftdashboard.models.fiat.exposure_start import add_exposure_locations_to_model
+from delftdashboard.models.fiat.exposure_damages import add_to_model
 from delftdashboard.operations.checklist import zoom_to_boundary
 from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import (
     generate_boundary,
@@ -711,6 +712,12 @@ class Model(GenericModel):
             app.gui.variables["_main"] = variables["main"]
             app.gui.variables["fiat"] = variables["fiat"]
             app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
+            
+            # Get parameter sources
+            max_source = app.gui.getvar("fiat", "source_max_potential_damage")
+            damage_type = app.gui.getvar("fiat", "damage_type")
+            gfh_source = app.gui.getvar("fiat", "source_finished_floor_height")
+            ground_elevation_source = app.gui.getvar("fiat", "source_ground_elevation")
 
             app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
             app.gui.setvar(
@@ -730,6 +737,22 @@ class Model(GenericModel):
 
             # exposure_buildings_model
             add_exposure_locations_to_model()
+
+            # Update exposure
+            ## Max potential Damages
+            if max_source[0] != "National Structure Inventory" or max_source != "JRC Damage Values":
+                app.gui.setvar("fiat", "source_max_potential_damage", max_source)
+                app.gui.setvar("fiat", "damage_type", damage_type)
+                add_to_model()
+
+            ## Finished Floor Height       
+            if gfh_source[0] != "National Structure Inventory" or gfh_source!= "User input":
+                app.gui.setvar("fiat", "source_finished _floor_height", gfh_source)
+
+            ## Ground Elevation
+            if ground_elevation_source[0] != "National Structure Inventory" or ground_elevation_source != "None":
+                app.gui.setvar("fiat", "source_ground_elevation", ground_elevation_source)
+                #app.active_model.update_exposure()
 
             # vulnerability_buildings_model
             selected_damage_curve_database = app.gui.getvar(
