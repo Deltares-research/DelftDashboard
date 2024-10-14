@@ -17,8 +17,12 @@ from delftdashboard.models.fiat.exposure_aggregation import get_table_data
 def select(*args):
     # De-activate existing layers
     map.update()
-    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
-        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    if all(
+        values.data is None for key, values in app.map.layer["buildings"].layer.items()
+    ):
+        app.map.layer["modelmaker_fiat"].layer[
+            app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+        ].show()
     app.gui.setvar("_main", "show_fiat_checkbox", False)
     app.gui.setvar("fiat", "show_asset_locations", True)
 
@@ -73,20 +77,24 @@ def display_damage(*args):
         else:
             app.active_model.show_max_potential_damage_cont()
 
+
 def display_asset_height(*args):
     if app.gui.getvar("fiat", "show_asset_locations"):
         app.map.layer["buildings"].clear()
         app.active_model.show_asset_height()
+
 
 def display_ground_elevation(*args):
     if app.gui.getvar("fiat", "show_asset_locations"):
         app.map.layer["buildings"].clear()
         app.active_model.show_ground_elevation()
 
-def display_svi(*args):    
+
+def display_svi(*args):
     if app.gui.getvar("fiat", "show_asset_locations"):
         app.map.layer["buildings"].clear()
         app.active_model.show_svi()
+
 
 def display_roads(*args):
     """Show/hide roads layer"""
@@ -96,6 +104,7 @@ def display_roads(*args):
     else:
         app.active_model.hide_exposure_roads()
 
+
 def display_asset_location(*args):
     """Show/hide asset layer"""
     app.gui.setvar("fiat", "show_asset_locations", args[0])
@@ -103,6 +112,7 @@ def display_asset_location(*args):
         app.map.layer["buildings"].show()
     else:
         app.map.layer["buildings"].hide()
+
 
 def display_attribute(*args):
     label_to_visualize = app.gui.getvar("fiat", "aggregation_label_display_name")
@@ -147,7 +157,7 @@ def toggle_attr_map(*args):
         else:
             label = ["Select"] + label
             app.gui.setvar("fiat", "aggregation_label_display_string", label)
-            app.gui.setvar("fiat", "aggregation_label_display_value",  label)
+            app.gui.setvar("fiat", "aggregation_label_display_value", label)
             attributes = [app.gui.getvar("fiat", "aggregation_label_display_name")]
             if len(attributes) > 0:
                 app.gui.setvar("fiat", "aggregation_label_display_name", 0)

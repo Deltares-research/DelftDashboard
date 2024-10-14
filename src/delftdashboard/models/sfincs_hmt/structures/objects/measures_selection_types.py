@@ -110,7 +110,7 @@ class PolygonSelectionType(ISelectionType):
             full path to geojson file
         """
 
-        # Save geojson data if measure type is polygon 
+        # Save geojson data if measure type is polygon
         if self._selection_type == "polygon":
             gdf = app.gui.getvar("measures", "temp_gdf")
             gdf = GeoDataFrame(geometry=gdf["geometry"])

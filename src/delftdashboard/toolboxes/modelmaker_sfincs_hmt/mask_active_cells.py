@@ -19,7 +19,7 @@ def select(*args):
 
 
 def delete_mask_init_polygon(*args):
-    """"Delete the initial mask polygon"""
+    """ "Delete the initial mask polygon"""
 
     if len(app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon) == 0:
         return
@@ -29,11 +29,12 @@ def delete_mask_init_polygon(*args):
 
     # Remove from the map
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_init"].clear()
-    
+
     # Remove from the modelmaker
     app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon = gpd.GeoDataFrame()
 
     update()
+
 
 def load_mask_init_polygon(*args):
     """Load the initial mask polygon"""
@@ -60,6 +61,7 @@ def load_mask_init_polygon(*args):
 
         mask_init_polygon_created(gdf, 0, 0)
 
+
 def mask_init_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_hmt"].mask_init_polygon = gdf
     update()
@@ -79,9 +81,11 @@ def delete_include_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "mask_include_polygon_index")
     # or: iac = args[0]
-    feature_id = app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].gdf.loc[
-        index, "id"
-    ]
+    feature_id = (
+        app.map.layer["modelmaker_sfincs_hmt"]
+        .layer["mask_include"]
+        .gdf.loc[index, "id"]
+    )
     # Delete from map
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_include"].delete_feature(
         feature_id
@@ -98,9 +102,10 @@ def delete_include_polygon(*args):
             "mask_include_polygon_index",
             len(app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon) - 1,
         )
-    
+
     # update list and GUI
     update()
+
 
 def load_include_polygon(*args):
     fname = app.gui.window.dialog_open_file(
@@ -117,7 +122,7 @@ def load_include_polygon(*args):
         gdf = gdf.to_crs(app.crs)
 
         nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon)
-        # if already a polygon is present, add the new polygon to the existing one	
+        # if already a polygon is present, add the new polygon to the existing one
         if nrp > 0:
             gdf = app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon.append(gdf)
             gdf = gdf.reset_index(drop=True)
@@ -138,9 +143,10 @@ def select_include_polygon(*args):
         feature_id
     )
 
+
 def include_polygon_created(gdf, index, id):
     """Add an include polygon to the modelmaker toolbox"""
-   
+
     app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon = gdf
 
     # Add the polygon to the map
@@ -170,9 +176,11 @@ def delete_exclude_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "mask_exclude_polygon_index")
     # or: iac = args[0]
-    feature_id = app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].gdf.loc[
-        index, "id"
-    ]
+    feature_id = (
+        app.map.layer["modelmaker_sfincs_hmt"]
+        .layer["mask_exclude"]
+        .gdf.loc[index, "id"]
+    )
     # Delete from map
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_exclude"].delete_feature(
         feature_id
@@ -208,15 +216,17 @@ def load_exclude_polygon(*args):
         gdf = gdf.to_crs(app.crs)
 
         nrp = len(app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon)
-        # if already a polygon is present, add the new polygon to the existing one	
+        # if already a polygon is present, add the new polygon to the existing one
         if nrp > 0:
             gdf = app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon.append(gdf)
             gdf = gdf.reset_index(drop=True)
 
         exclude_polygon_created(gdf, 0, 0)
 
+
 def save_exclude_polygon(*args):
     pass
+
 
 def select_exclude_polygon(*args):
     index = args[0]
@@ -227,9 +237,10 @@ def select_exclude_polygon(*args):
         feature_id
     )
 
+
 def exclude_polygon_created(gdf, index, id):
     """Add an exclude polygon to the modelmaker toolbox"""
-   
+
     app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon = gdf
 
     # Add the polygon to the map
@@ -272,6 +283,7 @@ def edit_mask_active(*args):
     else:
         update_mask_active()
 
+
 def update():
     """Update the lists with the include and exclude polygons in the modelmaker"""
 
@@ -279,7 +291,7 @@ def update():
     incnames = []
     for index in range(len(app.toolbox["modelmaker_sfincs_hmt"].mask_include_polygon)):
         # create a name with %02d format
-        incnames.append("Polygon " + "%02d" % (index+1))
+        incnames.append("Polygon " + "%02d" % (index + 1))
     app.gui.setvar("modelmaker_sfincs_hmt", "nr_mask_include_polygons", nrp)
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_include_polygon_names", incnames)
 
@@ -287,7 +299,7 @@ def update():
     excnames = []
     for index in range(len(app.toolbox["modelmaker_sfincs_hmt"].mask_exclude_polygon)):
         # create a name with %02d format
-        excnames.append("Polygon " + "%02d" % (index+1))
+        excnames.append("Polygon " + "%02d" % (index + 1))
     app.gui.setvar("modelmaker_sfincs_hmt", "nr_mask_exclude_polygons", nrp)
     app.gui.setvar("modelmaker_sfincs_hmt", "mask_exclude_polygon_names", excnames)
 

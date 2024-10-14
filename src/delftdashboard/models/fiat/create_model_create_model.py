@@ -9,11 +9,16 @@ from delftdashboard.app import app
 import geopandas as gpd
 from delftdashboard.operations import map
 
+
 def select(*args):
     # De-activate existing layers
     map.update()
-    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
-        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    if all(
+        values.data is None for key, values in app.map.layer["buildings"].layer.items()
+    ):
+        app.map.layer["modelmaker_fiat"].layer[
+            app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+        ].show()
     app.gui.setvar("_main", "show_fiat_checkbox", True)
 
 
@@ -30,7 +35,7 @@ def create_model(*args):
         try:
             app.active_model.overwrite_model()
         except ValueError as e:
-            return  
+            return
         app.map.layer["buildings"].clear()
 
     dlg = app.gui.window.dialog_wait("\nCreating a FIAT model...")
@@ -57,11 +62,11 @@ def create_model(*args):
     # Show exposure buildings
     display_asset_locations()
 
-    #TODO Save GUI variables and write as configuration for GUI
+    # TODO Save GUI variables and write as configuration for GUI
     app.active_model.save_gui_variables()
-    
+
     dlg.close()
-        
+
     app.gui.window.dialog_info(
         f"A FIAT model is created in:\n{app.active_model.domain.fiat_model.root}",
         "FIAT model created",
@@ -71,6 +76,7 @@ def create_model(*args):
 def edit(*args):
     app.active_model.set_model_variables()
 
+
 def display_asset_locations(*args):
     """Show/hide buildings layer"""
     app.map.layer["buildings"].layer["exposure_points"].crs = crs = app.gui.getvar(
@@ -78,16 +84,13 @@ def display_asset_locations(*args):
     )
 
     if not app.gui.getvar("fiat", "bf_conversion"):
-        point_buildings = app.active_model.convert_bf_into_centroids(app.active_model.buildings, app.gui.getvar(
-        "fiat", "selected_crs"
-        ))
-        app.map.layer["buildings"].layer["exposure_points"].set_data(
-            point_buildings
+        point_buildings = app.active_model.convert_bf_into_centroids(
+            app.active_model.buildings, app.gui.getvar("fiat", "selected_crs")
         )
+        app.map.layer["buildings"].layer["exposure_points"].set_data(point_buildings)
         app.active_model.buildings = point_buildings
     else:
         app.map.layer["buildings"].layer["exposure_points"].set_data(
             app.active_model.buildings
         )
     app.active_model.show_exposure_buildings()
-

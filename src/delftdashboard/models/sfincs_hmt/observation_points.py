@@ -5,7 +5,9 @@ from hydromt_sfincs import utils
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
-from delftdashboard.toolboxes.observation_stations.observation_stations import Toolbox as ObservationStationsToolbox
+from delftdashboard.toolboxes.observation_stations.observation_stations import (
+    Toolbox as ObservationStationsToolbox,
+)
 
 
 def select(*args):
@@ -29,7 +31,7 @@ def add_observation_point(gdf, merge=True):
         nr_obs = len(model.geoms["obs"].index)
 
     try:
-        model.setup_observation_points(locations = gdf, merge=merge)
+        model.setup_observation_points(locations=gdf, merge=merge)
         nr_obs_new = len(model.geoms["obs"].index)
         if nr_obs_new > nr_obs:
             app.gui.window.dialog_info(
@@ -55,6 +57,7 @@ def add_observation_point(gdf, merge=True):
     )
     app.gui.setvar("sfincs_hmt", "active_observation_point", index)
     update()
+
 
 def load(*args):
     # map.reset_cursor()
@@ -181,9 +184,9 @@ def delete_all_points_from_list(*args):
 def update():
     # get observation points
     gdf = app.map.layer["sfincs_hmt"].layer["observation_points"].data
-    
+
     names = []
-    if gdf is not None:      
+    if gdf is not None:
         for index, row in gdf.iterrows():
             names.append(row["name"])
 
@@ -193,13 +196,13 @@ def update():
 
 
 def go_to_observation_stations(*args):
-    """Go to observation stations toolbox in popup window."""	
+    """Go to observation stations toolbox in popup window."""
 
     toolbox_name = "observation_stations"
     toolbox_path = os.path.join(app.main_path, "toolboxes", toolbox_name)
 
     # initialize toolboxes
-    toolbox = ObservationStationsToolbox(toolbox_name)   
+    toolbox = ObservationStationsToolbox(toolbox_name)
 
     data = {
         "map_center": app.map.map_center,
@@ -209,7 +212,9 @@ def go_to_observation_stations(*args):
     }
 
     # Read GUI config file
-    pop_win_config_path  = os.path.join(toolbox_path,"config", "observation_stations_popup.yml")
+    pop_win_config_path = os.path.join(
+        toolbox_path, "config", "observation_stations_popup.yml"
+    )
     okay, data = app.gui.popup(
         pop_win_config_path, data=data, id="observation_stations"
     )

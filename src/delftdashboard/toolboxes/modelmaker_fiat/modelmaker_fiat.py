@@ -195,7 +195,6 @@ def generate_boundary(*args):
         fpath=str(app.active_model.domain.database.drive / "aoi.geojson")
     )
 
-
     app.map.layer["modelmaker_fiat"].layer[active_layer].hide()
     time.sleep(0.5)
     app.map.layer["modelmaker_fiat"].layer[active_layer].show()
@@ -330,7 +329,6 @@ def load_sfincs_domain(*args):
             gdf = gpd.read_file(path_to_sfincs_domain)
             gdf.to_crs(app.crs, inplace=True)
 
-
             # Write file into table
             app.gui.setvar(
                 "modelmaker_fiat", "area_of_interest_string", path_to_sfincs_domain.name
@@ -393,7 +391,7 @@ def quick_build(*args):
         source="NSI", ground_floor_height="NSI", crs=crs
     )
     app.active_model.domain.exposure_vm.set_country("United States")
-    
+
     # Set the damage curves
     selected_damage_curve_database = "default_vulnerability_curves"
     selected_link_table = "default_hazus_iwr_linking"
@@ -417,24 +415,24 @@ def quick_build(*args):
     # "secondary_link",
     # Use all roads for quick build
     road_types = [
-            "motorway",
-            "motorway_link",
-            "primary",
-            "primary_link",
-            "secondary",
-            "secondary_link",
-            "tertiary",
-            "tertiary_link",
-            "residential",
-            "unclassified",
-        ]
+        "motorway",
+        "motorway_link",
+        "primary",
+        "primary_link",
+        "secondary",
+        "secondary_link",
+        "tertiary",
+        "tertiary_link",
+        "residential",
+        "unclassified",
+    ]
     app.active_model.domain.exposure_vm.set_roads_settings(road_types)
 
     # Set the road damage threshold
-    #road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-    #app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
+    # road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
+    # app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
     #    road_damage_threshold
-    #)
+    # )
 
     # Set SVI and equity
     census_key_path = Path(app.config_path) / "census_key.txt"
@@ -446,7 +444,7 @@ def quick_build(*args):
     census_key = census_key[0]
     year_data = 2021  ## default
 
-    #app.active_model.domain.svi_vm.set_svi_settings(census_key, year_data)
+    # app.active_model.domain.svi_vm.set_svi_settings(census_key, year_data)
     app.active_model.domain.svi_vm.set_equity_settings(census_key, year_data)
 
     # Set the checkboxes checked
@@ -519,7 +517,7 @@ def quick_build(*args):
     app.map.layer["roads"].layer["exposure_lines"].set_data(app.active_model.roads)
     app.active_model.show_exposure_roads()
 
-    #TODO Save GUI variables and write as configuration for GUI
+    # TODO Save GUI variables and write as configuration for GUI
     app.active_model.save_gui_variables()
 
     dlg.close()

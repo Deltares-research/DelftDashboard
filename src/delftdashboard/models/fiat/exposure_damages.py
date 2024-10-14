@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from delftdashboard.app import app
 from delftdashboard.operations import map
-from delftdashboard.operations import  update
+from delftdashboard.operations import update
 from pathlib import Path
 import fiona
 
@@ -9,8 +9,12 @@ import fiona
 def select(*args):
     # De-activate existing layers
     map.update()
-    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
-        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    if all(
+        values.data is None for key, values in app.map.layer["buildings"].layer.items()
+    ):
+        app.map.layer["modelmaker_fiat"].layer[
+            app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+        ].show()
 
 
 def set_variables(*args):
@@ -25,9 +29,9 @@ def select_damages_file(*args):
     fn_value = app.gui.getvar("fiat", "loaded_damages_files_value")
     if fn not in fn_value:
         fn_value.append(Path(fn))
-    
-    # Remove empty string if in list 
-    fn_value = [item for item in fn_value if item != Path('.')]
+
+    # Remove empty string if in list
+    fn_value = [item for item in fn_value if item != Path(".")]
     app.gui.setvar("fiat", "loaded_damages_files_value", fn_value)
 
     name = Path(fn).name
@@ -36,7 +40,7 @@ def select_damages_file(*args):
         current_list_string.append(name)
 
     # Remove empty string if in list
-    current_list_string  = [item for item in current_list_string  if item != '']
+    current_list_string = [item for item in current_list_string if item != ""]
     app.gui.setvar("fiat", "loaded_damages_files_string", current_list_string)
 
 
@@ -150,7 +154,7 @@ def add_damages():
     attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
 
     # Empty field name parameter
-    #app.gui.setvar(model, "damages_file_field_name", 0)
+    # app.gui.setvar(model, "damages_file_field_name", 0)
 
     # Get the method
     method_damages = app.gui.getvar("fiat", "method_damages")
@@ -177,7 +181,9 @@ def add_damages():
     )
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
     if app.active_model.domain.fiat_model.exposure is not None:
-        dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
+        dlg = app.gui.window.dialog_wait(
+            "\nUpdating Max Potential Damages in your FIAT model..."
+        )
         update.update_parameters("Max Potential Damages")
         dlg.close()
 
@@ -228,9 +234,9 @@ def replace_damage(damage_index):
 
     app.gui.setvar(model, "damages_file_field_name_list", damages_attribute_list)
     attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
-    
+
     # Empty field name parameter
-    #app.gui.setvar(model, "damages_file_field_name", 0)
+    # app.gui.setvar(model, "damages_file_field_name", 0)
 
     # Get the method
     method_damages = app.gui.getvar("fiat", "method_damages")
@@ -256,10 +262,12 @@ def replace_damage(damage_index):
         max_dist=max_dist_damages,
         damage_types=damage_types,
     )
-    
+
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
     if app.active_model.domain.fiat_model.exposure is not None:
-        dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
+        dlg = app.gui.window.dialog_wait(
+            "\nUpdating Max Potential Damages in your FIAT model..."
+        )
         update.update_parameters("Max Potential Damages")
         dlg.close()
 
@@ -270,4 +278,3 @@ def replace_damage(damage_index):
         text="Maximum potential damage data was added to your model",
         title="Added maximum potential damage data",
     )
-

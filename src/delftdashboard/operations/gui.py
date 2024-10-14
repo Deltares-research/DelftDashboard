@@ -194,22 +194,24 @@ def build_gui_config():
                                 }
                             ],
                         }
-
                     ]
 
-                    dataset =  {
-                            "id": "topography." + key,
-                            "variable_group": "menu",
-                            "text": key,
-                            "separator": False,
-                            "checkable": True,
-                            "option": key,
-                            "method": "select_dataset",
-                            "dependency": dependency,
-                        }
-                    
+                    dataset = {
+                        "id": "topography." + key,
+                        "variable_group": "menu",
+                        "text": key,
+                        "separator": False,
+                        "checkable": True,
+                        "option": key,
+                        "method": "select_dataset",
+                        "dependency": dependency,
+                    }
+
                     # if source is not in menu, add it
-                    index = next((i for i, d in enumerate(menu["menu"]) if d["text"] == source), None)
+                    index = next(
+                        (i for i, d in enumerate(menu["menu"]) if d["text"] == source),
+                        None,
+                    )
                     if index is None:
                         source_menu = {}
                         source_menu["text"] = source

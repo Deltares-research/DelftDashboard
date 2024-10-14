@@ -7,7 +7,7 @@ Created on Mon October 30 12:18:09 2023
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
-from delftdashboard.operations import  update
+from delftdashboard.operations import update
 import geopandas as gpd
 from pathlib import Path
 import pandas as pd
@@ -18,8 +18,12 @@ import fiona
 def select(*args):
     # De-activate existing layers
     map.update()
-    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
-        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    if all(
+        values.data is None for key, values in app.map.layer["buildings"].layer.items()
+    ):
+        app.map.layer["modelmaker_fiat"].layer[
+            app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+        ].show()
 
 
 def set_variables(*args):
@@ -169,12 +173,14 @@ def add_aggregations(*args):
                     text="Your additional attributes are not within your model boundaries. Make sure to set the crs to EPSG:4326 in all your data.",
                     title="Additional attribute outside model boundaries. ",
                 )
-            
+
             app.gui.setvar("_main", "checkbox_attributes_(optional)", True)
-        
+
         # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
         if app.active_model.domain.fiat_model.exposure is not None:
-            dlg = app.gui.window.dialog_wait("\nAdding additional attributes to your FIAT model...")
+            dlg = app.gui.window.dialog_wait(
+                "\nAdding additional attributes to your FIAT model..."
+            )
             update.update_parameters("Additional Attributes")
             dlg.close()
 

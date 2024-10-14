@@ -6,7 +6,7 @@ def select(*args):
     # De-activate existing layers
     map.update()
     app.map.layer["sfincs_hmt"].layer["grid"].activate()
-    app.map.layer["sfincs_hmt"].layer["bed_levels"].activate()    
+    app.map.layer["sfincs_hmt"].layer["bed_levels"].activate()
     app.map.layer["sfincs_hmt"].layer["bed_levels"].show()
 
     # update the bed levels

@@ -105,9 +105,7 @@ def add_exposure_locations_to_model(*args):
         # Build OSM exposure
         build_osm_exposure()
 
-    elif (
-        selected_asset_locations == "User model"
-    ):
+    elif selected_asset_locations == "User model":
         # Build User exposure
         build_user_exposure()
     else:
@@ -273,14 +271,16 @@ def build_osm_exposure(*args):
         # Set the buildings attribute to gdf for easy visualization of the buildings
         app.active_model.buildings = gdf
 
-        # Create point data for display 
+        # Create point data for display
         if not bf_conversion:
-            point_buildings = app.active_model.convert_bf_into_centroids(app.active_model.buildings, app.gui.getvar(
-            "fiat", "selected_crs"
-            ))
+            point_buildings = app.active_model.convert_bf_into_centroids(
+                app.active_model.buildings, app.gui.getvar("fiat", "selected_crs")
+            )
 
             app.map.layer["buildings"].layer["exposure_points"].crs = crs
-            app.map.layer["buildings"].layer["exposure_points"].set_data(point_buildings)
+            app.map.layer["buildings"].layer["exposure_points"].set_data(
+                point_buildings
+            )
         else:
             app.map.layer["buildings"].layer["exposure_points"].crs = crs
             app.map.layer["buildings"].layer["exposure_points"].set_data(gdf)
@@ -328,55 +328,65 @@ def build_osm_exposure(*args):
         )
         dlg.close()
 
+
 def build_user_exposure(*args):
     model = "fiat"
     checkbox_group = "_main"
     try:
         crs = app.gui.getvar(model, "selected_crs")
         source = app.gui.getvar(model, "source_asset_locations")
-        
+
         ## TODO: Check if user model uses own data for parameters
         if source == "National Structure Inventory":
-            country = "United States"  
+            country = "United States"
             max_potential_damage = "NSI"
-            ground_floor_height = "NSI"    
+            ground_floor_height = "NSI"
             source = "NSI"
         elif source == "Open Street Map":
             country = app.gui.getvar(model, "OSM_country")
             max_potential_damage = "jrc_damage_values"
-            ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height"))
+            ground_floor_height = float(
+                app.gui.getvar(model, "osm_ground_floor_height")
+            )
             source = "OSM"
         else:
-            source= "User Model"
-        
+            source = "User Model"
+
         # Set exposure buildings model
-        
+
         (
             gdf,
             unique_primary_types,
             unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
-            source= source,
+            source=source,
             ground_floor_height=ground_floor_height,
             crs=crs,
             country=country,
             max_potential_damage=max_potential_damage,
-            ground_elevation_unit=app.gui.getvar(model, "ground_elevation_unit")
+            ground_elevation_unit=app.gui.getvar(model, "ground_elevation_unit"),
         )
-        
+
         # Set the buildings attribute to gdf for easy visualization of the buildings
-        app.active_model.buildings =gdf[gdf['geometry'].geom_type.isin(['Point', 'Polygon', 'multiPolygon'])]
-        app.active_model.roads = gdf[gdf['geometry'].geom_type.isin(['MultiLineString', 'LineString'])]
+        app.active_model.buildings = gdf[
+            gdf["geometry"].geom_type.isin(["Point", "Polygon", "multiPolygon"])
+        ]
+        app.active_model.roads = gdf[
+            gdf["geometry"].geom_type.isin(["MultiLineString", "LineString"])
+        ]
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
-        app.map.layer["buildings"].layer["exposure_points"].set_data(app.active_model.buildings)
+        app.map.layer["buildings"].layer["exposure_points"].set_data(
+            app.active_model.buildings
+        )
         app.map.layer["roads"].layer["exposure_lines"].crs = crs
         app.map.layer["roads"].layer["exposure_lines"].set_data(app.active_model.roads)
-      
+
     except FileNotFoundError:
         app.gui.window.dialog_info(
             text="Something went wrong",
             title="Error",
         )
+
 
 def get_roads(model):
     ## ROADS ##
@@ -398,10 +408,10 @@ def get_roads(model):
             app.map.layer["roads"].layer["exposure_lines"].set_data(gdf)
 
             # Set the road damage threshold
-            #road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-            #app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
+            # road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
+            # app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
             #    road_damage_threshold
-            #)
+            # )
 
             # Show the roads
             app.active_model.show_exposure_roads()

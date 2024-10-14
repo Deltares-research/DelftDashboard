@@ -25,7 +25,7 @@ def add_discharge_point(gdf, merge=True):
         model.set_forcing_1d(gdf_locs=gdf, name="dis", merge=merge)
         nr_dis_new = len(model.forcing["dis"].index)
         if nr_dis_new > nr_dis:
-             app.gui.window.dialog_info(
+            app.gui.window.dialog_info(
                 text="Added {} discharge points".format(nr_dis_new - nr_dis),
                 title="Success",
             )
@@ -40,7 +40,7 @@ def add_discharge_point(gdf, merge=True):
             title="Error",
         )
         return
-    
+
     # retrieve all discharge points as gdf from xarray
     gdf = model.forcing["dis"].vector.to_gdf()
 
@@ -71,8 +71,9 @@ def point_clicked(x, y):
 
     add_discharge_point(gdf)
 
+
 def load_from_file(*args):
-    """" Load discharge points from file """
+    """ " Load discharge points from file"""
     fname = app.gui.window.dialog_open_file(
         "Select file with discharge points ...",
         filter="*.geojson *.shp",
@@ -90,7 +91,7 @@ def select_discharge_point_from_list(*args):
     index = app.gui.getvar("sfincs_hmt", "active_discharge_point")
 
     # get maximum values of the model
-    dis = model.forcing["dis"].values[:,index].max()
+    dis = model.forcing["dis"].values[:, index].max()
     app.gui.setvar("sfincs_hmt", "bc_dis_value", dis)
 
     app.map.layer["sfincs_hmt"].layer["discharge_points"].select_by_index(index)
@@ -103,7 +104,7 @@ def select_discharge_point_from_map(*args):
     app.gui.setvar("sfincs_hmt", "active_discharge_point", index)
 
     # get maximum values of the model
-    dis = model.forcing["dis"].values[:,index].max()
+    dis = model.forcing["dis"].values[:, index].max()
     app.gui.setvar("sfincs_hmt", "bc_dis_value", dis)
 
     app.gui.window.update()
@@ -159,7 +160,9 @@ def update_list():
     app.gui.setvar("sfincs_hmt", "nr_discharge_points", nr_points)
     app.gui.window.update()
 
+
 ## Add timeseries to the boundary points
+
 
 def add_constant_discharge(*args):
     """Add constant discahrge to the selected point."""
@@ -186,10 +189,11 @@ def add_constant_discharge(*args):
     df_ts = pd.DataFrame({model_index: ts}, index=tt)
 
     # replace the boundary condition of the selected point
-    model.set_forcing_1d(df_ts = df_ts, name = "dis")
+    model.set_forcing_1d(df_ts=df_ts, name="dis")
+
 
 def add_synthetical_discharge(*args):
-    """Add a guassian shaped discharge (based on peak and tstart/tstop) to selected point """
+    """Add a guassian shaped discharge (based on peak and tstart/tstop) to selected point"""
     index = app.gui.getvar("sfincs_hmt", "active_discharge_point")
     value = app.gui.getvar("sfincs_hmt", "bc_dis_value")
 
@@ -202,9 +206,9 @@ def add_synthetical_discharge(*args):
     # make timeseries with gaussian peak
     peak = value
     duration = (tstop - tstart).total_seconds()
-    time_shift = 0.5 * duration # shift the peak to the middle of the duration
+    time_shift = 0.5 * duration  # shift the peak to the middle of the duration
     # TODO replace with: time_vec = pd.date_range(tstart, periods=duration / 600 + 1, freq="600S")
-    tt = np.arange(0, duration + 1, 600)        
+    tt = np.arange(0, duration + 1, 600)
     ts = peak * np.exp(-(((tt - time_shift) / (0.25 * duration)) ** 2))
 
     # get forcing locations in the model
@@ -215,7 +219,8 @@ def add_synthetical_discharge(*args):
     df_ts = pd.DataFrame({model_index: ts}, index=tt)
 
     # replace the boundary condition of the selected point
-    model.set_forcing_1d(df_ts = df_ts, name = "dis")
+    model.set_forcing_1d(df_ts=df_ts, name="dis")
+
 
 def copy_to_all(*args):
     """Copy the discharges of the selected station and copy to all boundary points."""
@@ -228,4 +233,4 @@ def copy_to_all(*args):
     dis = model.forcing["dis"].isel(index=index)
 
     # copy the boundary conditions to all other points
-    model.forcing["dis"][:] =  dis
+    model.forcing["dis"][:] = dis
