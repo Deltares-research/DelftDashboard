@@ -22,27 +22,27 @@ def new(option):
     if app.active_model.name in app.model.keys():
         app.map.layer["buildings"].delete()
         app.map.layer["roads"].delete()
-        app.map.layer["aggregation"].delete()                
+        app.map.layer["aggregation"].delete()
 
     # Initialize toolboxes
     initialize_toolboxes()
 
     # Initialize SFINCS models
-    if app.active_model.name != 'fiat':
+    if app.active_model.name != "fiat":
         initialize_models()
 
     # Add layers
     for toolbox in app.toolbox:
         app.toolbox[toolbox].add_layers()
-        
+
     if app.active_model.name in app.model.keys():
         app.active_model.add_layers()
 
     app.gui.window.dialog_info(
-    "Please select a new working directory",
-    "Select working directory",
+        "Please select a new working directory",
+        "Select working directory",
     )
-    select_working_directory(option)       
+    select_working_directory(option)
     ## FREDERIQUE: commented out below because it changes the active model
     # app.active_model = app.model[list(app.model)[0]]
     # app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
@@ -69,7 +69,9 @@ def select_working_directory(option):
         except Exception as e:
             print(e)
             # print(os.getcwd())
-            print("No method select_working_directory for model: ", app.active_model.name)
+            print(
+                "No method select_working_directory for model: ", app.active_model.name
+            )
 
 
 def exit(option):

@@ -11,8 +11,9 @@ def select(*args):
 def set_variables(*args):
     app.active_model.set_input_variables()
 
+
 def open_info(*args):
     app.gui.window.dialog_info(
-    text="For polygon data select \"intersection\". For point data select \"nearest\" as method." ,
-    title="Method selection",
+        text="For polygon data select \"intersection\". For point data select \"nearest\" as method.",
+        title="Method selection",
     )

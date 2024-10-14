@@ -14,8 +14,12 @@ import pandas as pd
 def select(*args):
     # De-activate existing layers
     map.update()
-    if all(values.data is None for key, values in app.map.layer["buildings"].layer.items()):
-        app.map.layer["modelmaker_fiat"].layer[app.gui.getvar("modelmaker_fiat", "active_area_of_interest")].show()
+    if all(
+        values.data is None for key, values in app.map.layer["buildings"].layer.items()
+    ):
+        app.map.layer["modelmaker_fiat"].layer[
+            app.gui.getvar("modelmaker_fiat", "active_area_of_interest")
+        ].show()
 
 
 def set_variables(*args):
@@ -187,10 +191,10 @@ def build_nsi_exposure(*args):
             app.map.layer["roads"].layer["exposure_lines"].set_data(gdf)
 
             # Set the road damage threshold
-            #road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
-            #app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
+            # road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
+            # app.active_model.domain.vulnerability_vm.set_road_damage_threshold(
             #    road_damage_threshold
-            #)
+            # )
 
             # Show the roads
             app.active_model.show_exposure_roads()
@@ -235,6 +239,6 @@ def get_road_types():
         list_road_types.extend(["secondary", "secondary_link"])
     if app.gui.getvar(model, "include_tertiary"):
         list_road_types.extend(["tertiary", "tertiary_link"])
-    
+
     app.gui.setvar(model, "list_road_types", list_road_types)
     return list_road_types

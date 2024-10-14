@@ -1,6 +1,7 @@
 from delftdashboard.app import app
 from delftdashboard.toolboxes.observation_stations import observation_stations
 
+
 def map_ready(mpbox):
     """MapBox callback function for when the map is ready.
 
@@ -25,12 +26,13 @@ def map_ready(mpbox):
     # initialize toolbox
     data["toolbox"] = observation_stations.Toolbox("observation_stations", mapbox=mp)
 
-    # Add layers to the mao 
+    # Add layers to the mao
     data["toolbox"].add_layers()
     data["toolbox"].select_tab()
 
     # Update list
     app.gui.popup_window[id].update()
+
 
 def map_moved(coords, mpbox):
     """MapBox callback function for when the map is moved.
@@ -44,12 +46,14 @@ def map_moved(coords, mpbox):
     """
     pass
 
+
 def select_source(*args):
     id = "observation_stations"
     data = app.gui.popup_data[id]
 
-    index= app.gui.getvar("observation_stations", "active_source_index")
+    index = app.gui.getvar("observation_stations", "active_source_index")
     data["toolbox"].select_source(index=index)
+
 
 def select_station(*args):
     id = "observation_stations"
@@ -57,11 +61,13 @@ def select_station(*args):
 
     data["toolbox"].select_station_from_list()
 
+
 def select_naming_option(*args):
     id = "observation_stations"
     data = app.gui.popup_data[id]
 
     data["toolbox"].select_naming_option()
+
 
 def add_stations_to_model(*args):
     id = "observation_stations"
@@ -69,8 +75,9 @@ def add_stations_to_model(*args):
 
     data["toolbox"].add_stations_to_model(model_option=data["option"])
 
+
 def add_all_stations_to_model(*args):
     id = "observation_stations"
     data = app.gui.popup_data[id]
 
-    data["toolbox"].add_all_stations_to_model(model_option=data["option"])    
+    data["toolbox"].add_all_stations_to_model(model_option=data["option"])

@@ -55,7 +55,9 @@ class Toolbox(GenericToolbox):
 
         # Set data
         self.map.layer["observation_stations"].layer["stations"].hover_property = opt
-        self.map.layer["observation_stations"].layer["stations"].set_data(self.gdf, index)
+        self.map.layer["observation_stations"].layer["stations"].set_data(
+            self.gdf, index
+        )
 
         # Show layer
         self.map.layer["observation_stations"].layer["stations"].activate()
@@ -64,9 +66,11 @@ class Toolbox(GenericToolbox):
         # Add model outline
         model = app.active_model.domain
         if not model.region.empty:
-            self.map.layer["observation_stations"].layer["model_outline"].set_data(model.region)
+            self.map.layer["observation_stations"].layer["model_outline"].set_data(
+                model.region
+            )
             self.map.layer["observation_stations"].layer["model_outline"].deactivate()
-            self.map.layer["observation_stations"].layer["model_outline"].show()   
+            self.map.layer["observation_stations"].layer["model_outline"].show()
 
         self.update()
 
@@ -89,12 +93,13 @@ class Toolbox(GenericToolbox):
     def add_layers(self):
         # Add Mapbox layers
         layer = self.map.add_layer("observation_stations")
-        layer.add_layer("stations",
-                         type="circle_selector",
-                         line_color="white",
-                         line_color_selected="white",
-                         select=self.select_station_from_map,
-                        )
+        layer.add_layer(
+            "stations",
+            type="circle_selector",
+            line_color="white",
+            line_color_selected="white",
+            select=self.select_station_from_map,
+        )
 
         # Add model outline (for now a draw-layer that we deactivate)
         # TODO make this a PolygonLayer (but not yet proeprly implemented in Guitares)
@@ -115,11 +120,15 @@ class Toolbox(GenericToolbox):
             gdf = gdf.drop(columns=["index"])
 
         # add source to gdf
-        gdf["source"] = list(self.sources.keys())[app.gui.getvar("observation_stations", "active_source_index")]
+        gdf["source"] = list(self.sources.keys())[
+            app.gui.getvar("observation_stations", "active_source_index")
+        ]
 
-        app.active_model.add_stations(gdf, 
-                                      naming_option=app.gui.getvar("observation_stations", "naming_option"),
-                                      model_option=model_option)
+        app.active_model.add_stations(
+            gdf,
+            naming_option=app.gui.getvar("observation_stations", "naming_option"),
+            model_option=model_option,
+        )
 
     def add_all_stations_to_model(self, model_option):
         gdf = self.gdf
@@ -135,19 +144,23 @@ class Toolbox(GenericToolbox):
             return
 
         # only keep stations within model extent
-        gdf = gpd.sjoin(gdf.to_crs(gdf_model.crs), gdf_model, op='within')
+        gdf = gpd.sjoin(gdf.to_crs(gdf_model.crs), gdf_model, op="within")
 
         # drop index column if it exists
         if "index" in gdf.columns:
             gdf = gdf.drop(columns=["index"])
 
         # add source to gdf
-        gdf["source"] = list(self.sources.keys())[app.gui.getvar("observation_stations", "active_source_index")]
-        
-        app.active_model.add_stations(gdf, 
-                                      naming_option=app.gui.getvar("observation_stations", "naming_option"),
-                                      model_option=model_option)
-        
+        gdf["source"] = list(self.sources.keys())[
+            app.gui.getvar("observation_stations", "active_source_index")
+        ]
+
+        app.active_model.add_stations(
+            gdf,
+            naming_option=app.gui.getvar("observation_stations", "naming_option"),
+            model_option=model_option,
+        )
+
     def select_naming_option(self):
         stnames = []
         opt = app.gui.getvar("observation_stations", "naming_option")
@@ -158,10 +171,10 @@ class Toolbox(GenericToolbox):
         # also change the map layer (including hover property)
         self.map.layer["observation_stations"].layer["stations"].hover_property = opt
         index = app.gui.getvar("observation_stations", "active_station_index")
-        self.map.layer["observation_stations"].layer["stations"].set_data(self.gdf,
-                                                                         index)
+        self.map.layer["observation_stations"].layer["stations"].set_data(
+            self.gdf, index
+        )
         self.update()
-        
 
     def select_station_from_map(self, *args):
         index = args[0]["id"]
@@ -181,7 +194,8 @@ class Toolbox(GenericToolbox):
         else:
             app.gui.window.update()
 
-# 
+
+#
 def select(*args):
     app.toolbox["observation_stations"].select_tab()
 

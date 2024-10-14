@@ -9,7 +9,10 @@ from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from delftdashboard.models.fiat.exposure_start import add_exposure_locations_to_model
 from delftdashboard.operations.checklist import zoom_to_boundary
-from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import generate_boundary, set_active_area_file
+from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import (
+    generate_boundary,
+    set_active_area_file,
+)
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 from hydromt_fiat.api.data_types import Currency, Units, ExposureRoadsSettings
 from hydromt_fiat.api.exposure_vm import ExposureVector
@@ -18,6 +21,7 @@ from hydromt.log import setuplog
 
 import copy
 from .utils import make_labels
+
 
 class Model(GenericModel):
     def __init__(self, name):
@@ -41,11 +45,9 @@ class Model(GenericModel):
         # Set GUI variables
         self.set_gui_variables()
 
-    def initialize_domain(self,root):
+    def initialize_domain(self, root):
         self.domain = HydroMtViewModel(
-            app.config["working_directory"],
-            app.config["data_libs"],
-            root 
+            app.config["working_directory"], app.config["data_libs"], root
         )
 
     def add_layers(self):
@@ -109,7 +111,7 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title= f'Max. potential damage: Structure [{app.gui.getvar("fiat", "damage_unit")}]',
+            legend_title=f'Max. potential damage: Structure [{app.gui.getvar("fiat", "damage_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Max Potential Damage: Structure",
@@ -122,7 +124,7 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title= f'Max. potential damage: Content [{app.gui.getvar("fiat", "damage_unit")}]',
+            legend_title=f'Max. potential damage: Content [{app.gui.getvar("fiat", "damage_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
             hover_property="Max Potential Damage: Content",
@@ -200,12 +202,8 @@ class Model(GenericModel):
         group = "fiat"
 
         ## Damage curve tables ##
-        app.gui.setvar(
-            group, "OSM_continent", None
-        )
-        app.gui.setvar(
-            group, "OSM_country", None
-        )
+        app.gui.setvar(group, "OSM_continent", None)
+        app.gui.setvar(group, "OSM_country", None)
         default_curves = app.data_catalog.get_dataframe("default_hazus_iwr_linking")
         app.gui.setvar(
             group,
@@ -245,9 +243,13 @@ class Model(GenericModel):
             "Occupancy Class", inplace=True, ignore_index=True
         )
         default_occupancy_df.fillna("", inplace=True)
-        default_occupancy_df_adjusted = default_occupancy_df[default_occupancy_df["Occupancy Class"] != "RES1"]
+        default_occupancy_df_adjusted = default_occupancy_df[
+            default_occupancy_df["Occupancy Class"] != "RES1"
+        ]
         app.gui.setvar(group, "hazus_iwr_occupancy_classes", default_occupancy_df)
-        app.gui.setvar(group, "hazus_iwr_occupancy_classes_adjusted", default_occupancy_df_adjusted)
+        app.gui.setvar(
+            group, "hazus_iwr_occupancy_classes_adjusted", default_occupancy_df_adjusted
+        )
 
         cols = [
             "-9",
@@ -292,7 +294,7 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "selected_damage_curves", pd.DataFrame(columns=cols))
 
-        #User classification
+        # User classification
         app.gui.setvar(group, "old_occupancy_type", "")
         app.gui.setvar(group, "new_occupancy_type", "")
         app.gui.setvar(group, "remove_classification", False)
@@ -309,7 +311,9 @@ class Model(GenericModel):
         app.gui.setvar(group, "source_ground_elevation", "")
 
         # Model type #
-        app.gui.setvar(group, "model_type", "Start with National Structure Inventory (NSI)")
+        app.gui.setvar(
+            group, "model_type", "Start with National Structure Inventory (NSI)"
+        )
         app.gui.setvar(group, "include_osm_roads", False)
         app.gui.setvar(group, "damage_unit", Currency.euro.value)
         app.gui.setvar(group, "bf_conversion", False)
@@ -476,12 +480,9 @@ class Model(GenericModel):
             "ground_elevation_files_value",
             ["sfincs_data", "upload_data"],
         )
-        app.gui.setvar(
-            group, "ground_elevation_unit", None),
-        app.gui.setvar(
-            group, "ground_elevation_unit_feet", False)
-        app.gui.setvar(
-            group, "ground_elevation_unit_meters", False)
+        app.gui.setvar(group, "ground_elevation_unit", None),
+        app.gui.setvar(group, "ground_elevation_unit_feet", False)
+        app.gui.setvar(group, "ground_elevation_unit_meters", False)
         app.gui.setvar(
             group,
             "loaded_ground_elevation_files_string",
@@ -628,7 +629,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "show_damage_values", 0)
         app.gui.setvar(group, "created_vulnerability_curves", 0)
         app.gui.setvar(group, "linking_object_type", 0)
-        #app.gui.setvar(group, "road_damage_threshold", 1)
+        # app.gui.setvar(group, "road_damage_threshold", 1)
 
         app.gui.setvar(group, "max_potential_damage_name", "")
         app.gui.setvar(group, "max_potential_damage_string", [])
@@ -657,7 +658,6 @@ class Model(GenericModel):
                 ]
             ),
         )
-        app.gui.setvar(group, "list_road_types", [])
 
     @staticmethod
     def set_dict_inverted(dictionary):
@@ -674,17 +674,16 @@ class Model(GenericModel):
         root = path or os.getcwd()
         app.gui.setvar("fiat", "selected_scenario", Path(root).stem)
         app.gui.setvar("fiat", "scenario_folder", Path(root))
-        self.initialize_domain(root)  
+        self.initialize_domain(root)
         if self.domain.fiat_model.root != root:
-            self.domain.fiat_model.set_root(root, mode='w+') 
-
+            self.domain.fiat_model.set_root(root, mode="w+")
 
     def open(self):
         # Open input file, and change working directory
         fname = app.gui.window.dialog_select_path("Select an existing model folder")
         if fname:
             dlg = app.gui.window.dialog_wait("Loading fiat model ...")
-            
+
             # Reading in model
             self.domain = HydroMtViewModel(
                 app.config["working_directory"],
@@ -694,45 +693,54 @@ class Model(GenericModel):
             self.domain.read()
 
             # Get region
-            fpath = str(Path(os.path.abspath("")) / self.domain.fiat_model.root / "exposure" / "region.gpkg")
+            fpath = str(
+                Path(os.path.abspath(""))
+                / self.domain.fiat_model.root
+                / "geoms"
+                / "region.geojson"
+            )
 
             # Set variables from existing model
-            with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'variables.pkl', 'rb') as f:
+            with open(
+                Path(os.path.abspath(""))
+                / self.domain.fiat_model.root
+                / "variables.pkl",
+                "rb",
+            ) as f:
                 variables = pickle.load(f)
-            app.gui.variables["_main"] = variables['main']
-            app.gui.variables["fiat"] = variables['fiat']
-            app.gui.variables["modelmaker_fiat"] = variables['modelmaker_fiat']
+            app.gui.variables["_main"] = variables["main"]
+            app.gui.variables["fiat"] = variables["fiat"]
+            app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
 
             app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
-            app.gui.setvar("modelmaker_fiat", "active_area_of_interest", "area_of_interest_from_file")
+            app.gui.setvar(
+                "modelmaker_fiat",
+                "active_area_of_interest",
+                "area_of_interest_from_file",
+            )
             app.gui.setvar("modelmaker_fiat", "fn_model_boundary_file_list", fpath)
 
             # Select filepath through self.domain output exposure
-            self.domain.exposure_vm.create_interest_area(
-                fpath=fpath)
+            self.domain.exposure_vm.create_interest_area(fpath=fpath)
             gdf = gpd.read_file(fpath)
             gdf.to_crs(app.crs, inplace=True)
             layer = app.map.layer["modelmaker_fiat"].layer["area_of_interest_from_file"]
             layer.set_data(gdf)
             app.active_toolbox.area_of_interest = gdf.set_crs(app.crs)
-            
 
-            # roads model
-            if (Path(os.path.abspath("")) / self.domain.fiat_model.root / "exposure" / "roads.gpkg").is_file():
-                self.domain.exposure_vm.exposure_roads_model = ExposureRoadsSettings(
-                roads_fn="OSM",
-                road_types=app.gui.getvar('fiat', "list_road_types"),
-                road_damage= None,
-                unit=Units.feet.value,
+            # exposure_buildings_model
+            add_exposure_locations_to_model()
+
+            # vulnerability_buildings_model
+            selected_damage_curve_database = app.gui.getvar(
+                "fiat", "selected_damage_curve_database"
             )
-            
-            #exposure_buildings_model  
-            add_exposure_locations_to_model()  
-
-            #vulnerability_buildings_model
-            selected_damage_curve_database = app.gui.getvar('fiat', "selected_damage_curve_database")
-            selected_link_table = app.gui.getvar('fiat', "selected_damage_curve_linking_table")
-            self.domain.vulnerability_vm.add_vulnerability_curves_to_model(selected_damage_curve_database, selected_link_table)
+            selected_link_table = app.gui.getvar(
+                "fiat", "selected_damage_curve_linking_table"
+            )
+            self.domain.vulnerability_vm.add_vulnerability_curves_to_model(
+                selected_damage_curve_database, selected_link_table
+            )
 
             # Change working directory
             os.chdir(fname)
@@ -741,6 +749,10 @@ class Model(GenericModel):
             app.crs = self.domain.fiat_model.config["global"]["crs"]
 
             zoom_to_boundary()
+
+            # Show exposure buildings
+            self.show_exposure_buildings()
+
             dlg.close()
 
     def save(self):
@@ -751,7 +763,7 @@ class Model(GenericModel):
 
     def set_crs(self, crs):
         self.domain.crs = crs
-    
+
     def get_filtered_damage_function_database(
         self, filter: str, col: str = "Occupancy"
     ):
@@ -959,60 +971,94 @@ class Model(GenericModel):
             circle_color = [
                 "step",
                 ["get", "Ground Floor Height"],
-                "#FFFFFF", 0,
-                "#EBF0FC", 0.5, 
-                "#D6E1F8", 1.0, 
-                "#A4C4F2", 1.5, 
-                "#6C95E1", 2.0, 
-                "#3750B2", 2.5, 
+                "#FFFFFF",
+                0,
+                "#EBF0FC",
+                0.5,
+                "#D6E1F8",
+                1.0,
+                "#A4C4F2",
+                1.5,
+                "#6C95E1",
+                2.0,
+                "#3750B2",
+                2.5,
                 "#1A237E",
-                ]
+            ]
         if type == "damage_struct":
             circle_color = [
                 "step",
                 ["get", "Max Potential Damage: Structure"],
-                "#FFFFFF", 0, 
-                "#FFF4E7", 15000.0, 
-                "#FEE9CE", 50000.0, 
-                "#FDBB84", 100000.0, 
-                "#FC844E", 250000.0, 
-                "#E03720", 500000.0, 
-                "#860000",                                    
-                ]
+                "#FFFFFF",
+                0,
+                "#FFF4E7",
+                15000.0,
+                "#FEE9CE",
+                50000.0,
+                "#FDBB84",
+                100000.0,
+                "#FC844E",
+                250000.0,
+                "#E03720",
+                500000.0,
+                "#860000",
+            ]
         if type == "damage_cont":
             circle_color = [
                 "step",
                 ["get", "Max Potential Damage: Content"],
-                "#FFFFFF", 0, 
-                "#FFF4E7", 15000.0, 
-                "#FEE9CE", 50000.0, 
-                "#FDBB84", 100000.0, 
-                "#FC844E", 250000.0, 
-                "#E03720", 500000.0, 
-                "#860000",                                    
-                ]
+                "#FFFFFF",
+                0,
+                "#FFF4E7",
+                15000.0,
+                "#FEE9CE",
+                50000.0,
+                "#FDBB84",
+                100000.0,
+                "#FC844E",
+                250000.0,
+                "#E03720",
+                500000.0,
+                "#860000",
+            ]
         if type == "ground_elevation":
             circle_color = [
                 "step",
                 ["get", "Ground Elevation"],
-                "#FFFFFF", 0, 
-                "#F7FFF6", 1,
-                "#E1FCE4", 2,
-                "#CDEA88", 3,
-                "#A8E496", 4,
-                "#74CC9C", 5,
-                "#4BAF7A", 6,
-                "#3F9E6F", 7,
-                "#359364", 8,
-                "#2C7B5A", 9,
-                "#236B50", 10, 
-                "#1A5A45", 11, 
-                "#124A3A", 12, 
-                "#093931", 13,
-                "#032C27", 14, 
-                "#00211D", 15, 
-                "#001615",                                    
-                ]
+                "#FFFFFF",
+                0,
+                "#F7FFF6",
+                1,
+                "#E1FCE4",
+                2,
+                "#CDEA88",
+                3,
+                "#A8E496",
+                4,
+                "#74CC9C",
+                5,
+                "#4BAF7A",
+                6,
+                "#3F9E6F",
+                7,
+                "#359364",
+                8,
+                "#2C7B5A",
+                9,
+                "#236B50",
+                10,
+                "#1A5A45",
+                11,
+                "#124A3A",
+                12,
+                "#093931",
+                13,
+                "#032C27",
+                14,
+                "#00211D",
+                15,
+                "#001615",
+            ]
         if type == "SVI_key_domain":
             circle_color = [
                 "match",
@@ -1051,19 +1097,30 @@ class Model(GenericModel):
             circle_color = [
                 "step",
                 ["get", "SVI"],
-                "#000080 ", -2, 
-                "#0000FF", -1.5, 
-                "#0080FF", -1, 
-                "#00FFFF", -0.5, 
-                "#80FF80", 0, 
-                "#FFFF00", 0.5, 
-                "#FFD700", 1, 
-                "#FFA500", 1.5, 
-                "#FF4500", 2.0, 
-                "#FF0000", 2.5, 
-                "#800000", 3, 
-                "#8B0000",                                    
-                ]
+                "#000080 ",
+                -2,
+                "#0000FF",
+                -1.5,
+                "#0080FF",
+                -1,
+                "#00FFFF",
+                -0.5,
+                "#80FF80",
+                0,
+                "#FFFF00",
+                0.5,
+                "#FFD700",
+                1,
+                "#FFA500",
+                1.5,
+                "#FF4500",
+                2.0,
+                "#FF0000",
+                2.5,
+                "#800000",
+                3,
+                "#8B0000",
+            ]
 
         paint_properties = {
             "circle-color": circle_color,
@@ -1083,11 +1140,16 @@ class Model(GenericModel):
         elif type == "secondary" and source == "Open Street Map":
             type = "osm_secondary"
         if not self.buildings.empty:
-            paint_properties = self.get_paint_properties(type=type) # always paint according to primary
-            color_items = paint_properties['circle-color'][2:-1]
-            color_items.append('other')
-            color_items.append(paint_properties['circle-color'][-1])
-            legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
+            paint_properties = self.get_paint_properties(
+                type=type
+            )  # always paint according to primary
+            color_items = paint_properties["circle-color"][2:-1]
+            color_items.append("other")
+            color_items.append(paint_properties["circle-color"][-1])
+            legend = [
+                {"style": color_items[i + 1], "label": color_items[i]}
+                for i in range(0, len(color_items), 2)
+            ]
             if type == "primary" or type == "osm_primary":
                 app.map.layer["buildings"].layer["primary_classification"].set_data(
                     self.buildings, paint_properties, legend
@@ -1098,19 +1160,32 @@ class Model(GenericModel):
                     self.buildings, paint_properties, legend
                 )
                 self.show_exposure_buildings_secondary()
-    
-    def show_asset_height(self,type="asset_height"):
+
+    def show_asset_height(self, type="asset_height"):
         if not self.buildings.empty:
             paint_properties = self.get_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:]
-            
+            color_items = paint_properties["circle-color"][2:]
+
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
-            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
-            
-            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
-            app.map.layer["buildings"].layer["asset_height"].fill_color = paint_properties["circle-color"]
-            app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar("fiat", "view_tab_unit")
-            app.map.layer["buildings"].layer["asset_height"].legend_title = f'Finished Floor Height [{app.gui.getvar("fiat", "view_tab_unit")}]'
+            labels = make_labels(
+                [color_items[i + 1] for i in range(0, len(color_items) - 1, 2)],
+                decimals=1,
+            )
+
+            legend = [
+                {"style": color, "label": label} for color, label in zip(colors, labels)
+            ]
+            app.map.layer["buildings"].layer["asset_height"].fill_color = (
+                paint_properties["circle-color"]
+            )
+            app.map.layer["buildings"].layer["asset_height"].unit = app.gui.getvar(
+                "fiat", "view_tab_unit"
+            )
+            app.map.layer["buildings"].layer[
+                "asset_height"
+            ].legend_title = (
+                f'Finished Floor Height [{app.gui.getvar("fiat", "view_tab_unit")}]'
+            )
             app.map.layer["buildings"].layer["asset_height"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -1120,15 +1195,26 @@ class Model(GenericModel):
         """Show maximum potential damage: structure layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:]
-            
+            color_items = paint_properties["circle-color"][2:]
+
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
-            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
-            
-            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
-            app.map.layer["buildings"].layer["max_potential_damage_struct"].fill_color = paint_properties["circle-color"]
-            app.map.layer["buildings"].layer["max_potential_damage_struct"].unit = self.domain.exposure_vm.exposure_buildings_model.damage_unit
-            app.map.layer["buildings"].layer["max_potential_damage_struct"].legend_title = f'Max. potential damage: Structure [{self.domain.exposure_vm.exposure_buildings_model.damage_unit}]'
+            labels = make_labels(
+                [color_items[i + 1] for i in range(0, len(color_items) - 1, 2)],
+                decimals=1,
+            )
+
+            legend = [
+                {"style": color, "label": label} for color, label in zip(colors, labels)
+            ]
+            app.map.layer["buildings"].layer[
+                "max_potential_damage_struct"
+            ].fill_color = paint_properties["circle-color"]
+            app.map.layer["buildings"].layer[
+                "max_potential_damage_struct"
+            ].unit = self.domain.exposure_vm.exposure_buildings_model.damage_unit
+            app.map.layer["buildings"].layer[
+                "max_potential_damage_struct"
+            ].legend_title = f"Max. potential damage: Structure [{self.domain.exposure_vm.exposure_buildings_model.damage_unit}]"
             app.map.layer["buildings"].layer["max_potential_damage_struct"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -1138,17 +1224,30 @@ class Model(GenericModel):
         """Show maximum potential damage: content layer(s)"""
         if not self.buildings.empty:
             paint_properties = self.get_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:]
-            
+            color_items = paint_properties["circle-color"][2:]
+
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
-            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
-            
-            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
-            app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = paint_properties["circle-color"] 
-            app.map.layer["buildings"].layer["max_potential_damage_cont"].unit = self.domain.exposure_vm.exposure_buildings_model.damage_unit
-            app.map.layer["buildings"].layer["max_potential_damage_cont"].legend_title = f'Max. potential damage: Content [{self.domain.exposure_vm.exposure_buildings_model.damage_unit}]'
+            labels = make_labels(
+                [color_items[i + 1] for i in range(0, len(color_items) - 1, 2)],
+                decimals=1,
+            )
+
+            legend = [
+                {"style": color, "label": label} for color, label in zip(colors, labels)
+            ]
+            app.map.layer["buildings"].layer["max_potential_damage_cont"].fill_color = (
+                paint_properties["circle-color"]
+            )
+            app.map.layer["buildings"].layer[
+                "max_potential_damage_cont"
+            ].unit = self.domain.exposure_vm.exposure_buildings_model.damage_unit
+            app.map.layer["buildings"].layer[
+                "max_potential_damage_cont"
+            ].legend_title = f"Max. potential damage: Content [{self.domain.exposure_vm.exposure_buildings_model.damage_unit}]"
             app.map.layer["buildings"].layer["max_potential_damage_cont"].set_data(
-                self.buildings, paint_properties, legend, 
+                self.buildings,
+                paint_properties,
+                legend,
             )
             self.show_max_potential_damage_content()
 
@@ -1156,15 +1255,28 @@ class Model(GenericModel):
         """Show ground elevation"""
         if not self.buildings.empty:
             paint_properties = self.get_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:]
-            
+            color_items = paint_properties["circle-color"][2:]
+
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
-            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
-            
-            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
-            app.map.layer["buildings"].layer["ground_elevation"].fill_color = paint_properties["circle-color"]
-            app.map.layer["buildings"].layer["ground_elevation"].unit = app.gui.getvar("fiat", "view_tab_unit")
-            app.map.layer["buildings"].layer["ground_elevation"].legend_title = f'Ground elevation [{app.gui.getvar("fiat", "view_tab_unit")}]'
+            labels = make_labels(
+                [color_items[i + 1] for i in range(0, len(color_items) - 1, 2)],
+                decimals=1,
+            )
+
+            legend = [
+                {"style": color, "label": label} for color, label in zip(colors, labels)
+            ]
+            app.map.layer["buildings"].layer["ground_elevation"].fill_color = (
+                paint_properties["circle-color"]
+            )
+            app.map.layer["buildings"].layer["ground_elevation"].unit = app.gui.getvar(
+                "fiat", "view_tab_unit"
+            )
+            app.map.layer["buildings"].layer[
+                "ground_elevation"
+            ].legend_title = (
+                f'Ground elevation [{app.gui.getvar("fiat", "view_tab_unit")}]'
+            )
             app.map.layer["buildings"].layer["ground_elevation"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -1174,12 +1286,19 @@ class Model(GenericModel):
         """Show SVI Index"""  # str(Path(self.root) / "exposure" / "SVI")
         if not self.buildings.empty and "SVI" in self.buildings.columns:
             paint_properties = self.get_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:]
+            color_items = paint_properties["circle-color"][2:]
             colors = [color_items[i] for i in range(0, len(color_items), 2)]
-            labels = make_labels([color_items[i+1] for i in range(0, len(color_items)-1, 2)], decimals=1)
-            legend = [{'style': color, 'label': label} for color, label in zip(colors, labels)]
-            app.map.layer["buildings"].layer["SVI"].fill_color = paint_properties["circle-color"]
-            app.map.layer["buildings"].layer["SVI"].legend_title = 'SVI'
+            labels = make_labels(
+                [color_items[i + 1] for i in range(0, len(color_items) - 1, 2)],
+                decimals=1,
+            )
+            legend = [
+                {"style": color, "label": label} for color, label in zip(colors, labels)
+            ]
+            app.map.layer["buildings"].layer["SVI"].fill_color = paint_properties[
+                "circle-color"
+            ]
+            app.map.layer["buildings"].layer["SVI"].legend_title = "SVI"
             app.map.layer["buildings"].layer["SVI"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -1189,14 +1308,18 @@ class Model(GenericModel):
                 text="There are no SVI data in your model. Please add SVI data when you set up your model.",
                 title="Additional attributes not found.",
             )
+
     def show_svi_key_domain(self, type="SVI_key_domain"):
         """Show SVI Key Domain"""  # str(Path(self.root) / "exposure" / "SVI")
         if not self.buildings.empty and "SVI_key_domain" in self.buildings.columns:
             paint_properties = self.get_paint_properties(type=type)
-            color_items = paint_properties['circle-color'][2:-1]
-            color_items.append('other')
-            color_items.append(paint_properties['circle-color'][-1])
-            legend = [{'style': color_items[i+1], 'label': color_items[i]} for i in range(0, len(color_items), 2)]
+            color_items = paint_properties["circle-color"][2:-1]
+            color_items.append("other")
+            color_items.append(paint_properties["circle-color"][-1])
+            legend = [
+                {"style": color_items[i + 1], "label": color_items[i]}
+                for i in range(0, len(color_items), 2)
+            ]
             app.map.layer["buildings"].layer["SVI"].set_data(
                 self.buildings, paint_properties, legend
             )
@@ -1206,6 +1329,7 @@ class Model(GenericModel):
                 text="There are no SVI data in your model. Please add SVI data when you set up your model.",
                 title="Additional attributes not found.",
             )
+
     def show_exposure_buildings(self):
         app.map.layer["buildings"].layer["exposure_points"].show()
 
@@ -1304,15 +1428,16 @@ class Model(GenericModel):
         okay, data = app.gui.popup(pop_win_config_path, data=None)
         if not okay:
             return
+
     def overwrite_classification(self):
         pop_win_config_path = str(
-        Path(
-            app.gui.config_path
-        ).parent  # TODO: replace with a variables config_path for the fiat model
-        / "models"
-        / self.name
-        / "config"
-        / "exposure_classification_settings_2.yml"
+            Path(
+                app.gui.config_path
+            ).parent  # TODO: replace with a variables config_path for the fiat model
+            / "models"
+            / self.name
+            / "config"
+            / "exposure_classification_settings_2.yml"
         )
         okay, data = app.gui.popup(pop_win_config_path, data=None)
         if not okay:
@@ -1414,15 +1539,15 @@ class Model(GenericModel):
         )
 
     def get_continent(self):
-        self.exposure= ExposureVector(
-                data_catalog=self.domain.data_catalog,
-                logger=self.domain.fiat_model.logger,
-                region=self.domain.fiat_model.region,
-                crs=self.domain.fiat_model.crs,
-            )
+        self.exposure = ExposureVector(
+            data_catalog=self.domain.data_catalog,
+            logger=self.domain.fiat_model.logger,
+            region=self.domain.fiat_model.region,
+            crs=self.domain.fiat_model.crs,
+        )
         country, continent = self.exposure.get_continent()
         return country, continent
-    
+
     def convert_bf_into_centroids(self, gdf_bf, crs):
         list_centroid = []
         list_object_id = []
@@ -1435,18 +1560,25 @@ class Model(GenericModel):
         gdf = gdf_bf.merge(gdf_centroid, on="Object ID", suffixes=("_gdf1", "_gdf2"))
         gdf.drop(columns="geometry_gdf1", inplace=True)
         gdf.rename(columns={"geometry_gdf2": "geometry"}, inplace=True)
-        gdf.drop_duplicates(inplace = True)
+        gdf.drop_duplicates(inplace=True)
         gdf = gpd.GeoDataFrame(gdf, geometry=gdf["geometry"])
         gdf.crs = crs
-        
+
         return gdf
-    
+
     def save_gui_variables(self):
         # Save model variables
         dic_variables_main = app.gui.variables["_main"]
         dic_variables_fiat = app.gui.variables["fiat"]
         dic_variables_model_maker = app.gui.variables["modelmaker_fiat"]
-        
-        dic_variables = {'main': dic_variables_main, 'fiat': dic_variables_fiat, 'modelmaker_fiat': dic_variables_model_maker}
-        with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'variables.pkl', 'wb') as f:
-            pickle.dump(dic_variables , f)
+
+        dic_variables = {
+            "main": dic_variables_main,
+            "fiat": dic_variables_fiat,
+            "modelmaker_fiat": dic_variables_model_maker,
+        }
+        with open(
+            Path(os.path.abspath("")) / self.domain.fiat_model.root / "variables.pkl",
+            "wb",
+        ) as f:
+            pickle.dump(dic_variables, f)

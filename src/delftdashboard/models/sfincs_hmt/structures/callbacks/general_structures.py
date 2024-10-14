@@ -15,7 +15,6 @@ from typing import List
 from shapely.geometry import Point
 
 
-
 class FAMBNameConverter:
     """Class to convert between the names of the measures from the flood adapt names to the names used in the model builder"""
 
@@ -49,8 +48,8 @@ def select(*args):
     model = app.model["sfincs_hmt"].domain
 
     # If no measures layer exists, create it
-    if "measures" not in app.map.layer['sfincs_hmt'].layer.keys():
-        measures_layer = app.map.layer['sfincs_hmt'].add_layer("measures")
+    if "measures" not in app.map.layer["sfincs_hmt"].layer.keys():
+        measures_layer = app.map.layer["sfincs_hmt"].add_layer("measures")
         layer = measures_layer.add_layer("weir")
         layer.line_color_selected = "green"
         layer.line_color = "darkgreen"
@@ -141,7 +140,13 @@ def select_struct(*args):
         app.gui.window.update()
 
 
-def make_geom_layer(geom_type: str, geom_list: list, layer, add_snapped: bool = True, add_cornerpoints: bool = False):
+def make_geom_layer(
+    geom_type: str,
+    geom_list: list,
+    layer,
+    add_snapped: bool = True,
+    add_cornerpoints: bool = False,
+):
     """Method to add a geom layer to the map
 
     Parameters
@@ -243,7 +248,7 @@ def make_geom_layer(geom_type: str, geom_list: list, layer, add_snapped: bool = 
         # Add cornerpoints to map
         if add_cornerpoints:
             cornerpoints = gpd.GeoDataFrame(
-                geometry=[Point(coord) for coord in geom['geometry'].coords]
+                geometry=[Point(coord) for coord in geom["geometry"].coords]
             )
             cornerpoints.crs = app.crs
             layer.layer[str(geom["name"]) + "_cornerpoints"].set_data(cornerpoints)
@@ -539,7 +544,7 @@ def delete_structure(selected_measures: List[str], measure_type: str):
     model = app.model["sfincs_hmt"].domain
 
     # Check if measure layer exists
-    if "measures" not in app.map.layer['sfincs_hmt'].layer.keys():
+    if "measures" not in app.map.layer["sfincs_hmt"].layer.keys():
         # Delete measure layer. You can only delete a measure if the layer exists
         raise ValueError("Cannot find measure layer")
 
@@ -562,26 +567,25 @@ def delete_structure(selected_measures: List[str], measure_type: str):
         # Delete layers from map
         measures_layer = app.map.layer["sfincs_hmt"].layer["measures"]
         if selected_measure in measures_layer.layer[measure_type].layer:
-            measures_layer.layer[measure_type].layer[
-                selected_measure
-            ].delete()
+            measures_layer.layer[measure_type].layer[selected_measure].delete()
 
             # Delete cornerpoints layer
-            if selected_measure + "_cornerpoints" in measures_layer.layer[
-                measure_type
-            ].layer:
+            if (
+                selected_measure + "_cornerpoints"
+                in measures_layer.layer[measure_type].layer
+            ):
                 measures_layer.layer[measure_type].layer[
                     selected_measure + "_cornerpoints"
                 ].delete()
 
             # Delete snapped layer
-            if selected_measure + "_snapped" in measures_layer.layer[
-                measure_type
-            ].layer:
+            if (
+                selected_measure + "_snapped"
+                in measures_layer.layer[measure_type].layer
+            ):
                 measures_layer.layer[measure_type].layer[
                     selected_measure + "_snapped"
                 ].delete()
-            
 
     # Set active measure
     if len(geom_list) > 0:

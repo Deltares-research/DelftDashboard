@@ -3,6 +3,7 @@ from delftdashboard.operations import map
 
 from hydromt_sfincs import utils
 
+
 def select(*args):
     # De-activate existing layers
     map.update()
@@ -26,13 +27,11 @@ def delete_wlev_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "wlev_include_polygon_index")
     # or: iac = args[0]
-    feature_id = app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].gdf.loc[
-        index, "id"
-    ]
-    # Delete from map
-    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].delete_feature(
-        feature_id
+    feature_id = (
+        app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].gdf.loc[index, "id"]
     )
+    # Delete from map
+    app.map.layer["modelmaker_sfincs_hmt"].layer["mask_wlev"].delete_feature(feature_id)
     # Delete from app
     app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon = app.toolbox[
         "modelmaker_sfincs_hmt"
@@ -48,9 +47,10 @@ def delete_wlev_polygon(*args):
     # update list and GUI
     update()
 
+
 def load_wlev_polygon(*args):
     """Load a polygon file to limit the extent of the waterlevel boundaries"""
-    
+
     fname = app.gui.window.dialog_open_file(
         "Select polygon file to limit the extent of the waterlevel boundaries",
         filter="*.pol *.shp *.geojson",
@@ -65,12 +65,12 @@ def load_wlev_polygon(*args):
         gdf = gdf.to_crs(app.crs)
 
         nrp = len(app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon)
-        # if already a polygon is present, add the new polygon to the existing one	
+        # if already a polygon is present, add the new polygon to the existing one
         if nrp > 0:
             gdf = app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon.append(gdf)
             gdf = gdf.reset_index(drop=True)
 
-        wlev_polygon_created(gdf, 0, 0)    
+        wlev_polygon_created(gdf, 0, 0)
 
 
 def save_wlev_polygon(*args):
@@ -126,9 +126,11 @@ def delete_outflow_polygon(*args):
         return
     index = app.gui.getvar("modelmaker_sfincs_hmt", "outflow_include_polygon_index")
     # or: iac = args[0]
-    feature_id = app.map.layer["modelmaker_sfincs_hmt"].layer["mask_outflow"].gdf.loc[
-        index, "id"
-    ]
+    feature_id = (
+        app.map.layer["modelmaker_sfincs_hmt"]
+        .layer["mask_outflow"]
+        .gdf.loc[index, "id"]
+    )
     # Delete from map
     app.map.layer["modelmaker_sfincs_hmt"].layer["mask_outflow"].delete_feature(
         feature_id
@@ -151,7 +153,7 @@ def delete_outflow_polygon(*args):
 
 def load_outflow_polygon(*args):
     """Load a polygon file to limit the extent of the outflow boundaries"""
-    
+
     fname = app.gui.window.dialog_open_file(
         "Select polygon file to limit the extent of the outflow boundaries",
         filter="*.pol *.shp *.geojson",
@@ -166,12 +168,14 @@ def load_outflow_polygon(*args):
         gdf = gdf.to_crs(app.crs)
 
         nrp = len(app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon)
-        # if already a polygon is present, add the new polygon to the existing one	
+        # if already a polygon is present, add the new polygon to the existing one
         if nrp > 0:
-            gdf = app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon.append(gdf)
+            gdf = app.toolbox["modelmaker_sfincs_hmt"].outflow_include_polygon.append(
+                gdf
+            )
             gdf = gdf.reset_index(drop=True)
 
-        outflow_polygon_created(gdf, 0, 0)   
+        outflow_polygon_created(gdf, 0, 0)
 
 
 def save_outflow_polygon(*args):
@@ -222,7 +226,7 @@ def update():
     incnames = []
     for index in range(len(app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon)):
         # create a name with %02d format
-        incnames.append("Polygon " + "%02d" % (index+1))
+        incnames.append("Polygon " + "%02d" % (index + 1))
     app.gui.setvar("modelmaker_sfincs_hmt", "nr_wlev_include_polygons", nrp)
     app.gui.setvar("modelmaker_sfincs_hmt", "wlev_include_polygon_names", incnames)
 
@@ -230,7 +234,7 @@ def update():
     incnames = []
     for index in range(len(app.toolbox["modelmaker_sfincs_hmt"].wlev_include_polygon)):
         # create a name with %02d format
-        incnames.append("Polygon " + "%02d" % (index+1))
+        incnames.append("Polygon " + "%02d" % (index + 1))
     app.gui.setvar("modelmaker_sfincs_hmt", "nr_outflow_include_polygons", nrp)
     app.gui.setvar("modelmaker_sfincs_hmt", "outflow_include_polygon_names", incnames)
 

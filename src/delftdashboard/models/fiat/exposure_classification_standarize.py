@@ -50,32 +50,36 @@ def assign_occupancy_type(*args):
     )
 
     app.gui.setvar(
-        model, "old_occupancy_type", exposure_categories_to_standardize["Assigned"].to_list()
+        model,
+        "old_occupancy_type",
+        exposure_categories_to_standardize["Assigned"].to_list(),
     )
     app.gui.setvar(
-        model, "new_occupancy_type", exposure_categories_to_standardize[object_type].to_list()
+        model,
+        "new_occupancy_type",
+        exposure_categories_to_standardize[object_type].to_list(),
     )
     for ec in exposure_category:
         app.active_model.default_dict_categories[ec] = hazus_iwr_occupancy_class
 
     # Update list and append new values
-    if object_type == "Primary Object Type": 
-        prim = app.gui.getvar(model,"selected_primary_classification_string")
+    if object_type == "Primary Object Type":
+        prim = app.gui.getvar(model, "selected_primary_classification_string")
         prim.extend(exposure_categories_to_standardize[object_type].to_list())
-        prim = list(set([item for item in prim if item != "" ]))
-        app.gui.setvar(model,"selected_primary_classification_string",prim)
-        app.gui.setvar(model,"selected_primary_classification_value",prim)
+        prim = list(set([item for item in prim if item != ""]))
+        app.gui.setvar(model, "selected_primary_classification_string", prim)
+        app.gui.setvar(model, "selected_primary_classification_value", prim)
     else:
-        secon = app.gui.getvar(model,"selected_secondary_classification_string")
+        secon = app.gui.getvar(model, "selected_secondary_classification_string")
         secon.extend(exposure_categories_to_standardize[object_type].to_list())
-        secon = list(set([item for item in secon if item != "" ]))
-        app.gui.setvar(model,"selected_secondary_classification_string", secon)
-        app.gui.setvar(model,"selected_secondary_classification_value",secon)
-        
+        secon = list(set([item for item in secon if item != ""]))
+        app.gui.setvar(model, "selected_secondary_classification_string", secon)
+        app.gui.setvar(model, "selected_secondary_classification_value", secon)
+
+
 def reset_occupancy_type_user_input(*args):
     model = "fiat"
-    app.gui.setvar(
-        model, "old_occupancy_type","")
+    app.gui.setvar(model, "old_occupancy_type", "")
     exposure_categories_to_standardize = app.gui.getvar(
         model, "exposure_categories_to_standardize"
     )

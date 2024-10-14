@@ -74,13 +74,12 @@ def initialize():
     # self.show_splash()
 
     # Check if overlays folder exists in server
-    if not os.path.exists(os.path.join(app.server_path,"overlays")):
-        os.mkdir(os.path.join(app.server_path,"overlays"))
-
+    if not os.path.exists(os.path.join(app.server_path, "overlays")):
+        os.mkdir(os.path.join(app.server_path, "overlays"))
 
     # Make temp file for data to show in GUI
     app.temp_data_path = Path(app.config_path).parent.joinpath("temp_data")
-    if not app.temp_data_path.exists(): # if path does not exist make it
+    if not app.temp_data_path.exists():  # if path does not exist make it
         app.temp_data_path.mkdir()
 
     # Define some other variables

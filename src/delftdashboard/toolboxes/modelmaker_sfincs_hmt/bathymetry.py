@@ -27,6 +27,7 @@ def select_bathymetry_source(*args):
 
     list_bathymetry_datasets(source)
 
+
 def list_bathymetry_datasets(source):
     dataset_names = []
     # Bathymetry
@@ -50,6 +51,7 @@ def list_bathymetry_datasets(source):
         app.gui.setvar(
             "modelmaker_sfincs_hmt", "selected_bathymetry_dataset_meta", meta_str
         )
+
 
 def select_bathymetry_dataset(*args):
     pass
@@ -90,9 +92,9 @@ def use_dataset(*args):
         )
         update()
 
+
 def add_dataset(*args):
-    """ Add a dataset to your data_catalog and add to the available datasets in the GUI
-    """
+    """Add a dataset to your data_catalog and add to the available datasets in the GUI"""
 
     # select file to add
     fn = app.gui.window.dialog_open_file(
@@ -108,29 +110,30 @@ def add_dataset(*args):
                 return
             if not src.overviews(1):
                 ok = app.gui.window.dialog_yes_no(
-                    "File does not have overviews (i.e., reduced resolution versions of the dataset)" +
-                    "\nYou can create them manually using the command: `rio overview --build auto <your_dataset.tif>" +
-                    "\nFor more information see: https://rasterio.readthedocs.io/en/latest/topics/overviews.html" +
-
-                    "\n\nNote that this will edit the file directly and increase its size significantly." +
-                    "\nThere is no undo for this, so please make a backup before pressing ok." +
-                    "\n\nDo you want to automatically create the overviews?"
-                    )
+                    "File does not have overviews (i.e., reduced resolution versions of the dataset)"
+                    + "\nYou can create them manually using the command: `rio overview --build auto <your_dataset.tif>"
+                    + "\nFor more information see: https://rasterio.readthedocs.io/en/latest/topics/overviews.html"
+                    + "\n\nNote that this will edit the file directly and increase its size significantly."
+                    + "\nThere is no undo for this, so please make a backup before pressing ok."
+                    + "\n\nDo you want to automatically create the overviews?"
+                )
                 if not ok:
                     return
                 else:
                     try:
                         # create new overviews, resampling with average method
                         src.build_overviews([2, 4, 8, 16, 32, 64], Resampling.average)
-                    
+
                         # update dataset tags
-                        src.update_tags(ns='rio_overview', resampling='average')
+                        src.update_tags(ns="rio_overview", resampling="average")
 
                         app.gui.window.dialog_info("Overviews created successfully")
                     except Exception as e:
-                        app.gui.window.dialog_warning(f"Failed to create overviews: {e}")
+                        app.gui.window.dialog_warning(
+                            f"Failed to create overviews: {e}"
+                        )
                         return
-                
+
             if not src.nodata:
                 app.gui.window.dialog_warning("File does not have a nodata value")
                 return
@@ -141,13 +144,17 @@ def add_dataset(*args):
                 epsg = src.crs.to_epsg()
 
         # ask for a name for the dataset
-        name, okay = app.gui.window.dialog_string("Provide a name for the dataset", "New dataset")
+        name, okay = app.gui.window.dialog_string(
+            "Provide a name for the dataset", "New dataset"
+        )
         if not okay:
             # Cancel was clicked
             return
         # check whether the name already exists in the data catalog
         while name in app.data_catalog.sources.keys():
-            name, okay = app.gui.window.dialog_string("Dataset name already exists. Provide a different name", "New dataset")
+            name, okay = app.gui.window.dialog_string(
+                "Dataset name already exists. Provide a different name", "New dataset"
+            )
             if not okay:
                 # Cancel was clicked
                 return
@@ -162,14 +169,14 @@ def add_dataset(*args):
             meta:
                 category: topography
                 source: User
-        """            
+        """
 
         # check if my_data_catalog.yml exists
         my_data_catalog = os.path.join(app.main_path, "config", "my_data_catalog.yml")
         if not os.path.exists(my_data_catalog):
             with open(my_data_catalog, "w") as f:
                 f.write(yml_str)
-            
+
             # add to delft_dashboard.ini
             app.config["data_libs"].append(my_data_catalog)
 
@@ -183,13 +190,15 @@ def add_dataset(*args):
         else:
             with open(my_data_catalog, "a") as f:
                 f.write(yml_str)
-        
+
         # reload the data catalog
         app.data_catalog = DataCatalog(data_libs=app.config["data_libs"])
         list_bathymetry_datasets(source="User")
 
         # reloading doesnt work yet, so we need to restart the app
-        app.gui.window.dialog_warning("Adding your own datasets is beta functionality. To use and view the dataset you just added, restart the app and go to menu -> Topgraphy -> User.")
+        app.gui.window.dialog_warning(
+            "Adding your own datasets is beta functionality. To use and view the dataset you just added, restart the app and go to menu -> Topgraphy -> User."
+        )
 
 
 def select_selected_bathymetry_dataset(*args):

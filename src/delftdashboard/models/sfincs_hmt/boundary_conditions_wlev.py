@@ -6,9 +6,12 @@ import pandas as pd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
-from delftdashboard.toolboxes.observation_stations.observation_stations import Toolbox as ObservationStationsToolbox
+from delftdashboard.toolboxes.observation_stations.observation_stations import (
+    Toolbox as ObservationStationsToolbox,
+)
 
 import cht_observations.observation_stations as cht_station
+
 
 def select(*args):
     # Set all layer inactive, except boundary_points
@@ -17,14 +20,15 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["boundary_points"].activate()
     update_list()
 
+
 def generate_boundary_points_from_msk(*args):
     """Generate boundary points from mask and add to model and map."""
     model = app.model["sfincs_hmt"].domain
 
     if "bzs" in model.forcing:
         ok = app.gui.window.dialog_ok_cancel(
-            text = "Existing boundary points will be overwritten! Continue?",                                
-            title="Warning"
+            text="Existing boundary points will be overwritten! Continue?",
+            title="Warning",
         )
         if not ok:
             return
@@ -104,7 +108,7 @@ def point_clicked(x, y):
 
 
 def load_from_file(*args):
-    """" Load boundary points from file """
+    """ " Load boundary points from file"""
     fname = app.gui.window.dialog_open_file(
         "Select file with boundary points ...",
         filter="*.geojson *.shp",
@@ -122,7 +126,7 @@ def select_boundary_point_from_list(*args):
     index = app.gui.getvar("sfincs_hmt", "active_boundary_point")
 
     # get maximum values of the model
-    bzs = model.forcing["bzs"].values[:,index].max()
+    bzs = model.forcing["bzs"].values[:, index].max()
     app.gui.setvar("sfincs_hmt", "bc_wlev_value", bzs)
 
     app.map.layer["sfincs_hmt"].layer["boundary_points"].select_by_index(index)
@@ -136,7 +140,7 @@ def select_boundary_point_from_map(*args):
 
     # get maximum values of the model
     # TODO change this for isel?
-    bzs = model.forcing["bzs"].values[:,index].max()
+    bzs = model.forcing["bzs"].values[:, index].max()
     app.gui.setvar("sfincs_hmt", "bc_wlev_value", bzs)
 
     app.gui.window.update()
@@ -194,13 +198,13 @@ def update_list():
 
 
 def go_to_observation_stations(*args):
-    """Go to observation stations toolbox in popup window."""	
+    """Go to observation stations toolbox in popup window."""
 
     toolbox_name = "observation_stations"
     toolbox_path = os.path.join(app.main_path, "toolboxes", toolbox_name)
 
     # initialize toolboxes
-    toolbox = ObservationStationsToolbox(toolbox_name)    
+    toolbox = ObservationStationsToolbox(toolbox_name)
 
     data = {
         "map_center": app.map.map_center,
@@ -210,12 +214,16 @@ def go_to_observation_stations(*args):
     }
 
     # Read GUI config file
-    pop_win_config_path  = os.path.join(toolbox_path,"config", "observation_stations_popup.yml")
+    pop_win_config_path = os.path.join(
+        toolbox_path, "config", "observation_stations_popup.yml"
+    )
     okay, data = app.gui.popup(
         pop_win_config_path, data=data, id="observation_stations"
     )
 
+
 ## Add timeseries to the boundary points
+
 
 def add_constant_water_level(*args):
     """Add constant waterlevel to the selected point."""
@@ -242,10 +250,11 @@ def add_constant_water_level(*args):
     df_ts = pd.DataFrame({model_index: ts}, index=tt)
 
     # replace the boundary condition of the selected point
-    model.set_forcing_1d(df_ts = df_ts, name = "bzs")
+    model.set_forcing_1d(df_ts=df_ts, name="bzs")
+
 
 def add_synthetical_water_level(*args):
-    """Add a guassian shaped water level (based on peak and tstart/tstop) to selected point """
+    """Add a guassian shaped water level (based on peak and tstart/tstop) to selected point"""
     index = app.gui.getvar("sfincs_hmt", "active_boundary_point")
     value = app.gui.getvar("sfincs_hmt", "bc_wlev_value")
 
@@ -258,9 +267,9 @@ def add_synthetical_water_level(*args):
     # make timeseries with gaussian peak
     peak = value
     duration = (tstop - tstart).total_seconds()
-    time_shift = 0.5 * duration # shift the peak to the middle of the duration
+    time_shift = 0.5 * duration  # shift the peak to the middle of the duration
     # TODO replace with: time_vec = pd.date_range(tstart, periods=duration / 600 + 1, freq="600S")
-    tt = np.arange(0, duration + 1, 600)        
+    tt = np.arange(0, duration + 1, 600)
     ts = peak * np.exp(-(((tt - time_shift) / (0.25 * duration)) ** 2))
 
     # get forcing locations in the model
@@ -271,7 +280,8 @@ def add_synthetical_water_level(*args):
     df_ts = pd.DataFrame({model_index: ts}, index=tt)
 
     # replace the boundary condition of the selected point
-    model.set_forcing_1d(df_ts = df_ts, name = "bzs")
+    model.set_forcing_1d(df_ts=df_ts, name="bzs")
+
 
 def add_tidal_constituents():
     """Retrieve tidal constituents and save them in a .bca-file."""
@@ -279,8 +289,9 @@ def add_tidal_constituents():
     # use bca-files to generate tidal water levels
     pass
 
+
 def download_water_level(*args):
-    """Download historical water levels from the API (if available) ... """
+    """Download historical water levels from the API (if available) ..."""
     index = app.gui.getvar("sfincs_hmt", "active_boundary_point")
 
     # get the model
@@ -304,11 +315,11 @@ def download_water_level(*args):
     if source == "noaa_coops":
         # get the station_id
         station_id = gdf_locs.id[model_index]
-        
+
         # convert start and stop time to seconds
         tstart = model.config["tstart"]
         tstop = model.config["tstop"]
-        
+
         # Get NOAA data
         try:
             source = cht_station.source(source)
@@ -317,10 +328,12 @@ def download_water_level(*args):
             df_ts = df.rename(columns={"v": model_index})
 
             # replace the boundary condition of the selected point
-            model.set_forcing_1d(df_ts = df_ts, name = "bzs")
+            model.set_forcing_1d(df_ts=df_ts, name="bzs")
 
             app.gui.window.dialog_info(
-                text="Downloaded water level timeseries from NOAA for station {}".format(station_id),
+                text="Downloaded water level timeseries from NOAA for station {}".format(
+                    station_id
+                ),
                 title="Success",
             )
             return
@@ -337,6 +350,7 @@ def download_water_level(*args):
         )
         return
 
+
 def copy_to_all(*args):
     """Copy the water levels of the selected station and copy to all boundary points."""
     index = app.gui.getvar("sfincs_hmt", "active_boundary_point")
@@ -348,6 +362,4 @@ def copy_to_all(*args):
     bzs = model.forcing["bzs"].isel(index=index)
 
     # copy the boundary conditions to all other points
-    model.forcing["bzs"][:] =  bzs
-
-
+    model.forcing["bzs"][:] = bzs

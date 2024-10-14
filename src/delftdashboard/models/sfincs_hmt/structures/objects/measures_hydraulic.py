@@ -122,7 +122,9 @@ class Floodwall(BaseMeasureType):
 
         # Set editable values for floodwall measure type
         app.gui.setvar("measure", "elevation", measure_attributes.elevation.value)
-        app.gui.setvar("measure", "absolute_elevation", measure_attributes.absolute_elevation)
+        app.gui.setvar(
+            "measure", "absolute_elevation", measure_attributes.absolute_elevation
+        )
 
     def get_window_values(self) -> Dict[str, Union[str, dict]]:
         """Returns the window values for the floodwall measure type
