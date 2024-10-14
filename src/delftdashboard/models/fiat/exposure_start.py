@@ -371,15 +371,15 @@ def build_user_exposure(*args):
         app.active_model.buildings = gdf[
             gdf["geometry"].geom_type.isin(["Point", "Polygon", "multiPolygon"])
         ]
-        app.active_model.roads = gdf[
-            gdf["geometry"].geom_type.isin(["MultiLineString", "LineString"])
-        ]
+
+        # get roads and set layer
+        if source == "OSM" or source == "NSI":
+            get_roads(model)
+
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
         app.map.layer["buildings"].layer["exposure_points"].set_data(
             app.active_model.buildings
         )
-        app.map.layer["roads"].layer["exposure_lines"].crs = crs
-        app.map.layer["roads"].layer["exposure_lines"].set_data(app.active_model.roads)
 
     except FileNotFoundError:
         app.gui.window.dialog_info(
@@ -400,7 +400,8 @@ def get_roads(model):
             gdf = app.active_model.domain.exposure_vm.get_osm_roads(
                 road_types=road_types
             )
-
+            gdf = gdf[gdf["geometry"].geom_type.isin(["MultiLineString", "LineString"])
+            ]
             crs = app.gui.getvar("fiat", "selected_crs")
             gdf.set_crs(crs, inplace=True)
 

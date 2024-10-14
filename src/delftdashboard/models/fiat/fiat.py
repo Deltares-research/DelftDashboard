@@ -746,6 +746,8 @@ class Model(GenericModel):
             # exposure_buildings_model
             add_exposure_locations_to_model()
 
+            # add exposure roads to model
+
             # vulnerability_buildings_model
             selected_damage_curve_database = app.gui.getvar(
                 "fiat", "selected_damage_curve_database"
@@ -769,13 +771,13 @@ class Model(GenericModel):
             self.show_exposure_buildings()
 
             # Show exposure roads
-            if (
-                Path(os.path.abspath(""))
-                / self.domain.fiat_model.root
-                / "exposure"
-                / "roads.gpkg"
-            ).is_file():
-                self.show_exposure_roads()
+            #if (
+            ##    Path(os.path.abspath(""))
+             #   / self.domain.fiat_model.root
+             #   / "exposure"
+             #   / "roads.gpkg"
+            #).is_file():
+            #    self.show_exposure_roads()
 
             dlg.close()
 
