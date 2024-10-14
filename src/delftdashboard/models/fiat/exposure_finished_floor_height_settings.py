@@ -14,6 +14,6 @@ def set_variables(*args):
 
 def open_info(*args):
     app.gui.window.dialog_info(
-        text='For polygon data select "intersection". For point data select "nearest" as method.',
+        text="For polygon data select \"intersection\". For point data select \"nearest\" as method.",
         title="Method selection",
     )
