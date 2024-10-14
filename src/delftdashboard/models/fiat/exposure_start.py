@@ -340,16 +340,23 @@ def build_user_exposure(*args):
             country = "United States"  
             max_potential_damage = "NSI"
             ground_floor_height = "NSI"    
+            source = "NSI"
         elif source == "Open Street Map":
             country = app.gui.getvar(model, "OSM_country")
             max_potential_damage = "jrc_damage_values"
             ground_floor_height = float(app.gui.getvar(model, "osm_ground_floor_height"))
+            source = "OSM"
+        else:
+            source= "User Model"
         
         # Set exposure buildings model
+        
         (
-            gdf
+            gdf,
+            unique_primary_types,
+            unique_secondary_types,
         ) = app.active_model.domain.exposure_vm.set_asset_locations_source_and_get_data(
-            source="User Model",
+            source= source,
             ground_floor_height=ground_floor_height,
             crs=crs,
             country=country,
@@ -358,7 +365,7 @@ def build_user_exposure(*args):
         )
         
         # Set the buildings attribute to gdf for easy visualization of the buildings
-        app.active_model.buildings = gdf[gdf['geometry'].geom_type == 'Point']
+        app.active_model.buildings =gdf[gdf['geometry'].geom_type.isin(['Point', 'Polygon', 'multiPolygon'])]
         app.active_model.roads = gdf[gdf['geometry'].geom_type.isin(['MultiLineString', 'LineString'])]
         app.map.layer["buildings"].layer["exposure_points"].crs = crs
         app.map.layer["buildings"].layer["exposure_points"].set_data(app.active_model.buildings)

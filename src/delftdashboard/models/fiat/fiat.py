@@ -694,7 +694,7 @@ class Model(GenericModel):
             self.domain.read()
 
             # Get region
-            fpath = str(Path(os.path.abspath("")) / self.domain.fiat_model.root / "exposure" / "region.gpkg")
+            fpath = str(Path(os.path.abspath("")) / self.domain.fiat_model.root / "geoms" / "region.geojson")
 
             # Set variables from existing model
             with open(Path(os.path.abspath("")) / self.domain.fiat_model.root  / 'variables.pkl', 'rb') as f:
@@ -741,6 +741,14 @@ class Model(GenericModel):
             app.crs = self.domain.fiat_model.config["global"]["crs"]
 
             zoom_to_boundary()
+
+            # Show exposure buildings
+            self.show_exposure_buildings()
+
+            # Show exposure roads 
+            if (Path(os.path.abspath("")) / self.domain.fiat_model.root / "exposure" / "roads.gpkg").is_file():
+                self.show_exposure_roads()
+
             dlg.close()
 
     def save(self):
