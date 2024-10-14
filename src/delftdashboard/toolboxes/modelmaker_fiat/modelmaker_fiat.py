@@ -428,6 +428,7 @@ def quick_build(*args):
     ]
     app.active_model.domain.exposure_vm.set_roads_settings(road_types)
     app.gui.setvar(model,"include_all", True)
+    app.gui.setvar(model, "include_osm_roads", True)
 
     # Set the road damage threshold
     # road_damage_threshold = app.gui.getvar("fiat", "road_damage_threshold")
