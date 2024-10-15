@@ -317,7 +317,7 @@ class Model(GenericModel):
         )
         app.gui.setvar(group, "include_osm_roads", False)
         app.gui.setvar(group, "damage_unit", Currency.euro.value)
-        app.gui.setvar(group, "bf_conversion", False)
+        app.gui.setvar(group, "bf_conversion", True)
         app.gui.setvar(group, "classification_unclassified_assets", True)
 
         # Units
@@ -763,7 +763,7 @@ class Model(GenericModel):
             app.gui.variables["fiat"] = variables["fiat"]
             app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
 
-            ## Max potential Damages # TODO: check if source is list or str
+            ## Max potential Damages
             if max_source not in ["National Structure Inventory", "JRC Damage Values"]:
                 idx = app.gui.getvar("fiat", "loaded_damages_files")
                 self.domain.exposure_vm.set_damages(
