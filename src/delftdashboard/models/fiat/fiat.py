@@ -767,20 +767,16 @@ class Model(GenericModel):
                 update.update_parameters("Max Potential Damages")
 
             ## Finished Floor Height       
-            #if gfh_source[0] != "National Structure Inventory" or gfh_source!= "User input":
-                #app.gui.setvar("fiat", "source_finished _floor_height", gfh_source[0])
-                #app.gui.setvar("fiat", "method_gfh", gfh_method)
-                #app.gui.setvar("fiat", "max_dist_gfh", max_distance_gfh)
-                #app.gui.setvar("fiat", "heights_file_field_name", gfh_attribute)
-                # TODO: create gfh model
-                
-            #    update.update_parameters("Finished Floor Height")
+            if gfh_source != "National Structure Inventory":
+                idx = app.gui.getvar("fiat", "loaded_asset_heights_files")
+                self.domain.exposure_vm.set_ground_floor_height(source = [str(app.gui.getvar("fiat", "loaded_asset_heights_files_value")[idx])], attribute_name = [app.gui.getvar("fiat", "heights_file_field_name")],method_damages = [app.gui.getvar("fiat", "method_gfh")], max_dist =[app.gui.getvar("fiat", "max_dist_gfh")])
+                update.update_parameters("Finished Floor Height")
 
             ## Ground Elevation
-            #if ground_elevation_source[0] != "National Structure Inventory" or ground_elevation_source != "None":
-                #app.gui.setvar("fiat", "source_ground_elevation", ground_elevation_source[0])
-                # TODO: create elevation model
-            #    update.update_parameters("Ground Elevation")       
+            if ground_elevation_source[0] != "National Structure Inventory" #or ground_elevation_source != "None":
+                idx = app.gui.getvar("fiat", "update_source_ground_elevation")
+                self.domain.exposure_vm.set_ground_floor_height(source = [str(app.gui.getvar("fiat", "ground_elevation_files_value")[idx])])
+                update.update_parameters("Ground Elevation")       
 
             # vulnerability_buildings_model
             selected_damage_curve_database = app.gui.getvar(
