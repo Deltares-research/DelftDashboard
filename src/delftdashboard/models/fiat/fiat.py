@@ -8,15 +8,15 @@ import pickle
 from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from delftdashboard.models.fiat.exposure_start import add_exposure_locations_to_model
-from delftdashboard.models.fiat.exposure_damages import add_to_model
 from delftdashboard.operations.checklist import zoom_to_boundary
+from delftdashboard.operations import  update
 from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import (
     generate_boundary,
     set_active_area_file,
 )
 from hydromt_fiat.api.hydromt_fiat_vm import HydroMtViewModel
 from hydromt_fiat.api.data_types import Currency, Units, ExposureRoadsSettings
-from hydromt_fiat.api.exposure_vm import ExposureVector
+from hydromt_fiat.api.exposure_vm import ExposureVector, ExposureViewModel
 from hydromt_fiat.fiat import FiatModel
 from hydromt.log import setuplog
 
@@ -713,12 +713,17 @@ class Model(GenericModel):
             app.gui.variables["fiat"] = variables["fiat"]
             app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
             
-            # Get parameter sources
+            # Get variables sources and parameters
+            ## Max Potential Damage
             max_source = app.gui.getvar("fiat", "source_max_potential_damage")
-            damage_type = app.gui.getvar("fiat", "damage_type")
+            
+            ## Ground Floor Height
             gfh_source = app.gui.getvar("fiat", "source_finished_floor_height")
+
+            ## Ground Elevation
             ground_elevation_source = app.gui.getvar("fiat", "source_ground_elevation")
 
+            # Set area of interest
             app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
             app.gui.setvar(
                 "modelmaker_fiat",
@@ -737,22 +742,45 @@ class Model(GenericModel):
 
             # exposure_buildings_model
             add_exposure_locations_to_model()
+            # set fiat model to vm
+            self.domain.fiat_model.exposure.exposure_db = self.domain.exposure_vm.exposure.exposure_db
+            self.domain.fiat_model.exposure.exposure_geoms = self.domain.exposure_vm.exposure.exposure_geoms
 
-            # Update exposure
+            # Update exposure 
+            # Re-setting variables from existing model
+            with open(
+                Path(os.path.abspath(""))
+                / self.domain.fiat_model.root
+                / "variables.pkl",
+                "rb",
+            ) as f:
+                variables = pickle.load(f)
+            app.gui.variables["_main"] = variables["main"]
+            app.gui.variables["fiat"] = variables["fiat"]
+            app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
+
             ## Max potential Damages
             if max_source[0] != "National Structure Inventory" or max_source != "JRC Damage Values":
-                app.gui.setvar("fiat", "source_max_potential_damage", max_source)
-                app.gui.setvar("fiat", "damage_type", damage_type)
-                add_to_model()
+                # TODO: create damage model
+                idx = app.gui.getvar("fiat", "loaded_damages_files")
+                self.domain.exposure_vm.set_damages(source = [str(app.gui.getvar("fiat", "loaded_damages_files_value")[idx])], attribute_name = [app.gui.getvar("fiat", "damages_file_field_name")],method_damages = [app.gui.getvar("fiat", "method_damages")], max_dist =[app.gui.getvar("fiat", "max_dist_damages")], damage_types = [str(app.gui.getvar("fiat", "damage_type"))])
+                update.update_parameters("Max Potential Damages")
 
             ## Finished Floor Height       
-            if gfh_source[0] != "National Structure Inventory" or gfh_source!= "User input":
-                app.gui.setvar("fiat", "source_finished _floor_height", gfh_source)
+            #if gfh_source[0] != "National Structure Inventory" or gfh_source!= "User input":
+                #app.gui.setvar("fiat", "source_finished _floor_height", gfh_source[0])
+                #app.gui.setvar("fiat", "method_gfh", gfh_method)
+                #app.gui.setvar("fiat", "max_dist_gfh", max_distance_gfh)
+                #app.gui.setvar("fiat", "heights_file_field_name", gfh_attribute)
+                # TODO: create gfh model
+                
+            #    update.update_parameters("Finished Floor Height")
 
             ## Ground Elevation
-            if ground_elevation_source[0] != "National Structure Inventory" or ground_elevation_source != "None":
-                app.gui.setvar("fiat", "source_ground_elevation", ground_elevation_source)
-                #app.active_model.update_exposure()
+            #if ground_elevation_source[0] != "National Structure Inventory" or ground_elevation_source != "None":
+                #app.gui.setvar("fiat", "source_ground_elevation", ground_elevation_source[0])
+                # TODO: create elevation model
+            #    update.update_parameters("Ground Elevation")       
 
             # vulnerability_buildings_model
             selected_damage_curve_database = app.gui.getvar(
