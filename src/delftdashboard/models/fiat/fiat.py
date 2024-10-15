@@ -774,8 +774,9 @@ class Model(GenericModel):
 
             ## Ground Elevation
             if ground_elevation_source != "National Structure Inventory": #or ground_elevation_source != "None"
-                idx = app.gui.getvar("fiat", "update_source_ground_elevation")
-                self.domain.exposure_vm.set_ground_floor_height(source = [str(app.gui.getvar("fiat", "ground_elevation_files_value")[idx])])
+                idx = app.gui.getvar("fiat", "loaded_ground_elevation_files")
+                unit = app.gui.getvar("fiat", "ground_elevation_unit")
+                self.domain.exposure_vm.set_ground_elevation(source = str(app.gui.getvar("fiat", "loaded_ground_elevation_files_value")[idx]), unit = unit)
                 update.update_parameters("Ground Elevation")       
 
             # vulnerability_buildings_model
@@ -1569,6 +1570,7 @@ class Model(GenericModel):
             return
 
     def set_object_types(self, unique_primary_types, unique_secondary_types):
+
         model = "fiat"
         unique_primary_types.sort()
         unique_secondary_types.sort()
