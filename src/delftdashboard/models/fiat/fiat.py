@@ -759,9 +759,8 @@ class Model(GenericModel):
             app.gui.variables["fiat"] = variables["fiat"]
             app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
 
-            ## Max potential Damages
-            if max_source[0] != "National Structure Inventory" or max_source != "JRC Damage Values":
-                # TODO: create damage model
+            ## Max potential Damages # TODO: check if source is list or str 
+            if max_source != "National Structure Inventory": #or max_source != "JRC Damage Values":
                 idx = app.gui.getvar("fiat", "loaded_damages_files")
                 self.domain.exposure_vm.set_damages(source = [str(app.gui.getvar("fiat", "loaded_damages_files_value")[idx])], attribute_name = [app.gui.getvar("fiat", "damages_file_field_name")],method_damages = [app.gui.getvar("fiat", "method_damages")], max_dist =[app.gui.getvar("fiat", "max_dist_damages")], damage_types = [str(app.gui.getvar("fiat", "damage_type"))])
                 update.update_parameters("Max Potential Damages")
@@ -769,11 +768,12 @@ class Model(GenericModel):
             ## Finished Floor Height       
             if gfh_source != "National Structure Inventory":
                 idx = app.gui.getvar("fiat", "loaded_asset_heights_files")
-                self.domain.exposure_vm.set_ground_floor_height(source = [str(app.gui.getvar("fiat", "loaded_asset_heights_files_value")[idx])], attribute_name = [app.gui.getvar("fiat", "heights_file_field_name")],method_damages = [app.gui.getvar("fiat", "method_gfh")], max_dist =[app.gui.getvar("fiat", "max_dist_gfh")])
+                idx_attr = app.gui.getvar("fiat", "heights_file_field_name")
+                self.domain.exposure_vm.set_ground_floor_height(source = str(app.gui.getvar("fiat", "loaded_asset_heights_files_value")[idx]), attribute_name = str(app.gui.getvar("fiat", "heights_file_field_name_value")[idx_attr]),gfh_method = app.gui.getvar("fiat", "method_gfh"), max_dist =app.gui.getvar("fiat", "max_dist_gfh"))
                 update.update_parameters("Finished Floor Height")
 
             ## Ground Elevation
-            if ground_elevation_source[0] != "National Structure Inventory" #or ground_elevation_source != "None":
+            if ground_elevation_source != "National Structure Inventory": #or ground_elevation_source != "None"
                 idx = app.gui.getvar("fiat", "update_source_ground_elevation")
                 self.domain.exposure_vm.set_ground_floor_height(source = [str(app.gui.getvar("fiat", "ground_elevation_files_value")[idx])])
                 update.update_parameters("Ground Elevation")       
