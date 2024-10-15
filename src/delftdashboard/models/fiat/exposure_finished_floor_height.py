@@ -121,10 +121,12 @@ def add_to_model(*args):
     if app.active_model.domain.fiat_model.exposure is not None:
         dlg = app.gui.window.dialog_wait("\nUpdating Finished Floor Height in your FIAT model...")
         update.update_parameters("Finished Floor Height")
+        
         dlg.close()
         
     # Set the source
     app.gui.setvar(model, "source_finished_floor_height", source_name)
+    app.active_model.save_gui_variables()
 
     app.gui.window.dialog_info(
         text="Finished floor height data was added to your model",

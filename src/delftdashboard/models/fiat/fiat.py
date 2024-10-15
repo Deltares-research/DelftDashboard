@@ -760,20 +760,20 @@ class Model(GenericModel):
             app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
 
             ## Max potential Damages # TODO: check if source is list or str 
-            if max_source != "National Structure Inventory": #or max_source != "JRC Damage Values":
+            if max_source not in ["National Structure Inventory", "JRC Damage Values"]:
                 idx = app.gui.getvar("fiat", "loaded_damages_files")
-                self.domain.exposure_vm.set_damages(source = [str(app.gui.getvar("fiat", "loaded_damages_files_value")[idx])], attribute_name = [app.gui.getvar("fiat", "damages_file_field_name")],method_damages = [app.gui.getvar("fiat", "method_damages")], max_dist =[app.gui.getvar("fiat", "max_dist_damages")], damage_types = [str(app.gui.getvar("fiat", "damage_type"))])
+                self.domain.exposure_vm.set_damages(source = (app.gui.getvar("fiat", "loaded_damages_files_value_list")), attribute_name = app.gui.getvar("fiat", "damages_file_field_name_list"),method_damages = app.gui.getvar("fiat", "method_damages_list"), max_dist =app.gui.getvar("fiat", "max_dist_damages_list"), damage_types = app.gui.getvar("fiat", "damage_type_list"))
                 update.update_parameters("Max Potential Damages")
 
             ## Finished Floor Height       
-            if gfh_source != "National Structure Inventory":
+            if gfh_source not in ["National Structure Inventory", "User input"]:
                 idx = app.gui.getvar("fiat", "loaded_asset_heights_files")
                 idx_attr = app.gui.getvar("fiat", "heights_file_field_name")
                 self.domain.exposure_vm.set_ground_floor_height(source = str(app.gui.getvar("fiat", "loaded_asset_heights_files_value")[idx]), attribute_name = str(app.gui.getvar("fiat", "heights_file_field_name_value")[idx_attr]),gfh_method = app.gui.getvar("fiat", "method_gfh"), max_dist =app.gui.getvar("fiat", "max_dist_gfh"))
                 update.update_parameters("Finished Floor Height")
 
             ## Ground Elevation
-            if ground_elevation_source != "National Structure Inventory": #or ground_elevation_source != "None"
+            if ground_elevation_source not in ["National Structure Inventory", "None"]:
                 idx = app.gui.getvar("fiat", "loaded_ground_elevation_files")
                 unit = app.gui.getvar("fiat", "ground_elevation_unit")
                 self.domain.exposure_vm.set_ground_elevation(source = str(app.gui.getvar("fiat", "loaded_ground_elevation_files_value")[idx]), unit = unit)
