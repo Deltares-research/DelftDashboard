@@ -9,7 +9,7 @@ from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
 from delftdashboard.models.fiat.exposure_start import add_exposure_locations_to_model
 from delftdashboard.operations.checklist import zoom_to_boundary
-from delftdashboard.operations import  update
+from delftdashboard.operations import update
 from delftdashboard.toolboxes.modelmaker_fiat.modelmaker_fiat import (
     generate_boundary,
     set_active_area_file,
@@ -712,11 +712,11 @@ class Model(GenericModel):
             app.gui.variables["_main"] = variables["main"]
             app.gui.variables["fiat"] = variables["fiat"]
             app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
-            
+
             # Get variables sources and parameters
             ## Max Potential Damage
             max_source = app.gui.getvar("fiat", "source_max_potential_damage")
-            
+
             ## Ground Floor Height
             gfh_source = app.gui.getvar("fiat", "source_finished_floor_height")
 
@@ -743,10 +743,14 @@ class Model(GenericModel):
             # exposure_buildings_model
             add_exposure_locations_to_model()
             # set fiat model to vm
-            self.domain.fiat_model.exposure.exposure_db = self.domain.exposure_vm.exposure.exposure_db
-            self.domain.fiat_model.exposure.exposure_geoms = self.domain.exposure_vm.exposure.exposure_geoms
+            self.domain.fiat_model.exposure.exposure_db = (
+                self.domain.exposure_vm.exposure.exposure_db
+            )
+            self.domain.fiat_model.exposure.exposure_geoms = (
+                self.domain.exposure_vm.exposure.exposure_geoms
+            )
 
-            # Update exposure 
+            # Update exposure
             # Re-setting variables from existing model
             with open(
                 Path(os.path.abspath(""))
@@ -759,25 +763,51 @@ class Model(GenericModel):
             app.gui.variables["fiat"] = variables["fiat"]
             app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
 
-            ## Max potential Damages # TODO: check if source is list or str 
+            ## Max potential Damages # TODO: check if source is list or str
             if max_source not in ["National Structure Inventory", "JRC Damage Values"]:
                 idx = app.gui.getvar("fiat", "loaded_damages_files")
-                self.domain.exposure_vm.set_damages(source = (app.gui.getvar("fiat", "loaded_damages_files_value_list")), attribute_name = app.gui.getvar("fiat", "damages_file_field_name_list"),method_damages = app.gui.getvar("fiat", "method_damages_list"), max_dist =app.gui.getvar("fiat", "max_dist_damages_list"), damage_types = app.gui.getvar("fiat", "damage_type_list"))
+                self.domain.exposure_vm.set_damages(
+                    source=(app.gui.getvar("fiat", "loaded_damages_files_value_list")),
+                    attribute_name=app.gui.getvar(
+                        "fiat", "damages_file_field_name_list"
+                    ),
+                    method_damages=app.gui.getvar("fiat", "method_damages_list"),
+                    max_dist=app.gui.getvar("fiat", "max_dist_damages_list"),
+                    damage_types=app.gui.getvar("fiat", "damage_type_list"),
+                )
                 update.update_parameters("Max Potential Damages")
 
-            ## Finished Floor Height       
+            ## Finished Floor Height
             if gfh_source not in ["National Structure Inventory", "User input"]:
                 idx = app.gui.getvar("fiat", "loaded_asset_heights_files")
                 idx_attr = app.gui.getvar("fiat", "heights_file_field_name")
-                self.domain.exposure_vm.set_ground_floor_height(source = str(app.gui.getvar("fiat", "loaded_asset_heights_files_value")[idx]), attribute_name = str(app.gui.getvar("fiat", "heights_file_field_name_value")[idx_attr]),gfh_method = app.gui.getvar("fiat", "method_gfh"), max_dist =app.gui.getvar("fiat", "max_dist_gfh"))
+                self.domain.exposure_vm.set_ground_floor_height(
+                    source=str(
+                        app.gui.getvar("fiat", "loaded_asset_heights_files_value")[idx]
+                    ),
+                    attribute_name=str(
+                        app.gui.getvar("fiat", "heights_file_field_name_value")[
+                            idx_attr
+                        ]
+                    ),
+                    gfh_method=app.gui.getvar("fiat", "method_gfh"),
+                    max_dist=app.gui.getvar("fiat", "max_dist_gfh"),
+                )
                 update.update_parameters("Finished Floor Height")
 
             ## Ground Elevation
             if ground_elevation_source not in ["National Structure Inventory", "None"]:
                 idx = app.gui.getvar("fiat", "loaded_ground_elevation_files")
                 unit = app.gui.getvar("fiat", "ground_elevation_unit")
-                self.domain.exposure_vm.set_ground_elevation(source = str(app.gui.getvar("fiat", "loaded_ground_elevation_files_value")[idx]), unit = unit)
-                update.update_parameters("Ground Elevation")       
+                self.domain.exposure_vm.set_ground_elevation(
+                    source=str(
+                        app.gui.getvar("fiat", "loaded_ground_elevation_files_value")[
+                            idx
+                        ]
+                    ),
+                    unit=unit,
+                )
+                update.update_parameters("Ground Elevation")
 
             # vulnerability_buildings_model
             selected_damage_curve_database = app.gui.getvar(
