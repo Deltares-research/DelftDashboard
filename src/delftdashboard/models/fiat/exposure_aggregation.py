@@ -159,7 +159,7 @@ def add_aggregations(*args):
         for i in fn:
             additional_attr = gpd.read_file(i)
             additional_attr_total_area = additional_attr.unary_union
-            if area_of_interest.overlaps(additional_attr_total_area, align=True).all():
+            if area_of_interest.overlaps(additional_attr_total_area, align=True).any():
                 app.active_model.domain.exposure_vm.set_aggregation_areas_config(
                     fn, attribute, label
                 )
@@ -176,12 +176,15 @@ def add_aggregations(*args):
         if app.active_model.domain.fiat_model.exposure is not None:
             dlg = app.gui.window.dialog_wait("\nAdding additional attributes to your FIAT model...")
             update.update_parameters("Additional Attributes")
+            
+
             dlg.close()
 
         app.gui.window.dialog_info(
             text="Your additional attributes were added to the model",
             title="Added additional attributes",
         )
+        app.active_model.save_gui_variables()
     else:
         print("no active model")
         app.gui.window.dialog_info(

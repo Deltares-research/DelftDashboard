@@ -714,14 +714,10 @@ class Model(GenericModel):
             app.gui.variables["modelmaker_fiat"] = variables["modelmaker_fiat"]
 
             # Get variables sources and parameters
-            ## Max Potential Damage
             max_source = app.gui.getvar("fiat", "source_max_potential_damage")
-
-            ## Ground Floor Height
             gfh_source = app.gui.getvar("fiat", "source_finished_floor_height")
-
-            ## Ground Elevation
             ground_elevation_source = app.gui.getvar("fiat", "source_ground_elevation")
+            additional_attr = app.gui.getvar("fiat", "loaded_aggregation_files_string")
 
             # Set area of interest
             app.gui.setvar("fiat", "selected_asset_locations_string", "User model")
@@ -808,6 +804,21 @@ class Model(GenericModel):
                     unit=unit,
                 )
                 update.update_parameters("Ground Elevation")
+
+            ## Additional Atrributes
+            if len(additional_attr) > 0:
+                table = app.gui.getvar("fiat", "aggregation_table")
+                source = [str(item) for item in table["File Path"].to_list()]
+                attribute_name = table["Attribute ID"].to_list()
+                label_names = table["Attribute Label"].to_list()
+                self.domain.exposure_vm.set_aggregation_areas_config(
+                    files=source,
+                    attribute_names=attribute_name,
+                    label_names=label_names,
+                )
+                self.domain.fiat_model.setup_additional_attributes(
+                    source, attribute_name, label_names
+                )
 
             # vulnerability_buildings_model
             selected_damage_curve_database = app.gui.getvar(
