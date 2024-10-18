@@ -141,6 +141,11 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
         app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
 
+        # Roughness
+        app.gui.setvar(group, "manning_land", 0.06)
+        app.gui.setvar(group, "manning_water", 0.02)
+        app.gui.setvar(group, "manning_level", 1.0)
+
         # Subgrid
         app.gui.setvar(group, "subgrid_nr_bins", 10)
         app.gui.setvar(group, "subgrid_nr_pixels", 20)
@@ -318,6 +323,10 @@ class Toolbox(GenericToolbox):
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
         bathymetry_list = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
+        # for bth in bathymetry_list:
+        #     bth["dataset"] = bth["dataset"].name
+        #     # bathy_lst = bth.name
+#        app.model["sfincs_cht"].domain.grid.set_bathymetry(bathy_lst)
         app.model["sfincs_cht"].domain.grid.set_bathymetry(bathymetry_list)
         app.model["sfincs_cht"].domain.grid.write()
         # If SnapWave also generate SnapWave mesh and save it
@@ -353,10 +362,10 @@ class Toolbox(GenericToolbox):
         app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_data(mask.to_gdf(option="open"))
         app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_data(mask.to_gdf(option="outflow"))
 
-        if app.model["sfincs_cht"].domain.grid_type == "quadtree":
-            grid.write() # Write new qtr file
-        else:
-            mask.write() # Write mask, index and depth files    
+        # if app.model["sfincs_cht"].domain.grid_type == "quadtree":
+        grid.write() # Write new qtr file
+        # else:
+        #     mask.write() # Write mask, index and depth files    
 
         dlg.close()
 
@@ -388,6 +397,9 @@ class Toolbox(GenericToolbox):
         group = "modelmaker_sfincs_cht"
         bathymetry_sets = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
         roughness_sets = []
+        manning_land = app.gui.getvar(group, "manning_land")
+        manning_water = app.gui.getvar(group, "manning_water")
+        manning_level = app.gui.getvar(group, "manning_level")
         nr_bins = app.gui.getvar(group, "subgrid_nr_bins")
         nr_pixels = app.gui.getvar(group, "subgrid_nr_pixels")
         max_dzdv = app.gui.getvar(group, "subgrid_max_dzdv")
@@ -397,6 +409,9 @@ class Toolbox(GenericToolbox):
         p = app.gui.window.dialog_progress("               Generating Sub-grid Tables ...                ", 100)
         app.model["sfincs_cht"].domain.subgrid.build(bathymetry_sets,
                                                      roughness_sets,
+                                                     manning_land=manning_land,
+                                                     manning_water=manning_water,
+                                                     manning_level=manning_level,
                                                      nr_bins=nr_bins,
                                                      nr_subgrid_pixels=nr_pixels,
                                                      max_gradient=max_dzdv,
@@ -828,7 +843,7 @@ class Toolbox(GenericToolbox):
         dct["bathymetry"]["dataset"] = []
         for d in app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets:
             dataset = {}
-            dataset["name"]   = d["dataset"].name
+            dataset["name"]   = d["name"]
             dataset["source"] = "delftdashboard"
             dataset["zmin"]   = d["zmin"]
             dataset["zmax"]   = d["zmax"]

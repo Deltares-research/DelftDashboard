@@ -31,8 +31,8 @@ def use_dataset(*args):
     index = app.gui.getvar(group, "bathymetry_dataset_index")
     name  = names[index]
     if name not in app.gui.getvar(group, "selected_bathymetry_dataset_names"):
-        d = bathymetry_database.get_dataset(name)
-        dataset = {"dataset": d, "zmin": -99999.0, "zmax": 99999.0}
+        # d = bathymetry_database.get_dataset(name)
+        dataset = {"name": name, "zmin": -99999.0, "zmax": 99999.0}
         app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets.append(dataset)
         app.gui.setvar(group, "selected_bathymetry_dataset_index", len(app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets) - 1)
         update()
@@ -103,7 +103,8 @@ def update():
     nrd = len(app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets)
     if nrd>0:
         for dataset in app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets:
-            selected_names.append(dataset["dataset"].name)
+            # selected_names.append(dataset["dataset"].name)
+            selected_names.append(dataset["name"])
         app.gui.setvar(group, "selected_bathymetry_dataset_names", selected_names)
         index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
         if index > nrd - 1:

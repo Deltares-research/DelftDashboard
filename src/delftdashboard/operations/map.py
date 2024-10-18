@@ -11,7 +11,6 @@ import matplotlib as mpl
 
 from delftdashboard.app import app
 from cht_bathymetry.bathymetry_database import bathymetry_database
-# from cht_utils.geometry import RegularGrid
 
 def map_ready(*args):
 
@@ -82,8 +81,8 @@ def update_background():
             dxy = (xl[1] - xl[0])/npix
             xv = np.arange(xl[0], xl[1], dxy)
             yv = np.arange(yl[0], yl[1], dxy)
-            dataset = bathymetry_database.get_dataset(app.background_topography)
-            dataset_list = [{"dataset": dataset, "zmin": -99999.9, "zmax": 99999.9}]
+            # dataset = bathymetry_database.get_dataset(app.background_topography)
+            dataset_list = [{"name": app.background_topography, "zmin": -99999.9, "zmax": 99999.9}]
 
             try:
                 cmap = mpl.cm.get_cmap(app.view["topography"]["colormap"])
