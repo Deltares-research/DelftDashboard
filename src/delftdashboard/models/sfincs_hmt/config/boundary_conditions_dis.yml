@@ -113,7 +113,7 @@ element:
     position:
       x: 10
       y: 65
-      width: 100
+      width: 110
       height: 20
     dependency:
     - action: visible
@@ -158,7 +158,7 @@ element:
     position:
       x: 10
       y: 65
-      width: 100
+      width: 110
       height: 20
     dependency:
     - action: visible
@@ -232,7 +232,7 @@ element:
     #     operator: gt
     #     value: 1            
 - style: text
-  text: "Discharge points: "
+  text: "Discharge points"
   position:
     x: -10
     y: 125
@@ -241,9 +241,9 @@ element:
 - style: listbox
   position:
     x: -10
-    y: 45
+    y: 60
     width: 120
-    height: 75
+    height: 60
   method: select_discharge_point_from_list
   variable: active_discharge_point
   select: index
@@ -251,28 +251,12 @@ element:
     variable: discharge_point_names
   tooltip: Select discharge point
 - style: pushbutton
-  text: Delete All
-  position:
-    x: -10
-    y: 5
-    width: 120
-    height: 15
-  method: delete_all_points_from_list
-  tooltip: Delete all discharge points
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_discharge_points
-      operator: gt
-      value: 0  
-- style: pushbutton
   text: Delete Point
   position:
     x: -10
-    y: 25
+    y: 35
     width: 120
-    height: 15
+    height: 20
   method: delete_point_from_list
   tooltip: Delete discharge point from model
   dependency:
@@ -282,3 +266,20 @@ element:
     - variable: nr_discharge_points
       operator: gt
       value: 0
+- style: pushbutton
+  text: Delete All
+  position:
+    x: -10
+    y: 10
+    width: 120
+    height: 20
+  method: delete_all_points_from_list
+  tooltip: Delete all discharge points
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_discharge_points
+      operator: gt
+      value: 0  
+      

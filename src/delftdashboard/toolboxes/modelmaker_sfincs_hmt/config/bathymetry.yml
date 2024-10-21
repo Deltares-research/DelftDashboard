@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: "Select dataset(s) from source: "
+  title: "Select dataset(s) from source"
   position:
     x: 10
     y: 5
@@ -153,3 +153,11 @@ element:
   tooltip: "Generate bathymetry from the selected datasets. \n Note that you have
     to specify at least one dataset in the list of selected datasets."
   method: generate_bathymetry
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+  
