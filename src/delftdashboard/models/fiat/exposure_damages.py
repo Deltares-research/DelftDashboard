@@ -142,7 +142,8 @@ def add_damages():
     source_name = app.gui.getvar(model, "loaded_damages_files_string_list")
 
     # Get the attribute name
-    attribute_name_damage = app.gui.getvar(model, "damages_file_field_name")
+    idx = app.gui.getvar(model, "damages_file_field_name")
+    attribute_name_damage = app.gui.getvar(model, "damages_file_field_name_value")[idx]
 
     app.gui.getvar(model, "damages_file_field_name_list").append(attribute_name_damage)
     attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
@@ -179,10 +180,12 @@ def add_damages():
     if app.active_model.domain.fiat_model.exposure is not None:
         dlg = app.gui.window.dialog_wait("\nUpdating Max Potential Damages in your FIAT model...")
         update.update_parameters("Max Potential Damages")
+        
         dlg.close()
 
     # Set the source
     app.gui.setvar(model, "source_max_potential_damage", source_name)
+    app.active_model.save_gui_variables()
 
     app.gui.window.dialog_info(
         text="Maximum potential damage data was added to your model",
@@ -193,6 +196,7 @@ def add_damages():
 def replace_damage(damage_index):
     model = "fiat"
 
+    # TODO:Maybe a check that if damage_type structure to add if the other one is conent and if structure replace
     # Replace Damage_type
     damage_type = app.gui.getvar("fiat", "damage_type")
     damage_type_list = app.gui.getvar(model, "damage_type_list")
@@ -221,13 +225,14 @@ def replace_damage(damage_index):
     source_name = app.gui.getvar(model, "loaded_damages_files_string_list")
 
     # Get the attribute name
-    attribute_name_damage = app.gui.getvar(model, "damages_file_field_name")
+    idx = app.gui.getvar(model, "damages_file_field_name")
+    attribute_name_damage = app.gui.getvar(model, "damages_file_field_name_value")[idx]
 
     damages_attribute_list = app.gui.getvar(model, "damages_file_field_name_list")
     damages_attribute_list[damage_index] = attribute_name_damage
 
     app.gui.setvar(model, "damages_file_field_name_list", damages_attribute_list)
-    attribute_name_damages = app.gui.getvar(model, "damages_file_field_name_list")
+    attribute_name_damages = damages_attribute_list
     
     # Empty field name parameter
     #app.gui.setvar(model, "damages_file_field_name", 0)
@@ -265,6 +270,7 @@ def replace_damage(damage_index):
 
     # Set the source
     app.gui.setvar(model, "source_max_potential_damage", source_name)
+    app.active_model.save_gui_variables()
 
     app.gui.window.dialog_info(
         text="Maximum potential damage data was added to your model",
