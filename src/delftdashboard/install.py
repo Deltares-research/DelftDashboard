@@ -121,6 +121,7 @@ def copy_p_drive_files(
         "delftdashboard.ini",
         "data_catalog_USA.yml",
         "hydromt_fiat_catalog_USA.yml",
+        "hydromt_fiat_catalog_global.yml",
         "data_catalog.yml",
         "data",
         "Hazus_IWR_curves.csv",
@@ -129,6 +130,7 @@ def copy_p_drive_files(
         "delftdashboard.ini",
         "datalib_delftdashboard",
         "hydromt_fiat_catalog_USA",
+        "hydromt_fiat_catalog_global",
         "hydromt_sfincs_catalog",
         "bathymetry_database",
         "Hazus_IWR_curves",
@@ -161,6 +163,8 @@ def copy_p_drive_files(
         {
             "hydromt_fiat_catalog_USA": repo_paths["hydromt_fiat"]
             / Path("hydromt_fiat", "data", "hydromt_fiat_catalog_USA.yml"),
+            "hydromt_fiat_catalog_global": repo_paths["hydromt_fiat"]
+            / Path("hydromt_fiat", "data", "hydromt_fiat_catalog_global.yml"),
             "Hazus_IWR_curves": repo_paths["hydromt_fiat"]
             / Path(
                 "hydromt_fiat",
@@ -201,6 +205,7 @@ def update_delftdashboard_ini(target_paths: dict) -> None:
         "data_libs": [
             os.fspath(target_paths["datalib_delftdashboard"]),
             os.fspath(target_paths["hydromt_fiat_catalog_USA"]),
+            os.fspath(target_paths["hydromt_fiat_catalog_global"]),
             os.fspath(target_paths["hydromt_sfincs_catalog"]),
         ],
     }
