@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: "Select boundary type: "
+  title: "Select boundary type"
   position:
     x: 10
     y: 10
@@ -34,11 +34,11 @@ element:
       height: 20
     method: reset_mask_bounds 
 - style: panel
-  title: "Water level boundaries: "
+  title: "Water level boundaries"
   position:
     x: 140
     y: 10
-    width: 270
+    width: 300
     height: 120
   dependency:
   - action: visible
@@ -48,9 +48,18 @@ element:
       operator: eq
       value: 2
   element:
+  - style: edit
+    position:
+      x: 245
+      y: 90
+      width: 45
+      height: 20
+    text:  "Restrict to cells with a maximum elevation of (in m+Ref): "
+    text_position: left
+    variable: wlev_zmax  
   - style: listbox
     position:
-      x: 130
+      x: 160
       y: 10
       width: 80
       height: 70
@@ -64,7 +73,7 @@ element:
   - style: pushbutton
     text: Draw
     position:
-      x: 220
+      x: 250
       y: 60
       width: 40
       height: 20
@@ -72,7 +81,7 @@ element:
   - style: pushbutton
     text: Delete
     position:
-      x: 220
+      x: 250
       y: 35
       width: 40
       height: 20
@@ -87,26 +96,17 @@ element:
   - style: pushbutton
     text: Load
     position:
-      x: 220
+      x: 250
       y: 10
       width: 40
       height: 20
     method: load_wlev_polygon
-  - style: edit
-    position:
-      x: 215
-      y: 90
-      width: 45
-      height: 20
-    text:  "Restrict to cells with a maximum elevation of (in m+Ref): "
-    text_position: left
-    variable: wlev_zmax  
 - style: panel
-  title: "Outflow boundaries: "
+  title: "Outflow boundaries"
   position:
     x: 140
     y: 10
-    width: 270
+    width: 300
     height: 120
   dependency:
   - action: visible
@@ -116,9 +116,18 @@ element:
       operator: eq
       value: 3
   element:
+  - style: edit
+    position:
+      x: 245
+      y: 90
+      width: 45
+      height: 20
+    text:  "Restrict to cells with a minimum elevation of (in m+Ref): "
+    text_position: left
+    variable: outflow_zmin        
   - style: listbox
     position:
-      x: 130
+      x: 160
       y: 10
       width: 80
       height: 70
@@ -132,7 +141,7 @@ element:
   - style: pushbutton
     text: Draw
     position:
-      x: 220
+      x: 250
       y: 60
       width: 40
       height: 20
@@ -140,7 +149,7 @@ element:
   - style: pushbutton
     text: Delete
     position:
-      x: 220
+      x: 250
       y: 35
       width: 40
       height: 20
@@ -155,19 +164,10 @@ element:
   - style: pushbutton
     text: Load
     position:
-      x: 220
+      x: 250
       y: 10
       width: 40
       height: 20
     method: load_outflow_polygon
-  - style: edit
-    position:
-      x: 215
-      y: 90
-      width: 45
-      height: 20
-    text:  "Restrict to cells with a minimum elevation of (in m+Ref): "
-    text_position: left
-    variable: outflow_zmin        
 
 

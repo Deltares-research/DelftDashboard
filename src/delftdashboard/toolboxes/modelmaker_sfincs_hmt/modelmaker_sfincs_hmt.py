@@ -360,6 +360,7 @@ class Toolbox(GenericToolbox):
         )
 
     def generate_grid(self):
+
         model = app.model["sfincs_hmt"].domain
 
         dlg = app.gui.window.dialog_wait("Generating grid ...")
@@ -426,9 +427,26 @@ class Toolbox(GenericToolbox):
 
         dlg.close()
 
+        # Now clear the original mask and dep layers
+        app.map.layer["sfincs_hmt"].layer["bed_levels"].clear()
+        app.map.layer["sfincs_hmt"].layer["mask"].clear()
+
+        # Should also do that in sfincs_hydromt object (is this the right way?).
+        # The first time a grid is generated, the model.grid dataset seems to be completely empty.
+        # Why is that? Why not give it dummy values for the depth, and set the mask to 0?
+        # Roel, can you have a look at this?
+        if "dep" in model.grid:
+            # Remove dep from model.grid
+            # Why does the following not work? Is model.grid more than just an XArrayDataset?
+            model.grid = model.grid.drop("dep")
+        if "msk" in model.grid:
+            # Remove msk from model.grid
+            model.grid = model.grid.drop("msk")
+
     def generate_bathymetry(self):
         model = app.model["sfincs_hmt"].domain
 
+        # Move this sort of GUI stuff to tab module
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
 
         group = "modelmaker_sfincs_hmt"
@@ -517,14 +535,16 @@ class Toolbox(GenericToolbox):
                 text = str(e)
                 )
             return
-        self.setup_dict.update({"setup_mask_active": setup_mask_active})
 
-        self.set_active_cell_layer()      
+        self.setup_dict.update({"setup_mask_active": setup_mask_active})
 
         # update bathymetry on map
         app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
 
         dlg.close()
+
+        self.set_active_cell_layer()      
+
 
     def update_mask_bounds(self, btype):
         model = app.model["sfincs_hmt"].domain
@@ -664,8 +684,8 @@ class Toolbox(GenericToolbox):
         app.map.layer["sfincs_hmt"].layer["mask"].set_data(
             data=gdf, color_by_attribute=paint_properties, legend_items=legend
         )
-        app.map.layer["sfincs_hmt"].layer["region"].set_data(region)
 
+        app.map.layer["sfincs_hmt"].layer["region"].set_data(region)
 
     def reset_mask_bounds(self, btype):
         model = app.model["sfincs_hmt"].domain
