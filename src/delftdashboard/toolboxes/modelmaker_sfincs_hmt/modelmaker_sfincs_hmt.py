@@ -431,17 +431,17 @@ class Toolbox(GenericToolbox):
         app.map.layer["sfincs_hmt"].layer["bed_levels"].clear()
         app.map.layer["sfincs_hmt"].layer["mask"].clear()
 
-        # Should also do that in sfincs_hydromt object (is this the right way?).
-        # The first time a grid is generated, the model.grid dataset seems to be completely empty.
-        # Why is that? Why not give it dummy values for the depth, and set the mask to 0?
-        # Roel, can you have a look at this?
-        if "dep" in model.grid:
-            # Remove dep from model.grid
-            # Why does the following not work? Is model.grid more than just an XArrayDataset?
-            model.grid = model.grid.drop("dep")
-        if "msk" in model.grid:
-            # Remove msk from model.grid
-            model.grid = model.grid.drop("msk")
+        # # Should also do that in sfincs_hydromt object (is this the right way?).
+        # # The first time a grid is generated, the model.grid dataset seems to be completely empty.
+        # # Why is that? Why not give it dummy values for the depth, and set the mask to 0?
+        # # Roel, can you have a look at this?
+        # if "dep" in model.grid:
+        #     # Remove dep from model.grid
+        #     # Why does the following not work? Is model.grid more than just an XArrayDataset?
+        #     model.grid = model.grid.drop("dep")
+        # if "msk" in model.grid:
+        #     # Remove msk from model.grid
+        #     model.grid = model.grid.drop("msk")
 
     def generate_bathymetry(self):
         model = app.model["sfincs_hmt"].domain
