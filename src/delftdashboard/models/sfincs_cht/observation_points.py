@@ -73,7 +73,6 @@ def point_clicked(x, y):
     update()
 #    write()
 
-
 def select_observation_point_from_list(*args):
     map.reset_cursor()
     index = app.gui.getvar("sfincs_cht", "active_observation_point")

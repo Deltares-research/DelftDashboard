@@ -6,84 +6,91 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 import os
+from copy import deepcopy
 
 from delftdashboard.app import app
 
 def globe(option):
-    if app.view["projection"] != "globe":
-        app.view["projection"] = "globe"
-        app.gui.setvar("menu", "projection", "globe")
+    if app.gui.getvar("view_settings", "projection") != "globe":
+        app.gui.setvar("view_settings", "projection", "globe")    
         app.map.set_projection("globe")
         app.gui.window.update()
 
 def mercator(option):
-    if app.view["projection"] != "mercator":
-        app.view["projection"] = "mercator"
-        app.gui.setvar("menu", "projection", "mercator")
+    # if app.view["projection"] != "mercator":
+    if app.gui.getvar("view_settings", "projection") != "mercator":
+        app.gui.setvar("view_settings", "projection", "mercator")
         app.map.set_projection("mercator")
         app.gui.window.update()
 
 def topography(option):
-    if app.view["topography"]["visible"] == False:
-        app.view["topography"]["visible"] = True
-        app.gui.setvar("menu", "show_topography", True)
+    if not app.gui.getvar("view_settings", "topography_visible"):
+        app.gui.setvar("view_settings", "topography_visible", True)
     else:
-        app.view["topography"]["visible"] = False
-        app.gui.setvar("menu", "show_topography", False)
-    app.map.layer["main"].layer["background_topography"].set_visibility(app.view["topography"]["visible"])
+        app.gui.setvar("view_settings", "topography_visible", False)
+    app.map.layer["main"].layer["background_topography"].set_visibility(app.gui.getvar("view_settings", "topography_visible"))
     app.gui.window.update()
 
-
 def layer_style(option):
-    app.gui.setvar("menu", "layer_style", option)
-    if app.view["layer_style"] != option:
+    if app.gui.getvar("view_settings", "layer_style") != option:
+        app.gui.setvar("view_settings", "layer_style", option)
         app.map.set_layer_style(option)
-    app.view["layer_style"] = option
-    # # No redraw all layers
-    # app.map.redraw_layers()
     app.gui.window.update()
 
 def terrain(option):
-    if app.view["terrain"]["visible"] == False:
-        app.view["terrain"]["visible"] = True
-        app.gui.setvar("menu", "show_terrain", True)
+    if not app.gui.getvar("view_settings", "terrain_visible"):
+        app.gui.setvar("view_settings", "terrain_visible", True)
     else:
-        app.view["terrain"]["visible"] = False
-        app.gui.setvar("menu", "show_terrain", False)
-    app.map.set_terrain(app.view["terrain"]["visible"], app.view["terrain"]["exaggeration"])
+        app.gui.setvar("view_settings", "terrain_visible", False)        
+    app.map.set_terrain(app.gui.getvar("view_settings", "terrain_visible"), app.gui.getvar("view_settings", "terrain_exaggeration"))
 
-def settings(option):
+def edit_settings(option):
 
-    # A lot of copying here. Should we just use setvar and getvar for the settings ? No, because we want to be able to cancel the settings.
-    app.gui.setvar("topography_view_settings", "colormap", app.view["topography"]["colormap"])
-    app.gui.setvar("topography_view_settings", "autoscaling", app.view["topography"]["autoscaling"])
-    app.gui.setvar("topography_view_settings", "zmin", app.view["topography"]["zmin"])
-    app.gui.setvar("topography_view_settings", "zmax", app.view["topography"]["zmax"])
-    app.gui.setvar("topography_view_settings", "opacity", app.view["topography"]["opacity"])
+    # This opens the popup window for the view settings
+
+    # We first make a copy of the gui variable group "view_settings" for editing. This will allow us to cancel the settings.
+    app.gui.variables["edit_view_settings"] = deepcopy(app.gui.variables["view_settings"])
 
     # Open settings window
-    okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "view_settings","view_settings.yml"), id="view_settings")
+    okay, data = app.gui.popup(os.path.join(app.main_path, "misc", "view_settings", "view_settings.yml"), id="view_settings")
     if not okay:
         return
-
+    
     # Okay was pressed, so update view settings
-    app.view["topography"]["colormap"] = app.gui.getvar("topography_view_settings", "colormap")
-    app.view["topography"]["autoscaling"] = app.gui.getvar("topography_view_settings", "autoscaling")
-    app.view["topography"]["zmin"] = app.gui.getvar("topography_view_settings", "zmin")
-    app.view["topography"]["zmax"] = app.gui.getvar("topography_view_settings", "zmax")
-    app.view["topography"]["opacity"]  = app.gui.getvar("topography_view_settings", "opacity")
+    original_view_settings = app.gui.variables["view_settings"]
+    edited_view_settings = app.gui.variables["edit_view_settings"]
 
-    # Updata topography layer
-    app.background_topography_layer.color_map = app.view["topography"]["colormap"]
-    app.background_topography_layer.color_scale_auto = app.view["topography"]["autoscaling"]
-    app.background_topography_layer.color_scale_cmin = app.view["topography"]["zmin"]
-    app.background_topography_layer.color_scale_cmax = app.view["topography"]["zmax"]
-    # app.background_topography_layer.color_scale_symmetric = app.view["topography"]["color_scale_symmetric"]
-    app.background_topography_layer.opacity = app.view["topography"]["opacity"]
+    # Perhaps we need to make some changes
 
-    # # Update view
-    # app.view["terrain"]["exaggeration"] = data["terrain_exaggeration"]
-    # app.view["terrain"]["visible"] = data["show_terrain"]
-    # app.view["topography"]["visible"] = data["show_topography"]
-    # app.view["layer_style"] = data["layer_style"]
-    # # Update GUI
+    # # Change projection
+    # if edited_view_settings["projection"]["value"] != original_view_settings["projection"]["value"]:
+    #     app.map.set_projection(edited_view_settings["projection"]["value"])
+
+    # Terrain
+    if edited_view_settings["terrain_exaggeration"]["value"] != original_view_settings["terrain_exaggeration"]["value"]:
+        if original_view_settings["terrain_visible"]["value"]:
+            app.map.set_terrain(True, edited_view_settings["terrain_exaggeration"]["value"])
+        else:
+            app.map.set_terrain(False, edited_view_settings["terrain_exaggeration"]["value"])
+
+    # Background topography
+    update_background_topography = False
+    vars_to_check = ["topography_dataset",
+                     "topography_auto_update",
+                     "topography_zmin",
+                     "topography_zmax",
+                     "topography_autoscaling",
+                     "topography_opacity",
+                     "topography_colormap",
+                     "topography_hillshading",
+                     "topography_interp_method",
+                     "topography_quality"]
+    for var in vars_to_check:
+        if edited_view_settings[var]["value"] != original_view_settings[var]["value"]:
+            update_background_topography = True
+
+    # Copy edited settings to view_settings
+    app.gui.variables["view_settings"] = deepcopy(edited_view_settings)
+
+    if update_background_topography:
+        app.map.layer["main"].layer["background_topography"].update()

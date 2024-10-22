@@ -12,7 +12,7 @@ from pyproj import CRS
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 
-from cht_bathymetry.bathymetry_database import bathymetry_database
+# from cht_bathymetry.bathymetry_database import bathymetry_database
 from cht_utils.misc_tools import dict2yaml
 from cht_utils.misc_tools import yaml2dict
 from cht_sfincs.quadtree_grid_snapwave import snapwave_quadtree2mesh
@@ -129,10 +129,10 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "exclude_zmin_snapwave", -99999.0)
 
         # Bathymetry
-        source_names, sources = bathymetry_database.sources()
+        source_names, sources = app.bathymetry_database.sources()
         app.gui.setvar(group, "bathymetry_source_names", source_names)
         app.gui.setvar(group, "active_bathymetry_source", source_names[0])
-        dataset_names, dataset_long_names, dataset_source_names = bathymetry_database.dataset_names(source=source_names[0])
+        dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source_names[0])
         app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
         app.gui.setvar(group, "bathymetry_dataset_index", 0)
         app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
@@ -327,7 +327,8 @@ class Toolbox(GenericToolbox):
         #     bth["dataset"] = bth["dataset"].name
         #     # bathy_lst = bth.name
 #        app.model["sfincs_cht"].domain.grid.set_bathymetry(bathy_lst)
-        app.model["sfincs_cht"].domain.grid.set_bathymetry(bathymetry_list)
+        app.model["sfincs_cht"].domain.grid.set_bathymetry(bathymetry_list,
+                                                           bathymetry_database=app.bathymetry_database)
         app.model["sfincs_cht"].domain.grid.write()
         # If SnapWave also generate SnapWave mesh and save it
         if app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"):
@@ -356,11 +357,10 @@ class Toolbox(GenericToolbox):
                    open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmax"),
                    outflow_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon,
                    outflow_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmin"),
-                   outflow_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmax")
+                   outflow_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmax"),
+                   update_datashader_dataframe=True
                    )
-        app.map.layer["sfincs_cht"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
-        app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_data(mask.to_gdf(option="open"))
-        app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_data(mask.to_gdf(option="outflow"))
+        app.map.layer["sfincs_cht"].layer["mask"].set_data(mask)
 
         # if app.model["sfincs_cht"].domain.grid_type == "quadtree":
         grid.write() # Write new qtr file
@@ -762,8 +762,7 @@ class Toolbox(GenericToolbox):
             name = ddict["name"]
             zmin = ddict["zmin"]
             zmax = ddict["zmax"] 
-            d = bathymetry_database.get_dataset(name)
-            dataset = {"dataset": d, "zmin": zmin, "zmax": zmax}
+            dataset = {"dataset": name, "zmin": zmin, "zmax": zmax}
             app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets.append(dataset)
             dataset_names.append(name)
         app.gui.setvar("modelmaker_sfincs_cht", "selected_bathymetry_dataset_names", dataset_names)

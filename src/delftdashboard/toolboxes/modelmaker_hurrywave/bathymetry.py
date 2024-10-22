@@ -6,7 +6,7 @@ Created on Mon May 10 12:18:09 2021
 """
 
 from delftdashboard.app import app
-from cht_bathymetry.bathymetry_database import bathymetry_database
+# from cht_bathymetry.bathymetry_database import bathymetry_database
 from delftdashboard.operations import map
 
 def select(*args):
@@ -16,7 +16,7 @@ def select(*args):
 
 def select_bathymetry_source(*args):
     source = args[0]
-    dataset_names, dataset_long_names, dataset_source_names = bathymetry_database.dataset_names(source=source)
+    dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source)
     app.gui.setvar("modelmaker_hurrywave", "bathymetry_dataset_names", dataset_names)
     app.gui.setvar("modelmaker_hurrywave", "bathymetry_dataset_index", 0)
 

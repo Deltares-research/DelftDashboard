@@ -15,7 +15,7 @@ from pyproj import CRS
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 
-from cht_bathymetry.bathymetry_database import bathymetry_database
+# from cht_bathymetry.bathymetry_database import bathymetry_database
 from cht_utils.misc_tools import dict2yaml
 from cht_utils.misc_tools import yaml2dict
 
@@ -58,10 +58,10 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "rotation", 0.0)
 
         # Bathymetry
-        source_names, sources = bathymetry_database.sources()
+        source_names, sources = app.bathymetry_database.sources()
         app.gui.setvar(group, "bathymetry_source_names", source_names)
         app.gui.setvar(group, "active_bathymetry_source", source_names[0])
-        dataset_names, dataset_long_names, dataset_source_names = bathymetry_database.dataset_names(source=source_names[0])
+        dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source_names[0])
         app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
         app.gui.setvar(group, "bathymetry_dataset_index", 0)
         app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
@@ -379,8 +379,8 @@ class Toolbox(GenericToolbox):
             name = ddict["name"]
             zmin = ddict["zmin"]
             zmax = ddict["zmax"] 
-            d = bathymetry_database.get_dataset(name)
-            dataset = {"dataset": d, "zmin": zmin, "zmax": zmax}
+            # d = app.bathymetry_database.get_dataset(name)
+            dataset = {"dataset": name, "zmin": zmin, "zmax": zmax}
             app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets.append(dataset)
             dataset_names.append(name)
         app.gui.setvar("modelmaker_hurrywave", "selected_bathymetry_dataset_names", dataset_names)

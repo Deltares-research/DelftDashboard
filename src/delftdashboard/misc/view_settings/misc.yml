@@ -1,16 +1,9 @@
 element:
 - style: edit  
+  text: Vertical Exaggeration (-)
   position:
-    x: 20
-    y: 80
+    x: 120
+    y: 120
     width: 60
     height: 20
-  variable: zmax
-- style: edit  
-  position:
-    x: 20
-    y: 40
-    width: 60
-    height: 20
-  variable: zmin
-  
+  variable: terrain_exaggeration

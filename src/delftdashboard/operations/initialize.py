@@ -12,7 +12,8 @@ import importlib
 from pyproj import CRS
 
 from guitares.gui import GUI
-from cht_bathymetry.bathymetry_database import bathymetry_database
+# from cht_bathymetry.bathymetry_database import bathymetry_database
+from cht_bathymetry import BathymetryDatabase
 from guitares.colormap import read_color_maps
 from .gui import build_gui_config
 
@@ -66,33 +67,62 @@ def initialize():
 
     # Define some other variables
     app.crs = CRS(4326)
-    app.auto_update_topography = True
+    # app.auto_update_topography = True
     app.background_topography  = "gebco19"
-    app.bathymetry_database_path = app.config["bathymetry_database"]
-    bathymetry_database.initialize(app.bathymetry_database_path)
+    app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database"])
+    # app.bathymetry_database_path = app.config["bathymetry_database"]
+    # bathymetry_database.initialize(app.bathymetry_database_path)
 
-    # View
-    app.view = {}
-    app.view["projection"] = "mercator"
+    # # View
+    # app.view = {}
+    # app.view["projection"] = "mercator" # "globe"
 
-    app.view["topography"] = {}
-    app.view["topography"]["visible"]  = True
-    app.view["topography"]["autoscaling"]  = True
-    app.view["topography"]["opacity"]  = 0.5
-    app.view["topography"]["quality"]  = "medium"
-    app.view["topography"]["colormap"] = "earth"
-    app.view["topography"]["interp_method"] = "nearest"
-    app.view["topography"]["interp_method"] = "linear"
-    app.view["topography"]["zmin"] = -10.0
-    app.view["topography"]["zmax"] =  10.0
+    # app.view["topography"] = {}
+    # app.view["topography"]["visible"]  = True
+    # app.view["topography"]["autoscaling"]  = True
+    # app.view["topography"]["opacity"]  = 0.5
+    # app.view["topography"]["quality"]  = "medium"
+    # app.view["topography"]["colormap"] = "earth"
+    # app.view["topography"]["interp_method"] = "nearest"
+    # app.view["topography"]["interp_method"] = "linear"
+    # app.view["topography"]["zmin"] = -10.0
+    # app.view["topography"]["zmax"] =  10.0
 
-    app.view["layer_style"] = "streets-v12"
+    # app.view["layer_style"] = "streets-v12"
 
-    app.view["terrain"] = {}
-    app.view["terrain"]["visible"] = False
-    app.view["terrain"]["exaggeration"] = 1.5
+    # app.view["terrain"] = {}
+    # app.view["terrain"]["visible"] = False
+    # app.view["terrain"]["exaggeration"] = 1.5
 
-    app.view["interp_method"] = "nearest"
+    # Use GUI variables to set the view settings    
+
+    # Layer style
+    app.gui.setvar("view_settings", "layer_style", "streets-v12")
+
+    # Projection
+    app.gui.setvar("view_settings", "projection", "mercator")
+
+    # Topography
+    app.gui.setvar("view_settings", "topography_dataset", "gebco19")
+    app.gui.setvar("view_settings", "topography_auto_update", "True")
+    app.gui.setvar("view_settings", "topography_visible", True)
+    app.gui.setvar("view_settings", "topography_colormap", "earth")
+    app.gui.setvar("view_settings", "topography_autoscaling", True)
+    app.gui.setvar("view_settings", "topography_opacity", 0.7)
+    app.gui.setvar("view_settings", "topography_quality", "medium")
+    app.gui.setvar("view_settings", "topography_hillshading", True)
+    app.gui.setvar("view_settings", "topography_interp_method", "linear")
+    # app.gui.setvar("view_settings", "topography_interp_method", "nearest")
+    app.gui.setvar("view_settings", "topography_zmin", -10.0)
+    app.gui.setvar("view_settings", "topography_zmax", 10.0)
+    app.gui.setvar("view_settings", "layer_style", "streets-v12")
+    app.gui.setvar("view_settings", "terrain_exaggeration", 1.5)
+    app.gui.setvar("view_settings", "terrain_visible", False)
+    # Read color maps (should be done in guitares)
+    cmps = read_color_maps(os.path.join(app.config_path, "colormaps"))
+    app.gui.setvar("view_settings", "colormaps", cmps)
+
+    # app.view["interp_method"] = "nearest"
 
     # Initialize toolboxes
     initialize_toolboxes()
@@ -134,9 +164,7 @@ def initialize():
 
     # Read tide database
 
-    # Read color maps (should be done in guitares)
-    cmps = read_color_maps(os.path.join(app.config_path, "colormaps"))
-    app.gui.setvar("topography_view_settings", "colormaps", cmps)
+    # app.gui.setvar("terrain_view_settings", "colormaps", cmps)
     # app.color_map = "earth"
     # app.color_map_earth = ListedColormap(rgb)
 
@@ -144,16 +172,16 @@ def initialize():
     app.gui.setvar("menu", "active_model_name", "")
     app.gui.setvar("menu", "active_toolbox_name", "")
     app.gui.setvar("menu", "active_topography_name", app.background_topography)
-    app.gui.setvar("menu", "projection", "mercator")
-    app.gui.setvar("menu", "show_topography", True)
-    app.gui.setvar("menu", "show_terrain", False)
-    app.gui.setvar("menu", "layer_style", app.view["layer_style"])
+    # app.gui.setvar("menu", "projection", "mercator")
+    # app.gui.setvar("menu", "show_topography", True)
+    # app.gui.setvar("menu", "show_terrain", False)
+    # app.gui.setvar("menu", "layer_style", app.view["layer_style"])
 
-    # Layers tab
-    app.gui.setvar("layers", "contour_elevation", 0.0)
-    app.gui.setvar("layers", "buffer_land", 5000.0)
-    app.gui.setvar("layers", "buffer_sea", 2000.0)
-    app.gui.setvar("layers", "buffer_single", True)
+    # # Layers tab
+    # app.gui.setvar("layers", "contour_elevation", 0.0)
+    # app.gui.setvar("layers", "buffer_land", 5000.0)
+    # app.gui.setvar("layers", "buffer_sea", 2000.0)
+    # app.gui.setvar("layers", "buffer_single", True)
 
     # Now build up GUI config
     build_gui_config()

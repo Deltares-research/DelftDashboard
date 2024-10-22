@@ -40,3 +40,11 @@ def map_moved(*args):
 
 def select_utm_zone(feature, widget):
     app.gui.popup_data["utm_zone"] = feature["properties"]
+
+def select_colormap(*args):
+    app.gui.popup_window["view_settings"].update()
+    pass
+    # widget = app.gui.popup_window["view_settings"].find_element_by_id("colormap").widget
+    # clrmap = app.gui.getvar("edit_view_settings", "topography_colormap")
+    # widget.element.colormap = clrmap
+    # widget.update_colormap_icon()

@@ -37,23 +37,8 @@ class Model(GenericModel):
                         circle_radius=0,
                         line_color="yellow")
 
-        layer.add_layer("mask_include",
-                        type="circle",
-                        circle_radius=3,
-                        fill_color="yellow",
-                        line_color="transparent")
-
-        layer.add_layer("mask_open_boundary",
-                        type="circle",
-                        circle_radius=3,
-                        fill_color="red",
-                        line_color="transparent")
-
-        layer.add_layer("mask_outflow_boundary",
-                        type="circle",
-                        circle_radius=3,
-                        fill_color="green",
-                        line_color="transparent")
+        layer.add_layer("mask",
+                        type="image")
 
         layer.add_layer("mask_include_snapwave",
                         type="circle",
@@ -101,8 +86,9 @@ class Model(GenericModel):
 
         from .observation_points import select_observation_point_from_map
         layer.add_layer("observation_points",
-                        type="circle_selector",
+                        type="circle_selector",                        
                         select=select_observation_point_from_map,
+                        hover_property="name",
                         line_color="white",
                         line_opacity=1.0,
                         fill_color="blue",
@@ -143,9 +129,7 @@ class Model(GenericModel):
             # Grid exterior is made visible
             layer.layer["grid_exterior"].deactivate()
             # Mask is made invisible
-            layer.layer["mask_include"].hide()
-            layer.layer["mask_open_boundary"].hide()
-            layer.layer["mask_outflow_boundary"].hide()
+            layer.layer["mask"].hide()
             layer.layer["mask_include_snapwave"].hide()
             # Boundary points are made grey
             layer.layer["boundary_points"].deactivate()
@@ -179,6 +163,8 @@ class Model(GenericModel):
             path = os.path.dirname(fname)
             self.domain.path = path
             self.domain.read()
+            # Also get mask datashader dataframe
+            self.domain.mask.get_datashader_dataframe()
             self.set_gui_variables()
             # Change working directory
             os.chdir(path)
@@ -187,9 +173,10 @@ class Model(GenericModel):
             app.crs = self.domain.crs
             app.map.crs = self.domain.crs
             self.plot()
-            if old_crs != app.crs:
-                app.map.fly_to(-80.0, 30.0, 6)
             dlg.close()
+            # Zoom to model extent
+            bounds = self.domain.grid.bounds(crs=4326, buffer=0.1)
+            app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def save(self):
         # Write sfincs.inp
@@ -208,9 +195,7 @@ class Model(GenericModel):
         # Grid exterior
         app.map.layer["sfincs_cht"].layer["grid_exterior"].set_data(app.model["sfincs_cht"].domain.grid.exterior)
         # Mask
-        app.map.layer["sfincs_cht"].layer["mask_include"].set_data(app.model["sfincs_cht"].domain.mask.to_gdf(option="include"))
-        app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_data(app.model["sfincs_cht"].domain.mask.to_gdf(option="open"))
-        app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_data(app.model["sfincs_cht"].domain.mask.to_gdf(option="outflow"))
+        app.map.layer["sfincs_cht"].layer["mask"].set_data(app.model["sfincs_cht"].domain.mask)
         # Observation points
         app.map.layer["sfincs_cht"].layer["observation_points"].set_data(app.model["sfincs_cht"].domain.observation_points.gdf, 0)
         # Boundary points
@@ -276,7 +261,6 @@ class Model(GenericModel):
 
         app.gui.setvar(group, "wind", True)
         app.gui.setvar(group, "rain", True)
-
 
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input variables

@@ -18,9 +18,7 @@ def select(*args):
     app.map.layer["modelmaker_sfincs_cht"].layer["outflow_boundary_polygon"].activate()
     # Show the grid and mask
     app.map.layer["sfincs_cht"].layer["grid"].activate()
-    app.map.layer["sfincs_cht"].layer["mask_include"].activate()
-    app.map.layer["sfincs_cht"].layer["mask_open_boundary"].activate()
-    app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].activate()
+    app.map.layer["sfincs_cht"].layer["mask"].activate()
     update()
 
 def draw_open_boundary_polygon(*args):

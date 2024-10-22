@@ -10,12 +10,12 @@ from pyproj import CRS
 import matplotlib as mpl
 
 from delftdashboard.app import app
-from cht_bathymetry.bathymetry_database import bathymetry_database
+# from cht_bathymetry.bathymetry_database import bathymetry_database
 
 def map_ready(*args):
 
     # This method is called when the map has been loaded
-    print('Map is ready !')
+    print('Map is ready ! Adding background topography and other layers ...')
 
     # Find map widget
     element = app.gui.window.find_element_by_id("map")
@@ -25,10 +25,12 @@ def map_ready(*args):
     main_layer = app.map.add_layer("main")
 
     # Add background topography layer
-    app.background_topography_layer = main_layer.add_layer("background_topography", type="raster")
+    main_layer.add_layer("background_topography", type="raster")
+    # app.background_topography_layer = main_layer.add_layer("background_topography", type="raster")
 
     # Set update method for topography layer
-    app.background_topography_layer.update = update_background
+    app.map.layer["main"].layer["background_topography"].update = update_background_topography_layer
+    # app.background_topography_layer.update = update_background_topography_layer
 
     # Go to point
     app.map.jump_to(0.0, 0.0, 2)
@@ -53,7 +55,7 @@ def map_moved(coords, widget):
     pass
 
 
-def update_background():
+def update_background_topography_layer():
 
     # Function that is called whenever the map has moved
 
@@ -63,7 +65,18 @@ def update_background():
 
     try:
 
-        if app.auto_update_topography and app.view["topography"]["visible"]:
+        auto_update = app.gui.getvar("view_settings", "topography_auto_update")
+        visible = app.gui.getvar("view_settings", "topography_visible")
+        quality = app.gui.getvar("view_settings", "topography_quality")
+        colormap = app.gui.getvar("view_settings", "topography_colormap")
+        interp_method = app.gui.getvar("view_settings", "topography_interp_method")
+        opacity = app.gui.getvar("view_settings", "topography_opacity")
+        zmin = app.gui.getvar("view_settings", "topography_zmin")
+        zmax = app.gui.getvar("view_settings", "topography_zmax")
+        autoscaling = app.gui.getvar("view_settings", "topography_autoscaling")
+        hillshading = app.gui.getvar("view_settings", "topography_hillshading")
+
+        if auto_update and visible:
 
             print("Updating background topography ...")
 
@@ -71,9 +84,9 @@ def update_background():
             xl = [coords[0][0], coords[1][0]]
             yl = [coords[0][1], coords[1][1]]
             wdt = app.map.view.geometry().width()
-            if app.view["topography"]["quality"] == "high":
+            if quality == "high":
                 npix = wdt
-            elif app.view["topography"]["quality"] == "medium":
+            elif quality == "medium":
                 npix = int(wdt*0.5)
             else:
                 npix = int(wdt*0.25)
@@ -81,14 +94,25 @@ def update_background():
             dxy = (xl[1] - xl[0])/npix
             xv = np.arange(xl[0], xl[1], dxy)
             yv = np.arange(yl[0], yl[1], dxy)
-            # dataset = bathymetry_database.get_dataset(app.background_topography)
-            dataset_list = [{"name": app.background_topography, "zmin": -99999.9, "zmax": 99999.9}]
+            background_topography_dataset = app.gui.getvar("view_settings", "topography_dataset")
+            dataset_list = [{"name": background_topography_dataset, "zmin": -99999.9, "zmax": 99999.9}]
 
             try:
-                cmap = mpl.cm.get_cmap(app.view["topography"]["colormap"])
-                z = bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(4326), dataset_list,
-                                                            method=app.view["topography"]["interp_method"])
-                app.background_topography_layer.set_data(x=xv, y=yv, z=z, colormap=cmap, decimals=0)
+                cmap = mpl.cm.get_cmap(colormap)
+                z = app.bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(4326), dataset_list,
+                                                                   method=interp_method)
+
+                app.map.layer["main"].layer["background_topography"].opacity = opacity
+
+                app.map.layer["main"].layer["background_topography"].color_scale_auto = autoscaling
+                app.map.layer["main"].layer["background_topography"].color_scale_symmetric = True
+                app.map.layer["main"].layer["background_topography"].color_scale_symmetric_side = "min"
+                app.map.layer["main"].layer["background_topography"].color_scale_cmin = zmin
+                app.map.layer["main"].layer["background_topography"].color_scale_cmax = zmax
+                app.map.layer["main"].layer["background_topography"].hillshading = hillshading
+
+                app.map.layer["main"].layer["background_topography"].set_data(x=xv, y=yv, z=z, colormap=cmap, decimals=0)
+
             except:
                 print("Error loading background topo ...")
                 traceback.print_exc()

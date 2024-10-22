@@ -8,6 +8,6 @@ Created on Tue Jul  5 13:40:07 2022
 from delftdashboard.app import app
 
 def select_dataset(option):
-    app.background_topography = option
-    app.background_topography_layer.update()
-    app.gui.setvar("menu", "active_topography_name", option)
+    app.gui.setvar("view_settings", "topography_dataset", option)
+    app.map.layer["main"].layer["background_topography"].update()
+    app.gui.setvar("menu", "active_topography_name", option) # still change this to in menu

@@ -14,9 +14,9 @@ element:
     height: 350
   tab:
   - string: Topography
-    variable_group: topography_view_settings
+    variable_group: edit_view_settings
     element: topography.yml
-  - string: Misc
-    variable_group: misc_view_settings
+  - string: Terrain
+    variable_group: edit_view_settings
     element: misc.yml
     
