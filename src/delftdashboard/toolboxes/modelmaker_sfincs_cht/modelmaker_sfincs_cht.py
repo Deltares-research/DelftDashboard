@@ -409,6 +409,7 @@ class Toolbox(GenericToolbox):
         p = app.gui.window.dialog_progress("               Generating Sub-grid Tables ...                ", 100)
         app.model["sfincs_cht"].domain.subgrid.build(bathymetry_sets,
                                                      roughness_sets,
+                                                     bathymetry_database=app.bathymetry_database,
                                                      manning_land=manning_land,
                                                      manning_water=manning_water,
                                                      manning_level=manning_level,
