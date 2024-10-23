@@ -27,10 +27,7 @@ DisableDirPage=no
 DisableProgramGroupPage=no
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{app}\_internal"
-Type: filesandordirs; Name: "{app}\data"
-Type: files; Name: "{app}\{#MyAppExeName}"
-Type: dirifempty; Name: "{app}"
+Type: filesandordirs; Name: "{app}"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

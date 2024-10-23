@@ -1,14 +1,17 @@
 import argparse
 from pathlib import Path
+import shutil
 
 from config import (
     BRANCA_TEMPLATES_DIR,
     BUILD_DIR,
+    DATA_DIR,
     DEPENDENCIES,
     DIFFERENT_METADATA_NAME,
     DIST_DIR,
     ENTRY_POINT,
     EXCLUDES,
+    EXE_DATA_DIR,
     EXPECTED_STRUCTURE_MSG_EXE,
     LOGO,
     MANUAL_BINARIES,
@@ -24,7 +27,7 @@ from config import (
     _validate_path,
     _increase_recursion_limit,
     _copy_shapely_libs,
-    finalize_exe
+    clean_exe
 )
 
 
@@ -175,9 +178,9 @@ def main():
 
     PyInstaller.__main__.run(cmd_args)
 
-    finalize_exe()
-
-
+    clean_exe()
+    if args.include_data:
+        shutil.copytree(DATA_DIR, EXE_DATA_DIR, dirs_exist_ok=True)
 
 if __name__ == "__main__":
     main()

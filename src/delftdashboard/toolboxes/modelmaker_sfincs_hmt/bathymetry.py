@@ -189,7 +189,7 @@ def add_dataset(*args):
         list_bathymetry_datasets(source="User")
 
         # reloading doesnt work yet, so we need to restart the app
-        app.gui.window.dialog_warning("Adding your own datasets is beta functionality. To use and view the dataset you just added, restart the app and go to menu -> Topgraphy -> User.")
+        app.gui.window.dialog_warning(title="Restart required.", text="Adding your own datasets is beta functionality.\n\nBefore you can use and view the dataset you just added, please restart the app.")
 
 
 def select_selected_bathymetry_dataset(*args):
