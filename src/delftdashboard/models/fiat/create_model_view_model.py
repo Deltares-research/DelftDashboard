@@ -56,19 +56,19 @@ def display_classification(*args):
         if app.gui.getvar("fiat", "classification_display_name") == "Primary":
             app.map.layer["buildings"].layer[
                 "exposure_points"
-            ].hover_property = "Primary Object Type"
+            ].hover_property = "primary_object_type"
             app.active_model.show_classification(type="primary")
         else:
             app.map.layer["buildings"].layer[
                 "exposure_points"
-            ].hover_property = "Secondary Object Type"
+            ].hover_property = "secondary_object_type"
             app.active_model.show_classification(type="secondary")
 
 
 def display_damage(*args):
     if app.gui.getvar("fiat", "show_asset_locations"):
         app.map.layer["buildings"].clear()
-        if app.gui.getvar("fiat", "max_potential_damage_name") == "Structure":
+        if app.gui.getvar("fiat", "max_potential_damage_name") == "structure":
             app.active_model.show_max_potential_damage_struct()
         else:
             app.active_model.show_max_potential_damage_cont()

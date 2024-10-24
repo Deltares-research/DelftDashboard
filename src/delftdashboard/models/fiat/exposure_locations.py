@@ -119,7 +119,7 @@ def build_nsi_exposure(*args):
         )
         gdf.set_crs(crs, inplace=True)
 
-        # Set the primary and secondary object type lists
+        # Set the primary and secondary_object_type lists
         app.active_model.set_object_types(unique_primary_types, unique_secondary_types)
 
         # Set the buildings attribute to gdf for easy visualization of the buildings
@@ -130,13 +130,13 @@ def build_nsi_exposure(*args):
 
         app.gui.setvar(model, "show_asset_locations", True)
 
-        list_types = list(gdf["Secondary Object Type"].unique())
+        list_types = list(gdf["secondary_object_type"].unique())
         list_types.sort()
         df = pd.DataFrame(
             data={
-                "Secondary Object Type": list_types,
-                "Assigned: Structure": "",
-                "Assigned: Content": "",
+                "secondary_object_type": list_types,
+                "Assigned: structure": "",
+                "Assigned: content": "",
             }
         )
         ## TODO: add the nr of stories and the basement?

@@ -63,7 +63,7 @@ class Model(GenericModel):
             legend_title="Buildings",
             fill_color="orange",
             line_color="transparent",
-            hover_property="Secondary Object Type",
+            hover_property="secondary_object_type",
             big_data=True,
             min_zoom=10,
         )
@@ -76,7 +76,7 @@ class Model(GenericModel):
             legend_title="Buildings",
             fill_color="orange",
             line_color="transparent",
-            hover_property="Primary Object Type",
+            hover_property="primary_object_type",
             big_data=True,
             min_zoom=10,
         )
@@ -89,7 +89,7 @@ class Model(GenericModel):
             legend_title="Buildings",
             fill_color="orange",
             line_color="transparent",
-            hover_property="Secondary Object Type",
+            hover_property="secondary_object_type",
             big_data=True,
             min_zoom=10,
         )
@@ -164,7 +164,7 @@ class Model(GenericModel):
             line_color="purple",
             line_width=3,
             circle_radius=0,
-            hover_property="Secondary Object Type",
+            hover_property="secondary_object_type",
         )
 
         layer = app.map.add_layer("aggregation")
@@ -349,7 +349,7 @@ class Model(GenericModel):
 
         df = pd.DataFrame(
             columns=[
-                "Secondary Object Type",
+                "secondary_object_type",
                 "Assigned: Structure",
                 "Assigned: Content",
             ]
@@ -357,7 +357,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
         ## STANDARDIZING EXPOSURE CATEGORIES ##
-        df = pd.DataFrame(columns=["Primary Object Type", "Assigned"])
+        df = pd.DataFrame(columns=["primary_object_type", "Assigned"])
         app.gui.setvar(group, "exposure_categories_to_standardize", df)
         app.gui.setvar(group, "active_exposure_category_standardize", [0])
         app.gui.setvar(group, "active_related_occupancy_type", [0])
@@ -411,14 +411,14 @@ class Model(GenericModel):
             "object_type_string",
             [
                 "Primary Object Type",
-                "Secondary Object Type",
+                "Secondary_object_type",
             ],  # Make sure these are capitalized
         )
         app.gui.setvar(
-            group, "object_type_value", ["Primary Object Type", "Secondary Object Type"]
+            group, "object_type_value", ["primary_object_type", "secondary_object_type"]
         )  # Make sure these are capitalized
         app.gui.setvar(
-            group, "object_type", "Primary Object Type"
+            group, "object_type", "primary_object_type"
         )  # Make sure this is capitalized
         app.gui.setvar(
             group,
@@ -643,8 +643,8 @@ class Model(GenericModel):
                 columns=[
                     "object_id",
                     "object_name",
-                    "Primary Object Type",
-                    "Secondary Object Type",
+                    "primary_object_type",
+                    "secondary_object_type",
                     "max_damage_structure",
                     "max_damage_content",
                     "ground_flht",
@@ -907,7 +907,7 @@ class Model(GenericModel):
         if type == "primary":
             circle_color = [
                 "match",
-                ["get", "Primary Object Type"],
+                ["get", "primary_object_type"],
                 "AGR",
                 "#009c99",
                 "COM",
@@ -928,7 +928,7 @@ class Model(GenericModel):
         if type == "secondary":
             circle_color = [
                 "match",
-                ["get", "Secondary Object Type"],
+                ["get", "secondary_object_type"],
                 "AGR1",
                 "#009c99",
                 "COM1",
@@ -1011,7 +1011,7 @@ class Model(GenericModel):
         if type == "osm_primary":
             circle_color = [
                 "match",
-                ["get", "Primary Object Type"],
+                ["get", "primary_object_type"],
                 "commercial",
                 "#6590bb",
                 "infrastructure",
@@ -1034,7 +1034,7 @@ class Model(GenericModel):
         if type == "osm_secondary":
             circle_color = [
                 "match",
-                ["get", "Secondary Object Type"],
+                ["get", "secondary_object_type"],
                 "retail",
                 "#009c99",
                 "commercial",

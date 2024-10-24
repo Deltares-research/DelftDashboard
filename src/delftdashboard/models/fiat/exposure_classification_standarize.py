@@ -59,7 +59,7 @@ def assign_occupancy_type(*args):
         app.active_model.default_dict_categories[ec] = hazus_iwr_occupancy_class
 
     # Update list and append new values
-    if object_type == "Primary Object Type": 
+    if object_type == "primary_object_type": 
         prim = app.gui.getvar(model,"selected_primary_classification_string")
         prim.extend(exposure_categories_to_standardize[object_type].to_list())
         prim = list(set([item for item in prim if item != "" ]))

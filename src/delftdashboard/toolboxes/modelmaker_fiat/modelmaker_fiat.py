@@ -484,16 +484,16 @@ def quick_build(*args):
         app.active_model.roads.set_crs(crs, inplace=True)
 
     list_types_primary = list(
-        app.active_model.buildings["Primary Object Type"].unique()
+        app.active_model.buildings["primary_object_type"].unique()
     )
     list_types_secondary = list(
-        app.active_model.buildings["Secondary Object Type"].unique()
+        app.active_model.buildings["secondary_object_type"].unique()
     )
     list_types_primary.sort()
     list_types_secondary.sort()
     df = pd.DataFrame(
         data={
-            "Secondary Object Type": list_types_secondary,
+            "secondary_object_type": list_types_secondary,
             "Assigned: Structure": "",
             "Assigned: Content": "",
         }
@@ -507,7 +507,7 @@ def quick_build(*args):
         app.active_model.buildings
     )
 
-    # Set the primary and secondary object type lists
+    # Set the primary and secondary_object_type lists
     app.active_model.set_object_types(list_types_primary, list_types_secondary)
 
     # Set the unit for Exposure Data for visualization
