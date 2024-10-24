@@ -1,0 +1,74 @@
+element:
+- style: edit
+  position:
+    x: 150
+    y: 110
+    width: 50
+    height: 20
+  text: Horizontal Eddy Viscosity (m2/s)
+  variable: physics.vicouv
+  method: set_model_variables
+- style: edit
+  position:
+    x: 150
+    y: 85
+    width: 50
+    height: 20
+  text: Vertical Eddy Viscosity (m2/s)
+  variable: physics.vicoww
+  method: set_model_variables
+- style: edit
+  position:
+    x: 150
+    y: 60
+    width: 50
+    height: 20
+  text: Vertical Eddy Diffusivity (m2/s)
+  variable: physics.dicoww
+  method: set_model_variables
+- style: edit
+  position:
+    x: 150
+    y: 35
+    width: 50
+    height: 20
+  text: Smagorinsky
+  variable: physics.smagorinsky
+  method: set_model_variables
+- style: edit
+  position:
+    x: 150
+    y: 10
+    width: 50
+    height: 20
+  text: Average Water Density (kg/m3)
+  variable: physics.rhomean
+  method: set_model_variables
+- style: checkbox
+  position:
+    x: 310
+    y: 110
+    width: 50
+    height: 20
+  text: Tidal Forcing
+  variable: physics.tidalforcing
+  method: set_model_variables
+- style: checkbox
+  position:
+    x: 310
+    y: 85
+    width: 50
+    height: 20
+  text: Salinity
+  variable: physics.salinity
+  method: set_model_variables
+- style: checkbox
+  position:
+    x: 310
+    y: 60
+    width: 50
+    height: 20
+  text: Secondary Flow
+  variable: physics.secondaryflow
+  method: set_model_variables
+

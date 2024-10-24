@@ -1,0 +1,53 @@
+element:
+- style: pushselectfile
+  position:
+    x: 30
+    y: 110
+    width: 110
+    height: 20
+  text: Net file
+  variable: geometry.netfile.filepath
+  method: set_model_variables
+  showfilename: True
+  filter: "Net file (*_net.nc)"
+  title: Select Net file
+  tooltipstring: Select Net file
+- style: popupmenu
+  position:
+    x: 90
+    y: 85
+    width: 50
+    height: 20
+  text: Bed Level Type
+  variable: geometry.bedlevtype
+  method: set_model_variables
+  option_string:
+  - 3 (nodes/meanLev)
+  - 1 ()
+  - 2 ()
+  - 4 (nodes/minLev)
+  - 5 (nodes/maxLev)
+  - 6 ()
+  option_value:
+  - 3
+  - 1
+  - 2
+  - 4
+  - 5
+  - 6
+- style: edit
+  position:
+    x: 90
+    y: 60
+    width: 50
+    height: 20
+  text: Uniform Bed Level
+  variable: geometry.bedlevuni
+  method: set_model_variables
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: geometry.bedlevtype
+      operator: gt
+      value: 2

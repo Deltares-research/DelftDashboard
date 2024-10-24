@@ -1,0 +1,20 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Net
+    module: delftdashboard.models.delft3dfm.generic
+    element: geometry_net.yml
+  - string: Structures
+    module: delftdashboard.models.delft3dfm.generic
+    element: geometry_struct.yml
+  - string: Initial Conditions
+    module: delftdashboard.models.delft3dfm.generic
+    element: geometry_ini.yml
+  - string: Miscellaneous
+    module: delftdashboard.models.delft3dfm.generic
+    element: geometry_misc.yml

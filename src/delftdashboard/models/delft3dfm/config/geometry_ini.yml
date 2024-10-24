@@ -1,0 +1,36 @@
+element:
+- style: pushselectfile
+  position:
+    x: 30
+    y: 110
+    width: 110
+    height: 20
+  text:  Ini Field file
+  method: set_model_variables
+  variable: geometry.inifieldfile
+  showfilename: True
+  filter: "Initial + Parameter Field file (*.ini)"
+  title: Select Ini Field file
+  tooltipstring: Select Initial and Parameter Field file
+- style: pushselectfile
+  position:
+    x: 30
+    y: 85
+    width: 110
+    height: 20
+  text: Ini WL File
+  method: set_model_variables
+  variable: geometry.waterlevinifile
+  showfilename: True
+  filter: "Initial water level sample file (*.xyz)"
+  title: Select Initial WL file
+  tooltipstring: Select Initial Water Level file
+- style: edit
+  position:
+    x: 90
+    y: 60
+    width: 50
+    height: 20
+  text: Initial WL (m)
+  variable: geometry.waterlevini
+  method: set_model_variables

@@ -1,0 +1,36 @@
+element:
+- style: panel
+  title: Time Frame
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: edit
+    position:
+      x: 140
+      y: 130
+      width: 60
+      height: 20
+    text: Reference Time (yyyymmdd)
+    variable: time.refdate
+    method: set_model_variables
+  - style: edit
+    position:
+      x: 140
+      y: 105
+      width: 60
+      height: 20
+    text: Start Time
+    variable: time.tstart
+    method: set_model_variables
+  - style: edit
+    position:
+      x: 140
+      y: 80
+      width: 60
+      height: 20
+    text: Stop Time
+    variable: time.tstop
+    method: set_model_variables

@@ -1,0 +1,57 @@
+element:
+- style: pushselectfile
+  position:
+    x: 30
+    y: 110
+    width: 110
+    height: 20
+  text: Profile Loc File
+  variable: geometry.proflocfile
+  method: set_model_variables
+  showfilename: True
+  filter: "Profile Location File (*_proflocation.xyz)"
+  title: Select Profile Location File
+  tooltipstring: Select Profile Location file
+- style: pushselectfile
+  position:
+    x: 30
+    y: 85
+    width: 110
+    height: 20
+  text: Profile Def file
+  variable: geometry.profdeffile
+  method: set_model_variables
+  showfilename: True
+  filter:  "Profile Location File (*_profdefinition.def)"
+  title: Select Profile Definition File
+  tooltipstring: Select Profile Definition File
+- style: edit
+  position:
+    x: 90
+    y: 60
+    width: 50
+    height: 20
+  text: Latitude
+  variable: geometry.anglat
+  method: set_model_variables
+- style: popupmenu
+  position:
+    x: 90
+    y: 35
+    width: 50
+    height: 20
+  text: Conveyance 2D
+  variable: geometry.conveyance2d
+  method: set_model_variables
+  option_string:
+  - R=HU
+  - R=H
+  - R=A/P
+  - K=analytic-1D conv
+  - K=analytic-2D conv
+  option_value:
+  - -1
+  - 0
+  - 1
+  - 2
+  - 3

@@ -1,0 +1,34 @@
+element:
+- style: edit
+  position:
+    x: 80
+    y: 130
+    width: 50
+    height: 20
+  text: CFL Max
+  variable: numerics.cflmax
+  method: set_model_variables
+  tooltipstring: Edit Maximum Courant number (-)
+- style: popupmenu
+  position:
+    x: 80
+    y: 105
+    width: 100
+    height: 20
+  text: Advection Type
+  variable: numerics.advectype
+  method: set_model_variables
+  option_string:
+  - no advection
+  - Wenneker, qu-udzt
+  - 1, q(uio-u)
+  - Perot q(uio-u)
+  - Perot q(ui-u)
+  - Perot q(ui-u) without itself
+  option_value:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5

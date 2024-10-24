@@ -1,0 +1,65 @@
+element:
+- style: panel
+  title: Wind
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: popupmenu
+    position:
+      x: 150
+      y: 125
+      width: 150
+      height: 20
+    text: Wind Friction Type
+    variable: wind.icdtyp
+    method: set_model_variables
+    option_string:
+    - Constant
+    - S&B 2 breakpoints
+    - S&B 3 breakpoints
+    - Charnock
+    option_value:
+    - 1
+    - 2
+    - 3
+    - 4
+  - style: edit
+    position:
+      x: 150
+      y: 100
+      width: 150
+      height: 20
+    text: Cd Breakpoints (list)
+    variable: wind.cdbreakpoints
+    method: set_model_variables
+  - style: edit
+    position:
+      x: 150
+      y: 75
+      width: 150
+      height: 20
+    text: Wind Speed Breakpoints (list)
+    variable: wind.windspeedbreakpoints
+    method: set_model_variables
+  - style: edit
+    position:
+      x: 150
+      y: 50
+      width: 50
+      height: 20
+    text: Air density (kg/m3)
+    variable: wind.rhoair
+    method: set_model_variables
+  - style: edit
+    position:
+      x: 150
+      y: 25
+      width: 50
+      height: 20
+    text: Relative Wind Speed Factor (kg/m3)
+    variable: wind.relativewind
+    method: set_model_variables
+

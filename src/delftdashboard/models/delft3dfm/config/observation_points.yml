@@ -1,0 +1,17 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Regular
+    module: delftdashboard.models.delft3dfm.observation_points_regular
+    element: observation_points_regular.yml
+  - string: Cross section
+    module: delftdashboard.models.delft3dfm.observation_points_crs
+    element: observation_points_crs.yml
+  - string: Spectra
+    module: delftdashboard.models.delft3dfm.observation_points_spectra
+    element: observation_points_spectra.yml

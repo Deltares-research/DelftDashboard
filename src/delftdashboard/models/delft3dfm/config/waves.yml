@@ -1,0 +1,17 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: edit
+    position:
+      x: 60
+      y: 130
+      width: 60
+      height: 20
+    text: X0
+    variable: x0
+    enable: False

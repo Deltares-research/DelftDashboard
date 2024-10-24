@@ -1,0 +1,86 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 40
+    width: 150
+    height: 80
+  text: Refinement Polygons  
+  text_position: above  
+  method: select_refinement_polygon
+  variable: refinement_polygon_index
+  select: index
+  option_string:
+    variable: refinement_polygon_names
+- style: popupmenu
+  position:
+    x: 10
+    y: 10
+    width: 150
+    height: 20
+  method: select_refinement_level
+  variable: refinement_polygon_level
+  select: index
+  option_string:
+    variable: refinement_polygon_levels
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_refinement_polygons
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: Draw Polygon
+  position:
+    x: 170
+    y: 100
+    width: 80
+    height: 20
+  method: draw_refinement_polygon
+- style: pushbutton
+  text: Delete Polygon
+  position:
+    x: 170
+    y: 75
+    width: 80
+    height: 20
+  method: delete_refinement_polygon
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_refinement_polygons
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: Load Polygons
+  position:
+    x: 170
+    y: 50
+    width: 80
+    height: 20
+  method: load_refinement_polygon
+- style: pushbutton
+  text: Save Polygons
+  position:
+    x: 170
+    y: 25
+    width: 80
+    height: 20
+  method: save_refinement_polygon
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_refinement_polygons
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: Generate Quadtree Mesh
+  position:
+    x: 270
+    y: 100
+    width: 120
+    height: 20
+  method: build_quadtree_grid

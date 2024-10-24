@@ -1,0 +1,72 @@
+element:
+- style: panel
+  title: Domain
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: edit
+    position:
+      x: 60
+      y: 130
+      width: 60
+      height: 20
+    text: lon_min
+    variable: setup.lon_min
+    enable: False
+  - style: edit
+    position:
+      x: 160
+      y: 130
+      width: 60
+      height: 20
+    text: lat_min
+    variable: setup.lat_min
+    enable: False
+  - style: edit
+    position:
+      x: 60
+      y: 105
+      width: 60
+      height: 20
+    text: lon_max
+    variable: setup.lon_max
+    enable: False
+  - style: edit
+    position:
+      x: 160
+      y: 105
+      width: 60
+      height: 20
+    text: lat_max
+    variable: setup.lat_max
+    enable: False
+  - style: edit
+    position:
+      x: 60
+      y: 80
+      width: 60
+      height: 20
+    text: dX
+    variable: setup.dx
+    enable: False
+  - style: edit
+    position:
+      x: 160
+      y: 80
+      width: 60
+      height: 20
+    text: dY
+    variable: setup.dy
+    enable: False
+  - style: edit
+    position:
+      x: 60
+      y: 55
+      width: 60
+      height: 20
+    text: Rotation
+    variable: rotation
+    enable: False

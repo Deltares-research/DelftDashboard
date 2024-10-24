@@ -1,0 +1,204 @@
+element:
+- style: panel
+  title: Global
+  position:
+    x: 10
+    y: 10
+    width: 90
+    height: 120
+  element:
+  - style: edit
+    position:
+      x: 35
+      y: 90
+      width: 45
+      height: 20
+    text: Zmax
+    variable: global_zmax_snapwave
+  - style: edit
+    position:
+      x: 35
+      y: 65
+      width: 45
+      height: 20
+    text: Zmin
+    variable: global_zmin_snapwave
+- style: panel
+  title: Include Polygons
+  position:
+    x: 110
+    y: 10
+    width: 270
+    height: 120
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 80
+      height: 100
+    method: select_include_polygon_snapwave
+    variable: include_polygon_index_snapwave
+    select: index
+    option_string:
+      variable: include_polygon_names_snapwave
+  - style: pushbutton
+    text: Draw Polygon
+    position:
+      x: 100
+      y: 90
+      width: 80
+      height: 20
+    method: draw_include_polygon_snapwave
+  - style: pushbutton
+    text: Delete Polygon
+    position:
+      x: 100
+      y: 65
+      width: 80
+      height: 20
+    method: delete_include_polygon_snapwave
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_include_polygons_snapwave
+        operator: gt
+        value: 0
+  - style: pushbutton
+    text: Load Polygon
+    position:
+      x: 100
+      y: 40
+      width: 80
+      height: 20
+    method: load_include_polygon_snapwave
+  - style: pushbutton
+    text: Save Polygon
+    position:
+      x: 100
+      y: 15
+      width: 80
+      height: 20
+    method: save_include_polygon_snapwave
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_include_polygons_snapwave
+        operator: gt
+        value: 0
+  - style: edit
+    position:
+      x: 215
+      y: 90
+      width: 45
+      height: 20
+    text: Zmax
+    variable: include_zmax_snapwave
+  - style: edit
+    position:
+      x: 215
+      y: 65
+      width: 45
+      height: 20
+    text: Zmin
+    variable: include_zmin_snapwave
+- style: panel
+  title: Exclude Polygons
+  position:
+    x: 390
+    y: 10
+    width: 270
+    height: 120
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 80
+      height: 100
+    method: select_exclude_polygon_snapwave
+    variable: exclude_polygon_index_snapwave
+    select: index
+    option_string:
+      variable: exclude_polygon_names_snapwave
+  - style: pushbutton
+    text: Draw Polygon
+    position:
+      x: 100
+      y: 90
+      width: 80
+      height: 20
+    method: draw_exclude_polygon_snapwave
+  - style: pushbutton
+    text: Delete Polygon
+    position:
+      x: 100
+      y: 65
+      width: 80
+      height: 20
+    method: delete_exclude_polygon_snapwave
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_exclude_polygons_snapwave
+        operator: gt
+        value: 0
+  - style: pushbutton
+    text: Load Polygon
+    position:
+      x: 100
+      y: 40
+      width: 80
+      height: 20
+    method: load_exclude_polygon_snapwave
+  - style: pushbutton
+    text: Save Polygon
+    position:
+      x: 100
+      y: 15
+      width: 80
+      height: 20
+    method: save_exclude_polygon_snapwave
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_exclude_polygons_snapwave
+        operator: gt
+        value: 0
+  - style: edit
+    position:
+      x: 215
+      y: 90
+      width: 45
+      height: 20
+    text: Zmax
+    variable: exclude_zmax_snapwave
+  - style: edit
+    position:
+      x: 215
+      y: 65
+      width: 45
+      height: 20
+    text: Zmin
+    variable: exclude_zmin_snapwave
+- style: pushbutton
+  text: Update Mask
+  position:
+    x: 670
+    y: 110
+    width: 100
+    height: 20
+  method: update_mask
+- style: pushbutton
+  text: Cut Inactive Cells
+  position:
+    x: 670
+    y: 85
+    width: 100
+    height: 20
+  method: cut_inactive_cells
+
