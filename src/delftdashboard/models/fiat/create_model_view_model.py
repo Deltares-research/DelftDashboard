@@ -37,14 +37,14 @@ def display_properties(*args):
         app.gui.setvar(model, "classification_display_value", ["Primary", "Secondary"])
         app.gui.setvar(model, "classification_display_name", "Primary")
         display_classification()
-    elif properties_to_display == "Finished floor height":
+    elif properties_to_display == "ground_flht":
         display_asset_height()
     elif properties_to_display == "Max potential damages":
         app.gui.setvar(model, "max_potential_damage_string", ["Structure", "Content"])
         app.gui.setvar(model, "max_potential_damage_value", ["Structure", "Content"])
         app.gui.setvar(model, "max_potential_damage_name", "Structure")
         display_damage()
-    elif properties_to_display == "Ground Elevation":
+    elif properties_to_display == "ground_elevtn":
         display_ground_elevation()
     elif properties_to_display == "Social Vulnerability Index (SVI)":
         display_svi()

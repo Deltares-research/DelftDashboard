@@ -114,7 +114,7 @@ def add_to_model(*args):
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
     if app.active_model.domain.fiat_model.exposure is not None:
         dlg = app.gui.window.dialog_wait("\nUpdating Ground Elevation in your FIAT model...")
-        update.update_parameters("Ground Elevation")
+        update.update_parameters("ground_elevtn")
         dlg.close()
     
     # Set the source
@@ -122,6 +122,6 @@ def add_to_model(*args):
     app.active_model.save_gui_variables()
 
     app.gui.window.dialog_info(
-        text="Ground elevation data was added to your model",
-        title="Added ground elevation data",
+        text="Ground Elevation data was added to your model",
+        title="Added Ground Elevation data",
     )
