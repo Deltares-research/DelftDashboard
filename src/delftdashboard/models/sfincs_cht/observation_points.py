@@ -8,11 +8,16 @@ Created on Mon May 10 12:18:09 2021
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-
 def select(*args):
     map.update()
     app.map.layer["sfincs_cht"].layer["observation_points"].activate()
     update()
+
+def deselect(*args):
+    if app.model["sfincs_cht"].observation_points_changed:
+        ok = app.gui.window.dialog_yes_no("The observation points have changed. Would you like to save the changes?")
+        if ok:
+            save()
 
 def edit(*args):
     app.model["sfincs_cht"].set_model_variables()
@@ -30,12 +35,13 @@ def load(*args):
         app.map.layer["sfincs_cht"].layer["observation_points"].set_data(gdf, 0)
         app.gui.setvar("sfincs_cht", "active_observation_point", 0)
         update()
+    app.model["sfincs_cht"].observation_points_changed = False
 
 def save(*args):
     map.reset_cursor()
     file_name = app.model["sfincs_cht"].domain.input.variables.obsfile
     if not file_name:
-        file_name = "sfincs_cht.obs"
+        file_name = "sfincs.obs"
     rsp = app.gui.window.dialog_save_file("Select file ...",
                                           file_name=file_name,
                                           filter="*.obs",
@@ -43,6 +49,7 @@ def save(*args):
     if rsp[0]:
         app.model["sfincs_cht"].domain.input.variables.obsfile = rsp[2] # file name without path
         app.model["sfincs_cht"].domain.observation_points.write()
+    app.model["sfincs_cht"].observation_points_changed = False
 
 def update():
     gdf = app.active_model.domain.observation_points.gdf
@@ -71,7 +78,7 @@ def point_clicked(x, y):
     app.map.layer["sfincs_cht"].layer["observation_points"].set_data(gdf, index)
     app.gui.setvar("sfincs_cht", "active_observation_point", index)
     update()
-#    write()
+    app.model["sfincs_cht"].observation_points_changed = True
 
 def select_observation_point_from_list(*args):
     map.reset_cursor()
@@ -92,5 +99,5 @@ def delete_point_from_list(*args):
     index = max(min(index, len(gdf) - 1), 0)
     app.map.layer["sfincs_cht"].layer["observation_points"].set_data(gdf, index)
     app.gui.setvar("sfincs_cht", "active_observation_point", index)
+    app.model["sfincs_cht"].observation_points_changed = True
     update()
-#    write()

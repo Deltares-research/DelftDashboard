@@ -98,6 +98,20 @@ class Model(GenericModel):
                         line_color_selected="white",
                         fill_color_selected="red")
 
+        from .discharge_points import select_discharge_point_from_map
+        layer.add_layer("discharge_points",
+                        type="circle_selector",                        
+                        select=select_discharge_point_from_map,
+                        hover_property="name",
+                        line_color="white",
+                        line_opacity=1.0,
+                        fill_color="blue",
+                        fill_opacity=1.0,
+                        circle_radius=3,
+                        circle_radius_selected=4,
+                        line_color_selected="white",
+                        fill_color_selected="red")
+
 
         # Snapwave Boundary Enclosure
         from .waves_snapwave import boundary_enclosure_created
@@ -135,11 +149,13 @@ class Model(GenericModel):
             layer.layer["boundary_points"].deactivate()
             # Observation points are made grey
             layer.layer["observation_points"].deactivate()
+            # Discharge points are made grey
+            layer.layer["discharge_points"].deactivate()
             # Thin dams are made grey
             layer.layer["thin_dams"].layer["polylines"].deactivate()
             layer.layer["thin_dams"].layer["snapped"].hide()
-            # SnapWave boundary enclosure is made invisible
-            layer.layer["snapwave_boundary_enclosure"].hide()
+            # # SnapWave boundary enclosure is made invisible
+            # layer.layer["snapwave_boundary_enclosure"].hide()
             # Wave makers are made invisible
             layer.layer["wave_makers"].hide()
         if mode == "invisible":
@@ -200,15 +216,17 @@ class Model(GenericModel):
         app.map.layer["sfincs_cht"].layer["observation_points"].set_data(app.model["sfincs_cht"].domain.observation_points.gdf, 0)
         # Boundary points
         app.map.layer["sfincs_cht"].layer["boundary_points"].set_data(app.model["sfincs_cht"].domain.boundary_conditions.gdf, 0)
-        # SnapWave boundary enclosure
-        app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].set_data(app.model["sfincs_cht"].domain.snapwave.boundary_enclosure.gdf)
+        # Discharge points
+        app.map.layer["sfincs_cht"].layer["discharge_points"].set_data(app.model["sfincs_cht"].domain.discharge_points.gdf, 0)
+        # # SnapWave boundary enclosure
+        # app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].set_data(app.model["sfincs_cht"].domain.snapwave.boundary_enclosure.gdf)
         # Wave makers
         app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(app.model["sfincs_cht"].domain.wave_makers.gdf)
 
-    def plot_wave_makers(self):
-        layer = app.map.layer["sfincs_cht"].layer["wave_makers"]
-        layer.clear()
-        layer.add_feature(self.domain.wave_makers.gdf)
+    # def plot_wave_makers(self):
+    #     layer = app.map.layer["sfincs_cht"].layer["wave_makers"]
+    #     layer.clear()
+    #     layer.add_feature(self.domain.wave_makers.gdf)
 
     def set_gui_variables(self):
 
@@ -237,17 +255,39 @@ class Model(GenericModel):
 
         app.gui.setvar(group, "crs_type", "geographic")
 
+        # Wind drag
+        app.gui.setvar(group, "wind_speed_1", self.domain.input.variables.cdwnd[0])
+        app.gui.setvar(group, "wind_speed_2", self.domain.input.variables.cdwnd[1])
+        app.gui.setvar(group, "wind_speed_3", self.domain.input.variables.cdwnd[2])
+        app.gui.setvar(group, "cd_1", self.domain.input.variables.cdval[0])
+        app.gui.setvar(group, "cd_2", self.domain.input.variables.cdval[1])
+        app.gui.setvar(group, "cd_3", self.domain.input.variables.cdval[2])
+
         # Boundary conditions
         app.gui.setvar(group, "boundary_point_names", [])
         app.gui.setvar(group, "nr_boundary_points", 0)
         app.gui.setvar(group, "active_boundary_point", 0)
-        app.gui.setvar(group, "boundary_wl", 0.0)
         app.gui.setvar(group, "boundary_dx", 10000.0)
-         
+        app.gui.setvar(group, "boundary_conditions_timeseries_shape", "constant")
+        app.gui.setvar(group, "boundary_conditions_timeseries_time_step", 600.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_offset", 0.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_amplitude", 1.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_phase", 0.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_period", 43200.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_peak", 1.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
+        app.gui.setvar(group, "boundary_conditions_tide_model", app.gui.getvar("tide_models", "names")[0])
+                 
         # Observation points 
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
+
+        # Discharge points 
+        app.gui.setvar(group, "discharge_point_names", [])
+        app.gui.setvar(group, "nr_discharge_points", 0)
+        app.gui.setvar(group, "active_discharge_point", 0)
 
         # Thin dams
         app.gui.setvar(group, "thin_dam_names", [])
@@ -259,8 +299,13 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_wave_makers", 0)
         app.gui.setvar(group, "active_wave_maker", 0)
 
-        app.gui.setvar(group, "wind", True)
-        app.gui.setvar(group, "rain", True)
+        app.gui.setvar(group, "wind", False)
+        app.gui.setvar(group, "baro", False)
+        app.gui.setvar(group, "rain", False)
+
+        # Turning off weirs for now
+        app.gui.setvar(group, "enable_weirs", False)
+
 
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input variables
@@ -271,10 +316,23 @@ class Model(GenericModel):
             app.gui.setvar("modelmaker_sfincs_cht", "use_snapwave", True)
         else:
             app.gui.setvar("modelmaker_sfincs_cht", "use_snapwave", False)
+        # Wind drag    
+        self.domain.input.variables.cdwnd[0] = app.gui.getvar(group, "wind_speed_1")
+        self.domain.input.variables.cdwnd[1] = app.gui.getvar(group, "wind_speed_2")
+        self.domain.input.variables.cdwnd[2] = app.gui.getvar(group, "wind_speed_3")
+        self.domain.input.variables.cdval[0] = app.gui.getvar(group, "cd_1")
+        self.domain.input.variables.cdval[1] = app.gui.getvar(group, "cd_2")
+        self.domain.input.variables.cdval[2] = app.gui.getvar(group, "cd_3")
+
 
 
     def initialize_domain(self):
         self.domain = SFINCS(crs=app.crs)
+        # Also add some other attributes needed for the GUI
+        self.observation_points_changed = False
+        self.discharge_points_changed = False
+        self.boundaries_changed = False
+        self.thin_dams_changed = False
 
     def set_input_variable(self, gui_variable, value):
         pass

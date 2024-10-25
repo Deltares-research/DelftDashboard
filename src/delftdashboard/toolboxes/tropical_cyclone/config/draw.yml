@@ -1,0 +1,10 @@
+element:
+- style: pushbutton
+  text: Draw Track
+  position:
+    x: 20
+    y: 110
+    width: 120
+    height: 20
+  method: draw_track
+  enable: false

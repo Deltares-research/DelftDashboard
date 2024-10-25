@@ -1,0 +1,9 @@
+element:
+- style: pushbutton
+  text: Build Spiderweb
+  position:
+    x: 20
+    y: 110
+    width: 120
+    height: 20
+  method: build_spiderweb

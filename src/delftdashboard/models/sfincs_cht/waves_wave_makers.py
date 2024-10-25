@@ -32,18 +32,21 @@ def delete_from_list(*args):
     app.model["sfincs_cht"].domain.wave_makers.delete_polyline(index)
     gdf = app.model["sfincs_cht"].domain.wave_makers.gdf
     index = max(min(index, len(gdf) - 1), 0)
-    app.model["sfincs_cht"].plot_wave_makers()
+    app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(gdf)
     app.gui.setvar("sfincs_cht", "active_wave_maker", index)
+    app.model["sfincs_cht"].wave_makers_changed = True
     update()
 
 def wave_maker_created(gdf, index, id):
     app.model["sfincs_cht"].domain.wave_makers.gdf = gdf
     nrp = len(app.model["sfincs_cht"].domain.wave_makers.gdf)
     app.gui.setvar("sfincs_cht", "active_wave_maker", nrp - 1)
+    app.model["sfincs_cht"].wave_makers_changed = True
     update()
 
 def wave_maker_modified(gdf, index, id):
     app.model["sfincs_cht"].domain.wave_makers.gdf = gdf
+    app.model["sfincs_cht"].wave_makers_changed = True
 
 def wave_maker_selected(index):
     app.gui.setvar("sfincs_cht", "active_wave_maker", index)
@@ -58,13 +61,24 @@ def load(*args):
     if rsp[0]:
         app.model["sfincs_cht"].domain.input.variables.wvmfile = rsp[2] # file name without path
         app.model["sfincs_cht"].domain.wave_makers.read()
+        gdf = app.model["sfincs_cht"].domain.wave_makers.gdf
+        app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(gdf)
         app.gui.setvar("sfincs_cht", "active_wave_maker", 0)
-        app.model["sfincs_cht"].plot_wave_makers()
+        app.model["sfincs_cht"].wave_makers_changed = False
         update()
 
 def save(*args):
-    app.model["sfincs_cht"].domain.input.variables.wvmfile = "sfincs.wvm"
-    app.model["sfincs_cht"].domain.wave_makers.write()
+    filename = app.model["sfincs_cht"].domain.input.variables.wvmfile
+    if not filename:
+        filename = "sfincs.wvm"
+    rsp = app.gui.window.dialog_save_file("Select file ...",
+                                          file_name=filename,
+                                          filter="*.wvm",
+                                          allow_directory_change=False)
+    if rsp[0]:
+        app.model["sfincs_cht"].domain.input.variables.wvmfile = rsp[2] # file name without path
+        app.model["sfincs_cht"].domain.wave_makers.write()
+    app.model["sfincs_cht"].wave_makers_changed = False
 
 def update():
     gdf = app.model["sfincs_cht"].domain.wave_makers.gdf

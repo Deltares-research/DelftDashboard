@@ -20,7 +20,12 @@ def build_gui_config():
         file_name = toolbox_name + ".yml"
         app.toolbox[toolbox_name].element = app.gui.read_gui_elements(path, file_name)
         for element in app.toolbox[toolbox_name].element:
-            element["module"]         = "delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name
+            # Set the callback module. This is the module that contains the callback functions, and does not have to be the same as the toolbox module.
+            # This is useful as some toolboxes do not have tabs for which modules are defined, and the main module can become very busy with all the callbacks and the toolbox object.
+            if app.toolbox[toolbox_name].callback_module_name is None:
+                element["module"]         = "delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name
+            else:
+                element["module"]         = "delftdashboard.toolboxes." + toolbox_name + "." + app.toolbox[toolbox_name].callback_module_name
             element["variable_group"] = toolbox_name
 
     # Models

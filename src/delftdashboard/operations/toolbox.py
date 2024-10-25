@@ -10,7 +10,7 @@ import inspect
 
 class GenericToolbox:
     def __init__(self):
-        pass
+        self.callback_module_name = None
 
     def select(self):
 
@@ -22,7 +22,9 @@ class GenericToolbox:
 
         # Toolbox tab
         tab = app.gui.window.elements[index].tabs[0]
-        tab.module = app.active_toolbox.module
+
+        # Set callback module
+        tab.module = app.active_toolbox.callback_module
         tab.widget.parent().parent().setTabText(0, app.active_toolbox.long_name)
 
         # First remove old toolbox elements from first tab
@@ -40,6 +42,16 @@ class GenericToolbox:
 
     def add_layers(self):
         pass
+
+    def delete_layers(self):
+        # Should not use this method, use clear_layers instead
+        if self.name in app.map.layer:
+            app.map.layer[self.name].delete()
+
+    def clear_layers(self):
+        # Clear data and remove from map
+        if self.name in app.map.layer:
+            app.map.layer[self.name].clear()        
 
     def set_crs(self):
         pass

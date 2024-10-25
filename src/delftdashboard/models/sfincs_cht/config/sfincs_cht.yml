@@ -22,6 +22,11 @@ element:
   - string: Boundary Conditions
     module: delftdashboard.models.sfincs_cht.boundary_conditions
     element: boundary_conditions.yml
+  - string: Discharges
+    module: delftdashboard.models.sfincs_cht.discharge_points
+    element: discharge_points.yml
+  - string: Structures
+    element: structures.yml
   - string: Waves
     element: waves.yml
   - string: Meteo
@@ -30,8 +35,6 @@ element:
   - string: Observation Points
     module: delftdashboard.models.sfincs_cht.observation_points
     element: observation_points.yml
-  - string: Structures
-    element: structures.yml
   - string: Output
     module: delftdashboard.models.sfincs_cht.output
     element: output.yml

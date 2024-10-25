@@ -1,24 +1,26 @@
 element:
-- style: panel
+- style: tabpanel
   position:
     x: 10
     y: 10
     width: -10
     height: 160
-  element:
-  - style: pushbutton
-    text: Select Track
-    position:
-      x: 20
-      y: 130
-      width: 120
-      height: 20
-    method: select_track
-  - style: pushbutton
-    text: Build Spiderweb
-    position:
-      x: 20
-      y: 105
-      width: 120
-      height: 20
-    method: build_spiderweb
+  tab:
+  - string: Import Track
+    module: delftdashboard.toolboxes.tropical_cyclone.import
+    element: import.yml
+  - string: Draw Track
+    module: delftdashboard.toolboxes.tropical_cyclone.draw
+    element: draw.yml
+  - string: Modify Track
+    module: delftdashboard.toolboxes.tropical_cyclone.modify
+    element: modify.yml
+  - string: Track Table
+    module: delftdashboard.toolboxes.tropical_cyclone.table
+    element: table.yml
+  - string: Wind Field
+    module: delftdashboard.toolboxes.tropical_cyclone.wind_field
+    element: wind_field.yml
+  - string: Ensemble
+    module: delftdashboard.toolboxes.tropical_cyclone.ensemble
+    element: ensemble.yml

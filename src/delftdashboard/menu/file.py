@@ -14,20 +14,21 @@ def new(option):
     ok = app.gui.window.dialog_yes_no("This will clear all existing data! Continue?")
     if not ok:
         return
-    for toolbox in app.toolbox.keys():
-        if toolbox in app.map.layer:
-            app.map.layer[toolbox].delete()
-    for model in app.model.keys():
-        if model in app.map.layer:
-            app.map.layer[model].delete()
+    # Delete all layers
+    for toolbox in app.toolbox.values():
+        toolbox.clear_layers()
+    for model in app.model.values():
+        model.clear_layers()
     # Initialize toolboxes
     initialize_toolboxes()
     # Initialize models
     initialize_models()
     # Add layers
     for toolbox in app.toolbox:
+        # Move this to initialize_toolbox
         app.toolbox[toolbox].add_layers()
     for model in app.model:
+        # Move this to initialize_models
         app.model[model].add_layers()
     app.active_model   = app.model[list(app.model)[0]]
     app.active_toolbox = app.toolbox[list(app.toolbox)[0]]

@@ -1,10 +1,10 @@
 element:
 - style: panel
-  text: Wind
+  text: Wind Drag
   position:
     x: 10
     y: 10
-    width: 200
+    width: 160
     height: 120
   element:
   - style: popupmenu
@@ -22,10 +22,85 @@ element:
     option_value:
     - 2
     - 3
+    tooltip: Number of breakpoints to compute wind drag coefficient
+  - style: edit
+    position:
+      x: 20
+      y: 60
+      width: 50
+      height: 20
+    text: '1'
+    variable: wind_speed_1
+    method: set_model_variables
+    tooltipstring: Edit wind speed 1 (m/s)
+    textposition: left
+  - style: edit
+    position:
+      x: 80
+      y: 60
+      width: 50
+      height: 20
+    variable: cd_1
+    method: set_model_variables
+    tooltipstring: Edit Cd 1
+  - style: edit
+    position:
+      x: 20
+      y: 35
+      width: 50
+      height: 20
+    text: '2'
+    variable: wind_speed_2
+    method: set_model_variables
+    tooltipstring: Edit wind speed 2 (m/s)
+    textposition: left
+  - style: edit
+    position:
+      x: 80
+      y: 35
+      width: 50
+      height: 20
+    variable: cd_2
+    method: set_model_variables
+    tooltipstring: Edit Cd 2
+  - style: edit
+    position:
+      x: 20
+      y: 10
+      width: 50
+      height: 20
+    text: '3'
+    variable: wind_speed_3
+    method: set_model_variables
+    tooltipstring: Edit wind speed 3 (m/s)
+    textposition: left
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: cdnrb
+        operator: eq
+        value: 3
+  - style: edit
+    position:
+      x: 80
+      y: 10
+      width: 50
+      height: 20
+    variable: cd_3
+    method: set_model_variables
+    tooltipstring: Edit Cd 3
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: cdnrb
+        operator: eq
+        value: 3
 - style: panel
   title: Barometric Pressure
   position:
-    x: 220
+    x: 180
     y: 10
     width: 300
     height: 120
@@ -63,9 +138,9 @@ element:
     tooltipstring: Edit background air pressure
     textposition: right
 - style: panel
-  title: Rain
+  title: Infiltration
   position:
-    x: 530
+    x: 490
     y: 10
     width: 180
     height: 120
