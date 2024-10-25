@@ -6,7 +6,7 @@ Created on Mon May 10 12:18:09 2021
 """
 # import math
 # import numpy as np
-import geopandas as gpd
+# import geopandas as gpd
 # import shapely
 # import json
 # import os

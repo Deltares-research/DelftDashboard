@@ -113,15 +113,14 @@ class Model(GenericModel):
                         fill_color_selected="red")
 
 
-        # Snapwave Boundary Enclosure
-        from .waves_snapwave import boundary_enclosure_created
-        from .waves_snapwave import boundary_enclosure_modified
-        layer.add_layer("snapwave_boundary_enclosure", type="draw",
-                             shape="polygon",
-                             create=boundary_enclosure_created,
-                             modify=boundary_enclosure_modified,
-#                             add=boundary_enclosure_created,
-                             polygon_line_color="red")
+        # # Snapwave Boundary Enclosure
+        # from .waves_snapwave import boundary_enclosure_created
+        # from .waves_snapwave import boundary_enclosure_modified
+        # layer.add_layer("snapwave_boundary_enclosure", type="draw",
+        #                      shape="polygon",
+        #                      create=boundary_enclosure_created,
+        #                      modify=boundary_enclosure_modified,
+        #                      polygon_line_color="red")
 
         # Wave makers
         from .waves_wave_makers import wave_maker_created
@@ -185,7 +184,6 @@ class Model(GenericModel):
             # Change working directory
             os.chdir(path)
             # Change CRS
-            old_crs = app.crs
             app.crs = self.domain.crs
             app.map.crs = self.domain.crs
             self.plot()
@@ -222,11 +220,6 @@ class Model(GenericModel):
         # app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].set_data(app.model["sfincs_cht"].domain.snapwave.boundary_enclosure.gdf)
         # Wave makers
         app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(app.model["sfincs_cht"].domain.wave_makers.gdf)
-
-    # def plot_wave_makers(self):
-    #     layer = app.map.layer["sfincs_cht"].layer["wave_makers"]
-    #     layer.clear()
-    #     layer.add_feature(self.domain.wave_makers.gdf)
 
     def set_gui_variables(self):
 
