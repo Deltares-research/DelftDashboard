@@ -1,0 +1,27 @@
+element:
+- style: pushselectfile
+  position:
+    x: 30
+    y: 110
+    width: 110
+    height: 20
+  text: Thin Dam File
+  variable: geometry.thindamfile
+  method: set_model_variables
+  showfilename: True
+  filter: "Thin Dam file (*_thd.pli)"
+  title: Select thin dam file
+  tooltipstring: Select Thin Dam file
+- style: pushselectfile
+  position:
+    x: 30
+    y: 85
+    width: 110
+    height: 20
+  text: Structure File
+  variable: geometry.structurefile
+  method: set_model_variables
+  showfilename: True
+  filter: "Structure file (*.ini)"
+  title: Select Hydraulic Structures file
+  tooltipstring: Select Hydraulic Structures file

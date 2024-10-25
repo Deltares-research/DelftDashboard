@@ -1,0 +1,29 @@
+element:
+- style: edit
+  position:
+    x: 140
+    y: 110
+    width: 50
+    height: 20
+  text: Uniform Friction Coefficient
+  variable: physics.uniffrictcoef
+  method: set_model_variables
+- style: popupmenu
+  position:
+    x: 140
+    y: 85
+    width: 80
+    height: 20
+  text: Friction Type
+  variable: physics.uniffricttype
+  method: set_model_variables
+  option_string:
+  - Chezy
+  - Manning
+  - White-Colebrook
+  - z0
+  option_value:
+  - 0
+  - 1
+  - 2
+  - 3

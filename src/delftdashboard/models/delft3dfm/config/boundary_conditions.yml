@@ -1,0 +1,155 @@
+element:
+- style: panel
+  title: Boundary Conditions
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 80
+      height: 140
+    method: select_boundary_point_from_list
+    variable: active_boundary_point
+    select: index
+    option_string:
+      variable: boundary_point_names
+    tooltip: Select boundary point
+  - style: pushbutton
+    text: Add Point
+    position:
+      x: 100
+      y: 130
+      width: 80
+      height: 20
+    method: add_boundary_point_on_map
+    tooltip: Add boundary point on map
+  - style: pushbutton
+    text: Delete Point
+    position:
+      x: 100
+      y: 105
+      width: 80
+      height: 20
+    method: delete_point_from_list
+    tooltip: Delete boundary point from list
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_boundary_points
+        operator: gt
+        value: 0
+  - style: radiobuttongroup
+    position:
+      x: 100
+      y: 10
+      width: 100
+      height: 20
+    variable: boundary_forcing
+    option_string: ["Time Series", "2D Spectra"]
+    option_value: ["timeseries", "spectra"]
+    method: select_boundary_forcing
+  - style: edit
+    text: Hm0 (m)
+    position:
+      x: 350
+      y: 130
+      width: 50
+      height: 20
+    variable: boundary_hm0
+    method: edit_hm0
+    tooltip: Edit Hm0 wave height (in metres)
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: boundary_forcing
+        operator: eq
+        value: timeseries
+      - variable: nr_boundary_points
+        operator: gt
+        value: 0
+  - style: edit
+    text: Tp (s)
+    position:
+      x: 350
+      y: 105
+      width: 50
+      height: 20
+    variable: boundary_tp
+    method: edit_tp
+    tooltip: Edit wave period Tp (in seconds)
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: boundary_forcing
+        operator: eq
+        value: timeseries
+      - variable: nr_boundary_points
+        operator: gt
+        value: 0
+  - style: edit
+    text: Direction (deg)
+    position:
+      x: 350
+      y: 80
+      width: 50
+      height: 20
+    variable: boundary_wd
+    method: edit_wd
+    tooltip: Edit wave direction (in degrees, nautical)
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: boundary_forcing
+        operator: eq
+        value: timeseries
+      - variable: nr_boundary_points
+        operator: gt
+        value: 0
+  - style: edit
+    text: Directional Spreading (deg)
+    position:
+      x: 350
+      y: 55
+      width: 50
+      height: 20
+    variable: boundary_ds
+    method: edit_ds
+    tooltip: Edit wave direction spreading (in degrees)
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: boundary_forcing
+        operator: eq
+        value: timeseries
+      - variable: nr_boundary_points
+        operator: gt
+        value: 0
+  - style: pushbutton
+    text: Apply to All
+    position:
+      x: 350
+      y: 30
+      width: 80
+      height: 20
+    method: apply_to_all
+    tooltip: Apply boundary conditions to all points
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: boundary_forcing
+        operator: eq
+        value: timeseries
+      - variable: nr_boundary_points
+        operator: gt
+        value: 0
