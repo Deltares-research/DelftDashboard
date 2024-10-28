@@ -48,6 +48,9 @@ class Toolbox(GenericToolbox):
 
         # Set GUI variable
         group = "modelmaker_hurrywave"
+
+        app.gui.setvar(group, "use_waveblocking", True)
+
         # Domain
         app.gui.setvar(group, "x0", 0.0)
         app.gui.setvar(group, "y0", 0.0)
@@ -91,6 +94,11 @@ class Toolbox(GenericToolbox):
 
         # Boundary points
         app.gui.setvar(group, "boundary_dx", 50000.0)
+
+        # Wave Blocking
+
+        app.gui.setvar(group, "subgrid_nr_bins", 36)
+        app.gui.setvar(group, "subgrid_nr_pixels", 20)
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
@@ -246,10 +254,26 @@ class Toolbox(GenericToolbox):
 
         dlg.close()
 
+    def generate_waveblocking(self):
+        group = "modelmaker_hurrywave"
+        bathymetry_sets = app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets
+        nr_bins = app.gui.getvar(group, "subgrid_nr_bins")
+        nr_pixels = app.gui.getvar(group, "subgrid_nr_pixels")
+        p = app.gui.window.dialog_progress("               Generating Wave blocking file ...                ", 100)
+        app.model["hurrywave"].domain.waveblocking.build(bathymetry_sets,
+                                                     nr_bins=nr_bins,
+                                                     nr_subgrid_pixels=nr_pixels,
+                                                     quiet = False, 
+                                                     progress_bar=p)
+        app.model["hurrywave"].domain.input.variables.sbgfile = "hurrywave.wbl"
+        app.gui.setvar("hurrywave", "wblfile", app.model["hurrywave"].domain.input.variables.wblfile)
+        app.gui.setvar("hurrywave", "bathymetry_type", "waveblocking")
+
     def build_model(self):
         self.generate_grid()
         self.generate_bathymetry()
         self.update_mask()
+        self.generate_waveblocking()
 
     def update_polygons(self):
 

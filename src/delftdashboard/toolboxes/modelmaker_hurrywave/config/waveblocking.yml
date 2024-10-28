@@ -1,0 +1,32 @@
+element:
+- style: edit
+  text: Nr Bins
+  variable: subgrid_nr_bins
+  position:
+    x: 80
+    y: 110
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Number of vertical bins in sub-grid tables
+- style: edit
+  text: Nr Pixels per Cell
+  variable: subgrid_nr_pixels
+  position:
+    x: 80
+    y: 85
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Number of sub-grid pixels per coarse cell
+- style: pushbutton
+  text: Generate
+  position:
+    x: 260
+    y: 10
+    width: 60
+    height: 20
+  method: generate_waveblocking
+  tooltip: Generate wave blocking file
+
+
