@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """
+GUI methods for modelmaker_hurrywave -> domain
+
 Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
@@ -122,3 +124,8 @@ def update():
 
 def generate_bathymetry(*args):
     app.toolbox["modelmaker_hurrywave"].generate_bathymetry()
+
+
+def info(*args):
+    pass
+

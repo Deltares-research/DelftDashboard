@@ -1,7 +1,6 @@
 @echo OFF
-set CONDAPATH=c:\work\miniconda3
-set DDBPATH=c:\work\checkouts\git\DelftDashboard\src\delftdashboard
-set ENVNAME=ddbtest
+set CONDAPATH= c:\Users\asselt\AppData\Local\miniconda3
+set ENVNAME=DDB_NRL
 
 rem The following command activates the base environment.
 rem call C:\ProgramData\Miniconda3\Scripts\activate.bat C:\ProgramData\Miniconda3

@@ -12,3 +12,5 @@ src/delftdashboard.egg-info/SOURCES.txt
 src/delftdashboard.egg-info/top_level.txt
 *.whl
 *.gz
+ddb_dev.yml
+environment.yml
