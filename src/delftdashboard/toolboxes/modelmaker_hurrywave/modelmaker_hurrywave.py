@@ -261,10 +261,12 @@ class Toolbox(GenericToolbox):
         nr_pixels = app.gui.getvar(group, "subgrid_nr_pixels")
         p = app.gui.window.dialog_progress("               Generating Wave blocking file ...                ", 100)
         app.model["hurrywave"].domain.waveblocking.build(bathymetry_sets,
-                                                     nr_bins=nr_bins,
-                                                     nr_subgrid_pixels=nr_pixels,
-                                                     quiet = False, 
-                                                     progress_bar=p)
+                                                         mask = app.model["hurrywave"].domain.grid.ds.mask,
+                                                         nr_bins=nr_bins,
+                                                         nr_subgrid_pixels=nr_pixels,
+                                                         quiet = False, 
+                                                         progress_bar=p)
+        
         app.model["hurrywave"].domain.input.variables.sbgfile = "hurrywave.wbl"
         app.gui.setvar("hurrywave", "wblfile", app.model["hurrywave"].domain.input.variables.wblfile)
         app.gui.setvar("hurrywave", "bathymetry_type", "waveblocking")
