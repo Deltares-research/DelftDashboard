@@ -62,12 +62,15 @@ def initialize():
                   splash_file=app.config["splash_file"],
                   copy_mapbox_server_folder=True)
 
-    # Define some other variables
-    app.crs = CRS(4326)
-    app.background_topography  = "gebco19"
-
     # Bathymetry database
     app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database"])
+
+    # Define some other variables
+    app.crs = CRS(4326)
+    if "default_bathymetry_dataset" in app.config:
+        app.background_topography = app.config["default_bathymetry_dataset"]
+    else:
+        app.background_topography  = app.bathymetry_database.dataset_names()[0][0]
 
     # Tide model database
     if "tide_model_database" in app.config:
@@ -86,7 +89,7 @@ def initialize():
     # Projection
     app.gui.setvar("view_settings", "projection", "mercator")
     # Topography
-    app.gui.setvar("view_settings", "topography_dataset", "gebco19")
+    app.gui.setvar("view_settings", "topography_dataset", app.background_topography)
     app.gui.setvar("view_settings", "topography_auto_update", "True")
     app.gui.setvar("view_settings", "topography_visible", True)
     app.gui.setvar("view_settings", "topography_colormap", "earth")
