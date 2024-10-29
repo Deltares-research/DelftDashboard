@@ -37,6 +37,9 @@ class GenericToolbox:
         # And select this tab
         app.gui.window.elements[index].widget.select_tab(0)
 
+        # Make toolbox layer visible
+        app.map.layer[self.name].show()    
+
         app.gui.window.update()
         # app.gui.window.resize()
 

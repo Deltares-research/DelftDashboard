@@ -89,6 +89,9 @@ class GenericModel:
             # Select first toolbox from the list
             select_toolbox(toolboxes_to_add[0])
 
+        # Make model layer visible
+        app.map.layer[self.name].show()    
+
         app.gui.window.update()
 
     def set_crs(self):        

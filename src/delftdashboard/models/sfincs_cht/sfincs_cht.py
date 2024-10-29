@@ -137,6 +137,8 @@ class Model(GenericModel):
     def set_layer_mode(self, mode):
         layer = app.map.layer["sfincs_cht"]
         if mode == "inactive":
+            # # Make the sfincs_cht layer visible
+            # layer.show()
             # Grid is made visible
             layer.layer["grid"].deactivate()
             # Grid exterior is made visible
@@ -157,7 +159,7 @@ class Model(GenericModel):
             # layer.layer["snapwave_boundary_enclosure"].hide()
             # Wave makers are made invisible
             layer.layer["wave_makers"].hide()
-        if mode == "invisible":
+        elif mode == "invisible":
            layer.hide()
 
     def set_crs(self):

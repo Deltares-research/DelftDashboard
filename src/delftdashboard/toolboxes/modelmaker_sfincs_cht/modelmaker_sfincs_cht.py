@@ -417,6 +417,7 @@ class Toolbox(GenericToolbox):
                                                      max_gradient=max_dzdv,
                                                      zmin=zmin,
                                                      progress_bar=p)
+        p.close()
         app.model["sfincs_cht"].domain.input.variables.sbgfile = "sfincs.sbg"
         app.gui.setvar("sfincs_cht", "sbgfile", app.model["sfincs_cht"].domain.input.variables.sbgfile)
         app.gui.setvar("sfincs_cht", "bathymetry_type", "subgrid")
@@ -428,7 +429,6 @@ class Toolbox(GenericToolbox):
         # Replot everything
         app.model["sfincs_cht"].plot()
         dlg.close()
-
 
     def build_model(self):
         self.generate_grid()

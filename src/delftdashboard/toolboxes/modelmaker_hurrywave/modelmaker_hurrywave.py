@@ -96,9 +96,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "boundary_dx", 50000.0)
 
         # Wave Blocking
-
-        app.gui.setvar(group, "subgrid_nr_bins", 36)
-        app.gui.setvar(group, "subgrid_nr_pixels", 20)
+        app.gui.setvar(group, "waveblocking_nr_dirs", 36)
+        app.gui.setvar(group, "waveblocking_nr_pixels", 20)
+        app.gui.setvar(group, "waveblocking_threshold_level", -5.0)
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
@@ -163,9 +163,20 @@ class Toolbox(GenericToolbox):
 
     def generate_grid(self):
 
-        dlg = app.gui.window.dialog_wait("Generating grid ...")
-
         model = app.model["hurrywave"].domain
+
+        # Check if there is already a grid. If so, ask if it should be overwritten.
+
+        if model.input.variables.nmax > 0:
+            ok = app.gui.window.dialog_ok_cancel("Existing model grid and spatial attributes will be deleted! Continue?",
+                                       title="Warning")
+            if not ok:
+                return
+
+        # Clear all spatial attributes (grid, mask, boundaries, etc.)
+        app.model["hurrywave"].clear_spatial_attributes()
+
+        dlg = app.gui.window.dialog_wait("Generating grid ...")
 
         group = "modelmaker_hurrywave"
         model.input.variables.x0       = app.gui.getvar(group, "x0")
@@ -196,7 +207,7 @@ class Toolbox(GenericToolbox):
         bathymetry_list = app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets
         if not app.model["hurrywave"].domain.input.variables.depfile:
             app.model["hurrywave"].domain.input.variables.depfile = "hurrywave.dep"
-        app.model["hurrywave"].domain.grid.get_bathymetry(bathymetry_list)
+        app.model["hurrywave"].domain.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
         app.model["hurrywave"].domain.grid.write_dep_file()
         # GUI variables
         app.gui.setvar("hurrywave", "depfile", app.model["hurrywave"].domain.input.variables.depfile)
@@ -255,19 +266,37 @@ class Toolbox(GenericToolbox):
         dlg.close()
 
     def generate_waveblocking(self):
+        """Generate wave blocking file"""
         group = "modelmaker_hurrywave"
+        filename = app.model["hurrywave"].domain.input.variables.wblfile
+        if not filename:
+            filename = "hurrywave.wbl"
+        rsp = app.gui.window.dialog_save_file("Select file ...",
+                                            file_name=filename,
+                                            filter="*.wbl",
+                                            allow_directory_change=False)
+        if rsp[0]:
+            filename = rsp[2] # file name without path
+        else:
+            return
         bathymetry_sets = app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets
-        nr_bins = app.gui.getvar(group, "subgrid_nr_bins")
-        nr_pixels = app.gui.getvar(group, "subgrid_nr_pixels")
+        # Set ndirs same as in hurrywave model
+        # nr_dirs = app.gui.getvar(group, "waveblocking_nr_directions")
+        nr_dirs = app.model["hurrywave"].domain.input.variables.ntheta
+        nr_pixels = app.gui.getvar(group, "waveblocking_nr_pixels")
+        threshold_level = app.gui.getvar(group, "waveblocking_threshold_level")
         p = app.gui.window.dialog_progress("               Generating Wave blocking file ...                ", 100)
-        app.model["hurrywave"].domain.waveblocking.build(bathymetry_sets,
-                                                     nr_bins=nr_bins,
-                                                     nr_subgrid_pixels=nr_pixels,
-                                                     quiet = False, 
-                                                     progress_bar=p)
-        app.model["hurrywave"].domain.input.variables.sbgfile = "hurrywave.wbl"
-        app.gui.setvar("hurrywave", "wblfile", app.model["hurrywave"].domain.input.variables.wblfile)
-        app.gui.setvar("hurrywave", "bathymetry_type", "waveblocking")
+        ds_wbl = app.model["hurrywave"].domain.waveblocking.build(bathymetry_sets,
+                                                                  bathymetry_database=app.bathymetry_database,
+                                                                  nr_dirs=nr_dirs,
+                                                                  nr_subgrid_pixels=nr_pixels,
+                                                                  threshold_level=threshold_level,
+                                                                  quiet=False, 
+                                                                  progress_bar=p)
+        p.close()
+        if ds_wbl:
+            app.model["hurrywave"].domain.input.variables.wblfile = filename
+            app.gui.setvar("hurrywave", "wblfile", filename)
 
     def build_model(self):
         self.generate_grid()

@@ -98,8 +98,8 @@ class Model(GenericModel):
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
-            # Grid is made visible
-            app.map.layer["hurrywave"].layer["grid"].deactivate()
+            # Grid is always made visible
+            app.map.layer["hurrywave"].layer["grid"].show()
             # Mask is made invisible
             app.map.layer["hurrywave"].layer["mask_include"].hide()
             app.map.layer["hurrywave"].layer["mask_boundary"].hide()
@@ -111,6 +111,19 @@ class Model(GenericModel):
         elif mode == "invisible":
             # Everything set to invisible
             app.map.layer["hurrywave"].hide()
+
+    def new(self):
+        self.initialize_domain()
+        self.set_gui_variables()
+        app.map.layer["modelmaker_hurrywave"].clear()
+
+    def clear_spatial_attributes(self):
+        # This happens when a new grid is created, but we want to keep time, physical and numerical attributes
+        # Clear the map
+        app.map.layer["hurrywave"].clear()
+        # And remove them from the model domain
+        self.domain.clear_spatial_attributes()
+        self.set_gui_variables()
 
     def set_gui_variables(self):
         group = "hurrywave"
@@ -160,11 +173,12 @@ class Model(GenericModel):
             dlg.close()
 
     def save(self):
-        # Write hurrywave.inp
-        self.domain.path = os.getcwd()
+        # Write hurrywave.inp and run.bat
+        self.domain.path = os.getcwd()        
+        self.domain.input.variables.epsg = app.crs.to_epsg()
+        self.domain.exe_path = self.exe_path
         self.domain.input.write()
         self.domain.write_batch_file()
-
 
     def load(self):
         self.domain.read()

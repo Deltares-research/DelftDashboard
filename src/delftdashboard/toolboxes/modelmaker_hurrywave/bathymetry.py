@@ -14,7 +14,7 @@ from delftdashboard.operations import map
 def select(*args):
     # De-activate() existing layers
     map.update()
-    app.map.layer["hurrywave"].layer["grid"].activate()
+    app.map.layer["hurrywave"].layer["grid"].show()
 
 def select_bathymetry_source(*args):
     source = args[0]

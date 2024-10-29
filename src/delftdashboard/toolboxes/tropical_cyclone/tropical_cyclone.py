@@ -106,3 +106,8 @@ class Toolbox(GenericToolbox):
             model.domain.input.variables.spwfile = spw_file
             # And update the GUI variable
             app.gui.setvar("sfincs_cht", "spwfile", spw_file)
+        elif model.name == "hurrywave":
+            # Add the spw file to the model
+            model.domain.input.variables.spwfile = spw_file
+            # And update the GUI variable
+            app.gui.setvar("hurrywave", "spwfile", spw_file)    
