@@ -23,6 +23,8 @@ class Toolbox(GenericToolbox):
         self.name = name
         self.long_name = "Tropical Cyclone"
 
+    def initialize(self):
+
         # Set variables
         self.tc = None
         self.track_database = None

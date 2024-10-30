@@ -94,6 +94,12 @@ class GenericModel:
 
         app.gui.window.update()
 
+    def get_view_menu(self):
+        return {}
+
+    def set_view_menu(self):
+        pass
+
     def set_crs(self):        
         pass
 

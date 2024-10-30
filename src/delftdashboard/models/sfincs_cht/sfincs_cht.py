@@ -21,11 +21,39 @@ class Model(GenericModel):
         self.name = name
         self.long_name = "SFINCS (CHT)"
 
-        print("Model " + self.name + " added!")
+    def initialize(self):
         self.active_domain = 0
-
-        self.initialize_domain()
+        self.domain = SFINCS(crs=app.crs)
         self.set_gui_variables()
+        self.observation_points_changed = False
+        self.discharge_points_changed = False
+        self.boundaries_changed = False
+        self.thin_dams_changed = False
+
+    def get_view_menu(self):
+        model_view_menu = {}
+        model_view_menu["text"] = self.long_name
+        model_view_menu["menu"] = []
+        model_view_menu["menu"].append({"variable_group": self.name,
+                                        "id": f"view.{self.name}.grid",
+                                        "text": "Grid",
+                                        "variable": "view_grid",
+                                        "separator": True,
+                                        "checkable": True,
+                                        "method": self.set_view_menu,
+                                        "option": "grid",
+                                        "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "view_grid", "operator": "eq", "value": True}]}]})
+        return model_view_menu
+
+    def set_view_menu(self, option, checked):
+        if option == "grid":
+            print(f"Checked: {checked}")
+            if app.gui.getvar(self.name, "view_grid"):
+                app.map.layer["sfincs_cht"].layer["grid"].show()
+                print("Grid is made visible")
+            else:
+                app.map.layer["sfincs_cht"].layer["grid"].hide()
+                print("Grid is made invisible")
 
     def add_layers(self):
         layer = app.map.add_layer("sfincs_cht")
@@ -231,23 +259,20 @@ class Model(GenericModel):
         for var_name in vars(self.domain.input.variables):
             app.gui.setvar(group, var_name, getattr(self.domain.input.variables, var_name))
 
+        # View  
+        app.gui.setvar(group, "view_grid", True)
+
         # Now set some extra variables needed for SFINCS GUI
 
         app.gui.setvar(group, "grid_type", "regular")
         app.gui.setvar(group, "bathymetry_type", "regular")
-
         app.gui.setvar(group, "snapwave", False)
-
         app.gui.setvar(group, "roughness_type", "landsea")
-
         app.gui.setvar(group, "input_options_text", ["Binary", "ASCII"])
         app.gui.setvar(group, "input_options_values", ["bin", "asc"])
-
         app.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
         app.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
-
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
-
         app.gui.setvar(group, "crs_type", "geographic")
 
         # Wind drag
@@ -301,7 +326,6 @@ class Model(GenericModel):
         # Turning off weirs for now
         app.gui.setvar(group, "enable_weirs", False)
 
-
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input variables
         group = "sfincs_cht"
@@ -319,15 +343,13 @@ class Model(GenericModel):
         self.domain.input.variables.cdval[1] = app.gui.getvar(group, "cd_2")
         self.domain.input.variables.cdval[2] = app.gui.getvar(group, "cd_3")
 
-
-
-    def initialize_domain(self):
-        self.domain = SFINCS(crs=app.crs)
-        # Also add some other attributes needed for the GUI
-        self.observation_points_changed = False
-        self.discharge_points_changed = False
-        self.boundaries_changed = False
-        self.thin_dams_changed = False
+    # def initialize_domain(self):
+    #     self.domain = SFINCS(crs=app.crs)
+    #     # Also add some other attributes needed for the GUI
+    #     self.observation_points_changed = False
+    #     self.discharge_points_changed = False
+    #     self.boundaries_changed = False
+    #     self.thin_dams_changed = False
 
     def set_input_variable(self, gui_variable, value):
         pass

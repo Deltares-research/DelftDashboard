@@ -23,6 +23,8 @@ class Toolbox(GenericToolbox):
         self.name = name
         self.long_name = "Model Maker"
 
+    def initialize(self):
+
         # Set variables
 
         # Grid outline

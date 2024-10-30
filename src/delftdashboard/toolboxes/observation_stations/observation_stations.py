@@ -25,6 +25,8 @@ class Toolbox(GenericToolbox):
         self.name = name
         self.long_name = "Observation Stations"
 
+    def initialize(self):
+
         # Set variables
         self.gdf = gpd.GeoDataFrame()
 

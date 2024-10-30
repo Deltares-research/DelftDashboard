@@ -14,13 +14,13 @@ class Polygon:
         self.name = name
         self.gdf = gdf
 
-
 class Toolbox(GenericToolbox):
     def __init__(self, name):
         super().__init__()
-
         self.name = name
         self.long_name = "Drawing"
+
+    def initialize(self):
 
         # Set GUI variables
         group = "drawing"

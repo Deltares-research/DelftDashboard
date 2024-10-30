@@ -166,6 +166,14 @@ def build_gui_config():
     layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.dark", "text": "Dark", "separator": False,  "checkable": True, "option": "dark-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "dark-v11"}]}]})
     layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.light", "text": "Light", "separator": False,  "checkable": True, "option": "light-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "light-v11"}]}]})
     menu["menu"].append(layer_style_menu)
+ 
+    # Add menu items for models
+    # Loop over all models in model dict
+    for model in app.model.values():
+        model_view_menu = model.get_view_menu()
+        # Check it's not an empty dictionary
+        if model_view_menu:
+            menu["menu"].append(model_view_menu)
 
     # View settings
     menu["menu"].append({"variable_group": "menu", "id": "view.settings",  "text": "Settings ...", "method": "edit_settings", "separator": True,  "checkable": False})

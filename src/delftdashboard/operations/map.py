@@ -99,8 +99,10 @@ def update_background_topography_layer():
 
             try:
                 cmap = mpl.cm.get_cmap(colormap)
+                # Add wait box
                 z = app.bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(4326), dataset_list,
-                                                                   method=interp_method)
+                                                                   method=interp_method,
+                                                                   waitbox=app.gui.window.dialog_wait)
 
                 app.map.layer["main"].layer["background_topography"].opacity = opacity
 

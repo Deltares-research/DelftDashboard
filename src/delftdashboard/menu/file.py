@@ -10,28 +10,26 @@ from delftdashboard.operations.initialize import initialize_toolboxes, initializ
 
 def new(option):
     # Reset everything
-    # Remove layers
+
     ok = app.gui.window.dialog_yes_no("This will clear all existing data! Continue?")
     if not ok:
         return
-    # Delete all layers
-    for toolbox in app.toolbox.values():
-        toolbox.clear_layers()
-    for model in app.model.values():
-        model.clear_layers()
+
     # Initialize toolboxes
-    initialize_toolboxes()
-    # Initialize models
-    initialize_models()
-    # Add layers
-    for toolbox in app.toolbox:
-        # Move this to initialize_toolbox
-        app.toolbox[toolbox].add_layers()
-    for model in app.model:
-        # Move this to initialize_models
-        app.model[model].add_layers()
+    for toolbox in app.toolbox.values():
+        toolbox.initialize()
+        toolbox.clear_layers()
+        # toolbox.add_layers()
+
+    # Initialize models    
+    for model in app.model.values():
+        model.initialize()
+        model.clear_layers()
+        # model.add_layers()
+
     app.active_model   = app.model[list(app.model)[0]]
     app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
+    app.active_toolbox.select()
 
 def open(option):
     app.active_model.open()

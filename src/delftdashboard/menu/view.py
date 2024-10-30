@@ -44,6 +44,11 @@ def terrain(option):
         app.gui.setvar("view_settings", "terrain_visible", False)        
     app.map.set_terrain(app.gui.getvar("view_settings", "terrain_visible"), app.gui.getvar("view_settings", "terrain_exaggeration"))
 
+def model_view(option):
+    # Get the model name (first string before . in option)
+    model_name = option.split(".")[0]
+    app.active_model.select()
+
 def edit_settings(option):
 
     # This opens the popup window for the view settings

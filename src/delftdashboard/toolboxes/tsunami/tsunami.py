@@ -14,6 +14,9 @@ class Toolbox(GenericToolbox):
         self.name = name
         self.long_name = "Tsunami"
 
+    def initialize(self):
+        pass
+
     def set_layer_mode(self, mode):
         pass
 

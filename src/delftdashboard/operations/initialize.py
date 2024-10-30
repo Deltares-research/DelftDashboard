@@ -36,7 +36,7 @@ def initialize():
     app.config["model"]         = []
     app.config["toolbox"]       = []
     app.config["window_icon"]   = os.path.join(app.config_path, "images", "deltares_icon.png")
-    app.config["splash_file"]   = os.path.join(app.config_path, "images", "DelftDashBoard.jpg")
+    app.config["splash_file"]   = os.path.join(app.config_path, "images", "DelftDashBoard_python.jpg")
     app.config["bathymetry_database"] = ""
 
     # Read ini file and override stuff in default config dict
@@ -153,6 +153,7 @@ def initialize_toolboxes():
         else:
             # Callback module is different from toolbox module
             app.toolbox[toolbox_name].callback_module = importlib.import_module(f"delftdashboard.toolboxes.{toolbox_name}.{app.toolbox[toolbox_name].callback_module_name}")
+        app.toolbox[toolbox_name].initialize()
 
 def initialize_models():
 
@@ -177,3 +178,5 @@ def initialize_models():
                     okay = False
             if okay:
                 app.model[model_name].toolbox.append(tlb["name"])
+        app.model[model_name].initialize()
+                

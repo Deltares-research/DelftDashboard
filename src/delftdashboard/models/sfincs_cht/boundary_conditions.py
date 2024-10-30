@@ -177,6 +177,19 @@ def generate_boundary_conditions_from_tide_model(*args):
     if not rsp[0]:
         return
     app.model["sfincs_cht"].domain.input.variables.bcafile = rsp[2] # file name without path
+
+    # Ask for name of bca file
+    filename = app.model["sfincs_cht"].domain.input.variables.bzsfile
+    if not filename:
+        filename = "sfincs.bzs"
+    rsp = app.gui.window.dialog_save_file("Select file ...",
+                                          file_name=filename,
+                                          filter="*.bzs",
+                                          allow_directory_change=False)
+    if not rsp[0]:
+        return
+    app.model["sfincs_cht"].domain.input.variables.bzsfile = rsp[2] # file name without path
+
     # Now interpolate tidal data to boundary points
     tide_model_name = app.gui.getvar("sfincs_cht", "boundary_conditions_tide_model")
     gdf = app.model["sfincs_cht"].domain.boundary_conditions.gdf
@@ -185,9 +198,12 @@ def generate_boundary_conditions_from_tide_model(*args):
     app.model["sfincs_cht"].domain.boundary_conditions.gdf = gdf
     # Save bca file
     app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_conditions_astro()
-    # And the bzs file
     app.gui.setvar("sfincs_cht", "boundary_conditions_timeseries_shape", "astronomical")
     set_boundary_conditions()
+    # And the bzs file
+    app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_conditions_timeseries()
+    app.model["sfincs_cht"].boundaries_changed = False
+
     app.gui.window.update()
 
 def set_boundary_conditions(*args):
@@ -214,9 +230,8 @@ def set_boundary_conditions(*args):
                                                                       tpeak=tpeak,
                                                                       duration=duration)
     dlg.close()
-    app.model["sfincs_cht"].boundaries_changed = True
 
-    # save_boundary_conditions()
+    app.model["sfincs_cht"].boundaries_changed = True
 
 def view_boundary_conditions(*args):
     print("Viewing boundary conditions not implemented yet")    
@@ -243,11 +258,12 @@ def create_boundary_points(*args):
     app.model["sfincs_cht"].domain.boundary_conditions.get_boundary_points_from_mask(bnd_dist=bnd_dist)
     gdf = app.model["sfincs_cht"].domain.boundary_conditions.gdf
     app.map.layer["sfincs_cht"].layer["boundary_points"].set_data(gdf, 0)
-    # Save points
-    save()
     # Set uniform conditions
     app.gui.setvar("sfincs_cht", "boundary_conditions_timeseries_shape", "constant")
     set_boundary_conditions()
+
+    # Save points
+    save()
 
     app.gui.setvar("sfincs_cht", "active_boundary_point", 0)
     update_list()
