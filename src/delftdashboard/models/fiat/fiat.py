@@ -115,7 +115,7 @@ class Model(GenericModel):
             legend_title=f'Max. potential damage: Structure [{app.gui.getvar("fiat", "damage_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
-            hover_property="max_damage_structure",
+            hover_property="max_damages_structure",
             big_data=True,
             min_zoom=10,
         )
@@ -128,7 +128,7 @@ class Model(GenericModel):
             legend_title=f'Max. potential damage: Content [{app.gui.getvar("fiat", "damage_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
-            hover_property="max_damage_content",
+            hover_property="max_damages_content",
             big_data=True,
             min_zoom=10,
         )
@@ -645,13 +645,13 @@ class Model(GenericModel):
                     "object_name",
                     "primary_object_type",
                     "secondary_object_type",
-                    "max_damage_structure",
-                    "max_damage_content",
+                    "max_damages_structure",
+                    "max_damages_content",
                     "ground_flht",
                     "ground_elevtn",
                     "extract_method",
-                    "fn_damage_structure",
-                    "fn_damage_content",
+                    "fn_damages_structure",
+                    "fn_damages_content",
                     "lanes",
                     "Segment Length [m]",
                     "SVI_key_domain",
@@ -1077,7 +1077,7 @@ class Model(GenericModel):
         if type == "damage_struct":
             circle_color = [
                 "step",
-                ["get", "max_damage_structure"],
+                ["get", "max_damages_structure"],
                 "#FFFFFF",
                 0,
                 "#FFF4E7",
@@ -1095,7 +1095,7 @@ class Model(GenericModel):
         if type == "damage_cont":
             circle_color = [
                 "step",
-                ["get", "max_damage_content"],
+                ["get", "max_damages_content"],
                 "#FFFFFF",
                 0,
                 "#FFF4E7",
