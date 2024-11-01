@@ -7,7 +7,8 @@ from config import (
     INSTALLER_SCRIPT_PATH,
     ISCC_PATH,
     SPEC_DIR,
-    _validate_path,
+    validate_path,
+    clean_exe
 )
 
 
@@ -37,7 +38,10 @@ def main():
     args = parse_args()
 
     # Validate before running Inno Setup Compiler
-    _validate_path("ISCC_PATH", ISCC_PATH, EXPECTED_STRUCTURE_MSG_INSTALLER)
+    validate_path("ISCC_PATH", ISCC_PATH, EXPECTED_STRUCTURE_MSG_INSTALLER)
+
+    # Make sure the exe doesnt contain any datacatalogs / ini files from testing it
+    clean_exe()
 
     # Create the command
     app_args = [f"/D{key}={value}" for key, value in INNOSETUP_DEFINES.items()]

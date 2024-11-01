@@ -110,14 +110,13 @@ DelftDashboard (PROJECT_ROOT_DIR)
 │   ├── rth-delftdashboard.py (RTH_HOOK)
 ├── dist (DIST_DIR)
 |  ├── FloodAdaptModelBuilder (PROJECT_NAME)
-|  |  ├── _internal (INTERNAL_DIR)
-|  |  |  ├── delftdashboard
-|  |  |  |  ├── system (EXE_SYSTEM_DIR)
-|  |  |  ├── flood_adapt
-|  |  |  |  ├── system (EXE_SYSTEM_DIR)
-|  |  |  |  ├── ...
+|  |  ├── FloodAdaptModelBuilder.exe
+|  |  ├── data (EXE_DATA_DIR)
+|  |  |  ├── watersheds
+|  |  |  ├── topobathy
 |  |  |  ├── ...
-|  |  ├── ...
+|  |  ├── _internal (INTERNAL_DIR)
+|  |  |  ├── ...
 """
 
 # Project definitions
@@ -180,18 +179,18 @@ INNOSETUP_DEFINES = {
 }
 
 
-def _validate_path(varname: str, path: Path, expected_structure_message="") -> None:
+def validate_path(varname: str, path: Path, expected_structure_message="") -> None:
     if not path.exists():
         raise FileNotFoundError(
             f"{varname} does not exist: {path}.\n{expected_structure_message}"
         )
 
 
-def _excluding_filter(module: str, patterns: list[str] = EXCLUDES) -> bool:
+def excluding_filter(module: str, patterns: list[str] = EXCLUDES) -> bool:
     return not any(pattern in module for pattern in patterns)
 
 
-def _validate_env_has_no_editable_installations() -> None:
+def validate_env_has_no_editable_installations() -> None:
     """Editable installations have a file: '__editable__.<package_name>-<version>.pth file in the environment."""
     env_name = Path(sys.executable).parent.name
     editable_installs = "\n".join(
@@ -207,7 +206,7 @@ def _validate_env_has_no_editable_installations() -> None:
 
     assert not editable_installs, msg
 
-def _increase_recursion_limit():
+def increase_recursion_limit(limit: int = 5000) -> None:
     """Explanation: Python's stack-limit is a safety-belt against endless recursion,
        eating up memory. PyInstaller imports modules recursively. If the structure
        how modules are imported within your program is awkward, this leads to the
@@ -216,10 +215,10 @@ def _increase_recursion_limit():
        115 nested imported, with limit 2000 at about 240, with limit 5000 at about
        660.
     """
-    sys.setrecursionlimit(5000)
+    sys.setrecursionlimit(limit)
     print(f"Recursion limit increased to {sys.getrecursionlimit()}")
 
-def _copy_shapely_libs():
+def copy_shapely_libs():
     """Explanation: The hook for shapely expects the .dll files to be in the shapely.libs directory, so we have to copy them there"""
     SHAPELY_LIBS_DIR.mkdir(exist_ok=True)
     dlls = [ SHAPELY_DIR / "geos.dll", SHAPELY_DIR / "geos_c.dll" ]
@@ -228,18 +227,19 @@ def _copy_shapely_libs():
             raise FileNotFoundError(f"{dll} not found in {SHAPELY_DIR}")
         shutil.copy2(src=dll, dst=SHAPELY_LIBS_DIR)
 
-
-def finalize_exe():
-    """Cleanup and finalize the executable by deleting, copying and overwriting necessary files"""
+def clean_exe():
+    """Revert any changes made by starting the exe. (This will edit the datacatalogs and delftdashboard ini files, see rth-delftdashboard.py)"""
     TO_DELETE = ["data_catalog", "delftdashboard.ini"]
     for root, dirs, files in os.walk(EXE_CONFIG_DIR):
         for file in files:
             if any([name in file for name in TO_DELETE]):
                 os.remove(os.path.join(root, file))
-
-    # Copy the data catalog and delftdashboard.ini from the distribution folder to the config dir
     shutil.copy2(src=DATA_CATALOG, dst=EXE_CONFIG_DIR)
     shutil.copy2(src=DELFTDASHBOARD_INI, dst=EXE_CONFIG_DIR)
 
-    # Add the data dir
-    shutil.copytree(DATA_DIR, EXE_DATA_DIR, dirs_exist_ok=True)
+def add_data_dir(include_data: bool):
+    """Create the data directory structure, optionally add the data directory to the exe from: `distribution/data`."""
+    (EXE_DATA_DIR / "watersheds").mkdir(exist_ok=True, parents=True)
+    (EXE_DATA_DIR / "topobathy").mkdir(exist_ok=True, parents=True)
+    if include_data:
+        shutil.copytree(DATA_DIR, EXE_DATA_DIR, dirs_exist_ok=True)
