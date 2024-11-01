@@ -2,7 +2,7 @@ watersheds:
   crs: 4326
   data_type: GeoDataFrame
   driver: vector
-  path: ../../../data/WaterSheds/Watersheds.gpkg
+  path: ../../../data/watersheds/watersheds.gpkg
   meta:
     category: watersheds
     source: USGS
@@ -10,7 +10,7 @@ watersheds:
 
 dem:
   data_type: RasterDataset
-  path: ../../../data/TopoBathy/dem.tif
+  path: ../../../data/topobathy/dem.tif
   driver: raster
   filesystem: local
   crs: 26918
