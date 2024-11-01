@@ -116,6 +116,10 @@ def add_to_model(*args):
         dlg = app.gui.window.dialog_wait("\nUpdating Ground Elevation in your FIAT model...")
         update.update_parameters("Ground Elevation")
         dlg.close()
+    
+    # Set the source
+    app.gui.setvar(model, "source_grouned_elevation", name_ground_elevation_source)
+    app.active_model.save_gui_variables()
 
     app.gui.window.dialog_info(
         text="Ground elevation data was added to your model",

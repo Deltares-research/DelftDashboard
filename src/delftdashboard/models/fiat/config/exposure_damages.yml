@@ -43,6 +43,7 @@ element:
     text: "\u0078"
     method: remove_datasource
   - style: popupmenu
+    select: index
     position:
       x: 255
       y: 60
