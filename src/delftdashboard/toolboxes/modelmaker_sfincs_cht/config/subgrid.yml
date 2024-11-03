@@ -38,7 +38,7 @@ element:
     width: 60
     height: 20
   method: edit
-  tooltip: Maximum Manning's n below cut-off level
+  tooltip: Maximum Manning's n below cut-off level. Sometimes roughness maps will not distinguish smaller streams, leading to overestimation of roughness in river bed. This is meant to avoid that.
 - style: edit
   text: Manning Cut-off Level (m)
   variable: subgrid_manning_z_cutoff

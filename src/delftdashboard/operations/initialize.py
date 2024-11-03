@@ -38,9 +38,23 @@ def initialize():
     app.config["window_icon"]   = os.path.join(app.config_path, "images", "deltares_icon.png")
     app.config["splash_file"]   = os.path.join(app.config_path, "images", "DelftDashBoard_python.jpg")
     app.config["bathymetry_database"] = ""
+    app.config["sfincs_exe_path"] = ""
+    app.config["hurrywave_exe_path"] = ""
+    app.config["auto_update_bathymetry"] = True
+    app.config["auto_update_tide_models"] = True
+
+    # Read cfg file and override stuff in default config dict
+    # cfg file contains gui config stuff, but not properties that need to be edited by the user ! It always sits in the config folder.
+    cfg_file_name = os.path.join(app.config_path, "delftdashboard.cfg")
+    cfgfile = open(cfg_file_name, "r")
+    config = yaml.load(cfgfile, Loader=yaml.FullLoader)
+    for key in config:
+        app.config[key] = config[key]
+    cfgfile.close()
 
     # Read ini file and override stuff in default config dict
-    ini_file_name = os.path.join(app.config_path, "delftdashboard.ini")
+    # ini file contains properties that need to be edited by the user !
+    ini_file_name = os.path.join(app.main_path, "delftdashboard.ini")
     # Check if there is also a local ini file
     if os.path.exists(os.path.join(os.getcwd(), "delftdashboard.ini")):
         ini_file_name = os.path.join(os.getcwd(), "delftdashboard.ini")
@@ -62,8 +76,16 @@ def initialize():
                   splash_file=app.config["splash_file"],
                   copy_mapbox_server_folder=True)
 
-    # Bathymetry database
-    app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database"])
+    # Bathymetry database (initialize local database)
+    s3_bucket = "deltares-ddb"
+    s3_key = f"data/bathymetry"
+    app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database"],
+                                                 s3_bucket=s3_bucket,
+                                                 s3_key=s3_key)
+
+    # Check for changes in online database and download if necessary
+    if app.config["auto_update_bathymetry"]:
+        app.bathymetry_database.check_online_database()
 
     # Define some other variables
     app.crs = CRS(4326)
@@ -77,7 +99,13 @@ def initialize():
         path = app.config["tide_model_database"]
     else:
         path = None
-    app.tide_model_database = TideModelDatabase(path=path)
+    s3_bucket = "deltares-ddb"
+    s3_key = f"data/tidemodels"
+    app.tide_model_database = TideModelDatabase(path=path,
+                                                s3_bucket=s3_bucket,
+                                                s3_key=s3_key)
+    if app.config["auto_update_tide_models"]:
+        app.tide_model_database.check_online_database()
     short_names, long_names = app.tide_model_database.dataset_names()
     app.gui.setvar("tide_models", "long_names", long_names)
     app.gui.setvar("tide_models", "names", short_names)

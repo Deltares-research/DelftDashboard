@@ -22,7 +22,7 @@ class Model(GenericModel):
         self.long_name = "SFINCS (CHT)"
 
     def initialize(self):
-        self.active_domain = 0
+        # self.active_domain = 0
         self.domain = SFINCS(crs=app.crs)
         self.set_gui_variables()
         self.observation_points_changed = False
@@ -204,13 +204,13 @@ class Model(GenericModel):
         fname = fname[0]
         if fname:
             dlg = app.gui.window.dialog_wait("Loading SFINCS model ...")
-            self.initialize_domain()
+            self.initialize()
             path = os.path.dirname(fname)
             self.domain.path = path
             self.domain.read()
             # Also get mask datashader dataframe
             self.domain.mask.get_datashader_dataframe()
-            self.set_gui_variables()
+            # self.set_gui_variables()
             # Change working directory
             os.chdir(path)
             # Change CRS
@@ -226,7 +226,7 @@ class Model(GenericModel):
         # Write sfincs.inp
         self.domain.path = os.getcwd()        
         self.domain.input.variables.epsg = app.crs.to_epsg()
-        self.domain.exe_path = self.exe_path
+        self.domain.exe_path = app.config["sfincs_exe_path"]
         self.domain.input.write()
         self.domain.write_batch_file()
         app.model["sfincs_cht"].domain.input.write()

@@ -6,7 +6,6 @@ Created on Tue Jul  5 13:40:07 2022
 """
 from delftdashboard.app import app
 from delftdashboard.operations.toolbox import select_toolbox
-#from guitares.gui import set_missing_menu_values
 
 class GenericModel:
     def __init__(self):

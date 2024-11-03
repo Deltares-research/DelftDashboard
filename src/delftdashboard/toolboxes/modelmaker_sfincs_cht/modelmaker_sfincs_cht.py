@@ -152,7 +152,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "subgrid_nr_pixels", 20)
         app.gui.setvar(group, "subgrid_max_dzdv", 5.0)
         app.gui.setvar(group, "subgrid_manning_max", 0.024)
-        app.gui.setvar(group, "subgrid_manning_z_cutoff", 0.024)
+        app.gui.setvar(group, "subgrid_manning_z_cutoff", -99999.0)
         app.gui.setvar(group, "subgrid_zmin", -99999.0)
 
         # Boundary points

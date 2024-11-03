@@ -181,7 +181,7 @@ class Model(GenericModel):
         # Write hurrywave.inp and run.bat
         self.domain.path = os.getcwd()        
         self.domain.input.variables.epsg = app.crs.to_epsg()
-        self.domain.exe_path = self.exe_path
+        self.domain.exe_path = app.config["hurrywave_exe_path"]
         self.domain.input.write()
         self.domain.write_batch_file()
 

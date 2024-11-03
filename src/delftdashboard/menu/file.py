@@ -6,7 +6,6 @@ Created on Tue Jul  5 13:40:07 2022
 """
 import os
 from delftdashboard.app import app
-from delftdashboard.operations.initialize import initialize_toolboxes, initialize_models
 
 def new(option):
     # Reset everything
@@ -19,13 +18,11 @@ def new(option):
     for toolbox in app.toolbox.values():
         toolbox.initialize()
         toolbox.clear_layers()
-        # toolbox.add_layers()
 
     # Initialize models    
     for model in app.model.values():
         model.initialize()
         model.clear_layers()
-        # model.add_layers()
 
     app.active_model   = app.model[list(app.model)[0]]
     app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
