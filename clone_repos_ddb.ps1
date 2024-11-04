@@ -6,6 +6,7 @@ mkdir c:\work\checkouts\git
 cd c:\work\checkouts\git
 
 git clone https://github.com/Deltares-research/delftdashboard
+git clone https://github.com/Deltares-research/cht_bathymetry
 git clone https://github.com/Deltares-research/cht_cyclones
 git clone https://github.com/Deltares-research/cht_sfincs
 git clone https://github.com/Deltares-research/cht_utils

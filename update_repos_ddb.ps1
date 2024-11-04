@@ -5,6 +5,8 @@
 
 $repos_path = "c:\work\checkouts\git"
 
+cd $repos_path\cht_bathymetry
+git pull 
 cd $repos_path\cht_cyclones
 git pull 
 cd $repos_path\cht_sfincs
