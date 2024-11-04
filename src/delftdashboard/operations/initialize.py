@@ -77,9 +77,11 @@ def initialize():
                   copy_mapbox_server_folder=True)
 
     # Bathymetry database (initialize local database)
+    if "bathymetry_database_path" not in app.config:
+        app.config["bathymetry_database_path"] = os.path.join(app.config["data_path"], "bathymetry")
     s3_bucket = "deltares-ddb"
     s3_key = f"data/bathymetry"
-    app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database"],
+    app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database_path"],
                                                  s3_bucket=s3_bucket,
                                                  s3_key=s3_key)
 
@@ -95,13 +97,11 @@ def initialize():
         app.background_topography  = app.bathymetry_database.dataset_names()[0][0]
 
     # Tide model database
-    if "tide_model_database" in app.config:
-        path = app.config["tide_model_database"]
-    else:
-        path = None
+    if "tide_model_database_path" not in app.config:
+        app.config["tide_model_database_path"] = os.path.join(app.config["data_path"], "tide_models")
     s3_bucket = "deltares-ddb"
-    s3_key = f"data/tidemodels"
-    app.tide_model_database = TideModelDatabase(path=path,
+    s3_key = f"data/tide_models"
+    app.tide_model_database = TideModelDatabase(path=app.config["tide_model_database_path"],
                                                 s3_bucket=s3_bucket,
                                                 s3_key=s3_key)
     if app.config["auto_update_tide_models"]:

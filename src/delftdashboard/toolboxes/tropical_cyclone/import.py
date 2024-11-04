@@ -4,6 +4,7 @@ Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
 """
+import os
 # import math
 # import numpy as np
 import geopandas as gpd
@@ -25,15 +26,12 @@ def select(*args):
     app.toolbox["tropical_cyclone"].set_layer_mode("active")
 
 def select_track(*args):
-    if app.toolbox["tropical_cyclone"].track_database is None:
-        # Read database
-        app.toolbox["tropical_cyclone"].track_database = CycloneTrackDatabase(
-            "ibtracs",
-            file_name=r"d:\old_d\delftdashboard\data\toolboxes\TropicalCyclone\IBTrACS.ALL.v04r00.nc",
-        )
+
+    # For now, only read in dataset "IBTrACS_NA_v04r00"
+    dataset = app.toolbox["tropical_cyclone"].cyclone_track_database.get_dataset("IBTrACS_NA_v04r00")
 
     # Open track selector
-    tc, okay = track_selector(app.toolbox["tropical_cyclone"].track_database,
+    tc, okay = track_selector(dataset,
         app, lon=-80.0, lat=30.0, distance=300.0, year_min=2000, year_max=2023
     )
 

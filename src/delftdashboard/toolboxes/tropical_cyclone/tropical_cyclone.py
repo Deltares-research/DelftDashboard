@@ -4,6 +4,7 @@ Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
 """
+import os
 # import math
 # import numpy as np
 # import geopandas as gpd
@@ -11,10 +12,9 @@ Created on Mon May 10 12:18:09 2021
 # import json
 # import os
 from delftdashboard.app import app
-# from delftdashboard.operations import map
-
 from delftdashboard.operations.toolbox import GenericToolbox
-# from cht_cyclones import CycloneTrackDatabase, track_selector
+
+from cht_cyclones import CycloneTrackDatabase
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):
@@ -27,7 +27,7 @@ class Toolbox(GenericToolbox):
 
         # Set variables
         self.tc = None
-        self.track_database = None
+        self.track_dataset = None
 
         # Set GUI variables
         group = "tropical_cyclone"
@@ -39,6 +39,18 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "ensemble_cone_buffer", 300000.0)
         app.gui.setvar(group, "ensemble_cone_only_forecast", True)
         app.gui.setvar(group, "track_time_strings", [])
+
+        # Read track database
+        s3_bucket = "deltares-ddb"
+        s3_key = f"data/tropical_cyclones"
+        path = os.path.join(app.config["data_path"], "tropical_cyclones")
+        self.cyclone_track_database = CycloneTrackDatabase(path,
+                                                           s3_bucket=s3_bucket,
+                                                           s3_key=s3_key)
+        self.cyclone_track_database.check_online_database()
+        short_names, long_names = self.cyclone_track_database.dataset_names()
+        app.gui.setvar("tropical_cyclone", "track_dataset_long_names", long_names)
+        app.gui.setvar("tropical_cyclone", "track_dataset_names", short_names)
 
     def set_layer_mode(self, mode):
         if mode == "active":
