@@ -12,24 +12,24 @@ element:
   select: index
   option_string:
     variable: refinement_polygon_names
-- style: popupmenu
-  position:
-    x: 10
-    y: 10
-    width: 150
-    height: 20
-  method: select_refinement_level
-  variable: refinement_polygon_level
-  select: index
-  option_string:
-    variable: refinement_polygon_levels
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_refinement_polygons
-      operator: gt
-      value: 0
+# - style: popupmenu
+#   position:
+#     x: 10
+#     y: 10
+#     width: 150
+#     height: 20
+#   method: select_refinement_level
+#   variable: refinement_polygon_level
+#   select: index
+#   option_string:
+#     variable: refinement_polygon_levels
+#   dependency:
+#   - action: enable
+#     checkfor: all
+#     check:
+#     - variable: nr_refinement_polygons
+#       operator: gt
+#       value: 0
 - style: pushbutton
   text: Draw Polygon
   position:
@@ -76,11 +76,28 @@ element:
     - variable: nr_refinement_polygons
       operator: gt
       value: 0
-- style: pushbutton
-  text: Generate Quadtree Mesh
+- style: edit
   position:
-    x: 270
+    x: 350
+    y: 100
+    width: 50
+    height: 20
+  text: Min. edge size
+  variable: min_edge_size
+  method: refine_depth
+- style: pushbutton
+  text: Generate Depth Refinement
+  position:
+    x: 550
     y: 100
     width: 120
     height: 20
-  method: build_quadtree_grid
+  method: build_depthrefined_grid
+- style: pushbutton
+  text: Generate Polygon Refinement
+  position:
+    x: 550
+    y: 75
+    width: 120
+    height: 20
+  method: build_polygonrefined_grid

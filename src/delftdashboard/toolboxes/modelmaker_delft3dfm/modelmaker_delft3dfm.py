@@ -41,22 +41,26 @@ class Toolbox(GenericToolbox):
         self.outflow_boundary_polygon = gpd.GeoDataFrame()
 
         # Refinement
-        self.refinement_levels = []
+        # self.refinement_levels = []
         self.refinement_polygon = gpd.GeoDataFrame()
+        self.refinement_polygon_names = []
+
+        self.refinement_depth = False
+        self.min_edge_size = 500
 
         self.setup_dict = {}
 
         # Set GUI variable
         group = "modelmaker_delft3dfm"
 
-        app.gui.setvar(group, "build_grid", True)
-        app.gui.setvar(group, "use_snapwave", False)
+        # app.gui.setvar(group, "build_grid", True)
+        # app.gui.setvar(group, "use_snapwave", False)
 
         # Domain
-        app.gui.setvar(group, "lon_min", 0.0)
-        app.gui.setvar(group, "lon_max", 0.0)
-        app.gui.setvar(group, "lat_min", 0)
-        app.gui.setvar(group, "lat_max", 0)
+        app.gui.setvar(group, "x0", 0.0)
+        app.gui.setvar(group, "y0", 0.0)
+        app.gui.setvar(group, "nmax", 0)
+        app.gui.setvar(group, "mmax", 0)
 
         if app.crs.is_geographic:
             app.gui.setvar(group, "dx", 0.1)
@@ -66,17 +70,17 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "dy", 1000.0)
 
         # Refinement
-        app.gui.setvar(group, "refinement_min_edge_size", 0) 
+        app.gui.setvar(group, "refinement_depth", 0) 
+        app.gui.setvar(group, "min_edge_size", 0) 
 
         # Polygon refinement
         app.gui.setvar(group, "refinement_polygon_file", "refine.pli")
         app.gui.setvar(group, "refinement_polygon_names", [])
-        app.gui.setvar(group, "refinement_polygon_min_edge_size", 100)
+        app.gui.setvar(group, "refinement_polygon_index", 0)
         app.gui.setvar(group, "refinement_polygon_refinement_type", 1) 
         app.gui.setvar(group, "refinement_polygon_connect_hanging_nodes", 1)
         app.gui.setvar(group, "refinement_polygon_smoothing", 2)
         app.gui.setvar(group, "refinement_polygon_max_courant_time", 2)
-        app.gui.setvar(group, "refinement_polygon_level", 0)
         app.gui.setvar(group, "nr_refinement_polygons", 0)
 
         # Mask
@@ -142,73 +146,73 @@ class Toolbox(GenericToolbox):
 
         ### Mask
         # Include
-        from .mask_active_cells import include_polygon_created
-        from .mask_active_cells import include_polygon_modified
-        from .mask_active_cells import include_polygon_selected
-        layer.add_layer("include_polygon", type="draw",
-                             shape="polygon",
-                             create=include_polygon_created,
-                             modify=include_polygon_modified,
-                             select=include_polygon_selected,
-                             polygon_line_color="limegreen",
-                             polygon_fill_color="limegreen",
-                             polygon_fill_opacity=0.3)
+        # from .mask_active_cells import include_polygon_created
+        # from .mask_active_cells import include_polygon_modified
+        # from .mask_active_cells import include_polygon_selected
+        # layer.add_layer("include_polygon", type="draw",
+        #                      shape="polygon",
+        #                      create=include_polygon_created,
+        #                      modify=include_polygon_modified,
+        #                      select=include_polygon_selected,
+        #                      polygon_line_color="limegreen",
+        #                      polygon_fill_color="limegreen",
+        #                      polygon_fill_opacity=0.3)
         # Exclude
-        from .mask_active_cells import exclude_polygon_created
-        from .mask_active_cells import exclude_polygon_modified
-        from .mask_active_cells import exclude_polygon_selected
-        layer.add_layer("exclude_polygon", type="draw",
-                             shape="polygon",
-                             create=exclude_polygon_created,
-                             modify=exclude_polygon_modified,
-                             select=exclude_polygon_selected,
-                             polygon_line_color="orangered",
-                             polygon_fill_color="orangered",
-                             polygon_fill_opacity=0.3)
+        # from .mask_active_cells import exclude_polygon_created
+        # from .mask_active_cells import exclude_polygon_modified
+        # from .mask_active_cells import exclude_polygon_selected
+        # layer.add_layer("exclude_polygon", type="draw",
+        #                      shape="polygon",
+        #                      create=exclude_polygon_created,
+        #                      modify=exclude_polygon_modified,
+        #                      select=exclude_polygon_selected,
+        #                      polygon_line_color="orangered",
+        #                      polygon_fill_color="orangered",
+        #                      polygon_fill_opacity=0.3)
         # Boundary
-        from .mask_boundary_cells import open_boundary_polygon_created
-        from .mask_boundary_cells import open_boundary_polygon_modified
-        from .mask_boundary_cells import open_boundary_polygon_selected
-        layer.add_layer("open_boundary_polygon", type="draw",
-                             shape="polygon",
-                             create=open_boundary_polygon_created,
-                             modify=open_boundary_polygon_modified,
-                             select=open_boundary_polygon_selected,
-                             polygon_line_color="deepskyblue",
-                             polygon_fill_color="deepskyblue",
-                             polygon_fill_opacity=0.3)
+        # from .mask_boundary_cells import open_boundary_polygon_created
+        # from .mask_boundary_cells import open_boundary_polygon_modified
+        # from .mask_boundary_cells import open_boundary_polygon_selected
+        # layer.add_layer("open_boundary_polygon", type="draw",
+        #                      shape="polygon",
+        #                      create=open_boundary_polygon_created,
+        #                      modify=open_boundary_polygon_modified,
+        #                      select=open_boundary_polygon_selected,
+        #                      polygon_line_color="deepskyblue",
+        #                      polygon_fill_color="deepskyblue",
+        #                      polygon_fill_opacity=0.3)
 
         # Outflow boundary
-        from .mask_boundary_cells import outflow_boundary_polygon_created
-        from .mask_boundary_cells import outflow_boundary_polygon_modified
-        from .mask_boundary_cells import outflow_boundary_polygon_selected
-        layer.add_layer("outflow_boundary_polygon", type="draw",
-                             shape="polygon",
-                             create=outflow_boundary_polygon_created,
-                             modify=outflow_boundary_polygon_modified,
-                             select=outflow_boundary_polygon_selected,
-                             polygon_line_color="red",
-                             polygon_fill_color="orange",
-                             polygon_fill_opacity=0.3)
+        # from .mask_boundary_cells import outflow_boundary_polygon_created
+        # from .mask_boundary_cells import outflow_boundary_polygon_modified
+        # from .mask_boundary_cells import outflow_boundary_polygon_selected
+        # layer.add_layer("outflow_boundary_polygon", type="draw",
+        #                      shape="polygon",
+        #                      create=outflow_boundary_polygon_created,
+        #                      modify=outflow_boundary_polygon_modified,
+        #                      select=outflow_boundary_polygon_selected,
+        #                      polygon_line_color="red",
+        #                      polygon_fill_color="orange",
+        #                      polygon_fill_opacity=0.3)
 
         # Exclude
-        from .mask_active_cells_snapwave import exclude_polygon_created_snapwave
-        from .mask_active_cells_snapwave import exclude_polygon_modified_snapwave
-        from .mask_active_cells_snapwave import exclude_polygon_selected_snapwave
-        layer.add_layer("exclude_polygon_snapwave", type="draw",
-                             shape="polygon",
-                             create=exclude_polygon_created_snapwave,
-                             modify=exclude_polygon_modified_snapwave,
-                             select=exclude_polygon_selected_snapwave,
-                             polygon_line_color="orangered",
-                             polygon_fill_color="orangered",
-                             polygon_fill_opacity=0.3)
+        # from .mask_active_cells_snapwave import exclude_polygon_created_snapwave
+        # from .mask_active_cells_snapwave import exclude_polygon_modified_snapwave
+        # from .mask_active_cells_snapwave import exclude_polygon_selected_snapwave
+        # layer.add_layer("exclude_polygon_snapwave", type="draw",
+        #                      shape="polygon",
+        #                      create=exclude_polygon_created_snapwave,
+        #                      modify=exclude_polygon_modified_snapwave,
+        #                      select=exclude_polygon_selected_snapwave,
+        #                      polygon_line_color="orangered",
+        #                      polygon_fill_color="orangered",
+        #                      polygon_fill_opacity=0.3)
 
         # Refinement polygons
-        from .quadtree import refinement_polygon_created
-        from .quadtree import refinement_polygon_modified
-        from .quadtree import refinement_polygon_selected
-        layer.add_layer("quadtree_refinement", type="draw",
+        from .refinement import refinement_polygon_created
+        from .refinement import refinement_polygon_modified
+        from .refinement import refinement_polygon_selected
+        layer.add_layer("polygon_refinement", type="draw",
                              shape="polygon",
                              create=refinement_polygon_created,
                              modify=refinement_polygon_modified,
@@ -238,43 +242,76 @@ class Toolbox(GenericToolbox):
         dy       = app.gui.getvar(group, "dy")
         nmax     = app.gui.getvar(group, "nmax")
         mmax     = app.gui.getvar(group, "mmax")
-        rotation = app.gui.getvar(group, "rotation")
-        model.input.variables.qtrfile = "sfincs.nc"
-        app.gui.setvar("delft3dfm", "qtrfile", model.input.variables.qtrfile)
+        rotation = 0
+        model.input.geometry.netfile.filepath = "flow_net.nc"
+        app.gui.setvar("delft3dfm", "netfile", model.input.geometry.netfile.filepath)
 
-        if len(self.refinement_polygon) == 0:
-            refpol = None
-        else:
-            # Make list of separate gdfs for each polygon
-            refpol = self.refinement_polygon
-            # Add refinement_level column
-            refpol["refinement_level"] = 0
-            # Iterate through rows and set refinement levels            
-            for irow, row in refpol.iterrows():
-                refpol.loc[irow, "refinement_level"] = self.refinement_levels[irow]
+        # if len(self.refinement_polygon) == 0:
+        #     refpol = None
+        # else:
+        #     # Make list of separate gdfs for each polygon
+        #     refpol = self.refinement_polygon
 
         # Build grid 
-        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation, refinement_polygons=refpol)
+        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+        model.grid.build(x0, y0, nmax, mmax, dx, dy, bathymetry_list=bathymetry_list)
         # Save grid 
         model.grid.write()
-
-        # If SnapWave also generate SnapWave mesh and save it
-        if app.gui.getvar(group, "use_snapwave"):
-            snapwave_quadtree2mesh(model.grid, file_name="snapwave.nc")
 
         # Replot everything
         app.model["delft3dfm"].plot()
 
         dlg.close()
 
+    def generate_depth_refinement(self):
+        group = "modelmaker_delft3dfm"
+        dlg = app.gui.window.dialog_wait("Generating refinement ...")
+        model = app.model["delft3dfm"].domain
+        
+        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+
+        if bathymetry_list:
+            model.grid.refine_depth(bathymetry_list)
+            
+            # Interpolate bathymetry onto the grid
+            model.grid.set_bathymetry(bathymetry_list)
+        
+            # Save grid 
+            model.grid.write()
+
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        else:
+            print("No bathymetry selected")
+
+        dlg.close()
+
+    def generate_polygon_refinement(self):
+        group = "modelmaker_delft3dfm"
+        dlg = app.gui.window.dialog_wait("Generating refinement ...")
+        model = app.model["delft3dfm"].domain
+        
+        model.grid.refine_polygon(gdf = self.refinement_polygon.geometry)
+        
+        # Interpolate bathymetry onto the grid
+        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+        if bathymetry_list:
+            model.grid.set_bathymetry(bathymetry_list)
+      
+        # Save grid 
+        model.grid.write()
+
+        # Replot everything
+        app.model["delft3dfm"].plot()
+
+        dlg.close()
+
+
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
         bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
         app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list)
         app.model["delft3dfm"].domain.grid.write()
-        # If SnapWave also generate SnapWave mesh and save it
-        if app.gui.getvar("modelmaker_delft3dfm", "use_snapwave"):
-            snapwave_quadtree2mesh(app.model["delft3dfm"].domain.grid, file_name="snapwave.nc")
         dlg.close()
 
     def update_mask(self):
@@ -370,8 +407,8 @@ class Toolbox(GenericToolbox):
     def build_model(self):
         self.generate_grid()
         self.generate_bathymetry()
-        self.update_mask()
-        self.generate_subgrid()
+        # self.update_mask()
+        # self.generate_subgrid()
 
 #    def update_polygons(self): # This should really be moved to the callback modules
 
@@ -428,10 +465,11 @@ class Toolbox(GenericToolbox):
     def read_refinement_polygon(self):
         fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_file")
         self.refinement_polygon = gpd.read_file(fname)
-        # Loop through rows in geodataframe and set refinement levels        
-        self.refinement_levels = []
+        # app.toolbox["modelmaker_delft3dfm"].refinement_polygon_names.append(fname)
+        # # Loop through rows in geodataframe and set refinement polygon names        
+        self.refinement_polygon_names = []
         for i in range(len(self.refinement_polygon)):
-            self.refinement_levels.append(self.refinement_polygon["refinement_level"][i])
+            self.refinement_polygon_names.append(self.refinement_polygon["refinement_polygon_name"][i])
 
     def read_include_polygon(self):
         fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file")
@@ -464,11 +502,9 @@ class Toolbox(GenericToolbox):
             print("No refinement polygons defined")
             return
         gdf = gpd.GeoDataFrame({"geometry": self.refinement_polygon["geometry"],
-                                "refinement_level": self.refinement_levels})
-        # Iterate over all polygons and add refinement level
-        # refinement_level = 1 means one level of refinement
-        # refinement_level = 2 means two levels of refinement
-        # etc.
+                                "refinement_polygon_name": self.refinement_polygon_names})
+        # index = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_index")
+        # fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_names")
         fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
 
@@ -517,7 +553,7 @@ class Toolbox(GenericToolbox):
     # PLOT
 
     def plot_refinement_polygon(self):
-        layer = app.map.layer["modelmaker_delft3dfm"].layer["quadtree_refinement"]
+        layer = app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"]
         layer.clear()
         layer.add_feature(self.refinement_polygon)
 

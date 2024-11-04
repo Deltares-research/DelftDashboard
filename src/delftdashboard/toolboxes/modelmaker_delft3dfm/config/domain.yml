@@ -53,15 +53,6 @@ element:
   text: dY
   variable: dy
   method: edit_dxdy
-- style: edit
-  position:
-    x: 60
-    y: 35
-    width: 60
-    height: 20
-  text: Rotation
-  variable: rotation
-  method: edit_rotation
 - style: pushbutton
   text: Draw Layout
   position:
@@ -78,25 +69,6 @@ element:
     width: 120
     height: 20
   method: generate_grid
-- style: checkbox
-  position:
-    x: 400
-    y: 110
-    width: 120
-    height: 20
-  text: SnapWave
-  variable: use_snapwave
-  method: use_snapwave
-- style: checkbox
-  id: sbg
-  position:
-    x: 400
-    y: 85
-    width: 20
-    height: 20
-  text: Sub-Grid Bathymetry
-  variable: use_subgrid
-  method: use_subgrid
 - style: pushbutton
   text: Read Set-up File
   position:
@@ -105,6 +77,7 @@ element:
     width: 120
     height: 20
   method: read_setup_yaml
+  enable: False
 - style: pushbutton
   text: Write Set-up File
   position:
@@ -113,6 +86,7 @@ element:
     width: 120
     height: 20
   method: write_setup_yaml
+  enable: False
 - style: pushbutton
   text: Build Model
   position:

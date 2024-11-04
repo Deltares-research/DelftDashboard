@@ -27,7 +27,7 @@ class Model(GenericModel):
         self.set_gui_variables()
 
     def initialize_domain(self):
-        self.domain = Delft3DFM()
+        self.domain = Delft3DFM(crs = app.crs)
 
     def add_layers(self):
         # Add main DDB layer
@@ -38,19 +38,19 @@ class Model(GenericModel):
         #                 line_color="black")
         layer.add_layer("grid", type="image")
 
-        layer.add_layer("mask_include",
-                        type="circle",
-                        file_name="delft3dfm_mask_include.geojson",
-                        circle_radius=3,
-                        fill_color="yellow",
-                        line_color="transparent")
+        # layer.add_layer("mask_include",
+        #                 type="circle",
+        #                 file_name="delft3dfm_mask_include.geojson",
+        #                 circle_radius=3,
+        #                 fill_color="yellow",
+        #                 line_color="transparent")
 
-        layer.add_layer("mask_boundary",
-                        type="circle",
-                        file_name="delft3dfm_mask_boundary.geojson",
-                        circle_radius=3,
-                        fill_color="red",
-                        line_color="transparent")
+        # layer.add_layer("mask_boundary",
+        #                 type="circle",
+        #                 file_name="delft3dfm_mask_boundary.geojson",
+        #                 circle_radius=3,
+        #                 fill_color="red",
+        #                 line_color="transparent")
 
         # Move this to delft3dfm.py
         from .boundary_conditions import select_boundary_point_from_map
@@ -84,31 +84,31 @@ class Model(GenericModel):
                         line_color_selected="white",
                         fill_color_selected="red")
 
-        from .observation_points_spectra import select_observation_point_from_map_spectra
-        layer.add_layer("observation_points_spectra",
-                        type="circle_selector",
-                        select=select_observation_point_from_map_spectra,
-                        line_color="white",
-                        line_opacity=1.0,
-                        fill_color="orange",
-                        fill_opacity=1.0,
-                        circle_radius=3,
-                        circle_radius_selected=4,
-                        line_color_selected="white",
-                        fill_color_selected="red")
+        # from .observation_points_spectra import select_observation_point_from_map_spectra
+        # layer.add_layer("observation_points_spectra",
+        #                 type="circle_selector",
+        #                 select=select_observation_point_from_map_spectra,
+        #                 line_color="white",
+        #                 line_opacity=1.0,
+        #                 fill_color="orange",
+        #                 fill_opacity=1.0,
+        #                 circle_radius=3,
+        #                 circle_radius_selected=4,
+        #                 line_color_selected="white",
+        #                 fill_color_selected="red")
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Grid is made visible
             app.map.layer["delft3dfm"].layer["grid"].deactivate()
             # Mask is made invisible
-            app.map.layer["delft3dfm"].layer["mask_include"].hide()
-            app.map.layer["delft3dfm"].layer["mask_boundary"].hide()
+            # app.map.layer["delft3dfm"].layer["mask_include"].hide()
+            # app.map.layer["delft3dfm"].layer["mask_boundary"].hide()
             # Boundary points are made grey
             app.map.layer["delft3dfm"].layer["boundary_points"].deactivate()
             # Observation points are made grey
             app.map.layer["delft3dfm"].layer["observation_points"].deactivate()
-            app.map.layer["delft3dfm"].layer["observation_points_spectra"].deactivate()
+            # app.map.layer["delft3dfm"].layer["observation_points_spectra"].deactivate()
         elif mode == "invisible":
             # Everything set to invisible
             app.map.layer["delft3dfm"].hide()
@@ -141,10 +141,10 @@ class Model(GenericModel):
                     #     var_value = str(var_value)
                     app.gui.setvar(group, f'{groupname}.{var_name}', var_value)
 
-        app.gui.setvar(group, "setup.lon_min", 0)
-        app.gui.setvar(group, "setup.lon_max", 1)
-        app.gui.setvar(group, "setup.lat_min", 0)
-        app.gui.setvar(group, "setup.lat_max", 0)
+        app.gui.setvar(group, "setup.x0", 0)
+        app.gui.setvar(group, "setup.y0", 1)
+        app.gui.setvar(group, "setup.nmax", 0)
+        app.gui.setvar(group, "setup.mmax", 0)
         app.gui.setvar(group, "setup.dx", 0.01)
         app.gui.setvar(group, "setup.dy", 0.01)
 
@@ -242,8 +242,7 @@ class Model(GenericModel):
 
     def plot(self):
         # Grid
-        pass
-        # app.map.layer["delft3dfm"].layer["grid"].set_data(self.domain.grid)
+        app.map.layer["delft3dfm"].layer["grid"].set_data(self.domain.grid)
         # # Mask
         # app.map.layer["delft3dfm"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
         # app.map.layer["delft3dfm"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
