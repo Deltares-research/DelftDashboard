@@ -12,3 +12,11 @@ element:
   - string: Weirs
     module: delftdashboard.models.sfincs_cht.structures_weirs
     element: structures_weirs.yml
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: enable_weirs
+        operator: eq
+        value: true
+        

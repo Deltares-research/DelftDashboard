@@ -12,7 +12,5 @@ def select(*args):
     # De-activate existing layers
     map.update()
 
-def draw_domain(*args):
-    toolbox = app.toolbox["modelmaker_sfincs_cht"]    
+def edit(*agrs):
     pass
-    

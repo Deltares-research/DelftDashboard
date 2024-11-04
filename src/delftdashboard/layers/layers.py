@@ -12,7 +12,7 @@ import geopandas as gpd
 from delftdashboard.app import app
 from delftdashboard.operations import map
 from cht_bathymetry.utils import get_isobaths, add_buffer
-from cht_bathymetry.bathymetry_database import bathymetry_database
+# from cht_bathymetry.bathymetry_database import bathymetry_database
 
 def select(*args):
     # De-activate existing layers
@@ -23,7 +23,6 @@ def select(*args):
 
 
 def push(*args):
-    print("PUSHED!")
     buffer_size = app.gui.getvar("layers", "buffer_size")
     buffer_land = app.gui.getvar("layers", "buffer_land")
     buffer_sea = app.gui.getvar("layers", "buffer_sea")

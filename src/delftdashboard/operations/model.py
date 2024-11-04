@@ -4,11 +4,8 @@ Created on Tue Jul  5 13:40:07 2022
 
 @author: ormondt
 """
-import importlib
-
 from delftdashboard.app import app
 from delftdashboard.operations.toolbox import select_toolbox
-#from guitares.gui import set_missing_menu_values
 
 class GenericModel:
     def __init__(self):
@@ -21,6 +18,16 @@ class GenericModel:
 
     def add_layers(self):
         pass
+
+    def delete_layers(self):
+        # Should not use this method, use clear_layers instead
+        if self.name in app.map.layer:
+            app.map.layer[self.name].delete()
+
+    def clear_layers(self):
+        # Clear data and remove from map
+        if self.name in app.map.layer:
+            app.map.layer[self.name].clear()
 
     def select(self):
 
@@ -81,7 +88,16 @@ class GenericModel:
             # Select first toolbox from the list
             select_toolbox(toolboxes_to_add[0])
 
+        # Make model layer visible
+        app.map.layer[self.name].show()    
+
         app.gui.window.update()
+
+    def get_view_menu(self):
+        return {}
+
+    def set_view_menu(self):
+        pass
 
     def set_crs(self):        
         pass

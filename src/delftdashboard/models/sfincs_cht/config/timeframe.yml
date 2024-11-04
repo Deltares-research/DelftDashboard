@@ -33,12 +33,3 @@ element:
     text: Stop Time
     variable: tstop
     method: set_model_variables
-  - style: edit
-    position:
-      x: 80
-      y: 55
-      width: 110
-      height: 20
-    text: Spin-up Time (s)
-    variable: tspinup
-    method: set_model_variables

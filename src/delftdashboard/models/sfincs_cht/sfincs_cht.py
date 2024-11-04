@@ -21,11 +21,39 @@ class Model(GenericModel):
         self.name = name
         self.long_name = "SFINCS (CHT)"
 
-        print("Model " + self.name + " added!")
-        self.active_domain = 0
-
-        self.initialize_domain()
+    def initialize(self):
+        # self.active_domain = 0
+        self.domain = SFINCS(crs=app.crs)
         self.set_gui_variables()
+        self.observation_points_changed = False
+        self.discharge_points_changed = False
+        self.boundaries_changed = False
+        self.thin_dams_changed = False
+
+    def get_view_menu(self):
+        model_view_menu = {}
+        model_view_menu["text"] = self.long_name
+        model_view_menu["menu"] = []
+        model_view_menu["menu"].append({"variable_group": self.name,
+                                        "id": f"view.{self.name}.grid",
+                                        "text": "Grid",
+                                        "variable": "view_grid",
+                                        "separator": True,
+                                        "checkable": True,
+                                        "method": self.set_view_menu,
+                                        "option": "grid",
+                                        "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "view_grid", "operator": "eq", "value": True}]}]})
+        return model_view_menu
+
+    def set_view_menu(self, option, checked):
+        if option == "grid":
+            print(f"Checked: {checked}")
+            if app.gui.getvar(self.name, "view_grid"):
+                app.map.layer["sfincs_cht"].layer["grid"].show()
+                print("Grid is made visible")
+            else:
+                app.map.layer["sfincs_cht"].layer["grid"].hide()
+                print("Grid is made invisible")
 
     def add_layers(self):
         layer = app.map.add_layer("sfincs_cht")
@@ -37,23 +65,8 @@ class Model(GenericModel):
                         circle_radius=0,
                         line_color="yellow")
 
-        layer.add_layer("mask_include",
-                        type="circle",
-                        circle_radius=3,
-                        fill_color="yellow",
-                        line_color="transparent")
-
-        layer.add_layer("mask_open_boundary",
-                        type="circle",
-                        circle_radius=3,
-                        fill_color="red",
-                        line_color="transparent")
-
-        layer.add_layer("mask_outflow_boundary",
-                        type="circle",
-                        circle_radius=3,
-                        fill_color="green",
-                        line_color="transparent")
+        layer.add_layer("mask",
+                        type="image")
 
         layer.add_layer("mask_include_snapwave",
                         type="circle",
@@ -101,8 +114,23 @@ class Model(GenericModel):
 
         from .observation_points import select_observation_point_from_map
         layer.add_layer("observation_points",
-                        type="circle_selector",
+                        type="circle_selector",                        
                         select=select_observation_point_from_map,
+                        hover_property="name",
+                        line_color="white",
+                        line_opacity=1.0,
+                        fill_color="blue",
+                        fill_opacity=1.0,
+                        circle_radius=3,
+                        circle_radius_selected=4,
+                        line_color_selected="white",
+                        fill_color_selected="red")
+
+        from .discharge_points import select_discharge_point_from_map
+        layer.add_layer("discharge_points",
+                        type="circle_selector",                        
+                        select=select_discharge_point_from_map,
+                        hover_property="name",
                         line_color="white",
                         line_opacity=1.0,
                         fill_color="blue",
@@ -113,15 +141,14 @@ class Model(GenericModel):
                         fill_color_selected="red")
 
 
-        # Snapwave Boundary Enclosure
-        from .waves_snapwave import boundary_enclosure_created
-        from .waves_snapwave import boundary_enclosure_modified
-        layer.add_layer("snapwave_boundary_enclosure", type="draw",
-                             shape="polygon",
-                             create=boundary_enclosure_created,
-                             modify=boundary_enclosure_modified,
-#                             add=boundary_enclosure_created,
-                             polygon_line_color="red")
+        # # Snapwave Boundary Enclosure
+        # from .waves_snapwave import boundary_enclosure_created
+        # from .waves_snapwave import boundary_enclosure_modified
+        # layer.add_layer("snapwave_boundary_enclosure", type="draw",
+        #                      shape="polygon",
+        #                      create=boundary_enclosure_created,
+        #                      modify=boundary_enclosure_modified,
+        #                      polygon_line_color="red")
 
         # Wave makers
         from .waves_wave_makers import wave_maker_created
@@ -138,27 +165,29 @@ class Model(GenericModel):
     def set_layer_mode(self, mode):
         layer = app.map.layer["sfincs_cht"]
         if mode == "inactive":
+            # # Make the sfincs_cht layer visible
+            # layer.show()
             # Grid is made visible
             layer.layer["grid"].deactivate()
             # Grid exterior is made visible
             layer.layer["grid_exterior"].deactivate()
             # Mask is made invisible
-            layer.layer["mask_include"].hide()
-            layer.layer["mask_open_boundary"].hide()
-            layer.layer["mask_outflow_boundary"].hide()
+            layer.layer["mask"].hide()
             layer.layer["mask_include_snapwave"].hide()
             # Boundary points are made grey
             layer.layer["boundary_points"].deactivate()
             # Observation points are made grey
             layer.layer["observation_points"].deactivate()
+            # Discharge points are made grey
+            layer.layer["discharge_points"].deactivate()
             # Thin dams are made grey
             layer.layer["thin_dams"].layer["polylines"].deactivate()
             layer.layer["thin_dams"].layer["snapped"].hide()
-            # SnapWave boundary enclosure is made invisible
-            layer.layer["snapwave_boundary_enclosure"].hide()
+            # # SnapWave boundary enclosure is made invisible
+            # layer.layer["snapwave_boundary_enclosure"].hide()
             # Wave makers are made invisible
             layer.layer["wave_makers"].hide()
-        if mode == "invisible":
+        elif mode == "invisible":
            layer.hide()
 
     def set_crs(self):
@@ -175,27 +204,29 @@ class Model(GenericModel):
         fname = fname[0]
         if fname:
             dlg = app.gui.window.dialog_wait("Loading SFINCS model ...")
-            self.initialize_domain()
+            self.initialize()
             path = os.path.dirname(fname)
             self.domain.path = path
             self.domain.read()
-            self.set_gui_variables()
+            # Also get mask datashader dataframe
+            self.domain.mask.get_datashader_dataframe()
+            # self.set_gui_variables()
             # Change working directory
             os.chdir(path)
             # Change CRS
-            old_crs = app.crs
             app.crs = self.domain.crs
             app.map.crs = self.domain.crs
             self.plot()
-            if old_crs != app.crs:
-                app.map.fly_to(-80.0, 30.0, 6)
             dlg.close()
+            # Zoom to model extent
+            bounds = self.domain.grid.bounds(crs=4326, buffer=0.1)
+            app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def save(self):
         # Write sfincs.inp
         self.domain.path = os.getcwd()        
         self.domain.input.variables.epsg = app.crs.to_epsg()
-        self.domain.exe_path = self.exe_path
+        self.domain.exe_path = app.config["sfincs_exe_path"]
         self.domain.input.write()
         self.domain.write_batch_file()
         app.model["sfincs_cht"].domain.input.write()
@@ -208,22 +239,17 @@ class Model(GenericModel):
         # Grid exterior
         app.map.layer["sfincs_cht"].layer["grid_exterior"].set_data(app.model["sfincs_cht"].domain.grid.exterior)
         # Mask
-        app.map.layer["sfincs_cht"].layer["mask_include"].set_data(app.model["sfincs_cht"].domain.mask.to_gdf(option="include"))
-        app.map.layer["sfincs_cht"].layer["mask_open_boundary"].set_data(app.model["sfincs_cht"].domain.mask.to_gdf(option="open"))
-        app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].set_data(app.model["sfincs_cht"].domain.mask.to_gdf(option="outflow"))
+        app.map.layer["sfincs_cht"].layer["mask"].set_data(app.model["sfincs_cht"].domain.mask)
         # Observation points
         app.map.layer["sfincs_cht"].layer["observation_points"].set_data(app.model["sfincs_cht"].domain.observation_points.gdf, 0)
         # Boundary points
         app.map.layer["sfincs_cht"].layer["boundary_points"].set_data(app.model["sfincs_cht"].domain.boundary_conditions.gdf, 0)
-        # SnapWave boundary enclosure
-        app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].set_data(app.model["sfincs_cht"].domain.snapwave.boundary_enclosure.gdf)
+        # Discharge points
+        app.map.layer["sfincs_cht"].layer["discharge_points"].set_data(app.model["sfincs_cht"].domain.discharge_points.gdf, 0)
+        # # SnapWave boundary enclosure
+        # app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].set_data(app.model["sfincs_cht"].domain.snapwave.boundary_enclosure.gdf)
         # Wave makers
         app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(app.model["sfincs_cht"].domain.wave_makers.gdf)
-
-    def plot_wave_makers(self):
-        layer = app.map.layer["sfincs_cht"].layer["wave_makers"]
-        layer.clear()
-        layer.add_feature(self.domain.wave_makers.gdf)
 
     def set_gui_variables(self):
 
@@ -233,36 +259,55 @@ class Model(GenericModel):
         for var_name in vars(self.domain.input.variables):
             app.gui.setvar(group, var_name, getattr(self.domain.input.variables, var_name))
 
+        # View  
+        app.gui.setvar(group, "view_grid", True)
+
         # Now set some extra variables needed for SFINCS GUI
 
         app.gui.setvar(group, "grid_type", "regular")
         app.gui.setvar(group, "bathymetry_type", "regular")
-
         app.gui.setvar(group, "snapwave", False)
-
         app.gui.setvar(group, "roughness_type", "landsea")
-
         app.gui.setvar(group, "input_options_text", ["Binary", "ASCII"])
         app.gui.setvar(group, "input_options_values", ["bin", "asc"])
-
         app.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
         app.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
-
         app.gui.setvar(group, "meteo_forcing_type", "uniform")
-
         app.gui.setvar(group, "crs_type", "geographic")
+
+        # Wind drag
+        app.gui.setvar(group, "wind_speed_1", self.domain.input.variables.cdwnd[0])
+        app.gui.setvar(group, "wind_speed_2", self.domain.input.variables.cdwnd[1])
+        app.gui.setvar(group, "wind_speed_3", self.domain.input.variables.cdwnd[2])
+        app.gui.setvar(group, "cd_1", self.domain.input.variables.cdval[0])
+        app.gui.setvar(group, "cd_2", self.domain.input.variables.cdval[1])
+        app.gui.setvar(group, "cd_3", self.domain.input.variables.cdval[2])
 
         # Boundary conditions
         app.gui.setvar(group, "boundary_point_names", [])
         app.gui.setvar(group, "nr_boundary_points", 0)
         app.gui.setvar(group, "active_boundary_point", 0)
-        app.gui.setvar(group, "boundary_wl", 0.0)
         app.gui.setvar(group, "boundary_dx", 10000.0)
-         
+        app.gui.setvar(group, "boundary_conditions_timeseries_shape", "constant")
+        app.gui.setvar(group, "boundary_conditions_timeseries_time_step", 600.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_offset", 0.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_amplitude", 1.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_phase", 0.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_period", 43200.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_peak", 1.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
+        app.gui.setvar(group, "boundary_conditions_tide_model", app.gui.getvar("tide_models", "names")[0])
+                 
         # Observation points 
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
+
+        # Discharge points 
+        app.gui.setvar(group, "discharge_point_names", [])
+        app.gui.setvar(group, "nr_discharge_points", 0)
+        app.gui.setvar(group, "active_discharge_point", 0)
 
         # Thin dams
         app.gui.setvar(group, "thin_dam_names", [])
@@ -274,9 +319,12 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_wave_makers", 0)
         app.gui.setvar(group, "active_wave_maker", 0)
 
-        app.gui.setvar(group, "wind", True)
-        app.gui.setvar(group, "rain", True)
+        app.gui.setvar(group, "wind", False)
+        app.gui.setvar(group, "baro", False)
+        app.gui.setvar(group, "rain", False)
 
+        # Turning off weirs for now
+        app.gui.setvar(group, "enable_weirs", False)
 
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input variables
@@ -287,10 +335,21 @@ class Model(GenericModel):
             app.gui.setvar("modelmaker_sfincs_cht", "use_snapwave", True)
         else:
             app.gui.setvar("modelmaker_sfincs_cht", "use_snapwave", False)
+        # Wind drag    
+        self.domain.input.variables.cdwnd[0] = app.gui.getvar(group, "wind_speed_1")
+        self.domain.input.variables.cdwnd[1] = app.gui.getvar(group, "wind_speed_2")
+        self.domain.input.variables.cdwnd[2] = app.gui.getvar(group, "wind_speed_3")
+        self.domain.input.variables.cdval[0] = app.gui.getvar(group, "cd_1")
+        self.domain.input.variables.cdval[1] = app.gui.getvar(group, "cd_2")
+        self.domain.input.variables.cdval[2] = app.gui.getvar(group, "cd_3")
 
-
-    def initialize_domain(self):
-        self.domain = SFINCS(crs=app.crs)
+    # def initialize_domain(self):
+    #     self.domain = SFINCS(crs=app.crs)
+    #     # Also add some other attributes needed for the GUI
+    #     self.observation_points_changed = False
+    #     self.discharge_points_changed = False
+    #     self.boundaries_changed = False
+    #     self.thin_dams_changed = False
 
     def set_input_variable(self, gui_variable, value):
         pass

@@ -18,15 +18,10 @@ class Model(GenericModel):
         self.name = name
         self.long_name = "HurryWave"
 
-        print("Model " + self.name + " added!")
+    def initialize(self):
         self.active_domain = 0
-
-        self.initialize_domain()
-
-        self.set_gui_variables()
-
-    def initialize_domain(self):
         self.domain = HurryWave()
+        self.set_gui_variables()
 
     def add_layers(self):
         # Add main DDB layer
@@ -98,8 +93,8 @@ class Model(GenericModel):
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
-            # Grid is made visible
-            app.map.layer["hurrywave"].layer["grid"].deactivate()
+            # Grid is always made visible
+            app.map.layer["hurrywave"].layer["grid"].show()
             # Mask is made invisible
             app.map.layer["hurrywave"].layer["mask_include"].hide()
             app.map.layer["hurrywave"].layer["mask_boundary"].hide()
@@ -112,11 +107,30 @@ class Model(GenericModel):
             # Everything set to invisible
             app.map.layer["hurrywave"].hide()
 
+    def new(self):
+        self.initialize_domain()
+        self.set_gui_variables()
+        app.map.layer["modelmaker_hurrywave"].clear()
+
+    def clear_spatial_attributes(self):
+        # This happens when a new grid is created, but we want to keep time, physical and numerical attributes
+        # Clear the map
+        app.map.layer["hurrywave"].clear()
+        # And remove them from the model domain
+        self.domain.clear_spatial_attributes()
+        self.set_gui_variables()
+
     def set_gui_variables(self):
+
         group = "hurrywave"
+
         # Input variables
         for var_name in vars(self.domain.input.variables):
             app.gui.setvar(group, var_name, getattr(self.domain.input.variables, var_name))
+
+        # View settings
+        app.gui.setvar(group, "view_grid", True)
+
         app.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
         app.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
         app.gui.setvar(group, "wind_type", "uniform")
@@ -147,6 +161,7 @@ class Model(GenericModel):
         fname = app.gui.window.dialog_open_file("Open file", filter="HurryWave input file (hurrywave.inp)")
         fname = fname[0]
         if fname:
+            self.domain = HurryWave()
             dlg = app.gui.window.dialog_wait("Loading HurryWave model ...")
             path = os.path.dirname(fname)
             self.domain.path = path
@@ -158,13 +173,17 @@ class Model(GenericModel):
             app.crs = self.domain.crs
             self.plot()
             dlg.close()
+            # Zoom to model extent
+            bounds = self.domain.grid.bounds(crs=4326, buffer=0.1)
+            app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def save(self):
-        # Write hurrywave.inp
-        self.domain.path = os.getcwd()
+        # Write hurrywave.inp and run.bat
+        self.domain.path = os.getcwd()        
+        self.domain.input.variables.epsg = app.crs.to_epsg()
+        self.domain.exe_path = app.config["hurrywave_exe_path"]
         self.domain.input.write()
         self.domain.write_batch_file()
-
 
     def load(self):
         self.domain.read()
@@ -196,3 +215,26 @@ class Model(GenericModel):
         if not self.domain.input.variables.obsfile:
             self.domain.input.variables.obsfile = "hurrywave.obs"
         self.domain.observation_points_regular.write()
+
+    def get_view_menu(self):
+        model_view_menu = {}
+        model_view_menu["text"] = self.long_name
+        model_view_menu["menu"] = []
+        model_view_menu["menu"].append({"variable_group": self.name,
+                                        "id": f"view.{self.name}.grid",
+                                        "text": "Grid",
+                                        "variable": "view_grid",
+                                        "separator": True,
+                                        "checkable": True,
+                                        "method": self.set_view_menu,
+                                        "option": "grid",
+                                        "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "view_grid", "operator": "eq", "value": True}]}]})
+        return model_view_menu
+
+    def set_view_menu(self, option, checked):
+        if option == "grid":
+            print(f"Checked: {checked}")
+            if app.gui.getvar(self.name, "view_grid"):
+                print("Grid is made visible")
+            else:
+                print("Grid is made invisible")

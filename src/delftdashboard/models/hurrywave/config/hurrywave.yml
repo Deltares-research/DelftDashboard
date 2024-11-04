@@ -28,9 +28,6 @@ element:
     element: meteo.yml
   - string: Observation Points
     element: observation_points.yml
-  - string: Structures
-    module: delftdashboard.models.hurrywave.structures
-    element: structures.yml
   - string: Output
     module: delftdashboard.models.hurrywave.output
     element: output.yml

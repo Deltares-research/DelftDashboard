@@ -1,0 +1,48 @@
+element:
+- style: pushbutton
+  text: Make Ensemble
+  position:
+    x: 20
+    y: 110
+    width: 120
+    height: 20
+  method: make_ensemble
+- style: popupmenu
+  position:
+    x: 100
+    y: 75
+    width: 100
+    height: 20
+  text: Start Time
+  method: select_tstart
+  variable: ensemble_start_time_index
+  select: index
+  option_string:
+    variable: track_time_strings
+- style: edit
+  position:
+    x: 100
+    y: 50
+    width: 60
+    height: 20
+  text: Duration
+  variable: ensemble_duration
+  method: edit_duration
+- style: edit
+  position:
+    x: 100
+    y: 25
+    width: 60
+    height: 20
+  text: Nr Members
+  variable: ensemble_number_of_realizations
+  method: edit_number_of_realizations
+- style: edit
+  position:
+    x: 400
+    y: 110
+    width: 60
+    height: 20
+  text: Buffer (m)
+  variable: ensemble_cone_buffer
+  method: edit_cone_buffer

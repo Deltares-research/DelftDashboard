@@ -58,10 +58,10 @@ def update_geometry():
     app.toolbox["modelmaker_sfincs_cht"].leny = leny
     app.gui.setvar(group, "rotation", round(gdf["rotation"][0] * 180 / math.pi, 1))
     app.gui.setvar(
-        group, "nmax", np.floor(leny / app.gui.getvar(group, "dy")).astype(int)
+        group, "nmax", int(np.floor(leny / app.gui.getvar(group, "dy")))
     )
     app.gui.setvar(
-        group, "mmax", np.floor(lenx / app.gui.getvar(group, "dx")).astype(int)
+        group, "mmax", int(np.floor(lenx / app.gui.getvar(group, "dx")))
     )
 
 

@@ -35,7 +35,7 @@ element:
     text: Threshold Depth (m)
     variable: huthresh
     method: set_model_variables
-    tooltipstring: Edit threshold depth
+    tooltipstring: Edit threshold depth (in metres)
   - style: edit
     position:
       x: 100
@@ -46,3 +46,13 @@ element:
     variable: stopdepth
     method: set_model_variables
     tooltipstring: Edit stop depth (simulation will stop when this depth is exceeded)
+  - style: edit
+    position:
+      x: 100
+      y: 10
+      width: 50
+      height: 20
+    text: Spin-up Time (s)
+    variable: tspinup
+    method: set_model_variables
+    tooltipstring: Edit spin-up time (in seconds)

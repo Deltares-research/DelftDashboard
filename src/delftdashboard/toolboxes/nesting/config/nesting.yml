@@ -1,0 +1,14 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Nest 1
+    module: delftdashboard.toolboxes.nesting.nest1
+    element: nest1.yml
+  - string: Nest 2
+    module: delftdashboard.toolboxes.nesting.nest2
+    element: nest2.yml

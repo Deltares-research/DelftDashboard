@@ -16,7 +16,7 @@ def select(*args):
     # De-activate() existing layers
     map.update()
     # Show the grid outline layer
-    app.map.layer["hurrywave"].layer["grid"].activate()
+    app.map.layer["hurrywave"].layer["grid"].show()
     app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].activate()
 
 

@@ -1,0 +1,50 @@
+element:
+- style: edit
+  text: Nr Dirs
+  variable_group: hurrywave
+#  variable: waveblocking_nr_dirs
+  variable: ntheta
+  position:
+    x: 80
+    y: 110
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Number of directional bins in wave blocking table (must for now always be identical to ntheta in HurryWave model)
+  enable: false
+- style: edit
+  text: Nr Pixels per Cell
+  variable: waveblocking_nr_pixels
+  position:
+    x: 80
+    y: 85
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Number of sub-grid pixels per cell
+- style: edit
+  text: Z Threshold
+  variable: waveblocking_threshold_level
+  position:
+    x: 80
+    y: 60
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Minimum bed elevation for wave blocking
+- style: pushbutton
+  text: Generate
+  position:
+    x: 80
+    y: 20
+    width: 60
+    height: 20
+  method: generate_waveblocking
+  tooltip: Generate wave blocking file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0

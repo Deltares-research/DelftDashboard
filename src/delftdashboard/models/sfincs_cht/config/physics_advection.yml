@@ -2,21 +2,23 @@ element:
 - style: popupmenu
   text: Advection
   position:
-    x: 100
+    x: 80
     y: 110
     width: 60
     height: 20
   variable: advection
   method: set_model_variables
+  select: item
   option_string:
   - "off"
   - "on"
   option_value:
-  - 0
-  - 1
+  - false
+  - true
+  tooltip: Turn on or off advection
 - style: edit
   position:
-    x: 100
+    x: 80
     y: 85
     width: 60
     height: 20
@@ -29,4 +31,6 @@ element:
     check:
     - variable: advection
       operator: eq
-      value: 1
+      value: true
+  tooltip: Edit limiter on advection term
+      

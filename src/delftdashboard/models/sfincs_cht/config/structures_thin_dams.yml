@@ -18,6 +18,7 @@ element:
     width: 80
     height: 20
   method: draw_thin_dam
+  tooltip: Draw thin dam on map
 - style: pushbutton
   text: Delete Thin Dam
   position:
@@ -33,15 +34,29 @@ element:
     - variable: nr_thin_dams
       operator: gt
       value: 0
-- style: pushselectfile
+  tooltip: Delete thin dam from list
+- style: pushbutton
+  text: Load
   position:
-    x: 500
-    y: 80
-    width: 130
+    x: 100
+    y: 60
+    width: 80
     height: 20
-  text: Thin Dam File
-  variable: thdfile
-  showfilename: True
-  extension: "*.thd"
-  selectiontext: Select thin dam file
-  tooltipstring: Select thin dam file
+  method: load
+  tooltip: Load thin dams from file
+- style: pushbutton
+  text: Save
+  position:
+    x: 100
+    y: 35
+    width: 80
+    height: 20
+  method: save
+  tooltip: Save thin dams to file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_thin_dams
+      operator: gt
+      value: 0

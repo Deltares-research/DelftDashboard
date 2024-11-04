@@ -5,43 +5,106 @@ element:
     y: 250
     width: 200
     height: 20
-  variable: colormap
+  variable: topography_colormap
+  method: select_colormap
   select: item
   text: Color Map
   option_string:
     variable: colormaps
   option_value:
     variable: colormaps
+- style: pushbutton
+  colormap:
+    variable: topography_colormap
+  position:
+    x: 270
+    y: 250
+    width: 150
+    height: 20
 - style: checkbox
   position:
     x: 60
     y: 220
     width: 60
     height: 20
-  variable: autoscaling
+  variable: topography_autoscaling
   text: Auto Scaling
+- style: checkbox
+  position:
+    x: 200
+    y: 220
+    width: 60
+    height: 20
+  variable: topography_hillshading
+  text: Hillshading
+- style: popupmenu
+  position:
+    x: 60
+    y: 180
+    width: 200
+    height: 20
+  variable: topography_quality
+  select: item
+  text: Quality
+  option_string:
+  - High
+  - Medium
+  - Low
+  option_value:
+  - high
+  - medium
+  - low
+- style: popupmenu
+  position:
+    x: 60
+    y: 150
+    width: 200
+    height: 20
+  variable: topography_interp_method
+  select: item
+  text: Interp
+  option_string:
+  - Linear
+  - Nearest
+  option_value:
+  - linear
+  - nearest
 - style: edit  
   position:
     x: 40
     y: 80
     width: 60
     height: 20
-  variable: zmax
-  text: Zmax
+  variable: topography_zmax
+  text: Zmax (m)
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: topography_autoscaling
+      operator: eq
+      value: False
 - style: edit  
   position:
     x: 150
     y: 80
     width: 60
     height: 20
-  variable: zmin
-  text: Zmin
+  variable: topography_zmin
+  text: Zmin (m)
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: topography_autoscaling
+      operator: eq
+      value: False
 - style: edit
   position:
     x: 40
     y: 40
     width: 60
     height: 20
-  variable: opacity
+  variable: topography_opacity
   text: Opacity
   

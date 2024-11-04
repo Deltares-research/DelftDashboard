@@ -7,13 +7,14 @@ Created on Tue Jul  5 13:40:07 2022
 
 import os
 import yaml
-from matplotlib.colors import ListedColormap
+# from matplotlib.colors import ListedColormap
 import importlib
 from pyproj import CRS
 
 from guitares.gui import GUI
-from cht_bathymetry.bathymetry_database import bathymetry_database
 from guitares.colormap import read_color_maps
+from cht_bathymetry import BathymetryDatabase
+from cht_tide import TideModelDatabase
 from .gui import build_gui_config
 
 from delftdashboard.app import app
@@ -35,11 +36,25 @@ def initialize():
     app.config["model"]         = []
     app.config["toolbox"]       = []
     app.config["window_icon"]   = os.path.join(app.config_path, "images", "deltares_icon.png")
-    app.config["splash_file"]   = os.path.join(app.config_path, "images", "DelftDashBoard.jpg")
+    app.config["splash_file"]   = os.path.join(app.config_path, "images", "DelftDashBoard_python.jpg")
     app.config["bathymetry_database"] = ""
+    app.config["sfincs_exe_path"] = ""
+    app.config["hurrywave_exe_path"] = ""
+    app.config["auto_update_bathymetry"] = True
+    app.config["auto_update_tide_models"] = True
+
+    # Read cfg file and override stuff in default config dict
+    # cfg file contains gui config stuff, but not properties that need to be edited by the user ! It always sits in the config folder.
+    cfg_file_name = os.path.join(app.config_path, "delftdashboard.cfg")
+    cfgfile = open(cfg_file_name, "r")
+    config = yaml.load(cfgfile, Loader=yaml.FullLoader)
+    for key in config:
+        app.config[key] = config[key]
+    cfgfile.close()
 
     # Read ini file and override stuff in default config dict
-    ini_file_name = os.path.join(app.config_path, "delftdashboard.ini")
+    # ini file contains properties that need to be edited by the user !
+    ini_file_name = os.path.join(app.main_path, "delftdashboard.ini")
     # Check if there is also a local ini file
     if os.path.exists(os.path.join(os.getcwd(), "delftdashboard.ini")):
         ini_file_name = os.path.join(os.getcwd(), "delftdashboard.ini")
@@ -61,99 +76,86 @@ def initialize():
                   splash_file=app.config["splash_file"],
                   copy_mapbox_server_folder=True)
 
-    # # Show splash screen
-    # self.show_splash()
+    # Bathymetry database (initialize local database)
+    if "bathymetry_database_path" not in app.config:
+        app.config["bathymetry_database_path"] = os.path.join(app.config["data_path"], "bathymetry")
+    s3_bucket = "deltares-ddb"
+    s3_key = f"data/bathymetry"
+    app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database_path"],
+                                                 s3_bucket=s3_bucket,
+                                                 s3_key=s3_key)
+
+    # Check for changes in online database and download if necessary
+    if app.config["auto_update_bathymetry"]:
+        app.bathymetry_database.check_online_database()
 
     # Define some other variables
     app.crs = CRS(4326)
-    app.auto_update_topography = True
-    app.background_topography  = "gebco19"
-    app.bathymetry_database_path = app.config["bathymetry_database"]
-    bathymetry_database.initialize(app.bathymetry_database_path)
+    if "default_bathymetry_dataset" in app.config:
+        app.background_topography = app.config["default_bathymetry_dataset"]
+    else:
+        app.background_topography  = app.bathymetry_database.dataset_names()[0][0]
 
-    # View
-    app.view = {}
-    app.view["projection"] = "mercator"
+    # Tide model database
+    if "tide_model_database_path" not in app.config:
+        app.config["tide_model_database_path"] = os.path.join(app.config["data_path"], "tide_models")
+    s3_bucket = "deltares-ddb"
+    s3_key = f"data/tide_models"
+    app.tide_model_database = TideModelDatabase(path=app.config["tide_model_database_path"],
+                                                s3_bucket=s3_bucket,
+                                                s3_key=s3_key)
+    if app.config["auto_update_tide_models"]:
+        app.tide_model_database.check_online_database()
+    short_names, long_names = app.tide_model_database.dataset_names()
+    app.gui.setvar("tide_models", "long_names", long_names)
+    app.gui.setvar("tide_models", "names", short_names)
 
-    app.view["topography"] = {}
-    app.view["topography"]["visible"]  = True
-    app.view["topography"]["autoscaling"]  = True
-    app.view["topography"]["opacity"]  = 0.5
-    app.view["topography"]["quality"]  = "medium"
-    app.view["topography"]["colormap"] = "earth"
-    app.view["topography"]["interp_method"] = "nearest"
-    app.view["topography"]["interp_method"] = "linear"
-    app.view["topography"]["zmin"] = -10.0
-    app.view["topography"]["zmax"] =  10.0
+    # Use GUI variables to set the view settings    
 
-    app.view["layer_style"] = "streets-v12"
-
-    app.view["terrain"] = {}
-    app.view["terrain"]["visible"] = False
-    app.view["terrain"]["exaggeration"] = 1.5
-
-    app.view["interp_method"] = "nearest"
+    # Layer style
+    app.gui.setvar("view_settings", "layer_style", "streets-v12")
+    # Projection
+    app.gui.setvar("view_settings", "projection", "mercator")
+    # Topography
+    app.gui.setvar("view_settings", "topography_dataset", app.background_topography)
+    app.gui.setvar("view_settings", "topography_auto_update", "True")
+    app.gui.setvar("view_settings", "topography_visible", True)
+    app.gui.setvar("view_settings", "topography_colormap", "earth")
+    app.gui.setvar("view_settings", "topography_autoscaling", True)
+    app.gui.setvar("view_settings", "topography_opacity", 0.7)
+    app.gui.setvar("view_settings", "topography_quality", "medium")
+    app.gui.setvar("view_settings", "topography_hillshading", True)
+    app.gui.setvar("view_settings", "topography_interp_method", "linear")
+    # app.gui.setvar("view_settings", "topography_interp_method", "nearest")
+    app.gui.setvar("view_settings", "topography_zmin", -10.0)
+    app.gui.setvar("view_settings", "topography_zmax", 10.0)
+    app.gui.setvar("view_settings", "layer_style", "streets-v12")
+    app.gui.setvar("view_settings", "terrain_exaggeration", 1.5)
+    app.gui.setvar("view_settings", "terrain_visible", False)
+    # Read color maps (should be done in guitares)
+    cmps = read_color_maps(os.path.join(app.config_path, "colormaps"))
+    app.gui.setvar("view_settings", "colormaps", cmps)
 
     # Initialize toolboxes
     initialize_toolboxes()
-    # app.toolbox = {}
-    # for tlb in app.config["toolbox"]:
-    #     toolbox_name = tlb["name"]
-    #     # And initialize this toolbox
-    #     print("Adding toolbox : " + toolbox_name)
-    #     module = importlib.import_module("delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name)
-    #     app.toolbox[toolbox_name] = module.Toolbox(toolbox_name)
-    #     app.toolbox[toolbox_name].module = module
 
     # Initialize models
     initialize_models()
-    # app.model = {}
-    # for mdl in app.config["model"]:
-    #     model_name = mdl["name"]
-    #     # And initialize the domain for this model
-    #     print("Adding model   : " + model_name)
-    #     module = importlib.import_module("delftdashboard.models." + model_name + "." + model_name)
-    #     app.model[model_name] = module.Model(model_name)
-    #     if "exe_path" in mdl:
-    #         app.model[model_name].domain.exe_path = mdl["exe_path"]
-    #     # Loop through toolboxes to see which ones should be activated for which model
-    #     app.model[model_name].toolbox = []
-    #     for tlb in app.config["toolbox"]:
-    #         okay = True
-    #         if "for_model" in tlb:
-    #             if model_name not in tlb["for_model"]:
-    #                 okay = False
-    #         if okay:
-    #             app.model[model_name].toolbox.append(tlb["name"])
 
     # Set active toolbox and model
     app.active_model   = app.model[list(app.model)[0]]
     app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
 
-    # Read bathymetry database
-
-    # Read tide database
-
-    # Read color maps (should be done in guitares)
-    cmps = read_color_maps(os.path.join(app.config_path, "colormaps"))
-    app.gui.setvar("topography_view_settings", "colormaps", cmps)
-    # app.color_map = "earth"
-    # app.color_map_earth = ListedColormap(rgb)
-
     # GUI variables
     app.gui.setvar("menu", "active_model_name", "")
     app.gui.setvar("menu", "active_toolbox_name", "")
     app.gui.setvar("menu", "active_topography_name", app.background_topography)
-    app.gui.setvar("menu", "projection", "mercator")
-    app.gui.setvar("menu", "show_topography", True)
-    app.gui.setvar("menu", "show_terrain", False)
-    app.gui.setvar("menu", "layer_style", app.view["layer_style"])
 
-    # Layers tab
-    app.gui.setvar("layers", "contour_elevation", 0.0)
-    app.gui.setvar("layers", "buffer_land", 5000.0)
-    app.gui.setvar("layers", "buffer_sea", 2000.0)
-    app.gui.setvar("layers", "buffer_single", True)
+    # # Layers tab
+    # app.gui.setvar("layers", "contour_elevation", 0.0)
+    # app.gui.setvar("layers", "buffer_land", 5000.0)
+    # app.gui.setvar("layers", "buffer_sea", 2000.0)
+    # app.gui.setvar("layers", "buffer_single", True)
 
     # Now build up GUI config
     build_gui_config()
@@ -167,8 +169,19 @@ def initialize_toolboxes():
         # And initialize this toolbox
         print("Adding toolbox : " + toolbox_name)
         module = importlib.import_module("delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name)
+        # Initialize the toolbox
         app.toolbox[toolbox_name] = module.Toolbox(toolbox_name)
-        app.toolbox[toolbox_name].module = module
+        # Set the callback module. This is the module that contains the callback functions,
+        # and does not have to be the same as the toolbox module.
+        # This is useful as some toolboxes do not have tabs for which modules are defined,
+        # and the main module can become very busy with all the callbacks and the toolbox object.
+        if app.toolbox[toolbox_name].callback_module_name is None:
+            # Callback module is same as toolbox module            
+            app.toolbox[toolbox_name].callback_module = module
+        else:
+            # Callback module is different from toolbox module
+            app.toolbox[toolbox_name].callback_module = importlib.import_module(f"delftdashboard.toolboxes.{toolbox_name}.{app.toolbox[toolbox_name].callback_module_name}")
+        app.toolbox[toolbox_name].initialize()
 
 def initialize_models():
 
@@ -193,3 +206,5 @@ def initialize_models():
                     okay = False
             if okay:
                 app.model[model_name].toolbox.append(tlb["name"])
+        app.model[model_name].initialize()
+                

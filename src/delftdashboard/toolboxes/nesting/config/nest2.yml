@@ -1,0 +1,73 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 150
+    height: 110
+  text: Overall Model Type
+  text_position: above  
+  method: select_overall_model_type
+  variable: overall_model_type
+  select: item
+  option_string:
+    variable: overall_model_type_long_names
+  option_value:
+    variable: overall_model_types
+- style: pushbutton
+  text: Select Overall Model
+  position:
+    x: 170
+    y: 100
+    width: 120
+    height: 20
+  method: load_overall_model
+- style: edit
+  text: Obs Point Prefix
+  textposition: right
+  position:
+    x: 170
+    y: 75
+    width: 120
+    height: 20
+  variable: obs_point_prefix
+  method: edit_obs_point_prefix
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: overall_model_loaded
+      operator: eq
+      value: True
+- style: edit
+  text: Water Level Correction (m)
+  textposition: right
+  position:
+    x: 170
+    y: 50
+    width: 120
+    height: 20
+  variable: water_level_correction
+  method: edit_water_level_correction
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: overall_model_loaded
+      operator: eq
+      value: True
+- style: pushbutton
+  text: Get Boundary Conditions
+  position:
+    x: 170
+    y: 10
+    width: 120
+    height: 20
+  method: perform_nesting_step_2
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: overall_model_loaded
+      operator: eq
+      value: True

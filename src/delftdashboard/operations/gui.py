@@ -6,11 +6,9 @@ Created on Tue Jul  5 13:40:07 2022
 """
 
 import os
-import importlib
+# import importlib
 
 from delftdashboard.app import app
-from cht_bathymetry.bathymetry_database import bathymetry_database
-
 
 def build_gui_config():
     # Read GUI elements
@@ -22,7 +20,12 @@ def build_gui_config():
         file_name = toolbox_name + ".yml"
         app.toolbox[toolbox_name].element = app.gui.read_gui_elements(path, file_name)
         for element in app.toolbox[toolbox_name].element:
-            element["module"]         = "delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name
+            # Set the callback module. This is the module that contains the callback functions, and does not have to be the same as the toolbox module.
+            # This is useful as some toolboxes do not have tabs for which modules are defined, and the main module can become very busy with all the callbacks and the toolbox object.
+            if app.toolbox[toolbox_name].callback_module_name is None:
+                element["module"]         = "delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name
+            else:
+                element["module"]         = "delftdashboard.toolboxes." + toolbox_name + "." + app.toolbox[toolbox_name].callback_module_name
             element["variable_group"] = toolbox_name
 
     # Models
@@ -44,17 +47,16 @@ def build_gui_config():
     app.gui.config["toolbar"] = []
     app.gui.config["element"] = []
 
-    # Layer tab
-    # Read elements
-    path = os.path.join(app.main_path, "layers", "config")
-    file_name = "layers.yml"
-    layer_tab_element = app.gui.read_gui_elements(path, file_name)
+    # # Layer tab
+    # # Read elements
+    # path = os.path.join(app.main_path, "layers", "config")
+    # file_name = "layers.yml"
+    # layer_tab_element = app.gui.read_gui_elements(path, file_name)
 
     # Add tab panels for models
     for model_name in app.model:
         # First insert tabs for Layers and Toolbox
         tab_panel = app.model[model_name].element
-        tab_panel["tab"].insert(0, {'string': 'Layers', 'element': layer_tab_element, "module": "delftdashboard.layers.layers"})
         tab_panel["tab"].insert(0, {'string': 'Toolbox', 'element': [], "module": ""})
         app.gui.config["element"].append(app.model[model_name].element)
 
@@ -113,10 +115,8 @@ def build_gui_config():
     menu["menu"].append({"text": "toolbox"})
     app.gui.config["menu"].append(menu)
 
-
     # Topography
-    source_names, sources = bathymetry_database.sources()
-#    dataset_names, dataset_long_names, dataset_source_names = bathymetry_database.dataset_names()
+    source_names, sources = app.bathymetry_database.sources()
     menu = {}
     menu["text"] = "Topography"
     menu["module"] = "delftdashboard.menu.topography"
@@ -128,13 +128,14 @@ def build_gui_config():
         for dataset in source.dataset:
             dependency = [{"action": "check",
                            "checkfor": "all",
-                           "check": [{"variable": "active_topography_name",
+                           "check": [{"variable": "topography_dataset",
                                       "operator": "eq",
                                       "value": dataset.name}]
                            }]
+                
             source_menu["menu"].append({"id": "topography." + dataset.name,
-                                        "variable_group": "menu",
-                                        "text": dataset.name,
+                                        "variable_group": "view_settings",
+                                        "text": dataset.long_name,
                                         "separator": False,
                                         "checkable": True,
                                         "option": dataset.name,
@@ -143,32 +144,39 @@ def build_gui_config():
         menu["menu"].append(source_menu)
     app.gui.config["menu"].append(menu)
 
-    dependency = [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]
+    # dependency = [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]
 
     # View
     menu = {}
     menu["text"] = "View"
     menu["module"] = "delftdashboard.menu.view"
     menu["menu"] = []
-    menu["menu"].append({"variable_group": "menu", "id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]})
-    menu["menu"].append({"variable_group": "menu", "id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "globe"}]}]})
-    menu["menu"].append({"variable_group": "menu", "id": "view.topography",  "text": "Topography", "method": "topography", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "show_topography", "operator": "eq", "value": True}]}]})
-
-    menu["menu"].append({"variable_group": "menu", "id": "view.terrain",  "text": "3D Terrain", "method": "terrain", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "show_terrain", "operator": "eq", "value": True}]}]})
+    menu["menu"].append({"variable_group": "view_settings", "id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]})
+    menu["menu"].append({"variable_group": "view_settings", "id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "globe"}]}]})
+    menu["menu"].append({"variable_group": "view_settings", "id": "view.topography",  "text": "Topography", "method": "topography", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "topography_visible", "operator": "eq", "value": True}]}]})
+    menu["menu"].append({"variable_group": "view_settings", "id": "view.terrain",  "text": "3D Terrain", "method": "terrain", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "terrain_visible", "operator": "eq", "value": True}]}]})
 
     layer_style_menu = {}
     layer_style_menu["text"] = "Layer Style"
     layer_style_menu["separator"] = True
     layer_style_menu["menu"] = []
-    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.streets", "text": "Streets", "separator": False,  "checkable": True, "option": "streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "streets-v12"}]}]})
-    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.satellite", "text": "Satellite", "separator": False,  "checkable": True, "option": "satellite-v9", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-v9"}]}]})
-    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.satellite_streets", "text": "Satellite Streets", "separator": False,  "checkable": True, "option": "satellite-streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-streets-v12"}]}]})
-    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.dark", "text": "Dark", "separator": False,  "checkable": True, "option": "dark-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "dark-v11"}]}]})
-    layer_style_menu["menu"].append({"variable_group": "menu", "id": "view.layer_style.light", "text": "Light", "separator": False,  "checkable": True, "option": "light-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "light-v11"}]}]})
+    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.streets", "text": "Streets", "separator": False,  "checkable": True, "option": "streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "streets-v12"}]}]})
+    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.satellite", "text": "Satellite", "separator": False,  "checkable": True, "option": "satellite-v9", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-v9"}]}]})
+    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.satellite_streets", "text": "Satellite Streets", "separator": False,  "checkable": True, "option": "satellite-streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-streets-v12"}]}]})
+    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.dark", "text": "Dark", "separator": False,  "checkable": True, "option": "dark-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "dark-v11"}]}]})
+    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.light", "text": "Light", "separator": False,  "checkable": True, "option": "light-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "light-v11"}]}]})
     menu["menu"].append(layer_style_menu)
+ 
+    # Add menu items for models
+    # Loop over all models in model dict
+    for model in app.model.values():
+        model_view_menu = model.get_view_menu()
+        # Check it's not an empty dictionary
+        if model_view_menu:
+            menu["menu"].append(model_view_menu)
 
     # View settings
-    menu["menu"].append({"variable_group": "menu", "id": "view.settings",  "text": "Settings ...", "method": "settings", "separator": True,  "checkable": False})
+    menu["menu"].append({"variable_group": "menu", "id": "view.settings",  "text": "Settings ...", "method": "edit_settings", "separator": True,  "checkable": False})
 
     app.gui.config["menu"].append(menu)
 
@@ -183,14 +191,9 @@ def build_gui_config():
     menu["menu"].append({"text": "Select Other Projected ...", "method": "other_projected", "separator": False})
     app.gui.config["menu"].append(menu)
 
-
     # Help
     menu = {}
     menu["text"] = "Help"
     menu["module"] = "delftdashboard.menu.help"
     menu["menu"] = []
     app.gui.config["menu"].append(menu)
-
-
-#    app.gui.config["element"].pop(1)
-#    app.gui.config["element"] = []

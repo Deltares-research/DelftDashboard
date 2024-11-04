@@ -1,0 +1,56 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 150
+    height: 110
+  text: Detail Model Type
+  text_position: above  
+  method: select_detail_model_type
+  variable: detail_model_type
+  select: item
+  option_string:
+    variable: detail_model_type_long_names
+  option_value:
+    variable: detail_model_types
+- style: pushbutton
+  text: Select Detail Model
+  position:
+    x: 170
+    y: 100
+    width: 120
+    height: 20
+  method: load_detail_model
+- style: edit
+  text: Obs Point Prefix
+  textposition: right
+  position:
+    x: 170
+    y: 75
+    width: 120
+    height: 20
+  variable: obs_point_prefix
+  method: edit_obs_point_prefix
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: detail_model_loaded
+      operator: eq
+      value: True
+- style: pushbutton
+  text: Make Observation Points
+  position:
+    x: 170
+    y: 10
+    width: 120
+    height: 20
+  method: perform_nesting_step_1
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: detail_model_loaded
+      operator: eq
+      value: True

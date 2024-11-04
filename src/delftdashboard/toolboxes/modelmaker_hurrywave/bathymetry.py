@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 """
+GUI methods for modelmaker_hurrywave -> domain
+
 Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
 """
 
 from delftdashboard.app import app
-from cht_bathymetry.bathymetry_database import bathymetry_database
+# from cht_bathymetry.bathymetry_database import bathymetry_database
 from delftdashboard.operations import map
 
 def select(*args):
     # De-activate() existing layers
     map.update()
-    app.map.layer["hurrywave"].layer["grid"].activate()
+    app.map.layer["hurrywave"].layer["grid"].show()
 
 def select_bathymetry_source(*args):
     source = args[0]
-    dataset_names, dataset_long_names, dataset_source_names = bathymetry_database.dataset_names(source=source)
+    dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source)
     app.gui.setvar("modelmaker_hurrywave", "bathymetry_dataset_names", dataset_names)
     app.gui.setvar("modelmaker_hurrywave", "bathymetry_dataset_index", 0)
 
@@ -31,8 +33,9 @@ def use_dataset(*args):
     index = app.gui.getvar(group, "bathymetry_dataset_index")
     name  = names[index]
     if name not in app.gui.getvar(group, "selected_bathymetry_dataset_names"):
-        d = bathymetry_database.get_dataset(name)
-        dataset = {"dataset": d, "zmin": -99999.0, "zmax": 99999.0}
+        # d = bathymetry_database.get_dataset(name)
+        # dataset = {"dataset": d, "zmin": -99999.0, "zmax": 99999.0}
+        dataset = {"name": name, "zmin": -99999.0, "zmax": 99999.0}
         app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets.append(dataset)
         app.gui.setvar(group, "selected_bathymetry_dataset_index", len(app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets) - 1)
         update()
@@ -103,7 +106,7 @@ def update():
     nrd = len(app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets)
     if nrd>0:
         for dataset in app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets:
-            selected_names.append(dataset["dataset"].name)
+            selected_names.append(dataset["name"])
         app.gui.setvar(group, "selected_bathymetry_dataset_names", selected_names)
         index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
         if index > nrd - 1:
@@ -121,3 +124,8 @@ def update():
 
 def generate_bathymetry(*args):
     app.toolbox["modelmaker_hurrywave"].generate_bathymetry()
+
+
+def info(*args):
+    pass
+

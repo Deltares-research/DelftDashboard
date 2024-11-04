@@ -8,21 +8,6 @@ element:
   text: SnapWave
   variable: snapwave
   method: set_model_variables
-- style: pushbutton
-  position:
-    x: 10
-    y: 80
-    width: 100
-    height: 20
-  text: Draw Boundary Enclosure
-  method: draw_boundary_enclosure
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: snapwave
-      operator: eq
-      value: True
 - style: checkbox
   position:
     x: 10
