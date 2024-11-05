@@ -11,6 +11,8 @@ cd $repos_path\cht_cyclones
 git pull 
 cd $repos_path\cht_sfincs
 git pull 
+cd $repos_path\cht_delft3dfm
+git pull 
 cd $repos_path\cht_utils
 git pull 
 cd $repos_path\cht_meteo
