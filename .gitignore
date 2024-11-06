@@ -14,3 +14,4 @@ src/delftdashboard.egg-info/top_level.txt
 *.gz
 ddb_dev.yml
 environment.yml
+src/delftdashboard/delftdashboard.ini
