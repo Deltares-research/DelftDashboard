@@ -16,7 +16,7 @@ def select(*args):
     # De-activate() existing layers
     map.update()
     # Show the grid outline layer
-    app.map.layer["delft3dfm"].layer["grid"].activate()
+    app.map.layer["delft3dfm"].layer["grid"].show()
     app.map.layer["modelmaker_delft3dfm"].layer["grid_outline"].activate()
 
 

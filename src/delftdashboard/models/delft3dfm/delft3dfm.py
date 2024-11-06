@@ -19,6 +19,8 @@ class Model(GenericModel):
         self.name = name
         self.long_name = "Delft3D-FM"
 
+    def initialize(self):
+
         print("Model " + self.name + " added!")
         self.active_domain = 0
 
@@ -28,6 +30,7 @@ class Model(GenericModel):
 
     def initialize_domain(self):
         self.domain = Delft3DFM(crs = app.crs)
+        self.domain.fname = 'flow.mdu'
 
     def add_layers(self):
         # Add main DDB layer
@@ -53,22 +56,15 @@ class Model(GenericModel):
         #                 line_color="transparent")
 
         # Move this to delft3dfm.py
-        from .boundary_conditions import select_boundary_point_from_map
-        layer.add_layer("boundary_points",
-                        type="circle_selector",
-                        select=select_boundary_point_from_map,
+        # from .boundary_conditions import select_boundary_point_from_map
+        layer.add_layer("boundary_line",
+                        type="line",
                         hover_property="name",
-                        line_color="white",
+                        line_color="red",
+                        line_width= 3,
                         line_opacity=1.0,
-                        fill_color="blue",
+                        fill_color="red",
                         fill_opacity=1.0,
-                        circle_radius=4,
-                        circle_radius_selected=5,
-                        line_color_selected="white",
-                        fill_color_selected="red",
-                        circle_radius_inactive=4,
-                        line_color_inactive="white",
-                        fill_color_inactive="lightgrey"
                        )
 
         from .observation_points_regular import select_observation_point_from_map
@@ -105,7 +101,7 @@ class Model(GenericModel):
             # app.map.layer["delft3dfm"].layer["mask_include"].hide()
             # app.map.layer["delft3dfm"].layer["mask_boundary"].hide()
             # Boundary points are made grey
-            app.map.layer["delft3dfm"].layer["boundary_points"].deactivate()
+            app.map.layer["delft3dfm"].layer["boundary_line"].deactivate()
             # Observation points are made grey
             app.map.layer["delft3dfm"].layer["observation_points"].deactivate()
             # app.map.layer["delft3dfm"].layer["observation_points_spectra"].deactivate()
@@ -246,6 +242,13 @@ class Model(GenericModel):
         # # Mask
         # app.map.layer["delft3dfm"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
         # app.map.layer["delft3dfm"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
+        # Boundary points
+        try:
+            gdf = self.domain.bnd_gdf
+            app.map.layer["delft3dfm"].layer["boundary_line"].clear()
+            app.map.layer["delft3dfm"].layer["boundary_line"].set_data(gdf)
+        except:
+            pass
         # # Boundary points
         # gdf = self.domain.boundary_conditions.gdf
         # app.map.layer["delft3dfm"].layer["boundary_points"].set_data(gdf, 0)

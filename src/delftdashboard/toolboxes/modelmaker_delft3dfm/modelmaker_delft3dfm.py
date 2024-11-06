@@ -24,6 +24,8 @@ class Toolbox(GenericToolbox):
         self.name = name
         self.long_name = "Model Maker"
 
+    def initialize(self):
+
         # Set variables
 
         # Grid outline
@@ -158,29 +160,29 @@ class Toolbox(GenericToolbox):
         #                      polygon_fill_color="limegreen",
         #                      polygon_fill_opacity=0.3)
         # Exclude
-        # from .mask_active_cells import exclude_polygon_created
-        # from .mask_active_cells import exclude_polygon_modified
-        # from .mask_active_cells import exclude_polygon_selected
-        # layer.add_layer("exclude_polygon", type="draw",
-        #                      shape="polygon",
-        #                      create=exclude_polygon_created,
-        #                      modify=exclude_polygon_modified,
-        #                      select=exclude_polygon_selected,
-        #                      polygon_line_color="orangered",
-        #                      polygon_fill_color="orangered",
-        #                      polygon_fill_opacity=0.3)
+        from .exclude import exclude_polygon_created
+        from .exclude import exclude_polygon_modified
+        from .exclude import exclude_polygon_selected
+        layer.add_layer("exclude_polygon", type="draw",
+                             shape="polygon",
+                             create=exclude_polygon_created,
+                             modify=exclude_polygon_modified,
+                             select=exclude_polygon_selected,
+                             polygon_line_color="orangered",
+                             polygon_fill_color="orangered",
+                             polygon_fill_opacity=0.3)
         # Boundary
-        # from .mask_boundary_cells import open_boundary_polygon_created
-        # from .mask_boundary_cells import open_boundary_polygon_modified
-        # from .mask_boundary_cells import open_boundary_polygon_selected
-        # layer.add_layer("open_boundary_polygon", type="draw",
-        #                      shape="polygon",
-        #                      create=open_boundary_polygon_created,
-        #                      modify=open_boundary_polygon_modified,
-        #                      select=open_boundary_polygon_selected,
-        #                      polygon_line_color="deepskyblue",
-        #                      polygon_fill_color="deepskyblue",
-        #                      polygon_fill_opacity=0.3)
+        from .boundary import open_boundary_polygon_created
+        from .boundary import open_boundary_polygon_modified
+        from .boundary import open_boundary_polygon_selected
+        layer.add_layer("open_boundary_polygon", type="draw",
+                             shape="polygon",
+                             create=open_boundary_polygon_created,
+                             modify=open_boundary_polygon_modified,
+                             select=open_boundary_polygon_selected,
+                             polygon_line_color="deepskyblue",
+                             polygon_fill_color="deepskyblue",
+                             polygon_fill_opacity=0.3)
 
         # Outflow boundary
         # from .mask_boundary_cells import outflow_boundary_polygon_created
@@ -234,6 +236,7 @@ class Toolbox(GenericToolbox):
     def generate_grid(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Generating grid ...")
+        self.clear_layers()
         model = app.model["delft3dfm"].domain
         model.clear_spatial_attributes()    
         x0       = app.gui.getvar(group, "x0")
@@ -254,7 +257,7 @@ class Toolbox(GenericToolbox):
 
         # Build grid 
         bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
-        model.grid.build(x0, y0, nmax, mmax, dx, dy, bathymetry_list=bathymetry_list)
+        model.grid.build(x0, y0, nmax, mmax, dx, dy, bathymetry_list=bathymetry_list, bathymetry_database=app.bathymetry_database)
         # Save grid 
         model.grid.write()
 
@@ -271,10 +274,10 @@ class Toolbox(GenericToolbox):
         bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
 
         if bathymetry_list:
-            model.grid.refine_depth(bathymetry_list)
+            model.grid.refine_depth(bathymetry_list, bathymetry_database=app.bathymetry_database)
             
             # Interpolate bathymetry onto the grid
-            model.grid.set_bathymetry(bathymetry_list)
+            model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
         
             # Save grid 
             model.grid.write()
@@ -296,7 +299,7 @@ class Toolbox(GenericToolbox):
         # Interpolate bathymetry onto the grid
         bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
         if bathymetry_list:
-            model.grid.set_bathymetry(bathymetry_list)
+            model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
       
         # Save grid 
         model.grid.write()
@@ -306,103 +309,49 @@ class Toolbox(GenericToolbox):
 
         dlg.close()
 
-
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
         bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
-        app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list)
+        app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
         app.model["delft3dfm"].domain.grid.write()
         dlg.close()
 
-    def update_mask(self):
-        # Should improve on this check
-        grid = app.model["delft3dfm"].domain.grid
-        mask = app.model["delft3dfm"].domain.mask
-        z    = app.model["delft3dfm"].domain.grid.data["z"]
-        if np.all(np.isnan(z)):
-            app.gui.window.dialog_warning("Please first generate a bathymetry !")
-            return
-        dlg = app.gui.window.dialog_wait("Updating mask ...")
-        mask.build(zmin=app.gui.getvar("modelmaker_delft3dfm", "global_zmin"),
-                   zmax=app.gui.getvar("modelmaker_delft3dfm", "global_zmax"),
-                   include_polygon=app.toolbox["modelmaker_delft3dfm"].include_polygon,
-                   include_zmin=app.gui.getvar("modelmaker_delft3dfm", "include_zmin"),
-                   include_zmax=app.gui.getvar("modelmaker_delft3dfm", "include_zmax"),
-                   exclude_polygon=app.toolbox["modelmaker_delft3dfm"].exclude_polygon,
-                   exclude_zmin=app.gui.getvar("modelmaker_delft3dfm", "exclude_zmin"),
-                   exclude_zmax=app.gui.getvar("modelmaker_delft3dfm", "exclude_zmax"),
-                   open_boundary_polygon=app.toolbox["modelmaker_delft3dfm"].open_boundary_polygon,
-                   open_boundary_zmin=app.gui.getvar("modelmaker_delft3dfm", "open_boundary_zmin"),
-                   open_boundary_zmax=app.gui.getvar("modelmaker_delft3dfm", "open_boundary_zmax"),
-                   outflow_boundary_polygon=app.toolbox["modelmaker_delft3dfm"].outflow_boundary_polygon,
-                   outflow_boundary_zmin=app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_zmin"),
-                   outflow_boundary_zmax=app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_zmax")
-                   )
-        app.map.layer["delft3dfm"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
-        app.map.layer["delft3dfm"].layer["mask_open_boundary"].set_data(mask.to_gdf(option="open"))
-        app.map.layer["delft3dfm"].layer["mask_outflow_boundary"].set_data(mask.to_gdf(option="outflow"))
+    def generate_bnd_coastline(self):
+        dlg = app.gui.window.dialog_wait("Creating open boundary based on coastline ...")
+        bnd=app.model["delft3dfm"].domain.grid.generate_bnd(bnd_withcoastlines = True)
+        app.model["delft3dfm"].domain.bnd_gdf= bnd
 
-        if app.model["delft3dfm"].domain.grid_type == "quadtree":
-            grid.write() # Write new qtr file
-        else:
-            mask.write() # Write mask, index and depth files    
-
+        # app.model["delft3dfm"].domain.grid.write()
+        # Replot everything
+        app.model["delft3dfm"].plot()
         dlg.close()
 
-    def update_mask_snapwave(self):
-        grid = app.model["delft3dfm"].domain.grid
-        mask = app.model["delft3dfm"].domain.snapwave.mask
-        if np.all(np.isnan(grid.data["z"])):
-            app.gui.window.dialog_warning("Please first generate a bathymetry !")
-            return
-        dlg = app.gui.window.dialog_wait("Updating SnapWave mask ...")
-        mask.build(zmin=app.gui.getvar("modelmaker_delft3dfm", "global_zmin_snapwave"),
-                   zmax=app.gui.getvar("modelmaker_delft3dfm", "global_zmax_snapwave"),
-                   include_polygon=app.toolbox["modelmaker_delft3dfm"].include_polygon_snapwave,
-                   include_zmin=app.gui.getvar("modelmaker_delft3dfm", "include_zmin_snapwave"),
-                   include_zmax=app.gui.getvar("modelmaker_delft3dfm", "include_zmax_snapwave"),
-                   exclude_polygon=app.toolbox["modelmaker_delft3dfm"].exclude_polygon_snapwave,
-                   exclude_zmin=app.gui.getvar("modelmaker_delft3dfm", "exclude_zmin_snapwave"),
-                   exclude_zmax=app.gui.getvar("modelmaker_delft3dfm", "exclude_zmax_snapwave")
-                   )
-        app.map.layer["delft3dfm"].layer["mask_include_snapwave"].set_data(mask.to_gdf(option="include"))
-        if not app.model["delft3dfm"].domain.input.variables.snapwave_mskfile:
-            app.model["delft3dfm"].domain.input.variables.snapwave_mskfile = "snapwave.msk"
-        grid.write()
-        # GUI variables
-        app.gui.setvar("delft3dfm", "snapwave_mskfile", app.model["delft3dfm"].domain.input.variables.snapwave_mskfile)
+    def generate_bnd_polygon(self):
+        dlg = app.gui.window.dialog_wait("Creating open boundary based on polygon ...")
+        gdf = self.open_boundary_polygon
+        bnd = app.model["delft3dfm"].domain.grid.generate_bnd(bnd_withpolygon = gdf)
+        app.model["delft3dfm"].domain.bnd_gdf= bnd
+        # app.model["delft3dfm"].domain.grid.write()
+        # Replot everything
+        app.model["delft3dfm"].plot()
         dlg.close()
 
-    def generate_subgrid(self):
-        group = "modelmaker_delft3dfm"
-        bathymetry_sets = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
-        roughness_sets = []
-        nr_bins = app.gui.getvar(group, "subgrid_nr_bins")
-        nr_pixels = app.gui.getvar(group, "subgrid_nr_pixels")
-        max_dzdv = app.gui.getvar(group, "subgrid_max_dzdv")
-        manning_max = app.gui.getvar(group, "subgrid_manning_max")
-        manning_z_cutoff = app.gui.getvar(group, "subgrid_manning_z_cutoff")
-        zmin = app.gui.getvar(group, "subgrid_zmin")
-        p = app.gui.window.dialog_progress("               Generating Sub-grid Tables ...                ", 100)
-        app.model["delft3dfm"].domain.subgrid.build(bathymetry_sets,
-                                                     roughness_sets,
-                                                     nr_bins=nr_bins,
-                                                     nr_subgrid_pixels=nr_pixels,
-                                                     max_gradient=max_dzdv,
-                                                     zmin=zmin,
-                                                     progress_bar=p)
-        app.model["delft3dfm"].domain.input.variables.sbgfile = "sfincs.sbg"
-        app.gui.setvar("delft3dfm", "sbgfile", app.model["delft3dfm"].domain.input.variables.sbgfile)
-        app.gui.setvar("delft3dfm", "bathymetry_type", "subgrid")
-
-    def cut_inactive_cells(self):
-        dlg = app.gui.window.dialog_wait("Cutting Inactive Cells ...")
-        app.model["delft3dfm"].domain.grid.cut_inactive_cells()
+    def cut_polygon(self):
+        dlg = app.gui.window.dialog_wait("Cutting Cells based on polygon ...")
+        gdf = self.exclude_polygon
+        app.model["delft3dfm"].domain.grid.delete_cells(delete_withpolygon = gdf)
         app.model["delft3dfm"].domain.grid.write()
         # Replot everything
         app.model["delft3dfm"].plot()
         dlg.close()
 
+    def cut_coastline(self):
+        dlg = app.gui.window.dialog_wait("Cutting Cells based on coastline ...")
+        app.model["delft3dfm"].domain.grid.delete_cells(delete_withcoastlines=True)
+        app.model["delft3dfm"].domain.grid.write()
+        # Replot everything
+        app.model["delft3dfm"].plot()
+        dlg.close()
 
     def build_model(self):
         self.generate_grid()
@@ -735,8 +684,7 @@ class Toolbox(GenericToolbox):
             name = ddict["name"]
             zmin = ddict["zmin"]
             zmax = ddict["zmax"] 
-            d = bathymetry_database.get_dataset(name)
-            dataset = {"dataset": d, "zmin": zmin, "zmax": zmax}
+            dataset = {"dataset": name, "zmin": zmin, "zmax": zmax}
             app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets.append(dataset)
             dataset_names.append(name)
         app.gui.setvar("modelmaker_delft3dfm", "selected_bathymetry_dataset_names", dataset_names)

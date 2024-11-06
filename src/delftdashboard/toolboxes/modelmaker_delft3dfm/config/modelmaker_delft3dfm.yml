@@ -15,15 +15,16 @@ element:
   - string: Refinement
     module: delftdashboard.toolboxes.modelmaker_delft3dfm.refinement
     element: refinement.yml
+  - string: Boundary
+    module: delftdashboard.toolboxes.modelmaker_delft3dfm.boundary
+    element: boundary.yml
   # - string: Roughness
   #   module: delftdashboard.toolboxes.modelmaker_delft3dfm.roughness
   #   element: roughness.yml
-  # - string: Cutting land
-  #   module: delftdashboard.toolboxes.modelmaker_delft3dfm.cut_land
-  #   element: mask_active_cells.yml
-  # - string: Mask Boundary Cells
-  #   module: delftdashboard.toolboxes.modelmaker_delft3dfm.mask_boundary_cells
-  #   element: mask_boundary_cells.yml
+  - string: Exclude
+    module: delftdashboard.toolboxes.modelmaker_delft3dfm.exclude
+    element: exclude.yml
+
   
   # - string: Sub Grid
   #   module: delftdashboard.toolboxes.modelmaker_delft3dfm.subgrid

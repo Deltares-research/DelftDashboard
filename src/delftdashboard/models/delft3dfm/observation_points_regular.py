@@ -35,9 +35,9 @@ def save(*args):
     from hydrolib.core.dflowfm.xyn.models import XYNModel
 
     map.reset_cursor()
-    file_name = app.model["delft3dfm"].domain.input.output.obsfile[0].filepath
+    # file_name = app.model["delft3dfm"].domain.input.output.obsfile[0].filepath
     rsp = app.gui.window.dialog_save_file("Select file ...",
-                                          file_name=file_name,
+                                          file_name='delft3dfm.obs',
                                           filter = None,
                                           allow_directory_change=False)
     if rsp[0]:

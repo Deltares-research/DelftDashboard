@@ -121,6 +121,6 @@ def build_polygonrefined_grid(*args):
     app.toolbox["modelmaker_delft3dfm"].generate_polygon_refinement()
 
 def refine_size(*args):
-    app.model["delft3dfm"].domain.refinement_polygon= app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon")
+    # app.model["delft3dfm"].domain.grid.refinement_polygon= app.toolbox["modelmaker_delft3dfm", "refinement_polygon")
     # app.model["delft3dfm"].domain.refinement_depth= app.gui.getvar("modelmaker_delft3dfm", "refinement_depth")
-    app.model["delft3dfm"].domain.min_edge_size= app.gui.getvar("modelmaker_delft3dfm", "min_edge_size")
+    app.model["delft3dfm"].domain.grid.min_edge_size= app.gui.getvar("modelmaker_delft3dfm", "min_edge_size")

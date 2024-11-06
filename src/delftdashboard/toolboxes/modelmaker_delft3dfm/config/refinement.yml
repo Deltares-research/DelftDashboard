@@ -1,96 +1,110 @@
 element:
-- style: listbox
+- style: panel
+  title: Refinement Polygons
   position:
     x: 10
-    y: 40
+    y: 10
+    width: 220
+    height: 120
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 80
+      height: 100
+    method: select_refinement_polygon
+    variable: refinement_polygon_index
+    select: index
+    option_string:
+      variable: refinement_polygon_names
+  # - style: popupmenu
+  #   position:
+  #     x: 10
+  #     y: 10
+  #     width: 150
+  #     height: 20
+  #   method: select_refinement_level
+  #   variable: refinement_polygon_level
+  #   select: index
+  #   option_string:
+  #     variable: refinement_polygon_levels
+  #   dependency:
+  #   - action: enable
+  #     checkfor: all
+  #     check:
+  #     - variable: nr_refinement_polygons
+  #       operator: gt
+  #       value: 0
+  - style: pushbutton
+    text: Draw Polygon
+    position:
+      x: 100
+      y: 90
+      width: 80
+      height: 20
+    method: draw_refinement_polygon
+  - style: pushbutton
+    text: Delete Polygon
+    position:
+      x: 100
+      y: 65
+      width: 80
+      height: 20
+    method: delete_refinement_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_refinement_polygons
+        operator: gt
+        value: 0
+  - style: pushbutton
+    text: Load Polygons
+    position:
+      x: 100
+      y: 40
+      width: 80
+      height: 20
+    method: load_refinement_polygon
+  - style: pushbutton
+    text: Save Polygons
+    position:
+      x: 100
+      y: 15
+      width: 80
+      height: 20
+    method: save_refinement_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_refinement_polygons
+        operator: gt
+        value: 0
+- style: panel
+  title: Settings
+  position:
+    x: 250
+    y: 10
     width: 150
-    height: 80
-  text: Refinement Polygons  
-  text_position: above  
-  method: select_refinement_polygon
-  variable: refinement_polygon_index
-  select: index
-  option_string:
-    variable: refinement_polygon_names
-# - style: popupmenu
-#   position:
-#     x: 10
-#     y: 10
-#     width: 150
-#     height: 20
-#   method: select_refinement_level
-#   variable: refinement_polygon_level
-#   select: index
-#   option_string:
-#     variable: refinement_polygon_levels
-#   dependency:
-#   - action: enable
-#     checkfor: all
-#     check:
-#     - variable: nr_refinement_polygons
-#       operator: gt
-#       value: 0
-- style: pushbutton
-  text: Draw Polygon
-  position:
-    x: 170
-    y: 100
-    width: 80
-    height: 20
-  method: draw_refinement_polygon
-- style: pushbutton
-  text: Delete Polygon
-  position:
-    x: 170
-    y: 75
-    width: 80
-    height: 20
-  method: delete_refinement_polygon
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_refinement_polygons
-      operator: gt
-      value: 0
-- style: pushbutton
-  text: Load Polygons
-  position:
-    x: 170
-    y: 50
-    width: 80
-    height: 20
-  method: load_refinement_polygon
-- style: pushbutton
-  text: Save Polygons
-  position:
-    x: 170
-    y: 25
-    width: 80
-    height: 20
-  method: save_refinement_polygon
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_refinement_polygons
-      operator: gt
-      value: 0
-- style: edit
-  position:
-    x: 350
-    y: 100
-    width: 50
-    height: 20
-  text: Min. edge size
-  variable: min_edge_size
-  method: refine_depth
+    height: 120
+  element:        
+  - style: edit
+    position:
+      x: 80
+      y: 90
+      width: 50
+      height: 20
+    text: Min. edge size
+    variable: min_edge_size
+    method: refine_size
 - style: pushbutton
   text: Generate Depth Refinement
   position:
     x: 550
     y: 100
-    width: 120
+    width: 170
     height: 20
   method: build_depthrefined_grid
 - style: pushbutton
@@ -98,6 +112,6 @@ element:
   position:
     x: 550
     y: 75
-    width: 120
+    width: 170
     height: 20
   method: build_polygonrefined_grid
