@@ -7,8 +7,10 @@ from config import (
     INSTALLER_SCRIPT_PATH,
     ISCC_PATH,
     SPEC_DIR,
+    P_DRIVE_INSTALLERS,
     validate_path,
-    clean_exe
+    clean_exe,
+    create_zip,
 )
 
 
@@ -20,6 +22,23 @@ def parse_args():
         dest="quiet",
         action="store_true",
         help="print less output to the console",
+    )
+
+    parser.add_argument(
+        "--zip",
+        required=False,
+        default=False,
+        dest="zip",
+        action="store_true",
+        help="Create a zip file containing the installer after creation and store it on the P drive",
+    )
+    parser.add_argument(
+        "--overwrite",
+        required=False,
+        default=False,
+        dest="overwrite",
+        action="store_true",
+        help="Overwrite the existing installer instead of raising an error when a version already exists",
     )
     args = parser.parse_args()
     return args
@@ -39,6 +58,11 @@ def main():
 
     # Validate before running Inno Setup Compiler
     validate_path("ISCC_PATH", ISCC_PATH, EXPECTED_STRUCTURE_MSG_INSTALLER)
+    if args.zip:
+        if not P_DRIVE_INSTALLERS.exists():
+            raise FileNotFoundError(
+                f"P_DRIVE_INSTALLERS does not exist: {P_DRIVE_INSTALLERS}. Make sure the P drive is mounted."
+            )
 
     # Make sure the exe doesnt contain any datacatalogs / ini files from testing it
     clean_exe()
@@ -78,6 +102,13 @@ def main():
         print(f"Command '{e.cmd}' returned non-zero exit status {e.returncode}.")
         print(f"Captured output:\n{e.stdout}")
         exit(e.returncode)
+
+    if args.zip:
+        create_zip(
+            dir_path=SPEC_DIR / "Output",
+            output_dir=P_DRIVE_INSTALLERS,
+            overwrite=args.overwrite,
+        )
 
 
 if __name__ == "__main__":

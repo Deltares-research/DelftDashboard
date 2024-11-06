@@ -2,7 +2,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-
+from zipfile import ZipFile
 from delftdashboard import __version__ as ddb_version
 
 # List of packages that are (partly) imported/used in floodadapt_gui and its dependencies.
@@ -137,6 +137,7 @@ SHAPELY_LIBS_DIR = SITE_PACKAGES_DIR / "Shapely.libs"
 INTERNAL_DIR = DIST_DIR / PROJECT_NAME / "_internal"
 EXE_CONFIG_DIR = INTERNAL_DIR / "delftdashboard" / "config"
 EXE_DATA_DIR = DIST_DIR / PROJECT_NAME / "data"
+P_DRIVE_INSTALLERS = Path("P:") / "11207949-dhs-phaseii-floodadapt" / "Model-builder" / "Installers"
 
 # src paths
 DATA_DIR = SPEC_DIR / "data"
@@ -243,3 +244,36 @@ def add_data_dir(include_data: bool):
     (EXE_DATA_DIR / "topobathy").mkdir(exist_ok=True, parents=True)
     if include_data:
         shutil.copytree(DATA_DIR, EXE_DATA_DIR, dirs_exist_ok=True)
+
+def create_zip(dir_path: Path, output_dir: Path, overwrite: bool = False) -> None:
+    """Create a zip file of a directory."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    zip_filename = f"{PROJECT_NAME}-v{ddb_version}.zip"
+
+    if any(f.endswith(".zip") for f in os.listdir(dir_path)):
+        raise ValueError(
+            f"Zipping a directory that contains a zip file is not allowed: {dir_path}"
+        )
+
+    if not output_dir.exists():
+        raise FileNotFoundError(f"Output directory does not exist: {output_dir}")
+
+    if (output_dir / zip_filename).exists():
+        if overwrite:
+            os.remove(output_dir / zip_filename)
+        else:
+            raise FileExistsError(
+                f"Zip file already exists: {output_dir / zip_filename}. Either remove it or change the version number."
+            )
+
+    print(f"Creating zip file: {output_dir / zip_filename}")
+    with ZipFile(output_dir / zip_filename, "x") as z:
+        for root, _, files in os.walk(dir_path):
+            for file in files:
+                z.write(
+                    os.path.join(root, file),
+                    os.path.relpath(os.path.join(root, file), dir_path),
+                )
+
+    print(f"Zipped {dir_path} to {output_dir / zip_filename}")
