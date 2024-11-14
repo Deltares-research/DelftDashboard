@@ -30,6 +30,7 @@ def initialize():
     app.config["server_port"]   = 3000
     app.config["server_nodejs"] = False
     app.config["stylesheet"]    = ""
+    app.config["map_engine"]    = "mapbox"
     app.config["title"]         = "Delft Dashboard"
     app.config["width"]         = 800
     app.config["height"]        = 600
@@ -74,8 +75,8 @@ def initialize():
                   stylesheet=app.config["stylesheet"],
                   icon=app.config["window_icon"],
                   splash_file=app.config["splash_file"],
-                  copy_mapbox_server_folder=False,
-                  copy_maplibre_server_folder=True
+                  map_engine=app.config["map_engine"],
+                  copy_map_server_folder=True
                   )
 
     # Bathymetry database (initialize local database)

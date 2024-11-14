@@ -60,17 +60,17 @@ def build_gui_config():
         tab_panel["tab"].insert(0, {'string': 'Toolbox', 'element': [], "module": ""})
         app.gui.config["element"].append(app.model[model_name].element)
 
-    # Now add MapBox element
-    mpbox = {}
-    mpbox["style"] = "maplibre"
-    mpbox["id"] = "map"
-    mpbox["position"] = {}
-    mpbox["position"]["x"] = 20
-    mpbox["position"]["y"] = 195
-    mpbox["position"]["width"] = -20
-    mpbox["position"]["height"] = -40
-    mpbox["module"] = "delftdashboard.operations.map"
-    app.gui.config["element"].append(mpbox)
+    # Now add map element
+    mp = {}
+    mp["style"] = "map"
+    mp["id"] = "map"
+    mp["position"] = {}
+    mp["position"]["x"] = 20
+    mp["position"]["y"] = 195
+    mp["position"]["width"] = -20
+    mp["position"]["height"] = -40
+    mp["module"] = "delftdashboard.operations.map"
+    app.gui.config["element"].append(mp)
 
     # Menu
 
