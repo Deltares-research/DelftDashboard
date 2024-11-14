@@ -62,7 +62,7 @@ def build_gui_config():
 
     # Now add MapBox element
     mpbox = {}
-    mpbox["style"] = "mapbox"
+    mpbox["style"] = "maplibre"
     mpbox["id"] = "map"
     mpbox["position"] = {}
     mpbox["position"]["x"] = 20

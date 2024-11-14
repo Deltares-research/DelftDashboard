@@ -74,7 +74,9 @@ def initialize():
                   stylesheet=app.config["stylesheet"],
                   icon=app.config["window_icon"],
                   splash_file=app.config["splash_file"],
-                  copy_mapbox_server_folder=True)
+                  copy_mapbox_server_folder=False,
+                  copy_maplibre_server_folder=True
+                  )
 
     # Bathymetry database (initialize local database)
     if "bathymetry_database_path" not in app.config:
