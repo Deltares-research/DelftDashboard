@@ -134,17 +134,30 @@ def add_dataset(*args):
             if not src.nodata:
                 app.gui.window.dialog_warning("File does not have a nodata value")
                 return
+            
             if not src.crs:
                 app.gui.window.dialog_warning("File does not have a valid CRS")
                 return
             else:
                 epsg = src.crs.to_epsg()
 
+            # Check if the vertical datum is explicitly mentioned in the files metadata
+            if src.tags().get('VERTICAL_CS'):
+                vdatum = src.tags()['VERTICAL_CS']
+            else:
+                vdatum, okay = app.gui.window.dialog_string("Provide a vertical datum for the dataset", "MSL")
+                if not okay:
+                    # Cancel was clicked
+                    return
+
         # ask for a name for the dataset
         name, okay = app.gui.window.dialog_string("Provide a name for the dataset", "New dataset")
         if not okay:
             # Cancel was clicked
             return
+        
+        #TODO add nodata, crs, vertical_datum and name to single pop-up, where everything that is already known is filled in
+                
         # check whether the name already exists in the data catalog
         while name in app.data_catalog.sources.keys():
             name, okay = app.gui.window.dialog_string("Dataset name already exists. Provide a different name", "New dataset")
@@ -162,6 +175,7 @@ def add_dataset(*args):
             meta:
                 category: topography
                 source: User
+                vertical_datum: {vdatum}
         """            
 
         # check if my_data_catalog.yml exists
@@ -316,6 +330,15 @@ def update():
         app.gui.setvar(group, "selected_bathymetry_dataset_zmin", dataset["zmin"])
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", dataset["zmax"])
         app.gui.setvar(group, "selected_bathymetry_dataset_offset", dataset["offset"])
+
+        # set vdatum of the model
+        name = selected_names[0]
+        meta = app.data_catalog[name].meta
+
+        # check if vertical datum is defined in the metadata
+        if "vertical_datum" in meta:
+            value = meta["vertical_datum"]
+            app.gui.setvar(group, "selected_bathymetry_vdatum", value)
     else:
         app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
         app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
@@ -323,6 +346,7 @@ def update():
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
         app.gui.setvar(group, "selected_bathymetry_dataset_offset", 0.0)
     app.gui.setvar(group, "nr_selected_bathymetry_datasets", nrd)
+
 
 
 def generate_bathymetry(*args):

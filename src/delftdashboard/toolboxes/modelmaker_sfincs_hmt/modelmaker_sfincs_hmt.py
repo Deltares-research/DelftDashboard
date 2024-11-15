@@ -42,6 +42,9 @@ class Toolbox(GenericToolbox):
 
         self.setup_dict = {}
 
+        # create "meta" entry in the setup_dict, this is not used in the model but can be used to store additional information
+        self.setup_dict["meta"] = {}
+
         # Set GUI variable
         group = "modelmaker_sfincs_hmt"
 
@@ -128,6 +131,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
         app.gui.setvar(group, "bathymetry_dataset_index", 0)
         app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
+        app.gui.setvar(group, "selected_bathymetry_vdatum", "MSL")
         app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
         app.gui.setvar(group, "selected_bathymetry_dataset_meta", "")
         app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
@@ -448,6 +452,9 @@ class Toolbox(GenericToolbox):
             return
         self.setup_dict.update({"setup_dep": setup_dep})
 
+        # add the vdatum to the metadata
+        self.setup_dict["meta"]["vertical_datum"] = app.gui.getvar(group, "selected_bathymetry_vdatum")
+        
         # show merged bathymetry on map
         app.map.layer["sfincs_hmt"].layer["bed_levels"].update()
 
