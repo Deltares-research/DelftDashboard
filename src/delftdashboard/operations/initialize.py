@@ -116,7 +116,10 @@ def initialize():
     # Use GUI variables to set the view settings    
 
     # Layer style
-    app.gui.setvar("view_settings", "layer_style", "streets-v12")
+    if app.gui.map_engine == "mapbox":
+        app.gui.setvar("view_settings", "layer_style", "streets-v12")
+    else:
+        app.gui.setvar("view_settings", "layer_style", "osm")
     # Projection
     app.gui.setvar("view_settings", "projection", "mercator")
     # Topography
