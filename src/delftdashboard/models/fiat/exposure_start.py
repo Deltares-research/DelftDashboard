@@ -120,7 +120,7 @@ def add_exposure_locations_to_model(*args):
     app.active_model.domain.exposure_vm.set_asset_data_source(selected_asset_locations)
 
     # Set the unit for Exposure Data for visualization
-    view_tab_unit = app.active_model.domain.exposure_vm.exposure_buildings_model.unit
+    view_tab_unit = app.active_model.domain.exposure_vm.exposure_buildings_model.length_unit
     if hasattr(view_tab_unit, "value"):
         view_tab_unit = view_tab_unit.value
     app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
@@ -257,7 +257,7 @@ def build_osm_exposure(*args):
             crs=crs,
             country=country,
             max_potential_damage="jrc_damage_values",
-            ground_elevation_unit=ground_elevation_unit,
+            grnd_elev_unit=ground_elevation_unit,
             bf_conversion=bf_conversion,
             keep_unclassified=keep_unclassified,
         )
@@ -366,7 +366,7 @@ def build_user_exposure(*args):
             crs=crs,
             country=country,
             max_potential_damage=max_potential_damage,
-            ground_elevation_unit=app.gui.getvar(model, "ground_elevation_unit"),
+            grnd_elev_unit=app.gui.getvar(model, "ground_elevation_unit"),
         )
 
         # Set the buildings attribute to gdf for easy visualization of the buildings

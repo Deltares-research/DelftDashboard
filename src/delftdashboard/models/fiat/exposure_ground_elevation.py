@@ -29,7 +29,7 @@ def select_ground_elevation_unit_meters(*args):
 def select_ground_elevation_file(*args):
     if app.gui.getvar("fiat", "update_source_ground_elevation") == "sfincs_data":
         app.gui.setvar("fiat", "ground_elevation_unit", "meters")
-        if app.active_model.domain.exposure_vm.exposure_buildings_model.unit == "feet":
+        if app.active_model.domain.exposure_vm.exposure_buildings_model.length_unit == "feet":
             app.active_model.domain.exposure_vm.logger.warning("SFINCS Ground Elevation is automatically converted from meters into feet")
         load_sfincs_ground_elevation()
     elif app.gui.getvar("fiat", "update_source_ground_elevation") == "upload_data":
@@ -108,7 +108,7 @@ def add_to_model(*args):
     
     # Set the settings in HydroMT-FIAT
     app.active_model.domain.exposure_vm.set_ground_elevation(
-        source=path_ground_elevation_source, unit = unit
+        source=path_ground_elevation_source, grnd_elev_unit = unit
     )
 
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
