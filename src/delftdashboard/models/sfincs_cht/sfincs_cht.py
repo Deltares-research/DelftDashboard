@@ -10,7 +10,7 @@ import os
 from delftdashboard.operations.model import GenericModel
 from delftdashboard.app import app
 
-from cht_sfincs.sfincs import SFINCS
+from cht_sfincs import SFINCS
 
 #from hydromt_sfincs import SfincsModel
 
@@ -208,9 +208,9 @@ class Model(GenericModel):
             path = os.path.dirname(fname)
             self.domain.path = path
             self.domain.read()
-            # Also get mask datashader dataframe
+            self.set_gui_variables()
+            # Also get mask datashader dataframe (should this not happen when grid is read?)
             self.domain.mask.get_datashader_dataframe()
-            # self.set_gui_variables()
             # Change working directory
             os.chdir(path)
             # Change CRS
