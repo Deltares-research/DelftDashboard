@@ -120,7 +120,7 @@ def add_exposure_locations_to_model(*args):
     app.active_model.domain.exposure_vm.set_asset_data_source(selected_asset_locations)
 
     # Set the unit for Exposure Data for visualization
-    view_tab_unit = app.active_model.domain.exposure_vm.exposure_buildings_model.length_unit
+    view_tab_unit = app.active_model.domain.exposure_vm.exposure_buildings_model.unit
     if hasattr(view_tab_unit, "value"):
         view_tab_unit = view_tab_unit.value
     app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)

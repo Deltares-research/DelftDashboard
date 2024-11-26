@@ -51,7 +51,7 @@ def create_model(*args):
         app.active_model.roads = roads
 
     # Set the unit for Exposure Data for visualization
-    view_tab_unit = app.active_model.domain.fiat_model.exposure.length_unit
+    view_tab_unit = app.active_model.domain.fiat_model.exposure.unit
     app.gui.setvar("fiat", "view_tab_unit", view_tab_unit)
 
     # Show exposure buildings
