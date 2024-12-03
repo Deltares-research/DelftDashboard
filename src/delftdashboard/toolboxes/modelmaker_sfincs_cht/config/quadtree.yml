@@ -12,6 +12,7 @@ element:
   select: index
   option_string:
     variable: refinement_polygon_names
+  tooltip: Select refinement polygon  
 - style: popupmenu
   position:
     x: 10
@@ -30,18 +31,54 @@ element:
     - variable: nr_refinement_polygons
       operator: gt
       value: 0
+  tooltip: Select refinement level for selected polygon  
+- style: edit
+  position:
+    x: 200
+    y: 100
+    width: 60
+    height: 20
+  method: edit_zmin_zmax
+  variable: refinement_polygon_zmax
+  text: Zmax
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_refinement_polygons
+      operator: gt
+      value: 0
+  tooltip: Edit maximum elevation for refinement within polygon  
+- style: edit
+  position:
+    x: 200
+    y: 75
+    width: 60
+    height: 20
+  method: edit_zmin_zmax
+  variable: refinement_polygon_zmin
+  text: Zmin
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_refinement_polygons
+      operator: gt
+      value: 0
+  tooltip: Edit minimum elevation for refinement within polygon  
 - style: pushbutton
   text: Draw Polygon
   position:
-    x: 170
+    x: 280
     y: 100
     width: 80
     height: 20
   method: draw_refinement_polygon
+  tooltip: Push to start drawing refinement polygon  
 - style: pushbutton
   text: Delete Polygon
   position:
-    x: 170
+    x: 280
     y: 75
     width: 80
     height: 20
@@ -53,18 +90,20 @@ element:
     - variable: nr_refinement_polygons
       operator: gt
       value: 0
+  tooltip: Push to delete selected refinement polygon  
 - style: pushbutton
   text: Load Polygons
   position:
-    x: 170
+    x: 280
     y: 50
     width: 80
     height: 20
   method: load_refinement_polygon
+  tooltip: Push to load refinement polygons (*.geojson)  
 - style: pushbutton
   text: Save Polygons
   position:
-    x: 170
+    x: 280
     y: 25
     width: 80
     height: 20
@@ -76,11 +115,13 @@ element:
     - variable: nr_refinement_polygons
       operator: gt
       value: 0
+  tooltip: Push to save refinement polygons (*.geojson)  
 - style: pushbutton
   text: Generate Quadtree Mesh
   position:
-    x: 270
+    x: 380
     y: 100
     width: 120
     height: 20
   method: build_quadtree_grid
+  tooltip: Generate QuadTree mesh  

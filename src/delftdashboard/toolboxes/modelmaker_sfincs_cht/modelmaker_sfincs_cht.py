@@ -46,6 +46,8 @@ class Toolbox(GenericToolbox):
         self.exclude_polygon_snapwave = gpd.GeoDataFrame()
         # Refinement
         self.refinement_levels = []
+        self.refinement_zmin = []
+        self.refinement_zmax = []
         self.refinement_polygon = gpd.GeoDataFrame()
 
         self.setup_dict = {}
@@ -77,6 +79,8 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "refinement_polygon_names", [])
         app.gui.setvar(group, "refinement_polygon_index", 0)
         app.gui.setvar(group, "refinement_polygon_level", 0)
+        app.gui.setvar(group, "refinement_polygon_zmin", -99999.0)
+        app.gui.setvar(group, "refinement_polygon_zmax", 99999.0)
         app.gui.setvar(group, "nr_refinement_polygons", 0)
         # Strings for refinement levels
         levstr = []
@@ -306,9 +310,16 @@ class Toolbox(GenericToolbox):
             # Iterate through rows and set refinement levels            
             for irow, row in refpol.iterrows():
                 refpol.loc[irow, "refinement_level"] = self.refinement_levels[irow]
+                refpol.loc[irow, "zmin"] = self.refinement_zmin[irow]
+                refpol.loc[irow, "zmax"] = self.refinement_zmax[irow]
 
-        # Build grid 
-        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation, refinement_polygons=refpol)
+        # Build grid
+
+        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation,
+                         refinement_polygons=refpol,
+                         bathymetry_sets=app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets,
+                         bathymetry_database=app.bathymetry_database)
+
         # Save grid 
         model.grid.write()
 
@@ -491,12 +502,23 @@ class Toolbox(GenericToolbox):
     # READ
 
     def read_refinement_polygon(self):
+        # Should we make this part of cht_sfincs?
         fname = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_file")
         self.refinement_polygon = gpd.read_file(fname)
         # Loop through rows in geodataframe and set refinement levels        
         self.refinement_levels = []
+        self.refinement_zmin = []
+        self.refinement_zmax = []
         for i in range(len(self.refinement_polygon)):
             self.refinement_levels.append(self.refinement_polygon["refinement_level"][i])
+            if "zmin" in self.refinement_polygon.columns:
+                self.refinement_zmin.append(self.refinement_polygon["zmin"][i])
+            else:
+                self.refinement_zmin.append(-99999.0)
+            if "zmax" in self.refinement_polygon.columns:
+                self.refinement_zmax.append(self.refinement_polygon["zmax"][i])
+            else:
+                self.refinement_zmax.append(99999.0)    
 
     def read_include_polygon(self):
         fname = app.gui.getvar("modelmaker_sfincs_cht", "include_polygon_file")
@@ -529,7 +551,9 @@ class Toolbox(GenericToolbox):
             print("No refinement polygons defined")
             return
         gdf = gpd.GeoDataFrame({"geometry": self.refinement_polygon["geometry"],
-                                "refinement_level": self.refinement_levels})
+                                "refinement_level": self.refinement_levels,
+                                "zmin": self.refinement_zmin,
+                                "zmax": self.refinement_zmax})
         # Iterate over all polygons and add refinement level
         # refinement_level = 1 means one level of refinement
         # refinement_level = 2 means two levels of refinement
