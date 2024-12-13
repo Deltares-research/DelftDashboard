@@ -30,6 +30,7 @@ def load(*args):
                                           allow_directory_change=False)
     if rsp[0]:
         app.model["sfincs_cht"].domain.input.variables.obsfile = rsp[2] # file name without path
+        app.gui.setvar("sfincs_cht", "obsfile", rsp[2])
         app.model["sfincs_cht"].domain.observation_points.read()
         gdf = app.model["sfincs_cht"].domain.observation_points.gdf
         app.map.layer["sfincs_cht"].layer["observation_points"].set_data(gdf, 0)
@@ -48,6 +49,7 @@ def save(*args):
                                           allow_directory_change=False)
     if rsp[0]:
         app.model["sfincs_cht"].domain.input.variables.obsfile = rsp[2] # file name without path
+        app.gui.setvar("sfincs_cht", "obsfile", rsp[2])
         app.model["sfincs_cht"].domain.observation_points.write()
     app.model["sfincs_cht"].observation_points_changed = False
 

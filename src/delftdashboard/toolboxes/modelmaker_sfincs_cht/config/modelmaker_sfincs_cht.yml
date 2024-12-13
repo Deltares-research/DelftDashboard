@@ -38,7 +38,7 @@ element:
     module: delftdashboard.toolboxes.modelmaker_sfincs_cht.subgrid
     element: subgrid.yml
     dependency:
-    - action: visible
+    - action: enable
       checkfor: all
       check:
       - variable: use_subgrid

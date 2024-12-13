@@ -15,3 +15,4 @@ src/delftdashboard.egg-info/top_level.txt
 ddb_dev.yml
 environment.yml
 src/delftdashboard/delftdashboard.ini
+src/delftdashboard/delftdashboard.pth

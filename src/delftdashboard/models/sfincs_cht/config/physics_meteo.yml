@@ -117,7 +117,7 @@ element:
     tooltipstring: Check to include barometric pressure gradients in flux computation
   - style: edit
     position:
-      x: 110
+      x: 10
       y: 70
       width: 50
       height: 20
@@ -128,7 +128,7 @@ element:
     textposition: right
   - style: edit
     position:
-      x: 110
+      x: 10
       y: 45
       width: 50
       height: 20
@@ -147,11 +147,12 @@ element:
   element:
   - style: edit
     position:
-      x: 120
+      x: 10
       y: 90
       width: 50
       height: 20
     text: Infiltration Rate (mm/h)
+    method: set_model_variables
     variable: qinf
     tooltipstring: Edit infiltration rate
     textposition: right

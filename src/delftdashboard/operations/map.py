@@ -138,6 +138,7 @@ def update():
             toolbox.set_layer_mode("inactive")
         else:
             toolbox.set_layer_mode("invisible")
+    app.map.close_popup()        
 
 def reset_cursor():
     app.map.set_mouse_default()

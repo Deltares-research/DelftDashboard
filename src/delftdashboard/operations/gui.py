@@ -151,11 +151,13 @@ def build_gui_config():
     menu["text"] = "View"
     menu["module"] = "delftdashboard.menu.view"
     menu["menu"] = []
-    menu["menu"].append({"variable_group": "view_settings", "id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]})
-    menu["menu"].append({"variable_group": "view_settings", "id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "globe"}]}]})
+    if app.gui.map_engine == "mapbox":
+        menu["menu"].append({"variable_group": "view_settings", "id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]})
+        menu["menu"].append({"variable_group": "view_settings", "id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "globe"}]}]})
     menu["menu"].append({"variable_group": "view_settings", "id": "view.topography",  "text": "Topography", "method": "topography", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "topography_visible", "operator": "eq", "value": True}]}]})
-    menu["menu"].append({"variable_group": "view_settings", "id": "view.terrain",  "text": "3D Terrain", "method": "terrain", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "terrain_visible", "operator": "eq", "value": True}]}]})
-
+    if app.gui.map_engine == "mapbox":
+        menu["menu"].append({"variable_group": "view_settings", "id": "view.terrain",  "text": "3D Terrain", "method": "terrain", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "terrain_visible", "operator": "eq", "value": True}]}]})
+ 
     layer_style_menu = {}
     layer_style_menu["text"] = "Layer Style"
     layer_style_menu["separator"] = True
@@ -170,6 +172,7 @@ def build_gui_config():
         layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.streets", "text": "Open Street Map", "separator": False,  "checkable": True, "option": "osm", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "osm"}]}]})
         layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.arcgishybrid", "text": "ArcGIS Hybrid", "separator": False,  "checkable": True, "option": "arcgishybrid", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "arcgishybrid"}]}]})
         layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.darkmatter", "text": "Dark Matter", "separator": False,  "checkable": True, "option": "darkmatter", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "darkmatter"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.positron", "text": "Positron", "separator": False,  "checkable": True, "option": "positron", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "positron"}]}]})
         layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.none", "text": "None", "separator": False,  "checkable": True, "option": "none", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "none"}]}]})
     menu["menu"].append(layer_style_menu)
  

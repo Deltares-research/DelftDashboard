@@ -57,7 +57,7 @@ class Toolbox(GenericToolbox):
 
         app.gui.setvar(group, "build_quadtree_grid", True)
         app.gui.setvar(group, "use_snapwave", False)
-        app.gui.setvar(group, "use_subgrid", True)
+        app.gui.setvar(group, "use_subgrid", False)
 
         # Domain
         app.gui.setvar(group, "x0", 0.0)
@@ -447,7 +447,10 @@ class Toolbox(GenericToolbox):
         self.generate_grid()
         self.generate_bathymetry()
         self.update_mask()
-        self.generate_subgrid()
+        if app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"):
+            self.update_mask_snapwave()
+        if app.gui.getvar("modelmaker_sfincs_cht", "use_subgrid"):
+            self.generate_subgrid()    
 
 #    def update_polygons(self): # This should really be moved to the callback modules
 
@@ -640,10 +643,9 @@ class Toolbox(GenericToolbox):
         layer.clear()
         layer.add_feature(self.exclude_polygon_snapwave)
 
-
     def read_setup_yaml(self, file_name):
 
-        # First set some default gui variables
+        # First set some default gui variables (should make this a 'clear' function)
         group = "modelmaker_sfincs_cht"
         app.gui.setvar(group, "refinement_polygon_file", "quadtree.geojson")
         app.gui.setvar(group, "global_zmin", -99999.0)
@@ -788,11 +790,12 @@ class Toolbox(GenericToolbox):
             name = ddict["name"]
             zmin = ddict["zmin"]
             zmax = ddict["zmax"] 
-            dataset = {"dataset": name, "zmin": zmin, "zmax": zmax}
+            dataset = {"name": name, "zmin": zmin, "zmax": zmax}
             app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets.append(dataset)
             dataset_names.append(name)
         app.gui.setvar("modelmaker_sfincs_cht", "selected_bathymetry_dataset_names", dataset_names)
         app.gui.setvar("modelmaker_sfincs_cht", "selected_bathymetry_dataset_index", 0)
+        app.gui.setvar("modelmaker_sfincs_cht", "nr_selected_bathymetry_datasets", len(dataset_names))
 
         layer = app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"]
         lenx = dct["coordinates"]["mmax"] * dct["coordinates"]["dx"]
@@ -802,6 +805,11 @@ class Toolbox(GenericToolbox):
                             lenx, leny,
                             dct["coordinates"]["rotation"])
 
+        # Sub grid
+        if "subgrid" in dct:
+            app.gui.setvar("modelmaker_sfincs_cht", "use_subgrid", True)
+        else:
+            app.gui.setvar("modelmaker_sfincs_cht", "use_subgrid", False)
 
     def write_setup_yaml(self):
         group = "modelmaker_sfincs_cht"

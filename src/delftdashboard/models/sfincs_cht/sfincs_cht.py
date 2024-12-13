@@ -126,6 +126,19 @@ class Model(GenericModel):
                         line_color_selected="white",
                         fill_color_selected="red")
 
+
+            # Make the layer
+        # Create geodataframe with one point at (0,0), crs(4326)    
+        layer.add_layer(
+                "obs_points",
+                type="marker",
+                hover_property="description",
+                click_property="url",
+                icon_size=0.5,
+                click_popup_width=600,
+                click_popup_height=220,
+            )
+
         from .discharge_points import select_discharge_point_from_map
         layer.add_layer("discharge_points",
                         type="circle_selector",                        

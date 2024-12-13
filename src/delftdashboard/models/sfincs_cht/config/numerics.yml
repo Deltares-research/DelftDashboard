@@ -1,15 +1,16 @@
 element:
 - style: panel
+  title: Numerics
   position:
     x: 10
     y: 10
     width: -10
-    height: 140
+    height: 160
   element:
   - style: edit
     position:
       x: 100
-      y: 110
+      y: 130
       width: 50
       height: 20
     text: Alpha (-)
@@ -19,7 +20,7 @@ element:
   - style: edit
     position:
       x: 100
-      y: 85
+      y: 105
       width: 50
       height: 20
     text: Theta (-)
@@ -29,7 +30,7 @@ element:
   - style: edit
     position:
       x: 100
-      y: 60
+      y: 80
       width: 50
       height: 20
     text: Threshold Depth (m)
@@ -39,7 +40,7 @@ element:
   - style: edit
     position:
       x: 100
-      y: 35
+      y: 55
       width: 50
       height: 20
     text: Stop Depth (m)
@@ -49,10 +50,20 @@ element:
   - style: edit
     position:
       x: 100
-      y: 10
+      y: 30
       width: 50
       height: 20
     text: Spin-up Time (s)
     variable: tspinup
     method: set_model_variables
     tooltipstring: Edit spin-up time (in seconds)
+- style: checkbox
+  text: Wiggle Suppression
+  position:
+    x: 200
+    y: 130
+#    width: 60
+#    height: 20
+  variable: wiggle_suppression
+  method: set_model_variables
+  tooltip: Turn on or off wiggle suppression (only for subgrid models)

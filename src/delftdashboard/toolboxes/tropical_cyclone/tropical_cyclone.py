@@ -51,6 +51,7 @@ class Toolbox(GenericToolbox):
         short_names, long_names = self.cyclone_track_database.dataset_names()
         app.gui.setvar("tropical_cyclone", "track_dataset_long_names", long_names)
         app.gui.setvar("tropical_cyclone", "track_dataset_names", short_names)
+        app.gui.setvar("tropical_cyclone", "selected_track_dataset", short_names[0])
 
     def set_layer_mode(self, mode):
         if mode == "active":

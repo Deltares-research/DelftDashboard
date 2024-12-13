@@ -440,6 +440,7 @@ class Toolbox(GenericToolbox):
             dataset_names.append(name)
         app.gui.setvar("modelmaker_hurrywave", "selected_bathymetry_dataset_names", dataset_names)
         app.gui.setvar("modelmaker_hurrywave", "selected_bathymetry_dataset_index", 0)
+        app.gui.setvar("modelmaker_hurrywave", "nr_selected_bathymetry_datasets", len(dataset_names))
 
         self.update_polygons()
 

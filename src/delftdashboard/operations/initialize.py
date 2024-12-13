@@ -53,12 +53,30 @@ def initialize():
         app.config[key] = config[key]
     cfgfile.close()
 
+    # First read delftdashboard.pth file. This contains the path to the delftdashboard folder.
+    pth_file_name = os.path.join(app.main_path, "delftdashboard.pth")
+    # Check if pth file exist. If not, give error message and exit
+    if not os.path.exists(pth_file_name):
+        print("If you have not yet created a folder for Delft Dashboard (outside of the source folder), please do so.")
+        print("The folder should be called delftdashboard (e.g. d:\work\delftdashboard).")
+        print("You'll need to copy the contents of the ddb folder in the GitHub repository to this new folder.")
+        print("Then create a text file called delftdashboard.pth (in src\delftdashboard) with one line in it: the path to the Delft Dashboard folder (e.g. d:\work\delftdashboard).")
+        print("ERROR: delftdashboard.pth file not found in main folder. Exiting.")
+        exit()
+    pthfile = open(pth_file_name, "r")
+    pth = pthfile.readline().strip()
+    # Replace backslashes with forward slashes
+    pth = pth.replace("\\", "/")
+    app.config["delft_dashboard_path"] = pth
+    app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
+    pthfile.close()
+
     # Read ini file and override stuff in default config dict
     # ini file contains properties that need to be edited by the user !
-    ini_file_name = os.path.join(app.main_path, "delftdashboard.ini")
-    # Check if there is also a local ini file
-    if os.path.exists(os.path.join(os.getcwd(), "delftdashboard.ini")):
-        ini_file_name = os.path.join(os.getcwd(), "delftdashboard.ini")
+    ini_file_name = os.path.join(app.config["delft_dashboard_path"], "delftdashboard.ini")
+    # # Check if there is also a local ini file
+    # if os.path.exists(os.path.join(os.getcwd(), "delftdashboard.ini")):
+    #     ini_file_name = os.path.join(os.getcwd(), "delftdashboard.ini")
     inifile = open(ini_file_name, "r")
     config = yaml.load(inifile, Loader=yaml.FullLoader)
     for key in config:
