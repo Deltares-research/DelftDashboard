@@ -14,7 +14,7 @@ import geopandas as gpd
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-from cht_cyclones import CycloneTrackDatabase, track_selector
+from cht_cyclones import track_selector
 
 # Callbacks
 
@@ -43,3 +43,12 @@ def select_track(*args):
         app.toolbox["tropical_cyclone"].tc = tc
         app.toolbox["tropical_cyclone"].tc.name = app.toolbox["tropical_cyclone"].tc.name.lower()
         app.toolbox["tropical_cyclone"].track_added()
+
+def load_track(*args):
+    app.toolbox["tropical_cyclone"].load_track()
+
+def save_track(*args):
+    app.toolbox["tropical_cyclone"].save_track()
+
+def delete_track(*args):
+    app.toolbox["tropical_cyclone"].delete_track()

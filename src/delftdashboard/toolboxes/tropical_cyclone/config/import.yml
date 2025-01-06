@@ -1,12 +1,4 @@
 element:
-- style: pushbutton
-  text: Select Track
-  position:
-    x: 320
-    y: 100
-    width: 120
-    height: 20
-  method: select_track
 - style: listbox
   position:
     x: 10
@@ -22,3 +14,53 @@ element:
     variable: track_dataset_long_names
   option_value:
     variable: track_dataset_names
+- style: pushbutton
+  text: Select Track
+  position:
+    x: 320
+    y: 100
+    width: 120
+    height: 20
+  method: select_track
+  tooltip: Select track from database
+- style: pushbutton
+  text: Load Track
+  position:
+    x: 320
+    y: 60
+    width: 120
+    height: 20
+  method: load_track
+  tooltip: Load track from file
+- style: pushbutton
+  text: Save Track
+  position:
+    x: 320
+    y: 35
+    width: 120
+    height: 20
+  method: save_track
+  tooltip: Save track to file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: track_loaded
+      operator: eq
+      value: true  
+- style: pushbutton
+  text: Delete Track
+  position:
+    x: 320
+    y: 10
+    width: 120
+    height: 20
+  method: delete_track
+  tooltip: Delete track
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: track_loaded
+      operator: eq
+      value: true  

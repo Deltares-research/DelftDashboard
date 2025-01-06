@@ -14,7 +14,7 @@ import os
 from delftdashboard.app import app
 from delftdashboard.operations.toolbox import GenericToolbox
 
-from cht_cyclones import CycloneTrackDatabase
+from cht_cyclones import CycloneTrackDatabase, TropicalCyclone
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):
@@ -26,19 +26,37 @@ class Toolbox(GenericToolbox):
     def initialize(self):
 
         # Set variables
-        self.tc = None
+        self.tc = TropicalCyclone()
         self.track_dataset = None
 
-        # Set GUI variables
         group = "tropical_cyclone"
+
         app.gui.setvar(group, "name", "")
+        app.gui.setvar(group, "track_loaded", False)
+
+        # Loop through the config and set the GUI variables
+        for key in self.tc.config:
+            app.gui.setvar(group, key, self.tc.config[key])
+
         app.gui.setvar(group, "ensemble_start_time", None)
         app.gui.setvar(group, "ensemble_start_time_index", 0)
         app.gui.setvar(group, "ensemble_number_of_realizations", 100)
         app.gui.setvar(group, "ensemble_duration", 72)
         app.gui.setvar(group, "ensemble_cone_buffer", 300000.0)
         app.gui.setvar(group, "ensemble_cone_only_forecast", True)
+        app.gui.setvar(group, "ensemble_start_time", None)
+
         app.gui.setvar(group, "track_time_strings", [])
+
+        app.gui.setvar(group, "include_rainfall", False)
+        app.gui.setvar(group, "wind_profile_options", ["holland2010"])
+        app.gui.setvar(group, "wind_profile_option_strings", ["Holland (2010)"])
+        app.gui.setvar(group, "vmax_pc_options", ["holland2008"])
+        app.gui.setvar(group, "vmax_pc_option_strings", ["Holland (2008)"])
+        app.gui.setvar(group, "rmax_options", ["nederhoff2019"])
+        app.gui.setvar(group, "rmax_option_strings", ["Nederhoff et al. (2019)"])
+        app.gui.setvar(group, "rainfall_options", ["ipet"])
+        app.gui.setvar(group, "rainfall_option_strings", ["IPET"])
 
         # Read track database
         s3_bucket = "deltares-ddb"
@@ -95,21 +113,29 @@ class Toolbox(GenericToolbox):
             line_color_selected="red",
             line_width_selected=3,
             hover_param="description",
+            icon_size=0.75
         )
 
     def track_added(self):
         app.gui.setvar("tropical_cyclone", "ensemble_start_time", None)
         app.gui.setvar("tropical_cyclone", "ensemble_start_time_index", 0)
+        app.gui.setvar("tropical_cyclone", "track_loaded", True)
         self.plot_track()
 
     def plot_track(self):
         app.map.layer[self.name].layer["cyclone_track"].set_data(self.tc.track.gdf)
 
     def build_spiderweb(self):
-        # Write the track
-        self.tc.write_track(self.tc.name + ".cyc")
+
+        file_name = app.gui.window.dialog_save_file("Save spiderweb file", "*.spw", self.tc.name + ".spw")
+        if len(file_name[0]) == 0:
+            return
+        spw_file = file_name[0] # Full file name
+
+        # Save config
+        self.set_config()
+
         # Build and save the spw file
-        spw_file = self.tc.name + ".spw"
         p = app.gui.window.dialog_progress("               Generating wind fields ...                ", len(self.tc.track.gdf))
         self.tc.compute_wind_field(filename=spw_file, progress_bar=p, format="ascii", error_stats=False)
         p.close()
@@ -118,11 +144,57 @@ class Toolbox(GenericToolbox):
         model = app.active_model
         if model.name == "sfincs_cht":
             # Add the spw file to the model
-            model.domain.input.variables.spwfile = spw_file
+            model.domain.input.variables.spwfile = file_name[2]
             # And update the GUI variable
             app.gui.setvar("sfincs_cht", "spwfile", spw_file)
         elif model.name == "hurrywave":
             # Add the spw file to the model
-            model.domain.input.variables.spwfile = spw_file
+            model.domain.input.variables.spwfile = file_name[2]
             # And update the GUI variable
             app.gui.setvar("hurrywave", "spwfile", spw_file)    
+
+    def load_track(self):
+        # Load the track
+        file_name = app.gui.window.dialog_open_file("Open track", "*.cyc")
+        if file_name[0]:
+            self.tc.read_track(file_name[0])
+            self.tc.name = os.path.basename(file_name[0]).split(".")[0]
+            app.gui.setvar("tropical_cyclone", "ensemble_start_time", None)
+            app.gui.setvar("tropical_cyclone", "ensemble_start_time_index", 0)
+            app.gui.setvar("tropical_cyclone", "track_loaded", True)
+            self.plot_track()
+
+    def save_track(self):
+        # Save the track to a file
+        file_name = app.gui.window.dialog_save_file("Save track", "*.cyc", self.tc.name + ".cyc")
+        if file_name[0]:
+            self.tc.name = os.path.basename(file_name[0]).split(".")[0]
+            self.tc.write_track(file_name[0])
+
+    def delete_track(self):
+        self.tc = TropicalCyclone()
+        app.gui.setvar("tropical_cyclone", "track_loaded", False)
+        app.map.layer["tropical_cyclone"].layer["cyclone_track"].clear()
+
+    def load_config(self):
+        # Load the configuration
+        file_name = app.gui.window.dialog_open_file("Open cyclone configuration", "*.cfg")
+        if file_name[0]:
+            self.tc.read_config(file_name[0])
+            # Loop through the config and set the GUI variables
+            for key in self.tc.config:
+                app.gui.setvar("tropical_cyclone", key, self.tc.config[key])
+            # Update the GUI variables
+            app.gui.window.update()
+
+    def save_config(self):
+        # Save the configuration
+        file_name = app.gui.window.dialog_save_file("Save configuration", "cfg", self.tc.name + ".cfg")
+        self.set_config()
+        if file_name[0]:
+            self.tc.write_config(file_name[0])
+
+    def set_config(self):
+        # Set the configuration
+        for key in self.tc.config:
+            self.tc.config[key] = app.gui.getvar("tropical_cyclone", key)
