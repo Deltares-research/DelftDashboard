@@ -3,7 +3,7 @@ requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.3.1"
+version = "0.3.2"
 name = "delftdashboard"
 authors = [
     {name = "Maarten van Ormondt", email = "maarten.vanormondt@deltares-usa.us"},
@@ -26,12 +26,6 @@ dependencies = [
     "pyyaml",
 	"xugrid",
     "toml",
-	"cht-sfincs",
-	"cht-hurrywave",
-	"cht-utils",
-	"cht-bathymetry",
-	"cht-cyclones",
-	"cht-observations",
 	"guitares"
 ]
 
