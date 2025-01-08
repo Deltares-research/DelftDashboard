@@ -1,0 +1,24 @@
+element:
+- style: popupmenu
+  text: Max Zoom
+  position:
+    x: 110
+    y: 110
+    width: 50
+    height: 20
+  select: item  
+  variable: max_zoom
+  tooltip: Maximum zoom level
+  method: edit_variables
+  option_string:
+    variable: zoom_levels_text
+  option_value:
+    variable: zoom_levels    
+- style: pushbutton
+  text: Generate Index Tiles
+  position:
+    x: 20
+    y: 85
+    width: 150
+    height: 20
+  method: generate_index_tiles

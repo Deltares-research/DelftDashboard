@@ -1,0 +1,14 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Index Tiles
+    module: delftdashboard.toolboxes.tiling.index_tiles
+    element: index_tiles.yml
+  - string: TopoBathy Tiles
+    module: delftdashboard.toolboxes.tiling.topobathy_tiles
+    element: topobathy_tiles.yml

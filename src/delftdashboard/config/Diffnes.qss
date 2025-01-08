@@ -969,10 +969,10 @@ QProgressBar::chunk
 /*-----QStatusBar-----*/
 QStatusBar
 {
-	background-color: #4a5157;
+	background-color: #242424;
 	color: #ffffff;
 	border-color: #051a39;
-
+	margin-left: 15px;
 }
 
 

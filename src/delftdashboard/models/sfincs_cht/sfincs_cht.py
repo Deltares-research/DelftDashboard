@@ -367,3 +367,11 @@ class Model(GenericModel):
     def set_input_variable(self, gui_variable, value):
         pass
 
+    def add_stations(self, gdf_stations_to_add, naming_option="id"):
+        self.domain.observation_points.add_points(gdf_stations_to_add, name=naming_option)
+        gdf = self.domain.observation_points.gdf
+        app.map.layer["sfincs_cht"].layer["observation_points"].set_data(gdf, 0)
+        if not self.domain.input.variables.obsfile:
+            self.domain.input.variables.obsfile = "sfincs.obs"
+            app.gui.setvar("sfincs_cht", "obsfile", self.domain.input.variables.obsfile)
+        self.domain.observation_points.write()

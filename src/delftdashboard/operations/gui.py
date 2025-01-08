@@ -46,6 +46,16 @@ def build_gui_config():
     app.gui.config["menu"] = []
     app.gui.config["toolbar"] = []
     app.gui.config["element"] = []
+    app.gui.config["statusbar"] = {}
+    app.gui.config["statusbar"]["field"] = []
+    app.gui.config["statusbar"]["field"].append({"id": "crs_name", "text": "WGS 84 (geographic) - EPSG:4326", "width": 12})
+    # app.gui.config["statusbar"]["field"].append({"id": "crs_type", "text": "geographic", "width": 3})
+    # app.gui.config["statusbar"]["field"].append({"id": "crs_code", "text": "EPSG:4326", "width": 3})
+    app.gui.config["statusbar"]["field"].append({"id": "lon", "text": "Lon :", "width": 4})
+    app.gui.config["statusbar"]["field"].append({"id": "lat", "text": "Lat :", "width": 4})
+    app.gui.config["statusbar"]["field"].append({"id": "x", "text": "X :", "width": 4})
+    app.gui.config["statusbar"]["field"].append({"id": "y", "text": "Y :", "width": 4})
+    app.gui.config["statusbar"]["field"].append({"id": "distance", "text": "", "width": 4})
 
     # # Layer tab
     # # Read elements
@@ -171,6 +181,7 @@ def build_gui_config():
     elif app.gui.map_engine == "maplibre":
         layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.streets", "text": "Open Street Map", "separator": False,  "checkable": True, "option": "osm", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "osm"}]}]})
         layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.arcgishybrid", "text": "ArcGIS Hybrid", "separator": False,  "checkable": True, "option": "arcgishybrid", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "arcgishybrid"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.arcgissatellite", "text": "ArcGIS Satellite", "separator": False,  "checkable": True, "option": "arcgissatellite", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "arcgissatellite"}]}]})
         layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.darkmatter", "text": "Dark Matter", "separator": False,  "checkable": True, "option": "darkmatter", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "darkmatter"}]}]})
         layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.positron", "text": "Positron", "separator": False,  "checkable": True, "option": "positron", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "positron"}]}]})
         layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.none", "text": "None", "separator": False,  "checkable": True, "option": "none", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "none"}]}]})

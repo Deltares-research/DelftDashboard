@@ -28,6 +28,7 @@ def select(*args):
 
         levstr.append("x" + str(2**(i + 1)) + " (" + sfx + ")") 
     app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_levels", levstr)
+    app.gui.window.statusbar.show_message("Select refinement polygon(s) and set refinement levels.", 5000)
     update()
 
 def draw_refinement_polygon(*args):

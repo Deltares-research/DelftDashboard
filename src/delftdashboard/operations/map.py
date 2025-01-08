@@ -47,6 +47,8 @@ def map_ready(*args):
     # Select this model (this will update the menu and add the toolbox)
     app.model[model_name].select()
 
+    update_statusbar()
+
     app.gui.close_splash()
 
 def map_moved(coords, widget):
@@ -54,6 +56,19 @@ def map_moved(coords, widget):
     # Layers are already automatically updated in MapBox
     pass
 
+def mouse_moved(x, y, lon, lat):
+    # This method is called whenever the mouse moves over the map
+    # We can use this to show the coordinates of the mouse in the status bar
+    if app.map.crs.is_geographic:
+        app.gui.window.statusbar.set_text("lon", f"Lon : {lon:.6f}")
+        app.gui.window.statusbar.set_text("lat", f"Lat : {lat:.6f}")
+        app.gui.window.statusbar.set_text("x", "X :")
+        app.gui.window.statusbar.set_text("y", "Y :")
+    else:
+        app.gui.window.statusbar.set_text("lon", f"Lon : {lon:.6f}")
+        app.gui.window.statusbar.set_text("lat", f"Lat : {lat:.6f}")
+        app.gui.window.statusbar.set_text("x", f"X : {x:.1f}")
+        app.gui.window.statusbar.set_text("y", f"Y : {y:.1f}")
 
 def update_background_topography_layer():
 
@@ -142,3 +157,14 @@ def update():
 
 def reset_cursor():
     app.map.set_mouse_default()
+
+def update_statusbar():
+    # Update the status bar with the current CRS
+    if app.crs.is_geographic:
+        crstp = " (geographic) - " + app.crs.to_string()
+        # app.gui.window.statusbar.set_text("crs_type", "geographic")
+    else:
+        crstp = " (projected) - " + app.crs.to_string()
+        # app.gui.window.statusbar.set_text("crs_type", "projected")
+    app.gui.window.statusbar.set_text("crs_name", "   " + app.crs.name + crstp)
+    # app.gui.window.statusbar.set_text("crs_code", app.crs.to_string())
