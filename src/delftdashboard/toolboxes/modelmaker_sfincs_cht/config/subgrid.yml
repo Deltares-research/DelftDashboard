@@ -50,11 +50,21 @@ element:
   method: edit
   tooltip: Cut-off level (m) for maximizing Manning's n value
 - style: edit
-  text: Zmin (m)
-  variable: subgrid_zmin
+  text: Zmax (m)
+  variable: zmax
   position:
     x: 260
     y: 60
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Maximum bed level used in subgrid table (used to limit extreme depths)
+- style: edit
+  text: Zmin (m)
+  variable: zmin
+  position:
+    x: 260
+    y: 35
     width: 60
     height: 20
   method: edit

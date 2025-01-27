@@ -8,6 +8,7 @@ Created on Mon May 10 12:18:09 2021
 import os
 
 from delftdashboard.operations.model import GenericModel
+from delftdashboard.operations import map
 from delftdashboard.app import app
 
 from cht_sfincs import SFINCS
@@ -217,18 +218,17 @@ class Model(GenericModel):
         fname = fname[0]
         if fname:
             dlg = app.gui.window.dialog_wait("Loading SFINCS model ...")
-            self.initialize()
             path = os.path.dirname(fname)
+            # Change working directory
+            os.chdir(path)
+            self.initialize()
             self.domain.path = path
             self.domain.read()
             self.set_gui_variables()
             # Also get mask datashader dataframe (should this not happen when grid is read?)
             self.domain.mask.get_datashader_dataframe()
-            # Change working directory
-            os.chdir(path)
             # Change CRS
-            app.crs = self.domain.crs
-            app.map.crs = self.domain.crs
+            map.set_crs(self.domain.crs)
             self.plot()
             dlg.close()
             # Zoom to model extent
@@ -265,6 +265,7 @@ class Model(GenericModel):
         app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(app.model["sfincs_cht"].domain.wave_makers.gdf)
 
     def set_gui_variables(self):
+        """Called after reading the input file to set the GUI variables"""
 
         group = "sfincs_cht"
 

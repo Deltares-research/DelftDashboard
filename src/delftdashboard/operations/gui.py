@@ -49,8 +49,6 @@ def build_gui_config():
     app.gui.config["statusbar"] = {}
     app.gui.config["statusbar"]["field"] = []
     app.gui.config["statusbar"]["field"].append({"id": "crs_name", "text": "WGS 84 (geographic) - EPSG:4326", "width": 12})
-    # app.gui.config["statusbar"]["field"].append({"id": "crs_type", "text": "geographic", "width": 3})
-    # app.gui.config["statusbar"]["field"].append({"id": "crs_code", "text": "EPSG:4326", "width": 3})
     app.gui.config["statusbar"]["field"].append({"id": "lon", "text": "Lon :", "width": 4})
     app.gui.config["statusbar"]["field"].append({"id": "lat", "text": "Lat :", "width": 4})
     app.gui.config["statusbar"]["field"].append({"id": "x", "text": "X :", "width": 4})

@@ -32,6 +32,8 @@ def map_ready(*args):
                     file_name="utm_zones.geojson",
                     select=select_utm_zone,
                     selection_type="single",
+                    fill_opacity=0.0,
+                    fill_opacity_selected=1.0,
                     hover_property="utm_zone")
     polygon_layer.set_data(gdf, 0)
 

@@ -144,11 +144,13 @@ def update():
     reset_cursor()
     # Sets all layers to inactive
     for name, model in app.model.items():
+        # The active model is set to inactive, the rest to invisible
         if model == app.active_model:
             model.set_layer_mode("inactive")
         else:
             model.set_layer_mode("invisible")
     for name, toolbox in app.toolbox.items():
+        # The active toolbox is set to inactive, the rest to invisible
         if toolbox == app.active_toolbox:
             toolbox.set_layer_mode("inactive")
         else:
@@ -157,6 +159,11 @@ def update():
 
 def reset_cursor():
     app.map.set_mouse_default()
+
+def set_crs(crs):
+    app.crs = crs
+    app.map.crs = crs
+    update_statusbar()
 
 def update_statusbar():
     # Update the status bar with the current CRS

@@ -132,9 +132,29 @@ element:
     - variable: nr_selected_bathymetry_datasets
       operator: gt
       value: 0
+- style: edit
+  text: Zmax (m)
+  variable: zmax
+  position:
+    x: 760
+    y: 65
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Maximum bed level used in model bathymetry (used to limit extreme depths)
+- style: edit
+  text: Zmin (m)
+  variable: zmin
+  position:
+    x: 760
+    y: 40
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Minimum bed level used in model bathymetry (used to limit extreme depths)
 - style: pushbutton
   position:
-    x: 590
+    x: 700
     y: 10
     width: 120
     height: 20
