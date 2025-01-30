@@ -57,31 +57,60 @@ def initialize():
     pth_file_name = os.path.join(app.main_path, "delftdashboard.pth")
     # Check if pth file exist. If not, give error message and exit
     if not os.path.exists(pth_file_name):
-        print("If you have not yet created a folder for Delft Dashboard (outside of the source folder), please do so.")
-        print("The folder should be called delftdashboard (e.g. d:\work\delftdashboard).")
-        print("You'll need to copy the contents of the ddb folder in the GitHub repository to this new folder.")
-        print("Then create a text file called delftdashboard.pth (in src\delftdashboard) with one line in it: the path to the Delft Dashboard folder (e.g. d:\work\delftdashboard).")
-        print("ERROR: delftdashboard.pth file not found in main folder. Exiting.")
-        exit()
+        # Ask the user to enter a path to the delftdashboard folder
+        print(f"Cannot find the file {pth_file_name} which contains the name of the Delft Dashboard folder where the data will be stored.")
+        print("Please enter a path to the Delft Dashboard folder (e.g. d:\work\delftdashboard):")
+        pth = input()
+        pthfile = open(pth_file_name, "w")
+        pthfile.write(pth)
+        pthfile.close()
+        # print("If you have not yet created a folder for Delft Dashboard (outside of the source folder), please do so.")
+        # print("The folder should be called delftdashboard (e.g. d:\work\delftdashboard).")
+        # print("You'll need to copy the contents of the ddb folder in the GitHub repository to this new folder.")
+        # print("Then create a text file called delftdashboard.pth (in src\delftdashboard) with one line in it: the path to the Delft Dashboard folder (e.g. d:\work\delftdashboard).")
+        # print("ERROR: delftdashboard.pth file not found in main folder. Exiting.")
+        # exit()
     pthfile = open(pth_file_name, "r")
     pth = pthfile.readline().strip()
-    # Replace backslashes with forward slashes
-    pth = pth.replace("\\", "/")
+    # # Replace backslashes with forward slashes
+    # pth = pth.replace("\\", "/")
     app.config["delft_dashboard_path"] = pth
     app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
     pthfile.close()
 
+    # First we check if the folder pth exists. If not, give warning and create it.
+    if not os.path.exists(app.config["delft_dashboard_path"]):
+        print("The folder specified in delftdashboard.pth does not exist. Creating it.")
+        os.mkdir(app.config["delft_dashboard_path"])
+
+    # Now check if the ini file exists. If not, give warning and create it.
+    ini_file_name = os.path.join(app.config["delft_dashboard_path"], "delftdashboard.ini")
+    if not os.path.exists(ini_file_name):
+        print(f"The ini file {ini_file_name} does not exist. It will be created but you'll need to edit it.")
+        inifile = open(ini_file_name, "w")
+        inifile.write("# This file need to be copied to delftdashboard.ini and edited. Please do NOT edit and push this file itself.\n")
+        inifile.write("# Please enter correct Delft Dashboard data path (where the bathymetry and tide models etc are store) and model executable folders.\n")
+        # inifile.write("data_path: c:\\work\\projects\\delftdashboard\\data")
+        inifile.write("sfincs_exe_path: c:\\programs\\sfincs\n")
+        inifile.write("hurrywave_exe_path: c:\\programs\\hurrywave\n")
+        inifile.write("auto_update_bathymetry: true\n")
+        inifile.write("auto_update_tide_models: true\n")
+        inifile.close()
+
     # Read ini file and override stuff in default config dict
     # ini file contains properties that need to be edited by the user !
-    ini_file_name = os.path.join(app.config["delft_dashboard_path"], "delftdashboard.ini")
-    # # Check if there is also a local ini file
-    # if os.path.exists(os.path.join(os.getcwd(), "delftdashboard.ini")):
-    #     ini_file_name = os.path.join(os.getcwd(), "delftdashboard.ini")
     inifile = open(ini_file_name, "r")
     config = yaml.load(inifile, Loader=yaml.FullLoader)
     for key in config:
         app.config[key] = config[key]
     inifile.close()
+
+    # The data path always sits in the delftdashboard folder
+    app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
+
+    # If it does not exist, create it
+    if not os.path.exists(app.config["data_path"]):
+        os.mkdir(app.config["data_path"])
 
     # Initialize GUI object
     app.gui = GUI(app,

@@ -40,6 +40,9 @@ class Toolbox(GenericToolbox):
         # if app.config["auto_update_tide_stations"]:
         #     app.tide_stations_database.check_online_database()
         short_names, long_names = app.tide_stations_database.dataset_names()
+        if len(short_names) == 0:
+            short_names = [" "]
+            long_names = [" "]
         app.gui.setvar("tide_stations", "dataset_long_names", long_names)
         app.gui.setvar("tide_stations", "dataset_names", short_names)
         app.gui.setvar("tide_stations", "dataset_name", short_names[0])
