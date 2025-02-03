@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+version = "0.3.2"
+name = "delftdashboard"
+authors = [
+    {name = "Maarten van Ormondt", email = "maarten.vanormondt@deltares-usa.us"},
+    {name = "Roel de Goede", email = "roel.degoede@deltares.nl"},
+    {name = "Kees Nederhoff", email = "kees.nederhoff@deltares-usa.us"},
+    {name = "Tim Leijnse", email = "tim.leijnse@deltares.nl"},
+    {name = "Panos Athanasiou", email = "panos.athanasiou@deltares.nl"},
+    {name = "Floortje Roelvink", email = "floortje.roelvink@deltares.nl"},
+]
+requires-python = ">=3.10"
+dependencies = [
+    "geopandas",
+    "numpy",
+    "pandas",
+    "pyproj",
+    "shapely",
+    "scipy",
+    "xarray",
+    "matplotlib",
+    "pyyaml",
+	"xugrid",
+    "toml",
+	"guitares"
+]
+
+[tool.setuptools.package-data]
+"delftdashboard.config"    = ["*.ini", "*.qss"]
+"delftdashboard.config.colormaps"    = ["*.txt"]
+"delftdashboard.config.images"    = ["*.png", "*.jpg"]
+"delftdashboard.misc.select_utm_zone"    = ["*.yml"]
+"delftdashboard.misc.cyclone_track_selector"    = ["*.yml"]
+"delftdashboard.models.hurrywave.config"    = ["*.yml"]
+"delftdashboard.models.sfincs_cht.config"    = ["*.yml"]
+"delftdashboard.toolboxes.drawing.config"    = ["*.yml"]
+"delftdashboard.toolboxes.modelmaker_hurrywave.config"    = ["*.yml"]
+"delftdashboard.toolboxes.modelmaker_sfincs_cht.config"    = ["*.yml"]
+"delftdashboard.toolboxes.observation_stations.config"    = ["*.yml"]
+"delftdashboard.toolboxes.tropical_cyclone.config"    = ["*.yml"]
+"delftdashboard.layers.config"    = ["*.yml"]
+"delftdashboard"    = ["*.yml"]

@@ -1,46 +1,168 @@
 [build-system]
-requires = ["setuptools>=42"]
+requires = [
+    "setuptools>=61",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.3.2"
 name = "delftdashboard"
 authors = [
     {name = "Maarten van Ormondt", email = "maarten.vanormondt@deltares-usa.us"},
     {name = "Roel de Goede", email = "roel.degoede@deltares.nl"},
     {name = "Kees Nederhoff", email = "kees.nederhoff@deltares-usa.us"},
     {name = "Tim Leijnse", email = "tim.leijnse@deltares.nl"},
-    {name = "Panos Athanasiou", email = "panos.athanasiou@deltares.nl"},
-    {name = "Floortje Roelvink", email = "floortje.roelvink@deltares.nl"},
+    {name = "Panos Athanasiou", email = "panos.athanasiou@deltares.nl"}
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "geopandas",
+    "geopandas >=0.8",
     "numpy",
     "pandas",
     "pyproj",
+    "plotly",
+    "dask<2024.7.0",# The last version that still supports pandas 1.x, which we need until fiat-toolbox and noaa_cops become compatible with pandas 2.x
+    "rasterio",
     "shapely",
     "scipy",
     "xarray",
+    "wget",
+    "elementpath",
+    "geojson",
+    "Pillow",
     "matplotlib",
-    "pyyaml",
-	"xugrid",
-    "toml",
-	"guitares"
+    "tabulate",
+    "xugrid",
+    "datashader",
+    "pyyaml >= 5.1.1",
+    "mypy",   
+    "pyyaml>=5.1.1",
+    "cartopy>=0.20",
+    "jupyterlab",
+    "descartes",
+    "openpyxl",
+    "tomli",
+    "tomli-w",
+    "guitares@ git+https://github.com/deltares/guitares.git",
+    "cht-observations@ git+https://github.com/deltares/cht_observations.git",
+    "cht_bathymetry@ git+https://github.com/deltares/cht_bathymetry.git",
+    "cht_cyclones@ git+https://github.com/deltares/cht_cyclones.git",
+    "cht_sfincs@ git+https://github.com/deltares/cht_sfincs.git",
+    "cht_delft3dfm@ git+https://github.com/deltares/cht_delft3dfm.git",
+    "cht_utils@ git+https://github.com/deltares/cht_utils.git",
+    "cht_meteo@ git+https://github.com/deltares/cht_meteo.git",
+    "cht_nesting@ git+https://github.com/deltares/cht_nesting.git",
+    "cht_hurrywave@ git+https://github.com/deltares/cht_hurrywave.git",
+    "cht_tide@ git+https://github.com/deltares/cht_tide.git",
+    "cht_tsunami@ git+https://github.com/deltares/cht_tsunami.git",
+    "cht_tiling@ git+https://github.com/deltares/cht_tiling.git",
+    "cht_physics@ git+https://github.com/deltares/cht_physics.git",
+]
+dynamic = [
+    "version",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black      == 24.1.1",
+    "pre-commit == 3.7.1",
+    "ruff       == 0.4.8",
+    "typos      == 1.22.7",
+]
+build = [
+    "build",
+    "pyinstaller==6.7",
+    "pefile<2024.8.26", # This version introduces a significant slowdown in binary vs data reclassification step of pyinstaller. Pyinstaller is aware. https://github.com/pyinstaller/pyinstaller/issues/8762
+    "twine",
+]
+docs = [
+    "jupyter",
+    "jupyter-cache",
+    "matplotlib",
+    "quartodoc",
+    "regex",
+    "pydata-sphinx-theme"
+]
+all = [
+    "delftdashboard[build,dev,docs]",
+]
+
+[project.urls]
+Source = "https://github.com/Deltares-research/DelftDashboard"
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.setuptools.dynamic]
+version = { attr = "delftdashboard.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["delftdashboard*"]
+
 [tool.setuptools.package-data]
-"delftdashboard.config"    = ["*.ini", "*.qss"]
-"delftdashboard.config.colormaps"    = ["*.txt"]
-"delftdashboard.config.images"    = ["*.png", "*.jpg"]
-"delftdashboard.misc.select_utm_zone"    = ["*.yml"]
-"delftdashboard.misc.cyclone_track_selector"    = ["*.yml"]
-"delftdashboard.models.hurrywave.config"    = ["*.yml"]
-"delftdashboard.models.sfincs_cht.config"    = ["*.yml"]
-"delftdashboard.toolboxes.drawing.config"    = ["*.yml"]
-"delftdashboard.toolboxes.modelmaker_hurrywave.config"    = ["*.yml"]
-"delftdashboard.toolboxes.modelmaker_sfincs_cht.config"    = ["*.yml"]
-"delftdashboard.toolboxes.observation_stations.config"    = ["*.yml"]
-"delftdashboard.toolboxes.tropical_cyclone.config"    = ["*.yml"]
-"delftdashboard.layers.config"    = ["*.yml"]
-"delftdashboard"    = ["*.yml"]
+"delftdashboard" = ["**/**.yml", "**/**.ini", "**/**.qss", "config/images/**", "config/colormaps/**"]
+
+[tool.setuptools.exclude-package-data]
+"delftdashboard" = [
+    "**/mapbox_token.txt",
+    "**/census_key.txt",
+    "**/data_catalog.yml",
+    "**/data_catalog_USA.yml",
+    "/env",
+    ]
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+
+[tool.ruff.format]
+docstring-code-format = true
+indent-style = "space"
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/rules/
+select = [
+    "D",
+    "E",
+    "F",
+    "NPY",
+    "PD",
+    "C4",
+    "I",
+]
+ignore = [
+    "D10",
+    "D417",
+
+    "PD010",
+    "PD013",
+    "PD901",
+
+    "E501",
+    "E741",
+]
+fixable = [
+    "I",
+    "F",
+    "D"
+]
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.black]
+line-length = 88
+target-version = [
+    "py311",
+]
+
+[tool.pyright]
+reportDeprecated = true
+
+[tool.typos]
+files.extend-exclude = [
+    "*.js",
+    "*.css",
+]
+files.ignore-hidden = true
