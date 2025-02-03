@@ -71,3 +71,17 @@ element:
     - net
     - bin
     - asc
+  - style: checkbox
+    position:
+      x: 220
+      y: 130
+    text: Store Meteo
+    variable: storemeteo
+    method: set_model_variables
+  - style: checkbox
+    position:
+      x: 220
+      y: 105
+    text: Store Velocity
+    variable: storevel
+    method: set_model_variables

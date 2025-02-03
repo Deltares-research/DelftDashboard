@@ -60,10 +60,15 @@ element:
 - style: checkbox
   text: Wiggle Suppression
   position:
-    x: 200
-    y: 130
-#    width: 60
-#    height: 20
+    x: 100
+    y: 10
   variable: wiggle_suppression
   method: set_model_variables
   tooltip: Turn on or off wiggle suppression (only for subgrid models)
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: bathymetry_type
+      operator: eq
+      value: subgrid

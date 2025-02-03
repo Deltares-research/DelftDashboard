@@ -166,7 +166,7 @@ def generate_boundary_conditions_from_tide_model(*args):
     # Now interpolate tidal data to boundary points
     tide_model_name = app.gui.getvar("sfincs_cht", "boundary_conditions_tide_model")
     gdf = app.model["sfincs_cht"].domain.boundary_conditions.gdf
-    tide_model = app.tide_model_database.get_dataset(tide_model_name)
+    tide_model = app.tide_model_database.get_dataset(tide_model_name)    
     gdf = tide_model.get_data_on_points(gdf=gdf, crs=app.model["sfincs_cht"].domain.crs, format="gdf", constituents="all")
     app.model["sfincs_cht"].domain.boundary_conditions.gdf = gdf
 
@@ -240,19 +240,23 @@ def create_boundary_points(*args):
     if bndfile is None:
         return
 
-    # Write bnd file
-    app.model["sfincs_cht"].domain.input.variables.bndfile = bndfile # file name without path
-    app.gui.setvar("sfincs_cht", "bndfile", bndfile)
-
-    app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_points()
-
     # Create points from mask
     bnd_dist = app.gui.getvar("sfincs_cht", "boundary_dx")
     app.model["sfincs_cht"].domain.boundary_conditions.get_boundary_points_from_mask(bnd_dist=bnd_dist)
     gdf = app.model["sfincs_cht"].domain.boundary_conditions.gdf
+    if len(gdf) == 0:
+        app.gui.window.dialog_info("No boundary points found in mask. Please check mask settings.", title="Warning")        
+        return
+    
     app.map.layer["sfincs_cht"].layer["boundary_points"].set_data(gdf, 0)
     # Set uniform conditions
     app.gui.setvar("sfincs_cht", "boundary_conditions_timeseries_shape", "constant")
+
+    # Write bnd file
+    app.model["sfincs_cht"].domain.input.variables.bndfile = bndfile # file name without path
+    app.gui.setvar("sfincs_cht", "bndfile", bndfile)
+    app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_points()
+
     set_boundary_conditions()
 
     app.gui.setvar("sfincs_cht", "active_boundary_point", 0)

@@ -43,6 +43,7 @@ class Toolbox(GenericToolbox):
         if len(short_names) == 0:
             short_names = [" "]
             long_names = [" "]
+
         app.gui.setvar("tide_stations", "dataset_long_names", long_names)
         app.gui.setvar("tide_stations", "dataset_names", short_names)
         app.gui.setvar("tide_stations", "dataset_name", short_names[0])

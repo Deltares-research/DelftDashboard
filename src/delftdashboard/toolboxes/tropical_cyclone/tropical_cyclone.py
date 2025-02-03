@@ -142,16 +142,43 @@ class Toolbox(GenericToolbox):
 
         # Get the active model
         model = app.active_model
-        if model.name == "sfincs_cht":
+        if model.name == "sfincs_cht":            
             # Add the spw file to the model
-            model.domain.input.variables.spwfile = file_name[2]
-            # And update the GUI variable
+            spw_file = file_name[2] # No path
+            model.domain.input.variables.spwfile = spw_file
             app.gui.setvar("sfincs_cht", "spwfile", spw_file)
+            # Do some other stuff here as well specific to SFINCS
+            # Turn on barometric pressure
+            model.domain.input.variables.baro = True
+            # Turn on meteo output
+            model.domain.input.variables.storemeteo = True
+            # Set the meteo forcing type to spiderweb (used in Meteo tab)
+            app.gui.setvar("sfincs_cht", "meteo_forcing_type", "spiderweb")            
+            # If the CRS of the model is a UTM zone, we need to set the utmzone variable
+            if model.domain.crs.is_projected:
+                # Check name of CRS
+                crs_name = model.domain.crs.name
+                if "UTM" in crs_name:
+                    # Get the UTM zone from the CRS name
+                    utmstr = crs_name.split(" ")[-1]
+                    # Set the UTM zone variable               
+                    model.domain.input.variables.utmzone = utmstr
+
         elif model.name == "hurrywave":
             # Add the spw file to the model
             model.domain.input.variables.spwfile = file_name[2]
             # And update the GUI variable
             app.gui.setvar("hurrywave", "spwfile", spw_file)    
+            # Do some other stuff here as well specific to HurryWave
+            # If the CRS of the model is a UTM zone, we need to set the utmzone variable
+            if model.domain.crs.is_projected:
+                # Check name of CRS
+                crs_name = model.domain.crs.name
+                if "UTM" in crs_name:
+                    # Get the UTM zone from the CRS name
+                    utmstr = crs_name.split(" ")[-1]
+                    # Set the UTM zone variable               
+                    model.domain.input.variables.utmzone = utmstr
 
     def load_track(self):
         # Load the track

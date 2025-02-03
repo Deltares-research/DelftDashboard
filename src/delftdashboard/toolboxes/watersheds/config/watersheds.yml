@@ -52,6 +52,13 @@ element:
       height: 20
     method: save
     text: Save
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_selected_watersheds
+        operator: gt
+        value: 0 
   - style: edit
     position:
       x: 480
