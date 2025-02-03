@@ -1,0 +1,16 @@
+Adding dem or watersheds data: 
+1. make sure the names are exactly: 'dem.tif' or 'watersheds.gpkg'
+2. copy them to FloodAdaptModelBuilder\\data\\topobathy or FloodAdaptModelBuilder\\data\\watersheds
+
+FloodAdaptModelBuilder
+  |-- _internal
+  |    |-- ...
+  |
+  |-- data
+  |    |-- topobathy
+  |    |    |--dem.tif
+  |    |
+  |    |-- watersheds
+  |        |-- watersheds.gpkg 
+  |
+  | -- FloodAdaptModelBuilder.exe
