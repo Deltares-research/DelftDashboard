@@ -33,27 +33,29 @@ class Toolbox(GenericToolbox):
         # Read the database
         if "watersheds_database_path" not in app.config:
             app.config["watersheds_database_path"] = os.path.join(app.config["data_path"], "watersheds")
-        s3_bucket = "deltares-ddb"
+        s3_bucket = app.config["s3_bucket"]
         s3_key = f"data/watersheds"
         app.watersheds_database = WatershedsDatabase(path=app.config["watersheds_database_path"],
                                                      s3_bucket=s3_bucket,
-                                                     s3_key=s3_key)
+                                                     s3_key=s3_key,
+                                                     check_online=False)
 
         short_names, long_names = app.watersheds_database.dataset_names()
-        if len(short_names) == 0:
-            short_names = [" "]
-            long_names = [" "]
 
         # GUI variables
         group = "watersheds"
-        app.gui.setvar(group, "dataset_names", short_names)
-        app.gui.setvar(group, "dataset_long_names", long_names)
-        app.gui.setvar(group, "dataset", short_names[0])
-        app.gui.setvar(group, "buffer", 100.0)
-        app.gui.setvar(group, "level_names", app.watersheds_database.dataset[short_names[0]].level_names)
-        app.gui.setvar(group, "level_long_names", app.watersheds_database.dataset[short_names[0]].level_long_names)
-        app.gui.setvar(group, "level", app.watersheds_database.dataset[short_names[0]].level_names[0])
-        app.gui.setvar(group, "nr_selected_watersheds", 0)
+        if len(short_names) == 0:
+            raise Exception("No datasets found in the watersheds database")
+            return
+        else:
+            app.gui.setvar(group, "dataset_names", short_names)
+            app.gui.setvar(group, "dataset_long_names", long_names)
+            app.gui.setvar(group, "dataset", short_names[0])
+            app.gui.setvar(group, "buffer", 100.0)
+            app.gui.setvar(group, "nr_selected_watersheds", 0)
+            app.gui.setvar(group, "level_names", app.watersheds_database.dataset[short_names[0]].level_names)
+            app.gui.setvar(group, "level_long_names", app.watersheds_database.dataset[short_names[0]].level_long_names)
+            app.gui.setvar(group, "level", app.watersheds_database.dataset[short_names[0]].level_names[0])
 
     def select_tab(self):
         map.update()

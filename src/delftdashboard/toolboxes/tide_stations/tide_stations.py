@@ -32,13 +32,13 @@ class Toolbox(GenericToolbox):
         # Read the database
         if "tide_stations_database_path" not in app.config:
             app.config["tide_stations_database_path"] = os.path.join(app.config["data_path"], "tide_stations")
-        s3_bucket = "deltares-ddb"
+        s3_bucket = app.config["s3_bucket"]
         s3_key = f"data/tide_stations"
         app.tide_stations_database = TideStationsDatabase(path=app.config["tide_stations_database_path"],
                                                           s3_bucket=s3_bucket,
-                                                          s3_key=s3_key)
-        # if app.config["auto_update_tide_stations"]:
-        #     app.tide_stations_database.check_online_database()
+                                                          s3_key=s3_key,
+                                                          check_online=True)
+
         short_names, long_names = app.tide_stations_database.dataset_names()
         if len(short_names) == 0:
             short_names = [" "]

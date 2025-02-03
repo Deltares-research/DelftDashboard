@@ -108,6 +108,9 @@ def initialize():
     # The data path always sits in the delftdashboard folder
     app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
 
+    # Set S3 bucket name
+    app.config["s3_bucket"] = "deltares-ddb"
+
     # If it does not exist, create it
     if not os.path.exists(app.config["data_path"]):
         os.mkdir(app.config["data_path"])
@@ -129,15 +132,12 @@ def initialize():
     # Bathymetry database (initialize local database)
     if "bathymetry_database_path" not in app.config:
         app.config["bathymetry_database_path"] = os.path.join(app.config["data_path"], "bathymetry")
-    s3_bucket = "deltares-ddb"
+    s3_bucket = app.config["s3_bucket"]
     s3_key = f"data/bathymetry"
     app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database_path"],
                                                  s3_bucket=s3_bucket,
-                                                 s3_key=s3_key)
-
-    # Check for changes in online database and download if necessary
-    if app.config["auto_update_bathymetry"]:
-        app.bathymetry_database.check_online_database()
+                                                 s3_key=s3_key,
+                                                 check_online=True)
 
     # Define some other variables
     app.crs = CRS(4326)
@@ -149,13 +149,12 @@ def initialize():
     # Tide model database
     if "tide_model_database_path" not in app.config:
         app.config["tide_model_database_path"] = os.path.join(app.config["data_path"], "tide_models")
-    s3_bucket = "deltares-ddb"
+    s3_bucket = app.config["s3_bucket"]
     s3_key = f"data/tide_models"
     app.tide_model_database = TideModelDatabase(path=app.config["tide_model_database_path"],
                                                 s3_bucket=s3_bucket,
-                                                s3_key=s3_key)
-    if app.config["auto_update_tide_models"]:
-        app.tide_model_database.check_online_database()
+                                                s3_key=s3_key,
+                                                check_online=True)
     short_names, long_names = app.tide_model_database.dataset_names()
     app.gui.setvar("tide_models", "long_names", long_names)
     app.gui.setvar("tide_models", "names", short_names)
@@ -218,23 +217,33 @@ def initialize_toolboxes():
     # Initialize toolboxes
     app.toolbox = {}
     for tlb in app.config["toolbox"]:
-        toolbox_name = tlb["name"]
-        # And initialize this toolbox
-        print("Adding toolbox : " + toolbox_name)
-        module = importlib.import_module("delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name)
-        # Initialize the toolbox
-        app.toolbox[toolbox_name] = module.Toolbox(toolbox_name)
-        # Set the callback module. This is the module that contains the callback functions,
-        # and does not have to be the same as the toolbox module.
-        # This is useful as some toolboxes do not have tabs for which modules are defined,
-        # and the main module can become very busy with all the callbacks and the toolbox object.
-        if app.toolbox[toolbox_name].callback_module_name is None:
-            # Callback module is same as toolbox module            
-            app.toolbox[toolbox_name].callback_module = module
-        else:
-            # Callback module is different from toolbox module
-            app.toolbox[toolbox_name].callback_module = importlib.import_module(f"delftdashboard.toolboxes.{toolbox_name}.{app.toolbox[toolbox_name].callback_module_name}")
-        app.toolbox[toolbox_name].initialize()
+
+        try:
+            toolbox_name = tlb["name"]
+            # And initialize this toolbox
+            print("Adding toolbox : " + toolbox_name)
+            module = importlib.import_module("delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name)
+            # Initialize the toolbox
+            app.toolbox[toolbox_name] = module.Toolbox(toolbox_name)
+            # Set the callback module. This is the module that contains the callback functions,
+            # and does not have to be the same as the toolbox module.
+            # This is useful as some toolboxes do not have tabs for which modules are defined,
+            # and the main module can become very busy with all the callbacks and the toolbox object.
+            if app.toolbox[toolbox_name].callback_module_name is None:
+                # Callback module is same as toolbox module            
+                app.toolbox[toolbox_name].callback_module = module
+            else:
+                # Callback module is different from toolbox module
+                app.toolbox[toolbox_name].callback_module = importlib.import_module(f"delftdashboard.toolboxes.{toolbox_name}.{app.toolbox[toolbox_name].callback_module_name}")
+            app.toolbox[toolbox_name].initialize()
+        
+        # Write error message if toolbox cannot be initialized
+        except Exception as e:
+            print(e)
+            print(f"Error initializing toolbox {toolbox_name}.")
+            # Drop toolbox from dictionary
+            if toolbox_name in app.toolbox:
+                del app.toolbox[toolbox_name]
 
 def initialize_models():
 

@@ -59,13 +59,13 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "rainfall_option_strings", ["IPET"])
 
         # Read track database
-        s3_bucket = "deltares-ddb"
+        s3_bucket = app.config["s3_bucket"]
         s3_key = f"data/tropical_cyclones"
         path = os.path.join(app.config["data_path"], "tropical_cyclones")
         self.cyclone_track_database = CycloneTrackDatabase(path,
                                                            s3_bucket=s3_bucket,
-                                                           s3_key=s3_key)
-        self.cyclone_track_database.check_online_database()
+                                                           s3_key=s3_key,
+                                                           check_online=True)
         short_names, long_names = self.cyclone_track_database.dataset_names()
         app.gui.setvar("tropical_cyclone", "track_dataset_long_names", long_names)
         app.gui.setvar("tropical_cyclone", "track_dataset_names", short_names)
