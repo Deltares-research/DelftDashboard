@@ -177,6 +177,14 @@ element:
     width: 170
     height: 20
   method: generate_bnd_coastline
+- style: pushbutton
+  text: Load bnd
+  position:
+    x: 550
+    y: 50
+    width: 170
+    height: 20
+  method: load_bnd
 # - style: pushbutton
 #   text: Update Mask
 #   position:

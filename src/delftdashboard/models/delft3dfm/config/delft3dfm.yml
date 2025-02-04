@@ -8,10 +8,10 @@ element:
     height: -10
   variable_group: delft3dfm
   tab:
-  - string: Domain
-    module: delftdashboard.models.delft3dfm.domain
-    method: set_model_variables
-    element: domain.yml
+  # - string: Domain
+  #   module: delftdashboard.models.delft3dfm.domain
+  #   method: set_model_variables
+  #   element: domain.yml
   - string: Geometry
     element: geometry.yml
   - string: Time Frame

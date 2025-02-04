@@ -225,7 +225,7 @@ class Model(GenericModel):
         # Write flow.mdu
         self.domain.path = os.getcwd()
         self.domain.write_input_file(input_file=self.domain.fname)
-        self.domain.write_batch_file()
+        # self.domain.write_batch_file()
 
 
     def load(self):
@@ -243,12 +243,9 @@ class Model(GenericModel):
         # app.map.layer["delft3dfm"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
         # app.map.layer["delft3dfm"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
         # Boundary points
-        try:
-            gdf = self.domain.bnd_gdf
-            app.map.layer["delft3dfm"].layer["boundary_line"].clear()
-            app.map.layer["delft3dfm"].layer["boundary_line"].set_data(gdf)
-        except:
-            pass
+        app.map.layer["delft3dfm"].layer["boundary_line"].clear()
+        app.map.layer["delft3dfm"].layer["boundary_line"].set_data(self.domain.boundary_conditions.gdf)
+
         # # Boundary points
         # gdf = self.domain.boundary_conditions.gdf
         # app.map.layer["delft3dfm"].layer["boundary_points"].set_data(gdf, 0)

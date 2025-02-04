@@ -318,9 +318,8 @@ class Toolbox(GenericToolbox):
 
     def generate_bnd_coastline(self):
         dlg = app.gui.window.dialog_wait("Creating open boundary based on coastline ...")
-        bnd=app.model["delft3dfm"].domain.grid.generate_bnd(bnd_withcoastlines = True)
-        app.model["delft3dfm"].domain.bnd_gdf= bnd
-
+        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withcoastlines = True)
+        app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
         # app.model["delft3dfm"].domain.grid.write()
         # Replot everything
         app.model["delft3dfm"].plot()
@@ -329,8 +328,16 @@ class Toolbox(GenericToolbox):
     def generate_bnd_polygon(self):
         dlg = app.gui.window.dialog_wait("Creating open boundary based on polygon ...")
         gdf = self.open_boundary_polygon
-        bnd = app.model["delft3dfm"].domain.grid.generate_bnd(bnd_withpolygon = gdf)
-        app.model["delft3dfm"].domain.bnd_gdf= bnd
+        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withpolygon = gdf)
+        app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
+        # app.model["delft3dfm"].domain.grid.write()
+        # Replot everything
+        app.model["delft3dfm"].plot()
+        dlg.close()
+
+    def load_bnd(self, fname):
+        dlg = app.gui.window.dialog_wait("Loading boundary ...")
+        app.model["delft3dfm"].domain.boundary_conditions.load_bnd(file_name = fname)
         # app.model["delft3dfm"].domain.grid.write()
         # Replot everything
         app.model["delft3dfm"].plot()
@@ -477,6 +484,7 @@ class Toolbox(GenericToolbox):
         gdf = gpd.GeoDataFrame(geometry=self.open_boundary_polygon["geometry"])
         fname = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
+        gdf.to_file(fname, driver='ESRI Shapefile')
 
     def write_outflow_boundary_polygon(self):
         if len(self.outflow_boundary_polygon) == 0:

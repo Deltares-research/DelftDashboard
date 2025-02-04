@@ -35,9 +35,10 @@ def delete_open_boundary_polygon(*args):
     update()
 
 def load_open_boundary_polygon(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select open boundary polygon file ...", filter="*.geojson")
-    if not okay:
-        return
+    fname = app.gui.window.dialog_open_files("Select file ...",
+                                        file_name="coastlines.shp",
+                                        filter= None, #"*.obs",
+                                        allow_directory_change=True)
     app.gui.setvar("modelmaker_delft3dfm", "open_boundary_polygon_file", fname[2])
     app.toolbox["modelmaker_delft3dfm"].read_open_boundary_polygon()
     app.toolbox["modelmaker_delft3dfm"].plot_open_boundary_polygon()
@@ -139,6 +140,13 @@ def generate_bnd_coastline(*args):
 
 def generate_bnd_polygon(*args):
     app.toolbox["modelmaker_delft3dfm"].generate_bnd_polygon()
+    
+def load_bnd(*args):
+    fname = app.gui.window.dialog_open_file("Select file ...",
+                                    file_name="bnd.pli",
+                                    filter= "*.pli",
+                                    allow_directory_change=True)
+    app.toolbox["modelmaker_delft3dfm"].load_bnd(fname[0])
     
 # def update_mask(*args):
 #     app.toolbox["modelmaker_delft3dfm"].update_mask()
