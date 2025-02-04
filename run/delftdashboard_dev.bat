@@ -1,6 +1,6 @@
 @echo OFF
 set CONDAPATH=c:\work\miniconda3
-set ENVNAME=delftdashboard_git
+set ENVNAME=delftdashboard_dev
 
 rem The following command activates the base environment.
 if %ENVNAME%==base (set ENVPATH=%CONDAPATH%) else (set ENVPATH=%CONDAPATH%\envs\%ENVNAME%)
