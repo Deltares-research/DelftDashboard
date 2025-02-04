@@ -22,5 +22,14 @@ def select(*args):
     # Tab selected
     app.toolbox["tropical_cyclone"].set_layer_mode("active")
 
+def edit_variables(*args):
+    pass
+
 def build_spiderweb(*args):
     app.toolbox["tropical_cyclone"].build_spiderweb()
+
+def load_config(*args):
+    app.toolbox["tropical_cyclone"].load_config()
+
+def save_config(*args):
+    app.toolbox["tropical_cyclone"].save_config()

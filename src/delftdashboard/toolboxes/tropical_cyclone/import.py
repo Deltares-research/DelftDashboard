@@ -14,7 +14,7 @@ import geopandas as gpd
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-from cht_cyclones import CycloneTrackDatabase, track_selector
+from cht_cyclones import track_selector
 
 # Callbacks
 
@@ -25,17 +25,30 @@ def select(*args):
     # Show track
     app.toolbox["tropical_cyclone"].set_layer_mode("active")
 
+def select_dataset(*args):
+    pass
+
 def select_track(*args):
 
     # For now, only read in dataset "IBTrACS_NA_v04r00"
-    dataset = app.toolbox["tropical_cyclone"].cyclone_track_database.get_dataset("IBTrACS_NA_v04r00")
+    dataset_name = app.gui.getvar("tropical_cyclone", "selected_track_dataset")
+    dataset = app.toolbox["tropical_cyclone"].cyclone_track_database.get_dataset(dataset_name)
 
     # Open track selector
     tc, okay = track_selector(dataset,
-        app, lon=-80.0, lat=30.0, distance=300.0, year_min=2000, year_max=2023
+        app, lon=125.0, lat=11.0, distance=300.0, year_min=2000, year_max=2023
     )
 
     if okay:
         app.toolbox["tropical_cyclone"].tc = tc
         app.toolbox["tropical_cyclone"].tc.name = app.toolbox["tropical_cyclone"].tc.name.lower()
         app.toolbox["tropical_cyclone"].track_added()
+
+def load_track(*args):
+    app.toolbox["tropical_cyclone"].load_track()
+
+def save_track(*args):
+    app.toolbox["tropical_cyclone"].save_track()
+
+def delete_track(*args):
+    app.toolbox["tropical_cyclone"].delete_track()

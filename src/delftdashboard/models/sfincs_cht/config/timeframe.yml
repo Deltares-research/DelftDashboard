@@ -1,5 +1,6 @@
 element:
 - style: panel
+  title: Time Frame
   position:
     x: 10
     y: 10
@@ -10,7 +11,7 @@ element:
     position:
       x: 80
       y: 130
-      width: 110
+      width: 120
       height: 20
     text: Reference Time
     variable: tref
@@ -19,7 +20,7 @@ element:
     position:
       x: 80
       y: 105
-      width: 110
+      width: 120
       height: 20
     text: Start Time
     variable: tstart
@@ -28,7 +29,7 @@ element:
     position:
       x: 80
       y: 80
-      width: 110
+      width: 120
       height: 20
     text: Stop Time
     variable: tstop

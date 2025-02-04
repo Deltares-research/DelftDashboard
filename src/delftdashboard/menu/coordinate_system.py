@@ -8,6 +8,8 @@ Created on Tue Jul  5 13:40:07 2022
 import os
 
 from delftdashboard.app import app
+from delftdashboard.operations import map
+
 from pyproj import CRS
 
 def wgs84(option):
@@ -52,5 +54,5 @@ def update_crs():
     # Also change the toolbox crs
     for toolbox in app.toolbox:
         app.toolbox[toolbox].set_crs()
-    app.gui.window.update()    
-
+    app.gui.window.update()
+    map.update_statusbar() # Update crs in statusbar

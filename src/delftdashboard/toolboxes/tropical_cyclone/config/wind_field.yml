@@ -1,9 +1,179 @@
 element:
+- style: edit
+  text: Radius
+  position:
+    x: 80
+    y: 110
+    width: 50
+    height: 20
+  variable: spiderweb_radius  
+  tooltip: Spiderweb radius (in kilometres)  
+  method: edit_variables
+- style: edit
+  text: Directional Bins
+  position:
+    x: 80
+    y: 85
+    width: 50
+    height: 20
+  variable: nr_directional_bins
+  tooltip: Number of directional bins
+  method: edit_variables
+- style: edit
+  text: Radial Bins
+  position:
+    x: 80
+    y: 60
+    width: 50
+    height: 20
+  variable: nr_radial_bins
+  tooltip: Number of radial bins
+  method: edit_variables  
+- style: popupmenu
+  text: Wind Profile
+  position:
+    x: 220
+    y: 110
+    width: 150
+    height: 20
+  select: item
+  option_string:
+    variable: wind_profile_option_strings
+  option_value:
+    variable: wind_profile_options
+  variable: wind_profile  
+  tooltip: Select parametric wind profile  
+  method: edit_variables
+- style: popupmenu
+  text: Vmax-Pc Relation
+  position:
+    x: 220
+    y: 85
+    width: 150
+    height: 20
+  select: item
+  option_string:
+    variable: vmax_pc_option_strings
+  option_value:
+    variable: vmax_pc_options
+  variable: wind_pressure_relation
+  tooltip: Select wind speed - central pressure relation
+  method: edit_variables
+- style: popupmenu
+  text: Rmax Relation
+  position:
+    x: 220
+    y: 60
+    width: 150
+    height: 20
+  select: item
+  option_string:
+    variable: rmax_option_strings
+  option_value:
+    variable: rmax_options
+  variable: rmw_relation
+  tooltip: Select radius of maximum winds relation
+  method: edit_variables
+- style: edit
+  text: Pn
+  position:
+    x: 220
+    y: 35
+    width: 60
+    height: 20
+  variable: background_pressure
+  tooltip: Background pressure (in mbar)  
+  method: edit_variables
+- style: edit
+  text: Phi
+  position:
+    x: 310
+    y: 35
+    width: 60
+    height: 20
+  variable: phi_spiral 
+  tooltip: Inflow angle phi (in degrees)  
+  method: edit_variables
+- style: edit
+  text: Wind Factor
+  position:
+    x: 220
+    y: 10
+    width: 60
+    height: 20
+  variable: wind_conversion_factor
+  tooltip: Wind conversion factor (1-minute to 10-minute average)  
+  method: edit_variables
+- style: checkbox
+  text: Rainfall
+  position:
+    x: 460
+    y: 110
+    width: 100
+    height: 20
+  select: item
+  variable: include_rainfall
+  tooltip: Check to include rainfall in spiderweb file
+  method: edit_variables
+- style: popupmenu
+  text: Rainfall Relation
+  position:
+    x: 460
+    y: 85
+    width: 150
+    height: 20
+  select: item
+  option_string:
+    variable: rainfall_option_strings
+  option_value:
+    variable: rainfall_options
+  variable: rainfall_relationship
+  tooltip: Select rainfall relationship 
+  method: edit_variables
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: include_rainfall
+      operator: eq
+      value: true  
+- style: datetimeedit
+  position:
+    x: 460
+    y: 10
+    width: 150
+    height: 20
+  text: Reference Time
+  variable: tref
+  method: edit_variables  
+- style: pushbutton
+  text: Load Configuration
+  position:
+    x: 650
+    y: 110
+    width: 100
+    height: 20
+  method: load_config
+- style: pushbutton
+  text: Save Configuration
+  position:
+    x: 650
+    y: 85
+    width: 100
+    height: 20
+  method: save_config
 - style: pushbutton
   text: Build Spiderweb
   position:
-    x: 20
-    y: 110
-    width: 120
+    x: 650
+    y: 10
+    width: 100
     height: 20
   method: build_spiderweb
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: track_loaded
+      operator: eq
+      value: true  

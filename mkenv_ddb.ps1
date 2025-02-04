@@ -10,6 +10,7 @@ pip install -e c:\work\checkouts\git\guitares
 pip install -e c:\work\checkouts\git\cht_bathymetry
 pip install -e c:\work\checkouts\git\cht_cyclones
 pip install -e c:\work\checkouts\git\cht_sfincs
+pip install -e c:\work\checkouts\git\cht_delft3dfm
 pip install -e c:\work\checkouts\git\cht_utils
 pip install -e c:\work\checkouts\git\cht_meteo
 pip install -e c:\work\checkouts\git\cht_nesting

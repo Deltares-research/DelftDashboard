@@ -1,0 +1,95 @@
+This is a legal agreement between the prospective user, either an individual or an entity, (hereafter: "Licensee") and Deltares (hereafter "Deltares") to license the pre-release computer program subject to this contracting-procedure (hereafter "Pre-Release Software").
+ 
+By clicking on the checkbox with "I Agree" and pressing the "Next" - button:
+
+1.	You expressly declare being authorized to act on behalf of Licensee for the purposes of accepting this Pre-Release Software license agreement (hereafter "Agreement");
+2.	Licensee expressly accepts this Agreement and accepts to be legally bound by the terms and conditions contained therein. 
+
+If you are not authorized to act on behalf of Licensee to agree upon this Agreement or if Licensee does not agree with the Agreement, please do not click the "Next"- button and exit this program by clicking the "Cancel" - button.
+
+
+WHEREAS:
+
+-	Deltares is a not-for-profit independent foundation for applied research in the field of water, subsurface and infrastructure with the mission to expand the scientific knowledge of inland and coastal water systems and to distribute that knowledge worldwide. 
+-	Deltares owns the intellectual property of the computer program being developed by Deltares, as described below, hereinafter referred to as "Pre-Release Software".
+-	The Pre-Release Software is under development by Deltares, has not been tested, verified or validated or whatsoever as standards require and should only be used for internal review, testing and evaluation of functionality of the Pre-Release Software;
+-	Licensee wishes to acquire a non-exclusive and non-transferable license, without the right of sub-licensing, to use internally within the organization of Licensee, the Pre-Release Software for review, testing and evaluation of functionality of the Pre-Release Software.
+-	Deltares grants Licensee a Pre-Release Software Licensing Agreement for the review, testing and evaluation of Pre-Release Software under the following conditions.
+
+
+AGREE AS FOLLOWS:
+
+Article 1  Definitions
+Agreement	This agreement, including the Appendices.
+
+Documentation	The manual or manuals and other documents that correspond to the Pre-Release Software.
+
+Pre-Release Software	The computer program or the computer programs under development as described in Appendix 1 under "Description Pre-Release Software" and the Documentation and later versions of said computer program and Documentation.
+
+Article 2  License
+Deltares grants Licensee for the period starting on the date this "I agree" was clicked until the official release of a maintenance and support version of the Pre-Release Software without a monetary charge, a non-exclusive, non-transferable, non-sub-licensable license to use for the purpose and with the limitations specified in Article 3, the Pre-Release Software, as described below under "Description Pre-Release Software" within the organisation of Licensee.
+
+Article 3  Use of Pre-Release Software and the Documentation 
+1. 	Licensee shall only be authorised to use the Pre-Release Software within its own organisation, for its own use and for review, testing and evaluation of functionality of the Pre-Release Software. Licensee shall not be permitted to make any other use of the Pre-Release Software or to make available or grant access to Pre-Release Software to any third party, subject to article 5 paragraph 1 under b. 
+2. 	Licensee shall not be authorised to modify and/or adjust the Pre-Release Software and/or to (otherwise) carry out alterations to it and/or to integrate the Pre-Release Software in other software, unless and only in so far as Licensee has obtained express written permission to that effect in advance from Deltares. 
+3. 	Licensee shall not be authorised to (have others) copy the Pre-Release Software in any manner whatsoever or to (have others) multiply it (in any other way), except for back-up purposes.
+
+Article 4  Intellectual Property Rights, Ownership 
+1.	Deltares owns the copyright to the Pre-Release Software. With the Agreement Deltares only grants Licensee the license rights in connection with the Pre-Release Software as described in Article 2. Licensee accepts that with this license granted no transfer of ownership whatsoever, including the transfer of the intellectual property rights, is made to Licensee.
+ 
+Article 5  Confidentiality
+1. 	Licensee shall keep confidential the Pre-Release Software which Licensee has obtained and/or obtains, in any manner, from Deltares under or in connection with the Agreement. 
+This obligation shall at any rate include: 
+a. treating of the Pre-Release Software confidentially; 
+b. releasing the Pre-Release Software solely to those employees of Licensees or a third party acting on behalf of Licensee under the conditions of this Agreement who require access to the Pre-Release Software, whereby Licensee will oblige these employees and third parties to the same confidentiality as Licensee;
+c. the non-disclosure of information and/or data related to the Agreement to third parties and/or refraining from making such information and/or data public in any other way without the prior express and written consent of Deltares, to be obtained for each separate event. 
+d. using information and/or data obtained solely for the purposes for which they were obtained.
+2. 	Licensee"s obligation of confidentiality referred to in Article 5.1 shall not apply to information and/or data that were already at Licensee"s free disposal, or were part of the public domain, or were already included in generally accessible literature at the time when they were obtained by Licensee, or that were obtained by Licensee from a third party or third parties who was or were free to disclose the relevant information and/or data and who had not obtained the information and/or data from Deltares.
+3. 	The provisions in this article and article 8 shall remain in full force after termination of the Agreement, as set forth in Article 7, as well.
+
+Article 6  No guarantee, no warrantee 
+The Pre-Release Software is under development by Deltares. Licensee acknowledges and agrees that the Pre-Release Software may contain bugs, defects, errors and may not be expected to function fully upon installation nor that results obtained with the Pre-Release Software are correct or of proper quality. Licensee also acknowledges that Deltares is under no obligation to correct any bugs, defects, or errors in the Pre-Release Software or to otherwise support or maintain the Pre-Release Software.
+
+Article 7  Duration, Termination 
+1. 	The Agreement concluded for the period starting on the date the "I agree" is clicked until the official release of a maintenance and support version of the Pre-Release Software that includes all required functionality, subject to termination in accordance with the provisions of article 7.2 and 7.3. 
+2. 	Parties are entitled without cause being required, to terminate the Agreement in writing within 10 working days after giving notice, without judicial intervention being required.
+3. 	In the event of termination of the Agreement, Licensee shall immediately return to Deltares all copies of Pre-Release Software.
+4. 	In addition, in the event of termination of the Agreement, Licensee shall furthermore immediately cease using (additional copies of) Pre-Release Software and delete Pre-Release Software from (all) their computer(s) and storage devices.
+5. 	"In writing" as mentioned in this article shall also be an e-mail message.
+
+Article 8  Liability
+1. 	Licensee agrees that Deltares (including its personnel and non-employees who (have) undertake(n) activities for Deltares) shall not be responsible to Licensee for any loss-of-profit, direct, indirect, incidental, special or consequential damages, including, but not limited to, loss of profit and revenues, arising out of this Agreement or the use of Pre-Release Software, except for damages caused by wilful act/conduct or gross negligence of Deltares or its personnel.
+2. 	Licensee shall indemnify, hold harmless and defend Deltares against any action brought by a third party against Deltares to the extent that such a claim is connected to the use of the Pre-Release Software by Licensee and/or third parties at whose disposal the Licensee has placed the Pre-Release Software in accordance with this Agreement and/or the results of the use of the Pre Release Software or to whom he has otherwise made them known these results.
+
+Article 9  Other provisions
+1. 	Changes in and/or deviations to the Agreement are valid only if they are explicitly agreed between the parties in writing.
+2. 	The parties are not allowed to assign any rights and/or obligations under the Agreement, entirely or in part, to third parties without the prior written consent of the other party.
+3. 	Parties shall seek to settle any dispute, controversy or claim arising out of or in connection with this Agreement through amicable negotiations. Such effort shall be deemed to have failed when one of the Parties so notifies the other in writing.
+4. 	Subject to the previous paragraph, any disputes arising from the Agreement or from agreements arising there from, shall be submitted solely to the competent court of The Hague.
+5. 	This Agreement and all the agreements arising there from are governed exclusively by Netherlands law.
+
+
+Stichting Deltares
+Boussinesqweg 1
+2629 HV Delft
+The Netherlands
+www.deltares.nl
++31 (0)883358273
+Chamber of Commerce Haaglanden trade register nr 41146461
+
+
+APPENDIX I: Description of Pre-Release Software
+
+FLOODADAPT MODEL-BUILDER
+The FloodAdapt model-builder software contains two model builders: a Delft-FIAT model builder and a SFINCS model builder. It supports users in rapidly creating Delft-FIAT and SFINCS models, which are key components of a FloodAdapt system.
+
+INTENDED USES OF THE FLOODADAPT MODEL-BUILDER
+FloodAdapt is intended to help users get started building a baseline SFINCS and Delft-FIAT model to facilitate the setup of a FloodAdapt system in a new location. These models can be modified and run interactively through a FloodAdapt system. 
+
+FloodAdapt - through its use of SFINCS and Delft-FIAT - allows users to create flood and impact maps for different what-if scenarios. The SFINCS and Delft-FIAT models created with the model-builders can be improved through calibration, validation, and interaction with the local or regional agencies who are using and evaluating FloodAdapt. The accuracy of the SFINCS and Delft-FIAT models will depend on the accuracy of the input data. The FloodAdapt model-builder contains some connections to open-source data for the building of models but provides no guarantee on the correctness of this data. Users should always take care to evaluate the accuracy of the models through validation and to update data sources accordingly. Evaluating historic events in FloodAdapt can help illuminate which data may need improvement and should be collected when resources allow.
+
+The use of SFINCS and Delft-FIAT models through FloodAdapt is not intended for detailed engineering design of adaptation measures. Once these models, through their use via FloodAdapt, have helped the community identify strategies and priority areas for improvements, the specific design requirements for these strategies should be done using more comprehensive modeling tools and accurate data sources.  
+
+QUALITY OF MODEL OUTPUT
+The quality of SFINCS and Delft-FIAT model output is directly related to the quality of the input data. When input data are coarse or uncertain, these models can still provide a meaningful understanding of trends in flooding and impacts under future conditions, identify areas of priority for adaptation, and explore the effectiveness of different adaptation strategies. However, it is important when setting up a FloodAdapt system for users to test the underlying models and to clearly communicate the level of accuracy end-users can expect when using FloodAdapt to support conceptual adaptation planning.
+

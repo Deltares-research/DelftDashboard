@@ -112,7 +112,7 @@ def point_clicked(x, y):
         # Cancel was clicked
         return    
     if name in app.gui.getvar("sfincs_cht", "discharge_point_names"):
-        app.gui.window.dialog_info("An discharge point with this name already exists !")
+        app.gui.window.dialog_info("A discharge point with this name already exists !")
         return
     # Discharge
     qstr, okay = app.gui.window.dialog_string("Edit discharge for new discharge point (m3/s)")

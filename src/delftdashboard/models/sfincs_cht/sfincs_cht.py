@@ -8,9 +8,10 @@ Created on Mon May 10 12:18:09 2021
 import os
 
 from delftdashboard.operations.model import GenericModel
+from delftdashboard.operations import map
 from delftdashboard.app import app
 
-from cht_sfincs.sfincs import SFINCS
+from cht_sfincs import SFINCS
 
 #from hydromt_sfincs import SfincsModel
 
@@ -126,6 +127,19 @@ class Model(GenericModel):
                         line_color_selected="white",
                         fill_color_selected="red")
 
+
+            # Make the layer
+        # Create geodataframe with one point at (0,0), crs(4326)    
+        layer.add_layer(
+                "obs_points",
+                type="marker",
+                hover_property="description",
+                click_property="url",
+                icon_size=0.5,
+                click_popup_width=600,
+                click_popup_height=220,
+            )
+
         from .discharge_points import select_discharge_point_from_map
         layer.add_layer("discharge_points",
                         type="circle_selector",                        
@@ -204,18 +218,17 @@ class Model(GenericModel):
         fname = fname[0]
         if fname:
             dlg = app.gui.window.dialog_wait("Loading SFINCS model ...")
-            self.initialize()
             path = os.path.dirname(fname)
-            self.domain.path = path
-            self.domain.read()
-            # Also get mask datashader dataframe
-            self.domain.mask.get_datashader_dataframe()
-            # self.set_gui_variables()
             # Change working directory
             os.chdir(path)
+            self.initialize()
+            self.domain.path = path
+            self.domain.read()
+            self.set_gui_variables()
+            # Also get mask datashader dataframe (should this not happen when grid is read?)
+            self.domain.mask.get_datashader_dataframe()
             # Change CRS
-            app.crs = self.domain.crs
-            app.map.crs = self.domain.crs
+            map.set_crs(self.domain.crs)
             self.plot()
             dlg.close()
             # Zoom to model extent
@@ -252,6 +265,7 @@ class Model(GenericModel):
         app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(app.model["sfincs_cht"].domain.wave_makers.gdf)
 
     def set_gui_variables(self):
+        """Called after reading the input file to set the GUI variables"""
 
         group = "sfincs_cht"
 
@@ -354,3 +368,11 @@ class Model(GenericModel):
     def set_input_variable(self, gui_variable, value):
         pass
 
+    def add_stations(self, gdf_stations_to_add, naming_option="id"):
+        self.domain.observation_points.add_points(gdf_stations_to_add, name=naming_option)
+        gdf = self.domain.observation_points.gdf
+        app.map.layer["sfincs_cht"].layer["observation_points"].set_data(gdf, 0)
+        if not self.domain.input.variables.obsfile:
+            self.domain.input.variables.obsfile = "sfincs.obs"
+            app.gui.setvar("sfincs_cht", "obsfile", self.domain.input.variables.obsfile)
+        self.domain.observation_points.write()

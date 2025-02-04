@@ -13,6 +13,7 @@ git clone https://github.com/Deltares-research/cht_utils
 git clone https://github.com/Deltares-research/cht_meteo
 git clone https://github.com/Deltares-research/cht_nesting
 git clone https://github.com/Deltares-research/cht_hurrywave
+git clone https://github.com/Deltares-research/cht_delft3dfm
 git clone https://github.com/Deltares-research/cht_tide
 git clone https://github.com/Deltares-research/cht_tsunami
 git clone https://github.com/Deltares-research/cht_tiling

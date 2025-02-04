@@ -1,5 +1,6 @@
 element:
 - style: panel
+  title: Domain
   position:
     x: 10
     y: 10

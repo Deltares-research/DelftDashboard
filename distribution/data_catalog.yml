@@ -1,0 +1,19 @@
+watersheds:
+  crs: 4326
+  data_type: GeoDataFrame
+  driver: vector
+  path: ../../../data/watersheds/watersheds.gpkg
+  meta:
+    category: watersheds
+    source: USGS
+    url: https://www.usgs.gov/national-hydrography/watershed-boundary-dataset
+
+dem:
+  data_type: RasterDataset
+  path: ../../../data/topobathy/dem.tif
+  driver: raster
+  filesystem: local
+  crs: 26918
+  meta:
+    category: topography
+    source: USGS

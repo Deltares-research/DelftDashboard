@@ -6,11 +6,13 @@ Created on Mon May 10 12:18:09 2021
 """
 
 import numpy as np
+import pandas as pd
 import geopandas as gpd
 from pyproj import CRS
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
+from delftdashboard.misc.gdfutils import mpol2pol
 
 from cht_utils.misc_tools import dict2yaml
 from cht_utils.misc_tools import yaml2dict
@@ -46,6 +48,8 @@ class Toolbox(GenericToolbox):
         self.exclude_polygon_snapwave = gpd.GeoDataFrame()
         # Refinement
         self.refinement_levels = []
+        self.refinement_zmin = []
+        self.refinement_zmax = []
         self.refinement_polygon = gpd.GeoDataFrame()
 
         self.setup_dict = {}
@@ -55,7 +59,7 @@ class Toolbox(GenericToolbox):
 
         app.gui.setvar(group, "build_quadtree_grid", True)
         app.gui.setvar(group, "use_snapwave", False)
-        app.gui.setvar(group, "use_subgrid", True)
+        app.gui.setvar(group, "use_subgrid", False)
 
         # Domain
         app.gui.setvar(group, "x0", 0.0)
@@ -77,6 +81,8 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "refinement_polygon_names", [])
         app.gui.setvar(group, "refinement_polygon_index", 0)
         app.gui.setvar(group, "refinement_polygon_level", 0)
+        app.gui.setvar(group, "refinement_polygon_zmin", -99999.0)
+        app.gui.setvar(group, "refinement_polygon_zmax", 99999.0)
         app.gui.setvar(group, "nr_refinement_polygons", 0)
         # Strings for refinement levels
         levstr = []
@@ -85,6 +91,8 @@ class Toolbox(GenericToolbox):
         app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_levels", levstr)    
 
         # Mask
+        app.gui.setvar(group, "zmax",  1000000.0)
+        app.gui.setvar(group, "zmin",  -1000000.0)
         app.gui.setvar(group, "global_zmax",  10.0)
         app.gui.setvar(group, "global_zmin",  -10.0)
         app.gui.setvar(group, "include_polygon_file", "include.geojson")
@@ -150,7 +158,7 @@ class Toolbox(GenericToolbox):
         # Subgrid
         app.gui.setvar(group, "subgrid_nr_bins", 10)
         app.gui.setvar(group, "subgrid_nr_pixels", 20)
-        app.gui.setvar(group, "subgrid_max_dzdv", 5.0)
+        app.gui.setvar(group, "subgrid_max_dzdv", 999.0)
         app.gui.setvar(group, "subgrid_manning_max", 0.024)
         app.gui.setvar(group, "subgrid_manning_z_cutoff", -99999.0)
         app.gui.setvar(group, "subgrid_zmin", -99999.0)
@@ -306,9 +314,16 @@ class Toolbox(GenericToolbox):
             # Iterate through rows and set refinement levels            
             for irow, row in refpol.iterrows():
                 refpol.loc[irow, "refinement_level"] = self.refinement_levels[irow]
+                refpol.loc[irow, "zmin"] = self.refinement_zmin[irow]
+                refpol.loc[irow, "zmax"] = self.refinement_zmax[irow]
 
-        # Build grid 
-        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation, refinement_polygons=refpol)
+        # Build grid
+
+        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation,
+                         refinement_polygons=refpol,
+                         bathymetry_sets=app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets,
+                         bathymetry_database=app.bathymetry_database)
+
         # Save grid 
         model.grid.write()
 
@@ -329,7 +344,10 @@ class Toolbox(GenericToolbox):
         #     # bathy_lst = bth.name
 #        app.model["sfincs_cht"].domain.grid.set_bathymetry(bathy_lst)
         app.model["sfincs_cht"].domain.grid.set_bathymetry(bathymetry_list,
-                                                           bathymetry_database=app.bathymetry_database)
+                                                           bathymetry_database=app.bathymetry_database,
+                                                           zmin=app.gui.getvar("modelmaker_sfincs_cht", "zmin"),
+                                                           zmax=app.gui.getvar("modelmaker_sfincs_cht", "zmax"))
+        app.model["sfincs_cht"].domain.input.variables.qtrfile="sfincs_adjusted.nc"
         app.model["sfincs_cht"].domain.grid.write()
         # If SnapWave also generate SnapWave mesh and save it
         if app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"):
@@ -406,7 +424,8 @@ class Toolbox(GenericToolbox):
         max_dzdv = app.gui.getvar(group, "subgrid_max_dzdv")
         manning_max = app.gui.getvar(group, "subgrid_manning_max")
         manning_z_cutoff = app.gui.getvar(group, "subgrid_manning_z_cutoff")
-        zmin = app.gui.getvar(group, "subgrid_zmin")
+        zmin = app.gui.getvar(group, "zmin")
+        zmax = app.gui.getvar(group, "zmax")
         p = app.gui.window.dialog_progress("               Generating Sub-grid Tables ...                ", 100)
         app.model["sfincs_cht"].domain.subgrid.build(bathymetry_sets,
                                                      roughness_sets,
@@ -418,6 +437,7 @@ class Toolbox(GenericToolbox):
                                                      nr_subgrid_pixels=nr_pixels,
                                                      max_gradient=max_dzdv,
                                                      zmin=zmin,
+                                                     zmax=zmax,
                                                      progress_bar=p)
         p.close()
         app.model["sfincs_cht"].domain.input.variables.sbgfile = "sfincs.sbg"
@@ -436,71 +456,44 @@ class Toolbox(GenericToolbox):
         self.generate_grid()
         self.generate_bathymetry()
         self.update_mask()
-        self.generate_subgrid()
-
-#    def update_polygons(self): # This should really be moved to the callback modules
-
-        # nrp = len(self.include_polygon)
-        # incnames = []
-        # for ip in range(nrp):
-        #     incnames.append(str(ip + 1))
-        # app.gui.setvar("modelmaker_sfincs_cht", "nr_include_polygons", nrp)
-        # app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_names", incnames)
-        # app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_index", max(nrp, 0))
-
-        # nrp = len(self.exclude_polygon)
-        # excnames = []
-        # for ip in range(nrp):
-        #     excnames.append(str(ip + 1))
-        # app.gui.setvar("modelmaker_sfincs_cht", "nr_exclude_polygons", nrp)
-        # app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_names", excnames)
-        # app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_index", max(nrp, 0))
-
-        # nrp = len(self.open_boundary_polygon)
-        # bndnames = []
-        # for ip in range(nrp):
-        #     bndnames.append(str(ip + 1))
-        # app.gui.setvar("modelmaker_sfincs_cht", "nr_open_boundary_polygons", nrp)
-        # app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_names", bndnames)
-
-        # nrp = len(self.outflow_boundary_polygon)
-        # bndnames = []
-        # for ip in range(nrp):
-        #     bndnames.append(str(ip + 1))
-        # app.gui.setvar("modelmaker_sfincs_cht", "nr_outflow_boundary_polygons", nrp)
-        # app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_names", bndnames)
-
-        # nrp = len(self.include_polygon_snapwave)
-        # incnames = []
-        # for ip in range(nrp):
-        #     incnames.append(str(ip + 1))
-        # app.gui.setvar("modelmaker_sfincs_cht", "nr_include_polygons_snapwave", nrp)
-        # app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_names_snapwave", incnames)
-
-        # nrp = len(self.exclude_polygon_snapwave)
-        # excnames = []
-        # for ip in range(nrp):
-        #     excnames.append(str(ip + 1))
-        # app.gui.setvar("modelmaker_sfincs_cht", "nr_exclude_polygons_snapwave", nrp)
-        # app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_names_snapwave", excnames)
-
-        # app.toolbox["modelmaker_sfincs_cht"].write_include_polygon()
-        # app.toolbox["modelmaker_sfincs_cht"].write_exclude_polygon()
-        # app.toolbox["modelmaker_sfincs_cht"].write_boundary_polygon()
+        if app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"):
+            self.update_mask_snapwave()
+        if app.gui.getvar("modelmaker_sfincs_cht", "use_subgrid"):
+            self.generate_subgrid()    
 
     # READ
 
     def read_refinement_polygon(self):
+        # Should we make this part of cht_sfincs?
         fname = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_file")
         self.refinement_polygon = gpd.read_file(fname)
         # Loop through rows in geodataframe and set refinement levels        
         self.refinement_levels = []
+        self.refinement_zmin = []
+        self.refinement_zmax = []
         for i in range(len(self.refinement_polygon)):
-            self.refinement_levels.append(self.refinement_polygon["refinement_level"][i])
+            if "refinement_level" in self.refinement_polygon.columns:
+                self.refinement_levels.append(self.refinement_polygon["refinement_level"][i])
+            else:
+                self.refinement_levels.append(1)
+            if "zmin" in self.refinement_polygon.columns:
+                self.refinement_zmin.append(self.refinement_polygon["zmin"][i])
+            else:
+                self.refinement_zmin.append(-99999.0)
+            if "zmax" in self.refinement_polygon.columns:
+                self.refinement_zmax.append(self.refinement_polygon["zmax"][i])
+            else:
+                self.refinement_zmax.append(99999.0)    
 
-    def read_include_polygon(self):
-        fname = app.gui.getvar("modelmaker_sfincs_cht", "include_polygon_file")
-        self.include_polygon = gpd.read_file(fname)
+    def read_include_polygon(self, fname, append):
+        if not append:
+            # New file
+            app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_file", fname)
+            self.include_polygon = mpol2pol(gpd.read_file(fname))
+        else:
+            # Append to existing file
+            gdf = mpol2pol(gpd.read_file(fname))
+            self.include_polygon = gpd.GeoDataFrame(pd.concat([self.include_polygon, gdf], ignore_index=True))
 
     def read_exclude_polygon(self):
         fname = app.gui.getvar("modelmaker_sfincs_cht", "exclude_polygon_file")
@@ -529,7 +522,9 @@ class Toolbox(GenericToolbox):
             print("No refinement polygons defined")
             return
         gdf = gpd.GeoDataFrame({"geometry": self.refinement_polygon["geometry"],
-                                "refinement_level": self.refinement_levels})
+                                "refinement_level": self.refinement_levels,
+                                "zmin": self.refinement_zmin,
+                                "zmax": self.refinement_zmax})
         # Iterate over all polygons and add refinement level
         # refinement_level = 1 means one level of refinement
         # refinement_level = 2 means two levels of refinement
@@ -616,10 +611,9 @@ class Toolbox(GenericToolbox):
         layer.clear()
         layer.add_feature(self.exclude_polygon_snapwave)
 
-
     def read_setup_yaml(self, file_name):
 
-        # First set some default gui variables
+        # First set some default gui variables (should make this a 'clear' function)
         group = "modelmaker_sfincs_cht"
         app.gui.setvar(group, "refinement_polygon_file", "quadtree.geojson")
         app.gui.setvar(group, "global_zmin", -99999.0)
@@ -764,11 +758,12 @@ class Toolbox(GenericToolbox):
             name = ddict["name"]
             zmin = ddict["zmin"]
             zmax = ddict["zmax"] 
-            dataset = {"dataset": name, "zmin": zmin, "zmax": zmax}
+            dataset = {"name": name, "zmin": zmin, "zmax": zmax}
             app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets.append(dataset)
             dataset_names.append(name)
         app.gui.setvar("modelmaker_sfincs_cht", "selected_bathymetry_dataset_names", dataset_names)
         app.gui.setvar("modelmaker_sfincs_cht", "selected_bathymetry_dataset_index", 0)
+        app.gui.setvar("modelmaker_sfincs_cht", "nr_selected_bathymetry_datasets", len(dataset_names))
 
         layer = app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"]
         lenx = dct["coordinates"]["mmax"] * dct["coordinates"]["dx"]
@@ -778,6 +773,11 @@ class Toolbox(GenericToolbox):
                             lenx, leny,
                             dct["coordinates"]["rotation"])
 
+        # Sub grid
+        if "subgrid" in dct:
+            app.gui.setvar("modelmaker_sfincs_cht", "use_subgrid", True)
+        else:
+            app.gui.setvar("modelmaker_sfincs_cht", "use_subgrid", False)
 
     def write_setup_yaml(self):
         group = "modelmaker_sfincs_cht"

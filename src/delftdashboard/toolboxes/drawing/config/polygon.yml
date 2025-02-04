@@ -1,0 +1,105 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 100
+    height: 110
+  text: Polygons
+  textposition: above
+  method: select_polygon
+  variable: active_polygon
+  select: index
+  option_string:
+    variable: polygon_names
+- style: pushbutton
+  text: Add Polygon
+  position:
+    x: 120
+    y: 100
+    width: 120
+    height: 20
+  method: draw_polygon
+- style: pushbutton
+  text: Delete Polygon
+  position:
+    x: 120
+    y: 75
+    width: 120
+    height: 20
+  method: delete_polygon
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polygons
+      operator: gt
+      value: 0 
+- style: pushbutton
+  text: Load Polygon
+  position:
+    x: 120
+    y: 50
+    width: 120
+    height: 20
+  method: load_polygon
+- style: pushbutton
+  text: Save Polygon
+  position:
+    x: 120
+    y: 25
+    width: 120
+    height: 20
+  method: save_polygon
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polygons
+      operator: gt
+      value: 0 
+- style: pushbutton
+  text: Apply Buffer
+  position:
+    x: 250
+    y: 100
+    width: 120
+    height: 20
+  method: apply_buffer
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polygons
+      operator: gt
+      value: 0 
+- style: edit
+  position:
+    x: 380
+    y: 100
+    width: 50
+    height: 20
+  variable: polygon_buffer_distance
+  method: edit_polygon_buffer_distance
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polygons
+      operator: gt
+      value: 0 
+- style: pushbutton
+  text: Merge Polygons
+  position:
+    x: 250
+    y: 75
+    width: 120
+    height: 20
+  method: merge_polygons
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polygons
+      operator: gt
+      value: 1

@@ -30,6 +30,7 @@ def initialize():
     app.config["server_port"]   = 3000
     app.config["server_nodejs"] = False
     app.config["stylesheet"]    = ""
+    app.config["map_engine"]    = "mapbox"
     app.config["title"]         = "Delft Dashboard"
     app.config["width"]         = 800
     app.config["height"]        = 600
@@ -52,17 +53,67 @@ def initialize():
         app.config[key] = config[key]
     cfgfile.close()
 
+    # First read delftdashboard.pth file. This contains the path to the delftdashboard folder.
+    pth_file_name = os.path.join(app.main_path, "delftdashboard.pth")
+    # Check if pth file exist. If not, give error message and exit
+    if not os.path.exists(pth_file_name):
+        # Ask the user to enter a path to the delftdashboard folder
+        print(f"Cannot find the file {pth_file_name} which contains the name of the Delft Dashboard folder where the data will be stored.")
+        print("Please enter a path to the Delft Dashboard folder (e.g. c:\work\delftdashboard):")
+        pth = input()
+        pthfile = open(pth_file_name, "w")
+        pthfile.write(pth)
+        pthfile.close()
+        # print("If you have not yet created a folder for Delft Dashboard (outside of the source folder), please do so.")
+        # print("The folder should be called delftdashboard (e.g. d:\work\delftdashboard).")
+        # print("You'll need to copy the contents of the ddb folder in the GitHub repository to this new folder.")
+        # print("Then create a text file called delftdashboard.pth (in src\delftdashboard) with one line in it: the path to the Delft Dashboard folder (e.g. d:\work\delftdashboard).")
+        # print("ERROR: delftdashboard.pth file not found in main folder. Exiting.")
+        # exit()
+    pthfile = open(pth_file_name, "r")
+    pth = pthfile.readline().strip()
+    # # Replace backslashes with forward slashes
+    # pth = pth.replace("\\", "/")
+    app.config["delft_dashboard_path"] = pth
+    app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
+    pthfile.close()
+
+    # First we check if the folder pth exists. If not, give warning and create it.
+    if not os.path.exists(app.config["delft_dashboard_path"]):
+        print("The folder specified in delftdashboard.pth does not exist. Creating it.")
+        os.mkdir(app.config["delft_dashboard_path"])
+
+    # Now check if the ini file exists. If not, give warning and create it.
+    ini_file_name = os.path.join(app.config["delft_dashboard_path"], "delftdashboard.ini")
+    if not os.path.exists(ini_file_name):
+        print(f"The ini file {ini_file_name} does not exist. It will be created but you'll need to edit it.")
+        inifile = open(ini_file_name, "w")
+        inifile.write("# This file need to be copied to delftdashboard.ini and edited. Please do NOT edit and push this file itself.\n")
+        inifile.write("# Please enter correct Delft Dashboard data path (where the bathymetry and tide models etc are store) and model executable folders.\n")
+        # inifile.write("data_path: c:\\work\\projects\\delftdashboard\\data")
+        inifile.write("sfincs_exe_path: c:\\programs\\sfincs\n")
+        inifile.write("hurrywave_exe_path: c:\\programs\\hurrywave\n")
+        inifile.write("auto_update_bathymetry: true\n")
+        inifile.write("auto_update_tide_models: true\n")
+        inifile.close()
+
     # Read ini file and override stuff in default config dict
     # ini file contains properties that need to be edited by the user !
-    ini_file_name = os.path.join(app.main_path, "delftdashboard.ini")
-    # Check if there is also a local ini file
-    if os.path.exists(os.path.join(os.getcwd(), "delftdashboard.ini")):
-        ini_file_name = os.path.join(os.getcwd(), "delftdashboard.ini")
     inifile = open(ini_file_name, "r")
     config = yaml.load(inifile, Loader=yaml.FullLoader)
     for key in config:
         app.config[key] = config[key]
     inifile.close()
+
+    # The data path always sits in the delftdashboard folder
+    app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
+
+    # Set S3 bucket name
+    app.config["s3_bucket"] = "deltares-ddb"
+
+    # If it does not exist, create it
+    if not os.path.exists(app.config["data_path"]):
+        os.mkdir(app.config["data_path"])
 
     # Initialize GUI object
     app.gui = GUI(app,
@@ -74,20 +125,19 @@ def initialize():
                   stylesheet=app.config["stylesheet"],
                   icon=app.config["window_icon"],
                   splash_file=app.config["splash_file"],
-                  copy_mapbox_server_folder=True)
+                  map_engine=app.config["map_engine"],
+                  copy_map_server_folder=True
+                  )
 
     # Bathymetry database (initialize local database)
     if "bathymetry_database_path" not in app.config:
         app.config["bathymetry_database_path"] = os.path.join(app.config["data_path"], "bathymetry")
-    s3_bucket = "deltares-ddb"
+    s3_bucket = app.config["s3_bucket"]
     s3_key = f"data/bathymetry"
     app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database_path"],
                                                  s3_bucket=s3_bucket,
-                                                 s3_key=s3_key)
-
-    # Check for changes in online database and download if necessary
-    if app.config["auto_update_bathymetry"]:
-        app.bathymetry_database.check_online_database()
+                                                 s3_key=s3_key,
+                                                 check_online=True)
 
     # Define some other variables
     app.crs = CRS(4326)
@@ -99,13 +149,12 @@ def initialize():
     # Tide model database
     if "tide_model_database_path" not in app.config:
         app.config["tide_model_database_path"] = os.path.join(app.config["data_path"], "tide_models")
-    s3_bucket = "deltares-ddb"
+    s3_bucket = app.config["s3_bucket"]
     s3_key = f"data/tide_models"
     app.tide_model_database = TideModelDatabase(path=app.config["tide_model_database_path"],
                                                 s3_bucket=s3_bucket,
-                                                s3_key=s3_key)
-    if app.config["auto_update_tide_models"]:
-        app.tide_model_database.check_online_database()
+                                                s3_key=s3_key,
+                                                check_online=True)
     short_names, long_names = app.tide_model_database.dataset_names()
     app.gui.setvar("tide_models", "long_names", long_names)
     app.gui.setvar("tide_models", "names", short_names)
@@ -113,7 +162,10 @@ def initialize():
     # Use GUI variables to set the view settings    
 
     # Layer style
-    app.gui.setvar("view_settings", "layer_style", "streets-v12")
+    if app.gui.map_engine == "mapbox":
+        app.gui.setvar("view_settings", "layer_style", "streets-v12")
+    else:
+        app.gui.setvar("view_settings", "layer_style", "osm")
     # Projection
     app.gui.setvar("view_settings", "projection", "mercator")
     # Topography
@@ -165,23 +217,33 @@ def initialize_toolboxes():
     # Initialize toolboxes
     app.toolbox = {}
     for tlb in app.config["toolbox"]:
-        toolbox_name = tlb["name"]
-        # And initialize this toolbox
-        print("Adding toolbox : " + toolbox_name)
-        module = importlib.import_module("delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name)
-        # Initialize the toolbox
-        app.toolbox[toolbox_name] = module.Toolbox(toolbox_name)
-        # Set the callback module. This is the module that contains the callback functions,
-        # and does not have to be the same as the toolbox module.
-        # This is useful as some toolboxes do not have tabs for which modules are defined,
-        # and the main module can become very busy with all the callbacks and the toolbox object.
-        if app.toolbox[toolbox_name].callback_module_name is None:
-            # Callback module is same as toolbox module            
-            app.toolbox[toolbox_name].callback_module = module
-        else:
-            # Callback module is different from toolbox module
-            app.toolbox[toolbox_name].callback_module = importlib.import_module(f"delftdashboard.toolboxes.{toolbox_name}.{app.toolbox[toolbox_name].callback_module_name}")
-        app.toolbox[toolbox_name].initialize()
+
+        try:
+            toolbox_name = tlb["name"]
+            # And initialize this toolbox
+            print("Adding toolbox : " + toolbox_name)
+            module = importlib.import_module("delftdashboard.toolboxes." + toolbox_name + "." + toolbox_name)
+            # Initialize the toolbox
+            app.toolbox[toolbox_name] = module.Toolbox(toolbox_name)
+            # Set the callback module. This is the module that contains the callback functions,
+            # and does not have to be the same as the toolbox module.
+            # This is useful as some toolboxes do not have tabs for which modules are defined,
+            # and the main module can become very busy with all the callbacks and the toolbox object.
+            if app.toolbox[toolbox_name].callback_module_name is None:
+                # Callback module is same as toolbox module            
+                app.toolbox[toolbox_name].callback_module = module
+            else:
+                # Callback module is different from toolbox module
+                app.toolbox[toolbox_name].callback_module = importlib.import_module(f"delftdashboard.toolboxes.{toolbox_name}.{app.toolbox[toolbox_name].callback_module_name}")
+            app.toolbox[toolbox_name].initialize()
+        
+        # Write error message if toolbox cannot be initialized
+        except Exception as e:
+            print(e)
+            print(f"Error initializing toolbox {toolbox_name}.")
+            # Drop toolbox from dictionary
+            if toolbox_name in app.toolbox:
+                del app.toolbox[toolbox_name]
 
 def initialize_models():
 

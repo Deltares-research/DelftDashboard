@@ -69,39 +69,24 @@ def load(*args):
 
 def save(*args, **kwargs):
     map.reset_cursor()
-    # Save both bnd and bzs files
-    # bnd file
-    filename = app.model["sfincs_cht"].domain.input.variables.bndfile
-    if not filename:
-        filename = "sfincs.bnd"
-    rsp = app.gui.window.dialog_save_file("Select file ...",
-                                        file_name=filename,
-                                        filter="*.bnd",
-                                        allow_directory_change=False)
-    if rsp[0]:
-        app.model["sfincs_cht"].domain.input.variables.bndfile = rsp[2] # file name without path
-    else:
-        # User pressed cancel
+
+    # Save both bnd and bzs files (not the bca file for now)
+
+    bndfile = get_bnd_file_name()
+    bzsfile = get_bzs_file_name()
+
+    if bndfile is None or bzsfile is None:
         return
 
-    # bzs file
-    filename = app.model["sfincs_cht"].domain.input.variables.bzsfile
-    if not filename:
-        filename = "sfincs.bzs"
-    rsp = app.gui.window.dialog_save_file("Select file ...",
-                                        file_name=filename,
-                                        filter="*.bzs",
-                                        allow_directory_change=False)
-    if rsp[0]:
-        app.model["sfincs_cht"].domain.input.variables.bzsfile = rsp[2]
-    else:
-        # User pressed cancel
-        return
+    app.model["sfincs_cht"].domain.input.variables.bndfile = bndfile # file name without path
+    app.model["sfincs_cht"].domain.input.variables.bzsfile = bzsfile # file name without path
+    app.gui.setvar("sfincs_cht", "bndfile", bndfile)
+    app.gui.setvar("sfincs_cht", "bzsfile", bzsfile)
 
-    # bca file
-    filename = app.model["sfincs_cht"].domain.input.variables.bcafile
-    if not filename:
-        filename = "sfincs.bca"
+    # # bca file
+    # filename = app.model["sfincs_cht"].domain.input.variables.bcafile
+    # if not filename:
+    #     filename = "sfincs.bca"
 
     # Bca is already saved when generating boundary conditions from tide model.
     # However, if points were added or removed, the astro components should be generated again. But we're not doing that now. Maybe later.
@@ -119,6 +104,7 @@ def save(*args, **kwargs):
     app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_points()
     app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_conditions_timeseries()
     app.model["sfincs_cht"].boundaries_changed = False
+
 
 def add_boundary_point_on_map(*args):
     app.map.click_point(point_clicked)
@@ -151,7 +137,7 @@ def delete_point_from_list(*args):
     app.map.layer["sfincs_cht"].layer["boundary_points"].set_data(gdf, index)
     app.gui.setvar("sfincs_cht", "active_boundary_point", index)
     update_list()
-    # write()
+    app.model["sfincs_cht"].boundaries_changed = True
 
 def update_list():
     # Update boundary point names
@@ -165,49 +151,42 @@ def update_list():
     app.gui.window.update()
 
 def generate_boundary_conditions_from_tide_model(*args):
+
     map.reset_cursor()
-    # Ask for name of bca file
-    filename = app.model["sfincs_cht"].domain.input.variables.bcafile
-    if not filename:
-        filename = "sfincs.bca"
-    rsp = app.gui.window.dialog_save_file("Select file ...",
-                                          file_name=filename,
-                                          filter="*.bca",
-                                          allow_directory_change=False)
-    if not rsp[0]:
-        return
-    app.model["sfincs_cht"].domain.input.variables.bcafile = rsp[2] # file name without path
 
     # Ask for name of bca file
-    filename = app.model["sfincs_cht"].domain.input.variables.bzsfile
-    if not filename:
-        filename = "sfincs.bzs"
-    rsp = app.gui.window.dialog_save_file("Select file ...",
-                                          file_name=filename,
-                                          filter="*.bzs",
-                                          allow_directory_change=False)
-    if not rsp[0]:
+    bcafile = get_bca_file_name()
+
+    if bcafile is None:
         return
-    app.model["sfincs_cht"].domain.input.variables.bzsfile = rsp[2] # file name without path
+
+    app.model["sfincs_cht"].domain.input.variables.bcafile = bcafile # file name without path
+    app.gui.setvar("sfincs_cht", "bcafile", bcafile)
 
     # Now interpolate tidal data to boundary points
     tide_model_name = app.gui.getvar("sfincs_cht", "boundary_conditions_tide_model")
     gdf = app.model["sfincs_cht"].domain.boundary_conditions.gdf
-    tide_model = app.tide_model_database.get_dataset(tide_model_name)
+    tide_model = app.tide_model_database.get_dataset(tide_model_name)    
     gdf = tide_model.get_data_on_points(gdf=gdf, crs=app.model["sfincs_cht"].domain.crs, format="gdf", constituents="all")
     app.model["sfincs_cht"].domain.boundary_conditions.gdf = gdf
+
     # Save bca file
     app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_conditions_astro()
     app.gui.setvar("sfincs_cht", "boundary_conditions_timeseries_shape", "astronomical")
-    set_boundary_conditions()
-    # And the bzs file
-    app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_conditions_timeseries()
-    app.model["sfincs_cht"].boundaries_changed = False
+
+    set_boundary_conditions() # This is where the bzs file gets saved
 
     app.gui.window.update()
 
 def set_boundary_conditions(*args):
     """Set boundary conditions based on the values in the GUI"""
+
+    bzsfile = get_bzs_file_name()
+    if bzsfile is None:
+        return
+
+    app.model["sfincs_cht"].domain.input.variables.bzsfile = bzsfile # file name without path
+    app.gui.setvar("sfincs_cht", "bzsfile", bzsfile)
 
     dlg = app.gui.window.dialog_wait("Generating boundary conditions ...")
 
@@ -231,12 +210,15 @@ def set_boundary_conditions(*args):
                                                                       duration=duration)
     dlg.close()
 
-    app.model["sfincs_cht"].boundaries_changed = True
+    # Save the bzs file
+    app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_conditions_timeseries()
+    app.model["sfincs_cht"].boundaries_changed = False
 
 def view_boundary_conditions(*args):
     print("Viewing boundary conditions not implemented yet")    
 
 def create_boundary_points(*args):
+    
     # First check if there are already boundary points
     if len(app.model["sfincs_cht"].domain.boundary_conditions.gdf.index)>0:
         ok = app.gui.window.dialog_ok_cancel("Existing boundary points will be overwritten! Continue?",                                
@@ -253,17 +235,71 @@ def create_boundary_points(*args):
         ok = app.gui.window.dialog_info("The mask for this domain does not have any open boundary points !",                                
                                     title=" ")
         return
+
+    bndfile = get_bnd_file_name()
+    if bndfile is None:
+        return
+
     # Create points from mask
     bnd_dist = app.gui.getvar("sfincs_cht", "boundary_dx")
     app.model["sfincs_cht"].domain.boundary_conditions.get_boundary_points_from_mask(bnd_dist=bnd_dist)
     gdf = app.model["sfincs_cht"].domain.boundary_conditions.gdf
+    if len(gdf) == 0:
+        app.gui.window.dialog_info("No boundary points found in mask. Please check mask settings.", title="Warning")        
+        return
+    
     app.map.layer["sfincs_cht"].layer["boundary_points"].set_data(gdf, 0)
     # Set uniform conditions
     app.gui.setvar("sfincs_cht", "boundary_conditions_timeseries_shape", "constant")
-    set_boundary_conditions()
 
-    # Save points
-    save()
+    # Write bnd file
+    app.model["sfincs_cht"].domain.input.variables.bndfile = bndfile # file name without path
+    app.gui.setvar("sfincs_cht", "bndfile", bndfile)
+    app.model["sfincs_cht"].domain.boundary_conditions.write_boundary_points()
+
+    set_boundary_conditions()
 
     app.gui.setvar("sfincs_cht", "active_boundary_point", 0)
     update_list()
+
+def get_bnd_file_name(*args):
+    filename = app.model["sfincs_cht"].domain.input.variables.bndfile
+    if not filename:
+        filename = "sfincs.bnd"
+    rsp = app.gui.window.dialog_save_file("Select file ...",
+                                        file_name=filename,
+                                        filter="*.bnd",
+                                        allow_directory_change=False)
+    if rsp[0]:
+        return rsp[2]
+    else:
+        # User pressed cancel
+        return None
+
+def get_bzs_file_name(*args):
+    filename = app.model["sfincs_cht"].domain.input.variables.bzsfile
+    if not filename:
+        filename = "sfincs.bzs"
+    rsp = app.gui.window.dialog_save_file("Select file ...",
+                                        file_name=filename,
+                                        filter="*.bzs",
+                                        allow_directory_change=False)
+    if rsp[0]:
+        return rsp[2]
+    else:
+        # User pressed cancel
+        return None
+
+def get_bca_file_name(*args):
+    filename = app.model["sfincs_cht"].domain.input.variables.bcafile
+    if not filename:
+        filename = "sfincs.bca"
+    rsp = app.gui.window.dialog_save_file("Select file ...",
+                                        file_name=filename,
+                                        filter="*.bca",
+                                        allow_directory_change=False)
+    if rsp[0]:
+        return rsp[2]
+    else:
+        # User pressed cancel
+        return None

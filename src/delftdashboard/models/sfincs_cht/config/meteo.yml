@@ -71,6 +71,7 @@ element:
     filter: "Wind file (*.wnd)"
     title: Select wind file
     tooltipstring: Select wind file
+    method: set_model_variables
     dependency:
     - action: enable
       checkfor: all
@@ -91,6 +92,7 @@ element:
     title: Select AMU file
     tooltipstring: Select AMU file
     filter: "AMU file (*.amu)"
+    method: set_model_variables
     dependency:
     - action: enable
       checkfor: any
@@ -113,6 +115,7 @@ element:
     filter: "AMV file (*.amv)"
     title: Select AMV file
     tooltipstring: Select AMV file
+    method: set_model_variables
     dependency:
     - action: enable
       checkfor: any
@@ -140,10 +143,10 @@ element:
     text: AMP File
     variable: ampfile
     showfilename: True
-    extension: "*.amp"
     title: Select AMP file
     tooltipstring: Select AMP file
     filter: "AMP file (*.amp)"
+    method: set_model_variables
     dependency:
     - action: enable
       checkfor: any
@@ -171,9 +174,10 @@ element:
     text: Precip File
     variable: precipfile
     showfilename: True
-    extension: "*.prc"
+    filter: "Precip file (*.prc)"
     selectiontext: Select precipitation file
     tooltipstring: Select precipitation file
+    method: set_model_variables
     dependency:
     - action: enable
       checkfor: all
@@ -190,9 +194,10 @@ element:
     text: AMPR File
     variable: amprfile
     showfilename: True
-    extension: "*.ampr"
+    filter: "AMPR file (*.ampr)"
     selectiontext: Select AMPR file
     tooltipstring: Select AMPR file
+    method: set_model_variables
     dependency:
     - action: enable
       checkfor: any
@@ -220,9 +225,10 @@ element:
     text: Spiderweb File
     variable: spwfile
     showfilename: True
-    extension: "*.spw"
+    filter: "Spiderweb file (*.spw)"
     selectiontext: Select spiderweb file
     tooltipstring: Select spiderweb file
+    method: set_model_variables
     dependency:
     - action: enable
       checkfor: any

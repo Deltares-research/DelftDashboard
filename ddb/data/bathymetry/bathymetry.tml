@@ -1,0 +1,26 @@
+[[dataset]]
+name = "gebco2024"
+
+[[dataset]]
+name = "cudem_ninth_north_carolina"
+
+[[dataset]]
+name = "cudem_ninth_oregon"
+
+[[dataset]]
+name = "cudem_ninth_wa_outercoast"
+
+[[dataset]]
+name = "cudem_ninth_prusvi"
+
+[[dataset]]
+name = "pibhmc_bathy_60m_guam"
+
+[[dataset]]
+name = "pibhmc_bathy_5m_guam"
+
+[[dataset]]
+name = "usgs_dem_10m_guam"
+
+[[dataset]]
+name = "cudem_ninth_hawaii"

@@ -46,6 +46,14 @@ def build_gui_config():
     app.gui.config["menu"] = []
     app.gui.config["toolbar"] = []
     app.gui.config["element"] = []
+    app.gui.config["statusbar"] = {}
+    app.gui.config["statusbar"]["field"] = []
+    app.gui.config["statusbar"]["field"].append({"id": "crs_name", "text": "WGS 84 (geographic) - EPSG:4326", "width": 12})
+    app.gui.config["statusbar"]["field"].append({"id": "lon", "text": "Lon :", "width": 4})
+    app.gui.config["statusbar"]["field"].append({"id": "lat", "text": "Lat :", "width": 4})
+    app.gui.config["statusbar"]["field"].append({"id": "x", "text": "X :", "width": 4})
+    app.gui.config["statusbar"]["field"].append({"id": "y", "text": "Y :", "width": 4})
+    app.gui.config["statusbar"]["field"].append({"id": "distance", "text": "", "width": 4})
 
     # # Layer tab
     # # Read elements
@@ -60,17 +68,17 @@ def build_gui_config():
         tab_panel["tab"].insert(0, {'string': 'Toolbox', 'element': [], "module": ""})
         app.gui.config["element"].append(app.model[model_name].element)
 
-    # Now add MapBox element
-    mpbox = {}
-    mpbox["style"] = "mapbox"
-    mpbox["id"] = "map"
-    mpbox["position"] = {}
-    mpbox["position"]["x"] = 20
-    mpbox["position"]["y"] = 195
-    mpbox["position"]["width"] = -20
-    mpbox["position"]["height"] = -40
-    mpbox["module"] = "delftdashboard.operations.map"
-    app.gui.config["element"].append(mpbox)
+    # Now add map element
+    mp = {}
+    mp["style"] = "map"
+    mp["id"] = "map"
+    mp["position"] = {}
+    mp["position"]["x"] = 20
+    mp["position"]["y"] = 195
+    mp["position"]["width"] = -20
+    mp["position"]["height"] = -40
+    mp["module"] = "delftdashboard.operations.map"
+    app.gui.config["element"].append(mp)
 
     # Menu
 
@@ -151,20 +159,30 @@ def build_gui_config():
     menu["text"] = "View"
     menu["module"] = "delftdashboard.menu.view"
     menu["menu"] = []
-    menu["menu"].append({"variable_group": "view_settings", "id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]})
-    menu["menu"].append({"variable_group": "view_settings", "id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "globe"}]}]})
+    if app.gui.map_engine == "mapbox":
+        menu["menu"].append({"variable_group": "view_settings", "id": "view.mercator",    "text": "Mercator",   "method": "mercator",   "separator": False, "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "mercator"}]}]})
+        menu["menu"].append({"variable_group": "view_settings", "id": "view.globe",       "text": "Globe",      "method": "globe",      "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "projection", "operator": "eq", "value": "globe"}]}]})
     menu["menu"].append({"variable_group": "view_settings", "id": "view.topography",  "text": "Topography", "method": "topography", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "topography_visible", "operator": "eq", "value": True}]}]})
-    menu["menu"].append({"variable_group": "view_settings", "id": "view.terrain",  "text": "3D Terrain", "method": "terrain", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "terrain_visible", "operator": "eq", "value": True}]}]})
-
+    if app.gui.map_engine == "mapbox":
+        menu["menu"].append({"variable_group": "view_settings", "id": "view.terrain",  "text": "3D Terrain", "method": "terrain", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "terrain_visible", "operator": "eq", "value": True}]}]})
+ 
     layer_style_menu = {}
     layer_style_menu["text"] = "Layer Style"
     layer_style_menu["separator"] = True
     layer_style_menu["menu"] = []
-    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.streets", "text": "Streets", "separator": False,  "checkable": True, "option": "streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "streets-v12"}]}]})
-    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.satellite", "text": "Satellite", "separator": False,  "checkable": True, "option": "satellite-v9", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-v9"}]}]})
-    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.satellite_streets", "text": "Satellite Streets", "separator": False,  "checkable": True, "option": "satellite-streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-streets-v12"}]}]})
-    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.dark", "text": "Dark", "separator": False,  "checkable": True, "option": "dark-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "dark-v11"}]}]})
-    layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.light", "text": "Light", "separator": False,  "checkable": True, "option": "light-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "light-v11"}]}]})
+    if app.gui.map_engine == "mapbox":
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.streets", "text": "Streets", "separator": False,  "checkable": True, "option": "streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "streets-v12"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.satellite", "text": "Satellite", "separator": False,  "checkable": True, "option": "satellite-v9", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-v9"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.satellite_streets", "text": "Satellite Streets", "separator": False,  "checkable": True, "option": "satellite-streets-v12", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "satellite-streets-v12"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.dark", "text": "Dark", "separator": False,  "checkable": True, "option": "dark-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "dark-v11"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.light", "text": "Light", "separator": False,  "checkable": True, "option": "light-v11", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "light-v11"}]}]})
+    elif app.gui.map_engine == "maplibre":
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.streets", "text": "Open Street Map", "separator": False,  "checkable": True, "option": "osm", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "osm"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.arcgishybrid", "text": "ArcGIS Hybrid", "separator": False,  "checkable": True, "option": "arcgishybrid", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "arcgishybrid"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.arcgissatellite", "text": "ArcGIS Satellite", "separator": False,  "checkable": True, "option": "arcgissatellite", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "arcgissatellite"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.darkmatter", "text": "Dark Matter", "separator": False,  "checkable": True, "option": "darkmatter", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "darkmatter"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.positron", "text": "Positron", "separator": False,  "checkable": True, "option": "positron", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "positron"}]}]})
+        layer_style_menu["menu"].append({"variable_group": "view_settings", "id": "view.layer_style.none", "text": "None", "separator": False,  "checkable": True, "option": "none", "method": "layer_style", "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "layer_style", "operator": "eq", "value": "none"}]}]})
     menu["menu"].append(layer_style_menu)
  
     # Add menu items for models

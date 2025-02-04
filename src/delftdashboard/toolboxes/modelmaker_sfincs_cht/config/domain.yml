@@ -63,7 +63,7 @@ element:
   variable: rotation
   method: edit_rotation
 - style: pushbutton
-  text: Draw Layout
+  text: Draw Bounding Box
   position:
     x: 230
     y: 110
