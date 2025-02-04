@@ -102,7 +102,7 @@ where = ["src"]
 include = ["delftdashboard*"]
 
 [tool.setuptools.package-data]
-"delftdashboard" = ["**/**.yml", "**/**.ini", "**/**.qss", "config/images/**", "config/colormaps/**"]
+"delftdashboard" = ["**/**.yml", "**/**.ini", "**/**.qss", "**/**.cfg", "config/images/**", "config/colormaps/**"]
 
 [tool.setuptools.exclude-package-data]
 "delftdashboard" = [

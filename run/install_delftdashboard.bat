@@ -5,6 +5,7 @@ set ENVNAME=delftdashboard_git
 call %CONDAPATH%\Scripts\activate.bat
 
 REM Activate the desired Conda environment
+call conda env remove -n %ENVNAME%
 call conda create -n %ENVNAME% python=3.12 -y
 call conda activate %ENVNAME%
 
