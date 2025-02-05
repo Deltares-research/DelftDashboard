@@ -97,6 +97,15 @@ element:
   text: Sub-Grid Bathymetry
   variable: use_subgrid
   method: use_subgrid
+- style: checkbox
+  position:
+    x: 400
+    y: 50
+    width: 20
+    height: 20
+  text: Show Mask Polygons
+  variable: show_mask_polygons_in_domain_tab
+  method: show_mask_polygons
 - style: pushbutton
   text: Read Set-up File
   position:
