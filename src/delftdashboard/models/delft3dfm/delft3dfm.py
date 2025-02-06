@@ -8,8 +8,10 @@ import os
 #from PyQt5.QtWidgets import QFileDialog
 from pathlib import Path
 
-from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
+from delftdashboard.operations import map
+from delftdashboard.app import app
+
 from cht_delft3dfm.delft3dfm import Delft3DFM
 
 class Model(GenericModel):
@@ -20,17 +22,14 @@ class Model(GenericModel):
         self.long_name = "Delft3D-FM"
 
     def initialize(self):
-
-        print("Model " + self.name + " added!")
-        self.active_domain = 0
-
-        self.initialize_domain()
-
-        self.set_gui_variables()
-
-    def initialize_domain(self):
+        # self.active_domain = 0
         self.domain = Delft3DFM(crs = app.crs)
         self.domain.fname = 'flow.mdu'
+        self.set_gui_variables()
+        self.observation_points_changed = False
+        self.discharge_points_changed = False
+        self.boundaries_changed = False
+        self.thin_dams_changed = False
 
     def add_layers(self):
         # Add main DDB layer
@@ -108,6 +107,14 @@ class Model(GenericModel):
         elif mode == "invisible":
             # Everything set to invisible
             app.map.layer["delft3dfm"].hide()
+
+    def set_crs(self):
+        crs = app.crs
+        old_crs = self.domain.crs
+        if old_crs != crs:
+            self.domain.crs = crs
+            self.domain.clear_spatial_attributes()
+            self.plot()
 
     def set_gui_variables(self):
         group = "delft3dfm"
@@ -230,11 +237,6 @@ class Model(GenericModel):
 
     def load(self):
         self.domain.read()
-
-    def set_crs(self):
-        self.domain.crs = app.crs
-        self.domain.clear_spatial_attributes()
-        self.plot()
 
     def plot(self):
         # Grid
