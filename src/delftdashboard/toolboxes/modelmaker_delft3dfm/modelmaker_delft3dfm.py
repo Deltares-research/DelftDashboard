@@ -24,6 +24,8 @@ class Toolbox(GenericToolbox):
         self.name = name
         self.long_name = "Model Maker"
 
+    def initialize(self):
+
         # Set variables
 
         # Grid outline
@@ -41,22 +43,26 @@ class Toolbox(GenericToolbox):
         self.outflow_boundary_polygon = gpd.GeoDataFrame()
 
         # Refinement
-        self.refinement_levels = []
+        # self.refinement_levels = []
         self.refinement_polygon = gpd.GeoDataFrame()
+        self.refinement_polygon_names = []
+
+        self.refinement_depth = False
+        self.min_edge_size = 500
 
         self.setup_dict = {}
 
         # Set GUI variable
         group = "modelmaker_delft3dfm"
 
-        app.gui.setvar(group, "build_grid", True)
-        app.gui.setvar(group, "use_snapwave", False)
+        # app.gui.setvar(group, "build_grid", True)
+        # app.gui.setvar(group, "use_snapwave", False)
 
         # Domain
-        app.gui.setvar(group, "lon_min", 0.0)
-        app.gui.setvar(group, "lon_max", 0.0)
-        app.gui.setvar(group, "lat_min", 0)
-        app.gui.setvar(group, "lat_max", 0)
+        app.gui.setvar(group, "x0", 0.0)
+        app.gui.setvar(group, "y0", 0.0)
+        app.gui.setvar(group, "nmax", 0)
+        app.gui.setvar(group, "mmax", 0)
 
         if app.crs.is_geographic:
             app.gui.setvar(group, "dx", 0.1)
@@ -66,17 +72,17 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "dy", 1000.0)
 
         # Refinement
-        app.gui.setvar(group, "refinement_min_edge_size", 0) 
+        app.gui.setvar(group, "refinement_depth", 0) 
+        app.gui.setvar(group, "min_edge_size", 0) 
 
         # Polygon refinement
         app.gui.setvar(group, "refinement_polygon_file", "refine.pli")
         app.gui.setvar(group, "refinement_polygon_names", [])
-        app.gui.setvar(group, "refinement_polygon_min_edge_size", 100)
+        app.gui.setvar(group, "refinement_polygon_index", 0)
         app.gui.setvar(group, "refinement_polygon_refinement_type", 1) 
         app.gui.setvar(group, "refinement_polygon_connect_hanging_nodes", 1)
         app.gui.setvar(group, "refinement_polygon_smoothing", 2)
         app.gui.setvar(group, "refinement_polygon_max_courant_time", 2)
-        app.gui.setvar(group, "refinement_polygon_level", 0)
         app.gui.setvar(group, "nr_refinement_polygons", 0)
 
         # Mask
@@ -142,21 +148,21 @@ class Toolbox(GenericToolbox):
 
         ### Mask
         # Include
-        from .mask_active_cells import include_polygon_created
-        from .mask_active_cells import include_polygon_modified
-        from .mask_active_cells import include_polygon_selected
-        layer.add_layer("include_polygon", type="draw",
-                             shape="polygon",
-                             create=include_polygon_created,
-                             modify=include_polygon_modified,
-                             select=include_polygon_selected,
-                             polygon_line_color="limegreen",
-                             polygon_fill_color="limegreen",
-                             polygon_fill_opacity=0.3)
+        # from .mask_active_cells import include_polygon_created
+        # from .mask_active_cells import include_polygon_modified
+        # from .mask_active_cells import include_polygon_selected
+        # layer.add_layer("include_polygon", type="draw",
+        #                      shape="polygon",
+        #                      create=include_polygon_created,
+        #                      modify=include_polygon_modified,
+        #                      select=include_polygon_selected,
+        #                      polygon_line_color="limegreen",
+        #                      polygon_fill_color="limegreen",
+        #                      polygon_fill_opacity=0.3)
         # Exclude
-        from .mask_active_cells import exclude_polygon_created
-        from .mask_active_cells import exclude_polygon_modified
-        from .mask_active_cells import exclude_polygon_selected
+        from .exclude import exclude_polygon_created
+        from .exclude import exclude_polygon_modified
+        from .exclude import exclude_polygon_selected
         layer.add_layer("exclude_polygon", type="draw",
                              shape="polygon",
                              create=exclude_polygon_created,
@@ -166,9 +172,9 @@ class Toolbox(GenericToolbox):
                              polygon_fill_color="orangered",
                              polygon_fill_opacity=0.3)
         # Boundary
-        from .mask_boundary_cells import open_boundary_polygon_created
-        from .mask_boundary_cells import open_boundary_polygon_modified
-        from .mask_boundary_cells import open_boundary_polygon_selected
+        from .boundary import open_boundary_polygon_created
+        from .boundary import open_boundary_polygon_modified
+        from .boundary import open_boundary_polygon_selected
         layer.add_layer("open_boundary_polygon", type="draw",
                              shape="polygon",
                              create=open_boundary_polygon_created,
@@ -179,36 +185,36 @@ class Toolbox(GenericToolbox):
                              polygon_fill_opacity=0.3)
 
         # Outflow boundary
-        from .mask_boundary_cells import outflow_boundary_polygon_created
-        from .mask_boundary_cells import outflow_boundary_polygon_modified
-        from .mask_boundary_cells import outflow_boundary_polygon_selected
-        layer.add_layer("outflow_boundary_polygon", type="draw",
-                             shape="polygon",
-                             create=outflow_boundary_polygon_created,
-                             modify=outflow_boundary_polygon_modified,
-                             select=outflow_boundary_polygon_selected,
-                             polygon_line_color="red",
-                             polygon_fill_color="orange",
-                             polygon_fill_opacity=0.3)
+        # from .mask_boundary_cells import outflow_boundary_polygon_created
+        # from .mask_boundary_cells import outflow_boundary_polygon_modified
+        # from .mask_boundary_cells import outflow_boundary_polygon_selected
+        # layer.add_layer("outflow_boundary_polygon", type="draw",
+        #                      shape="polygon",
+        #                      create=outflow_boundary_polygon_created,
+        #                      modify=outflow_boundary_polygon_modified,
+        #                      select=outflow_boundary_polygon_selected,
+        #                      polygon_line_color="red",
+        #                      polygon_fill_color="orange",
+        #                      polygon_fill_opacity=0.3)
 
         # Exclude
-        from .mask_active_cells_snapwave import exclude_polygon_created_snapwave
-        from .mask_active_cells_snapwave import exclude_polygon_modified_snapwave
-        from .mask_active_cells_snapwave import exclude_polygon_selected_snapwave
-        layer.add_layer("exclude_polygon_snapwave", type="draw",
-                             shape="polygon",
-                             create=exclude_polygon_created_snapwave,
-                             modify=exclude_polygon_modified_snapwave,
-                             select=exclude_polygon_selected_snapwave,
-                             polygon_line_color="orangered",
-                             polygon_fill_color="orangered",
-                             polygon_fill_opacity=0.3)
+        # from .mask_active_cells_snapwave import exclude_polygon_created_snapwave
+        # from .mask_active_cells_snapwave import exclude_polygon_modified_snapwave
+        # from .mask_active_cells_snapwave import exclude_polygon_selected_snapwave
+        # layer.add_layer("exclude_polygon_snapwave", type="draw",
+        #                      shape="polygon",
+        #                      create=exclude_polygon_created_snapwave,
+        #                      modify=exclude_polygon_modified_snapwave,
+        #                      select=exclude_polygon_selected_snapwave,
+        #                      polygon_line_color="orangered",
+        #                      polygon_fill_color="orangered",
+        #                      polygon_fill_opacity=0.3)
 
         # Refinement polygons
-        from .quadtree import refinement_polygon_created
-        from .quadtree import refinement_polygon_modified
-        from .quadtree import refinement_polygon_selected
-        layer.add_layer("quadtree_refinement", type="draw",
+        from .refinement import refinement_polygon_created
+        from .refinement import refinement_polygon_modified
+        from .refinement import refinement_polygon_selected
+        layer.add_layer("polygon_refinement", type="draw",
                              shape="polygon",
                              create=refinement_polygon_created,
                              modify=refinement_polygon_modified,
@@ -230,6 +236,7 @@ class Toolbox(GenericToolbox):
     def generate_grid(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Generating grid ...")
+        self.clear_layers()
         model = app.model["delft3dfm"].domain
         model.clear_spatial_attributes()    
         x0       = app.gui.getvar(group, "x0")
@@ -238,29 +245,64 @@ class Toolbox(GenericToolbox):
         dy       = app.gui.getvar(group, "dy")
         nmax     = app.gui.getvar(group, "nmax")
         mmax     = app.gui.getvar(group, "mmax")
-        rotation = app.gui.getvar(group, "rotation")
-        model.input.variables.qtrfile = "sfincs.nc"
-        app.gui.setvar("delft3dfm", "qtrfile", model.input.variables.qtrfile)
+        rotation = 0
+        model.input.geometry.netfile.filepath = "flow_net.nc"
+        app.gui.setvar("delft3dfm", "netfile", model.input.geometry.netfile.filepath)
 
-        if len(self.refinement_polygon) == 0:
-            refpol = None
-        else:
-            # Make list of separate gdfs for each polygon
-            refpol = self.refinement_polygon
-            # Add refinement_level column
-            refpol["refinement_level"] = 0
-            # Iterate through rows and set refinement levels            
-            for irow, row in refpol.iterrows():
-                refpol.loc[irow, "refinement_level"] = self.refinement_levels[irow]
+        # if len(self.refinement_polygon) == 0:
+        #     refpol = None
+        # else:
+        #     # Make list of separate gdfs for each polygon
+        #     refpol = self.refinement_polygon
 
         # Build grid 
-        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation, refinement_polygons=refpol)
+        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+        model.grid.build(x0, y0, nmax, mmax, dx, dy, bathymetry_list=bathymetry_list, bathymetry_database=app.bathymetry_database)
         # Save grid 
         model.grid.write()
 
-        # If SnapWave also generate SnapWave mesh and save it
-        if app.gui.getvar(group, "use_snapwave"):
-            snapwave_quadtree2mesh(model.grid, file_name="snapwave.nc")
+        # Replot everything
+        app.model["delft3dfm"].plot()
+
+        dlg.close()
+
+    def generate_depth_refinement(self):
+        group = "modelmaker_delft3dfm"
+        dlg = app.gui.window.dialog_wait("Generating refinement ...")
+        model = app.model["delft3dfm"].domain
+        
+        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+
+        if bathymetry_list:
+            model.grid.refine_depth(bathymetry_list, bathymetry_database=app.bathymetry_database)
+            
+            # Interpolate bathymetry onto the grid
+            model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
+        
+            # Save grid 
+            model.grid.write()
+
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        else:
+            print("No bathymetry selected")
+
+        dlg.close()
+
+    def generate_polygon_refinement(self):
+        group = "modelmaker_delft3dfm"
+        dlg = app.gui.window.dialog_wait("Generating refinement ...")
+        model = app.model["delft3dfm"].domain
+        
+        model.grid.refine_polygon(gdf = self.refinement_polygon.geometry)
+        
+        # Interpolate bathymetry onto the grid
+        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+        if bathymetry_list:
+            model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
+      
+        # Save grid 
+        model.grid.write()
 
         # Replot everything
         app.model["delft3dfm"].plot()
@@ -270,108 +312,59 @@ class Toolbox(GenericToolbox):
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
         bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
-        app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list)
+        app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
         app.model["delft3dfm"].domain.grid.write()
-        # If SnapWave also generate SnapWave mesh and save it
-        if app.gui.getvar("modelmaker_delft3dfm", "use_snapwave"):
-            snapwave_quadtree2mesh(app.model["delft3dfm"].domain.grid, file_name="snapwave.nc")
         dlg.close()
 
-    def update_mask(self):
-        # Should improve on this check
-        grid = app.model["delft3dfm"].domain.grid
-        mask = app.model["delft3dfm"].domain.mask
-        z    = app.model["delft3dfm"].domain.grid.data["z"]
-        if np.all(np.isnan(z)):
-            app.gui.window.dialog_warning("Please first generate a bathymetry !")
-            return
-        dlg = app.gui.window.dialog_wait("Updating mask ...")
-        mask.build(zmin=app.gui.getvar("modelmaker_delft3dfm", "global_zmin"),
-                   zmax=app.gui.getvar("modelmaker_delft3dfm", "global_zmax"),
-                   include_polygon=app.toolbox["modelmaker_delft3dfm"].include_polygon,
-                   include_zmin=app.gui.getvar("modelmaker_delft3dfm", "include_zmin"),
-                   include_zmax=app.gui.getvar("modelmaker_delft3dfm", "include_zmax"),
-                   exclude_polygon=app.toolbox["modelmaker_delft3dfm"].exclude_polygon,
-                   exclude_zmin=app.gui.getvar("modelmaker_delft3dfm", "exclude_zmin"),
-                   exclude_zmax=app.gui.getvar("modelmaker_delft3dfm", "exclude_zmax"),
-                   open_boundary_polygon=app.toolbox["modelmaker_delft3dfm"].open_boundary_polygon,
-                   open_boundary_zmin=app.gui.getvar("modelmaker_delft3dfm", "open_boundary_zmin"),
-                   open_boundary_zmax=app.gui.getvar("modelmaker_delft3dfm", "open_boundary_zmax"),
-                   outflow_boundary_polygon=app.toolbox["modelmaker_delft3dfm"].outflow_boundary_polygon,
-                   outflow_boundary_zmin=app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_zmin"),
-                   outflow_boundary_zmax=app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_zmax")
-                   )
-        app.map.layer["delft3dfm"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
-        app.map.layer["delft3dfm"].layer["mask_open_boundary"].set_data(mask.to_gdf(option="open"))
-        app.map.layer["delft3dfm"].layer["mask_outflow_boundary"].set_data(mask.to_gdf(option="outflow"))
-
-        if app.model["delft3dfm"].domain.grid_type == "quadtree":
-            grid.write() # Write new qtr file
-        else:
-            mask.write() # Write mask, index and depth files    
-
+    def generate_bnd_coastline(self):
+        dlg = app.gui.window.dialog_wait("Creating open boundary based on coastline ...")
+        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withcoastlines = True)
+        app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
+        # app.model["delft3dfm"].domain.grid.write()
+        # Replot everything
+        app.model["delft3dfm"].plot()
         dlg.close()
 
-    def update_mask_snapwave(self):
-        grid = app.model["delft3dfm"].domain.grid
-        mask = app.model["delft3dfm"].domain.snapwave.mask
-        if np.all(np.isnan(grid.data["z"])):
-            app.gui.window.dialog_warning("Please first generate a bathymetry !")
-            return
-        dlg = app.gui.window.dialog_wait("Updating SnapWave mask ...")
-        mask.build(zmin=app.gui.getvar("modelmaker_delft3dfm", "global_zmin_snapwave"),
-                   zmax=app.gui.getvar("modelmaker_delft3dfm", "global_zmax_snapwave"),
-                   include_polygon=app.toolbox["modelmaker_delft3dfm"].include_polygon_snapwave,
-                   include_zmin=app.gui.getvar("modelmaker_delft3dfm", "include_zmin_snapwave"),
-                   include_zmax=app.gui.getvar("modelmaker_delft3dfm", "include_zmax_snapwave"),
-                   exclude_polygon=app.toolbox["modelmaker_delft3dfm"].exclude_polygon_snapwave,
-                   exclude_zmin=app.gui.getvar("modelmaker_delft3dfm", "exclude_zmin_snapwave"),
-                   exclude_zmax=app.gui.getvar("modelmaker_delft3dfm", "exclude_zmax_snapwave")
-                   )
-        app.map.layer["delft3dfm"].layer["mask_include_snapwave"].set_data(mask.to_gdf(option="include"))
-        if not app.model["delft3dfm"].domain.input.variables.snapwave_mskfile:
-            app.model["delft3dfm"].domain.input.variables.snapwave_mskfile = "snapwave.msk"
-        grid.write()
-        # GUI variables
-        app.gui.setvar("delft3dfm", "snapwave_mskfile", app.model["delft3dfm"].domain.input.variables.snapwave_mskfile)
+    def generate_bnd_polygon(self):
+        dlg = app.gui.window.dialog_wait("Creating open boundary based on polygon ...")
+        gdf = self.open_boundary_polygon
+        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withpolygon = gdf)
+        app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
+        # app.model["delft3dfm"].domain.grid.write()
+        # Replot everything
+        app.model["delft3dfm"].plot()
         dlg.close()
 
-    def generate_subgrid(self):
-        group = "modelmaker_delft3dfm"
-        bathymetry_sets = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
-        roughness_sets = []
-        nr_bins = app.gui.getvar(group, "subgrid_nr_bins")
-        nr_pixels = app.gui.getvar(group, "subgrid_nr_pixels")
-        max_dzdv = app.gui.getvar(group, "subgrid_max_dzdv")
-        manning_max = app.gui.getvar(group, "subgrid_manning_max")
-        manning_z_cutoff = app.gui.getvar(group, "subgrid_manning_z_cutoff")
-        zmin = app.gui.getvar(group, "subgrid_zmin")
-        p = app.gui.window.dialog_progress("               Generating Sub-grid Tables ...                ", 100)
-        app.model["delft3dfm"].domain.subgrid.build(bathymetry_sets,
-                                                     roughness_sets,
-                                                     nr_bins=nr_bins,
-                                                     nr_subgrid_pixels=nr_pixels,
-                                                     max_gradient=max_dzdv,
-                                                     zmin=zmin,
-                                                     progress_bar=p)
-        app.model["delft3dfm"].domain.input.variables.sbgfile = "sfincs.sbg"
-        app.gui.setvar("delft3dfm", "sbgfile", app.model["delft3dfm"].domain.input.variables.sbgfile)
-        app.gui.setvar("delft3dfm", "bathymetry_type", "subgrid")
+    def load_bnd(self, fname):
+        dlg = app.gui.window.dialog_wait("Loading boundary ...")
+        app.model["delft3dfm"].domain.boundary_conditions.load_bnd(file_name = fname)
+        # app.model["delft3dfm"].domain.grid.write()
+        # Replot everything
+        app.model["delft3dfm"].plot()
+        dlg.close()
 
-    def cut_inactive_cells(self):
-        dlg = app.gui.window.dialog_wait("Cutting Inactive Cells ...")
-        app.model["delft3dfm"].domain.grid.cut_inactive_cells()
+    def cut_polygon(self):
+        dlg = app.gui.window.dialog_wait("Cutting Cells based on polygon ...")
+        gdf = self.exclude_polygon
+        app.model["delft3dfm"].domain.grid.delete_cells(delete_withpolygon = gdf)
         app.model["delft3dfm"].domain.grid.write()
         # Replot everything
         app.model["delft3dfm"].plot()
         dlg.close()
 
+    def cut_coastline(self):
+        dlg = app.gui.window.dialog_wait("Cutting Cells based on coastline ...")
+        app.model["delft3dfm"].domain.grid.delete_cells(delete_withcoastlines=True)
+        app.model["delft3dfm"].domain.grid.write()
+        # Replot everything
+        app.model["delft3dfm"].plot()
+        dlg.close()
 
     def build_model(self):
         self.generate_grid()
         self.generate_bathymetry()
-        self.update_mask()
-        self.generate_subgrid()
+        # self.update_mask()
+        # self.generate_subgrid()
 
 #    def update_polygons(self): # This should really be moved to the callback modules
 
@@ -428,10 +421,11 @@ class Toolbox(GenericToolbox):
     def read_refinement_polygon(self):
         fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_file")
         self.refinement_polygon = gpd.read_file(fname)
-        # Loop through rows in geodataframe and set refinement levels        
-        self.refinement_levels = []
+        # app.toolbox["modelmaker_delft3dfm"].refinement_polygon_names.append(fname)
+        # # Loop through rows in geodataframe and set refinement polygon names        
+        self.refinement_polygon_names = []
         for i in range(len(self.refinement_polygon)):
-            self.refinement_levels.append(self.refinement_polygon["refinement_level"][i])
+            self.refinement_polygon_names.append(self.refinement_polygon["refinement_polygon_name"][i])
 
     def read_include_polygon(self):
         fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file")
@@ -464,11 +458,9 @@ class Toolbox(GenericToolbox):
             print("No refinement polygons defined")
             return
         gdf = gpd.GeoDataFrame({"geometry": self.refinement_polygon["geometry"],
-                                "refinement_level": self.refinement_levels})
-        # Iterate over all polygons and add refinement level
-        # refinement_level = 1 means one level of refinement
-        # refinement_level = 2 means two levels of refinement
-        # etc.
+                                "refinement_polygon_name": self.refinement_polygon_names})
+        # index = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_index")
+        # fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_names")
         fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
 
@@ -492,6 +484,7 @@ class Toolbox(GenericToolbox):
         gdf = gpd.GeoDataFrame(geometry=self.open_boundary_polygon["geometry"])
         fname = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
+        gdf.to_file(fname, driver='ESRI Shapefile')
 
     def write_outflow_boundary_polygon(self):
         if len(self.outflow_boundary_polygon) == 0:
@@ -517,7 +510,7 @@ class Toolbox(GenericToolbox):
     # PLOT
 
     def plot_refinement_polygon(self):
-        layer = app.map.layer["modelmaker_delft3dfm"].layer["quadtree_refinement"]
+        layer = app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"]
         layer.clear()
         layer.add_feature(self.refinement_polygon)
 
@@ -699,8 +692,7 @@ class Toolbox(GenericToolbox):
             name = ddict["name"]
             zmin = ddict["zmin"]
             zmax = ddict["zmax"] 
-            d = bathymetry_database.get_dataset(name)
-            dataset = {"dataset": d, "zmin": zmin, "zmax": zmax}
+            dataset = {"dataset": name, "zmin": zmin, "zmax": zmax}
             app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets.append(dataset)
             dataset_names.append(name)
         app.gui.setvar("modelmaker_delft3dfm", "selected_bathymetry_dataset_names", dataset_names)

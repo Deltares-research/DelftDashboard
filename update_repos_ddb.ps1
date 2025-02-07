@@ -3,7 +3,7 @@
 # cd c:\work\cosmos\run_folder
 # ./pull_repos.ps1
 
-$repos_path = "c:\work\checkouts\git"
+$repos_path = "c:\git"
 
 cd $repos_path\cht_bathymetry
 git pull 
@@ -20,6 +20,8 @@ git pull
 cd $repos_path\cht_nesting
 git pull 
 cd $repos_path\cht_hurrywave
+git pull 
+cd $repos_path\cht_delft3dfm
 git pull 
 cd $repos_path\cht_tide
 git pull 

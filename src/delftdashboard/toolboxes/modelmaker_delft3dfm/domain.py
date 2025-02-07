@@ -16,47 +16,46 @@ def select(*args):
     # De-activate() existing layers
     map.update()
     # Show the grid outline layer
-    app.map.layer["sfincs_cht"].layer["grid"].activate()
-    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].activate()
+    app.map.layer["delft3dfm"].layer["grid"].show()
+    app.map.layer["modelmaker_delft3dfm"].layer["grid_outline"].activate()
 
 
 def draw_grid_outline(*args):
     # Clear grid outline layer
-    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].crs = app.crs
-    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].draw()
+    app.map.layer["modelmaker_delft3dfm"].layer["grid_outline"].crs = app.crs
+    app.map.layer["modelmaker_delft3dfm"].layer["grid_outline"].draw()
 
 
 def grid_outline_created(gdf, index, id):
     if len(gdf) > 1:
         # Remove the old grid outline
         id0 = gdf["id"][0]
-        app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].delete_feature(id0)
+        app.map.layer["modelmaker_delft3dfm"].layer["grid_outline"].delete_feature(id0)
         gdf = gdf.drop([0]).reset_index()
-    app.toolbox["modelmaker_sfincs_cht"].grid_outline = gdf
+    app.toolbox["modelmaker_delft3dfm"].grid_outline = gdf
     update_geometry()
     app.gui.window.update()
 
 
 def grid_outline_modified(gdf, index, id):
-    app.toolbox["modelmaker_sfincs_cht"].grid_outline = gdf
+    app.toolbox["modelmaker_delft3dfm"].grid_outline = gdf
     update_geometry()
     app.gui.window.update()
 
 
 def generate_grid(*args):
-    app.toolbox["modelmaker_sfincs_cht"].generate_grid()
-
+    app.toolbox["modelmaker_delft3dfm"].generate_grid()
 
 def update_geometry():
-    gdf = app.toolbox["modelmaker_sfincs_cht"].grid_outline
-    group = "modelmaker_sfincs_cht"
+    gdf = app.toolbox["modelmaker_delft3dfm"].grid_outline
+    group = "modelmaker_delft3dfm"
     app.gui.setvar(group, "x0", round(gdf["x0"][0], 3))
     app.gui.setvar(group, "y0", round(gdf["y0"][0], 3))
     lenx = gdf["dx"][0]
     leny = gdf["dy"][0]
-    app.toolbox["modelmaker_sfincs_cht"].lenx = lenx
-    app.toolbox["modelmaker_sfincs_cht"].leny = leny
-    app.gui.setvar(group, "rotation", round(gdf["rotation"][0] * 180 / math.pi, 1))
+    app.toolbox["modelmaker_delft3dfm"].lenx = lenx
+    app.toolbox["modelmaker_delft3dfm"].leny = leny
+    app.gui.setvar(group, "rotation",0)
     app.gui.setvar(
         group, "nmax", np.floor(leny / app.gui.getvar(group, "dy")).astype(int)
     )
@@ -78,9 +77,9 @@ def edit_rotation(*args):
 
 
 def edit_dxdy(*args):
-    group = "modelmaker_sfincs_cht"
-    lenx = app.toolbox["modelmaker_sfincs_cht"].lenx
-    leny = app.toolbox["modelmaker_sfincs_cht"].leny
+    group = "modelmaker_delft3dfm"
+    lenx = app.toolbox["modelmaker_delft3dfm"].lenx
+    leny = app.toolbox["modelmaker_delft3dfm"].leny
     app.gui.setvar(
         group, "nmax", np.floor(leny / app.gui.getvar(group, "dy")).astype(int)
     )
@@ -90,19 +89,19 @@ def edit_dxdy(*args):
 
 
 def redraw_rectangle():
-    group = "modelmaker_sfincs_cht"
-    app.toolbox["modelmaker_sfincs_cht"].lenx = app.gui.getvar(
+    group = "modelmaker_delft3dfm"
+    app.toolbox["modelmaker_delft3dfm"].lenx = app.gui.getvar(
         group, "dx"
     ) * app.gui.getvar(group, "mmax")
-    app.toolbox["modelmaker_sfincs_cht"].leny = app.gui.getvar(
+    app.toolbox["modelmaker_delft3dfm"].leny = app.gui.getvar(
         group, "dy"
     ) * app.gui.getvar(group, "nmax")
-    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].clear()
-    app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].add_rectangle(
+    app.map.layer["modelmaker_delft3dfm"].layer["grid_outline"].clear()
+    app.map.layer["modelmaker_delft3dfm"].layer["grid_outline"].add_rectangle(
         app.gui.getvar(group, "x0"),
         app.gui.getvar(group, "y0"),
-        app.toolbox["modelmaker_sfincs_cht"].lenx,
-        app.toolbox["modelmaker_sfincs_cht"].leny,
+        app.toolbox["modelmaker_delft3dfm"].lenx,
+        app.toolbox["modelmaker_delft3dfm"].leny,
         app.gui.getvar(group, "rotation"),
     )
 
@@ -111,19 +110,19 @@ def read_setup_yaml(*args):
     if not full_name:
         return
     # This will automatically also read and plot the polygons    
-    app.toolbox["modelmaker_sfincs_cht"].read_setup_yaml(full_name)
+    app.toolbox["modelmaker_delft3dfm"].read_setup_yaml(full_name)
 
 def write_setup_yaml(*args):
     # This will automatically also write the polygons    
-    app.toolbox["modelmaker_sfincs_cht"].write_setup_yaml()
+    app.toolbox["modelmaker_delft3dfm"].write_setup_yaml()
 
 def build_model(*args):
-    app.toolbox["modelmaker_sfincs_cht"].build_model()
+    app.toolbox["modelmaker_delft3dfm"].build_model()
 
-def use_snapwave(*args):
-    # group = "modelmaker_sfincs_cht"
-    app.gui.setvar("sfincs_cht", "snapwave", app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"))
-    app.model["sfincs_cht"].domain.input.variables.snapwave = app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave")
+# def use_snapwave(*args):
+#     # group = "modelmaker_delft3dfm"
+#     app.gui.setvar("delft3dfm", "snapwave", app.gui.getvar("modelmaker_delft3dfm", "use_snapwave"))
+#     app.model["delft3dfm"].domain.input.variables.snapwave = app.gui.getvar("modelmaker_delft3dfm", "use_snapwave")
 
-def use_subgrid(*args):
-    pass
+# def use_subgrid(*args):
+#     pass

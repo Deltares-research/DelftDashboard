@@ -8,8 +8,10 @@ import os
 #from PyQt5.QtWidgets import QFileDialog
 from pathlib import Path
 
-from delftdashboard.app import app
 from delftdashboard.operations.model import GenericModel
+from delftdashboard.operations import map
+from delftdashboard.app import app
+
 from cht_delft3dfm.delft3dfm import Delft3DFM
 
 class Model(GenericModel):
@@ -19,15 +21,15 @@ class Model(GenericModel):
         self.name = name
         self.long_name = "Delft3D-FM"
 
-        print("Model " + self.name + " added!")
-        self.active_domain = 0
-
-        self.initialize_domain()
-
+    def initialize(self):
+        # self.active_domain = 0
+        self.domain = Delft3DFM(crs = app.crs)
+        self.domain.fname = 'flow.mdu'
         self.set_gui_variables()
-
-    def initialize_domain(self):
-        self.domain = Delft3DFM()
+        self.observation_points_changed = False
+        self.discharge_points_changed = False
+        self.boundaries_changed = False
+        self.thin_dams_changed = False
 
     def add_layers(self):
         # Add main DDB layer
@@ -38,37 +40,30 @@ class Model(GenericModel):
         #                 line_color="black")
         layer.add_layer("grid", type="image")
 
-        layer.add_layer("mask_include",
-                        type="circle",
-                        file_name="delft3dfm_mask_include.geojson",
-                        circle_radius=3,
-                        fill_color="yellow",
-                        line_color="transparent")
+        # layer.add_layer("mask_include",
+        #                 type="circle",
+        #                 file_name="delft3dfm_mask_include.geojson",
+        #                 circle_radius=3,
+        #                 fill_color="yellow",
+        #                 line_color="transparent")
 
-        layer.add_layer("mask_boundary",
-                        type="circle",
-                        file_name="delft3dfm_mask_boundary.geojson",
-                        circle_radius=3,
-                        fill_color="red",
-                        line_color="transparent")
+        # layer.add_layer("mask_boundary",
+        #                 type="circle",
+        #                 file_name="delft3dfm_mask_boundary.geojson",
+        #                 circle_radius=3,
+        #                 fill_color="red",
+        #                 line_color="transparent")
 
         # Move this to delft3dfm.py
-        from .boundary_conditions import select_boundary_point_from_map
-        layer.add_layer("boundary_points",
-                        type="circle_selector",
-                        select=select_boundary_point_from_map,
+        # from .boundary_conditions import select_boundary_point_from_map
+        layer.add_layer("boundary_line",
+                        type="line",
                         hover_property="name",
-                        line_color="white",
+                        line_color="red",
+                        line_width= 3,
                         line_opacity=1.0,
-                        fill_color="blue",
+                        fill_color="red",
                         fill_opacity=1.0,
-                        circle_radius=4,
-                        circle_radius_selected=5,
-                        line_color_selected="white",
-                        fill_color_selected="red",
-                        circle_radius_inactive=4,
-                        line_color_inactive="white",
-                        fill_color_inactive="lightgrey"
                        )
 
         from .observation_points_regular import select_observation_point_from_map
@@ -84,34 +79,42 @@ class Model(GenericModel):
                         line_color_selected="white",
                         fill_color_selected="red")
 
-        from .observation_points_spectra import select_observation_point_from_map_spectra
-        layer.add_layer("observation_points_spectra",
-                        type="circle_selector",
-                        select=select_observation_point_from_map_spectra,
-                        line_color="white",
-                        line_opacity=1.0,
-                        fill_color="orange",
-                        fill_opacity=1.0,
-                        circle_radius=3,
-                        circle_radius_selected=4,
-                        line_color_selected="white",
-                        fill_color_selected="red")
+        # from .observation_points_spectra import select_observation_point_from_map_spectra
+        # layer.add_layer("observation_points_spectra",
+        #                 type="circle_selector",
+        #                 select=select_observation_point_from_map_spectra,
+        #                 line_color="white",
+        #                 line_opacity=1.0,
+        #                 fill_color="orange",
+        #                 fill_opacity=1.0,
+        #                 circle_radius=3,
+        #                 circle_radius_selected=4,
+        #                 line_color_selected="white",
+        #                 fill_color_selected="red")
 
     def set_layer_mode(self, mode):
         if mode == "inactive":
             # Grid is made visible
             app.map.layer["delft3dfm"].layer["grid"].deactivate()
             # Mask is made invisible
-            app.map.layer["delft3dfm"].layer["mask_include"].hide()
-            app.map.layer["delft3dfm"].layer["mask_boundary"].hide()
+            # app.map.layer["delft3dfm"].layer["mask_include"].hide()
+            # app.map.layer["delft3dfm"].layer["mask_boundary"].hide()
             # Boundary points are made grey
-            app.map.layer["delft3dfm"].layer["boundary_points"].deactivate()
+            app.map.layer["delft3dfm"].layer["boundary_line"].deactivate()
             # Observation points are made grey
             app.map.layer["delft3dfm"].layer["observation_points"].deactivate()
-            app.map.layer["delft3dfm"].layer["observation_points_spectra"].deactivate()
+            # app.map.layer["delft3dfm"].layer["observation_points_spectra"].deactivate()
         elif mode == "invisible":
             # Everything set to invisible
             app.map.layer["delft3dfm"].hide()
+
+    def set_crs(self):
+        crs = app.crs
+        old_crs = self.domain.crs
+        if old_crs != crs:
+            self.domain.crs = crs
+            self.domain.clear_spatial_attributes()
+            self.plot()
 
     def set_gui_variables(self):
         group = "delft3dfm"
@@ -141,10 +144,10 @@ class Model(GenericModel):
                     #     var_value = str(var_value)
                     app.gui.setvar(group, f'{groupname}.{var_name}', var_value)
 
-        app.gui.setvar(group, "setup.lon_min", 0)
-        app.gui.setvar(group, "setup.lon_max", 1)
-        app.gui.setvar(group, "setup.lat_min", 0)
-        app.gui.setvar(group, "setup.lat_max", 0)
+        app.gui.setvar(group, "setup.x0", 0)
+        app.gui.setvar(group, "setup.y0", 1)
+        app.gui.setvar(group, "setup.nmax", 0)
+        app.gui.setvar(group, "setup.mmax", 0)
         app.gui.setvar(group, "setup.dx", 0.01)
         app.gui.setvar(group, "setup.dy", 0.01)
 
@@ -229,24 +232,22 @@ class Model(GenericModel):
         # Write flow.mdu
         self.domain.path = os.getcwd()
         self.domain.write_input_file(input_file=self.domain.fname)
-        self.domain.write_batch_file()
+        # self.domain.write_batch_file()
 
 
     def load(self):
         self.domain.read()
 
-    def set_crs(self):
-        self.domain.crs = app.crs
-        self.domain.clear_spatial_attributes()
-        self.plot()
-
     def plot(self):
         # Grid
-        pass
-        # app.map.layer["delft3dfm"].layer["grid"].set_data(self.domain.grid)
+        app.map.layer["delft3dfm"].layer["grid"].set_data(self.domain.grid)
         # # Mask
         # app.map.layer["delft3dfm"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
         # app.map.layer["delft3dfm"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
+        # Boundary points
+        app.map.layer["delft3dfm"].layer["boundary_line"].clear()
+        app.map.layer["delft3dfm"].layer["boundary_line"].set_data(self.domain.boundary_conditions.gdf)
+
         # # Boundary points
         # gdf = self.domain.boundary_conditions.gdf
         # app.map.layer["delft3dfm"].layer["boundary_points"].set_data(gdf, 0)
