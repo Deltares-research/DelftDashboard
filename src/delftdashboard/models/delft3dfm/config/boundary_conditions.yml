@@ -7,149 +7,375 @@ element:
     width: -10
     height: 160
   element:
-  - style: listbox
+  # - style: listbox
+  #   position:
+  #     x: 10
+  #     y: 10
+  #     width: 80
+  #     height: 140
+  #   method: select_boundary_point_from_list
+  #   variable: active_boundary_point
+  #   select: index
+  #   option_string:
+  #     variable: boundary_point_names
+  #   tooltip: Select boundary point
+  # - style: pushbutton
+  #   text: Add Point
+  #   position:
+  #     x: 100
+  #     y: 130
+  #     width: 80
+  #     height: 20
+  #   method: add_boundary_point_on_map
+  #   tooltip: Add boundary point on map
+  # - style: pushbutton
+  #   text: Delete Point
+  #   position:
+  #     x: 100
+  #     y: 105
+  #     width: 80
+  #     height: 20
+  #   method: delete_point_from_list
+  #   tooltip: Delete boundary point from list
+  #   dependency:
+  #   - action: enable
+  #     checkfor: all
+  #     check:
+  #     - variable: nr_boundary_points
+  #       operator: gt
+  #       value: 0
+  # - style: pushbutton
+  #   text: Load
+  #   position:
+  #     x: 100
+  #     y: 80
+  #     width: 80
+  #     height: 20
+  #   method: load
+  #   tooltip: Load boundary conditions
+  # - style: pushbutton
+  #   text: Save
+  #   position:
+  #     x: 100
+  #     y: 55
+  #     width: 80
+  #     height: 20
+  #   method: save
+  #   tooltip: Save boundary conditions
+  #   dependency:
+  #   - action: enable
+  #     checkfor: all
+  #     check:
+  #     - variable: nr_boundary_points
+  #       operator: gt
+  #       value: 0
+  # - style: pushbutton
+  #   text: View
+  #   position:
+  #     x: 100
+  #     y: 30
+  #     width: 80
+  #     height: 20
+  #   method: view_boundary_conditions
+  #   tooltip: View time series of selected point
+  #   enable: false
+  #   dependency:
+  #   - action: enable
+  #     checkfor: all
+  #     check:
+  #     - variable: nr_boundary_points
+  #       operator: gt
+  #       value: 0
+  # - style: pushbutton
+  #   text: Create Points
+  #   position:
+  #     x: 190
+  #     y: 130
+  #     width: 80
+  #     height: 20
+  #   method: create_boundary_points
+  #   tooltip: Create equally spaced boundary point along the mesh
+  # - style: edit
+  #   text: Distance (m)
+  #   text_position: right  
+  #   position:
+  #     x: 190
+  #     y: 105
+  #     width: 50
+  #     height: 20
+  #   variable: boundary_dx  
+  #   tooltip: Edit spacing between boundary point along the mesh
+  - style: pushbutton
+    text: Generate WL From Tide Model
     position:
       x: 10
-      y: 10
-      width: 80
-      height: 140
-    method: select_boundary_point_from_list
-    variable: active_boundary_point
-    select: index
+      y: 130
+      width: 150
+      height: 20
+    method: generate_boundary_conditions_from_tide_model
+    tooltip: Generate tidal boundary conditions
+    # dependency:
+    # - action: enable
+    #   checkfor: all
+    #   check:
+    #   - variable: nr_open_boundary_polygons
+    #     operator: gt
+    #     value: 0
+  - style: popupmenu
+    position:
+      x: 10
+      y: 105
+      width: 150
+      height: 20
+    variable: boundary_conditions_tide_model
+    select: item
+    method: set_model_variables
     option_string:
-      variable: boundary_point_names
-    tooltip: Select boundary point
-  - style: pushbutton
-    text: Add Point
-    position:
-      x: 100
-      y: 130
-      width: 80
-      height: 20
-    method: add_boundary_point_on_map
-    tooltip: Add boundary point on map
-  - style: pushbutton
-    text: Delete Point
-    position:
-      x: 100
-      y: 105
-      width: 80
-      height: 20
-    method: delete_point_from_list
-    tooltip: Delete boundary point from list
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: nr_boundary_points
-        operator: gt
-        value: 0
-  - style: radiobuttongroup
-    position:
-      x: 100
-      y: 10
-      width: 100
-      height: 20
-    variable: boundary_forcing
-    option_string: ["Time Series", "2D Spectra"]
-    option_value: ["timeseries", "spectra"]
-    method: select_boundary_forcing
+    - FES2014
+    - FES2012
+    - EOT20
+    - GTSMv4.1
+    - tpxo80
+    option_value:
+    - FES2014
+    - FES2012
+    - EOT20
+    - GTSMv4.1_opendap
+    - tpxo80_opendap
+    tooltip: Select global tide model
+    # dependency:
+    # - action: enable
+    #   checkfor: all
+    #   check:
+    #   - variable: nr_open_boundary_polygons
+    #     operator: gt
+    #     value: 0
   - style: edit
-    text: Hm0 (m)
+    text: Offset (m)
+    text_position: right  
     position:
-      x: 350
-      y: 130
-      width: 50
-      height: 20
-    variable: boundary_hm0
-    method: edit_hm0
-    tooltip: Edit Hm0 wave height (in metres)
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: boundary_forcing
-        operator: eq
-        value: timeseries
-      - variable: nr_boundary_points
-        operator: gt
-        value: 0
-  - style: edit
-    text: Tp (s)
-    position:
-      x: 350
-      y: 105
-      width: 50
-      height: 20
-    variable: boundary_tp
-    method: edit_tp
-    tooltip: Edit wave period Tp (in seconds)
-    dependency:
-    - action: enable
-      checkfor: all
-      check:
-      - variable: boundary_forcing
-        operator: eq
-        value: timeseries
-      - variable: nr_boundary_points
-        operator: gt
-        value: 0
-  - style: edit
-    text: Direction (deg)
-    position:
-      x: 350
+      x: 10
       y: 80
       width: 50
       height: 20
-    variable: boundary_wd
-    method: edit_wd
-    tooltip: Edit wave direction (in degrees, nautical)
+    variable: boundary_conditions_timeseries_offset
+    tooltip: Edit water level offset in metres
+  # - style: popupmenu
+  #   position:
+  #     x: 310
+  #     y: 105
+  #     width: 120
+  #     height: 20
+  #   variable: boundary_conditions_tide_model
+  #   select: item
+  #   option_string:
+  #     variable_group: tide_models
+  #     variable: long_names
+  #   option_value:
+  #     variable_group: tide_models
+  #     variable: names
+  #   tooltip: Select global tide model
+  #   dependency:
+  #   - action: enable
+  #     checkfor: all
+  #     check:
+  #     - variable: nr_open_boundary_polygons
+  #       operator: gt
+  #       value: 0
+  - style: pushbutton
+    text: Generate Custom WL Signal
+    position:
+      x: 200
+      y: 130
+      width: 150
+      height: 20
+    method: generate_boundary_conditions_custom
+    tooltip: Generate custom time series for all points
+    # dependency:
+    # - action: enable
+    #   checkfor: all
+    #   check:
+    #   - variable: nr_boundary_points
+    #     operator: gt
+    #     value: 0
+  - style: popupmenu
+    position:
+      x: 200
+      y: 105
+      width: 150
+      height: 20
+    variable: boundary_conditions_timeseries_shape
+    select: item
+    option_string:
+    - "Constant"
+    - "Gaussian"
+    - "Sinusoidal"
+    option_value:
+    - constant
+    - gaussian
+    - sine
+    tooltip: Select time series shape
+    # dependency:
+    # - action: enable
+    #   checkfor: all
+    #   check:
+    #   - variable: nr_boundary_points
+    #     operator: gt
+    #     value: 0
+  # - style: edit
+  #   text: Offset (m)
+  #   text_position: right  
+  #   position:
+  #     x: 10
+  #     y: 80
+  #     width: 50
+  #     height: 20
+  #   variable: boundary_conditions_tide_offset
+  #   tooltip: Edit water level offset in metres
+    # dependency:
+    # - action: visible
+    #   checkfor: all
+    #   check:
+    #   - variable: nr_boundary_points
+    #     operator: gt
+    #     value: 0
+  - style: edit
+    text: Amplitude (m)
+    text_position: right  
+    position:
+      x: 200
+      y: 80
+      width: 50
+      height: 20
+    variable: boundary_conditions_timeseries_amplitude
+    tooltip: Edit sinusoidal amplitude in metres
     dependency:
-    - action: enable
+    - action: visible
       checkfor: all
       check:
-      - variable: boundary_forcing
+      # - variable: nr_boundary_points
+      #   operator: gt
+      #   value: 0
+      - variable: boundary_conditions_timeseries_shape
         operator: eq
-        value: timeseries
-      - variable: nr_boundary_points
-        operator: gt
-        value: 0
+        value: sine
   - style: edit
-    text: Directional Spreading (deg)
+    text: Phase (deg)
+    text_position: right  
     position:
-      x: 350
+      x: 200
       y: 55
       width: 50
       height: 20
-    variable: boundary_ds
-    method: edit_ds
-    tooltip: Edit wave direction spreading (in degrees)
+    variable: boundary_conditions_timeseries_phase
+    tooltip: Edit sinusoidal phase in degrees
     dependency:
-    - action: enable
+    - action: visible
       checkfor: all
       check:
-      - variable: boundary_forcing
+      # - variable: nr_boundary_points
+      #   operator: gt
+      #   value: 0
+      - variable: boundary_conditions_timeseries_shape
         operator: eq
-        value: timeseries
-      - variable: nr_boundary_points
-        operator: gt
-        value: 0
-  - style: pushbutton
-    text: Apply to All
+        value: sine
+  - style: edit
+    text: Period (s)
+    text_position: right  
     position:
-      x: 350
+      x: 200
       y: 30
-      width: 80
+      width: 50
       height: 20
-    method: apply_to_all
-    tooltip: Apply boundary conditions to all points
+    variable: boundary_conditions_timeseries_period
+    tooltip: Edit sinusoidal period in seconds
     dependency:
-    - action: enable
+    - action: visible
       checkfor: all
       check:
-      - variable: boundary_forcing
+      # - variable: nr_boundary_points
+      #   operator: gt
+      #   value: 0
+      - variable: boundary_conditions_timeseries_shape
         operator: eq
-        value: timeseries
-      - variable: nr_boundary_points
-        operator: gt
-        value: 0
+        value: sine
+  - style: edit
+    text: Peak (m)
+    text_position: right  
+    position:
+      x: 200
+      y: 80
+      width: 50
+      height: 20
+    variable: boundary_conditions_timeseries_peak
+    tooltip: Edit gaussian peak in metres
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      # - variable: nr_boundary_points
+      #   operator: gt
+      #   value: 0
+      - variable: boundary_conditions_timeseries_shape
+        operator: eq
+        value: gaussian
+  - style: edit
+    text: Peak Time (s)
+    text_position: right  
+    position:
+      x: 200
+      y: 55
+      width: 50
+      height: 20
+    variable: boundary_conditions_timeseries_tpeak
+    tooltip: Edit time of peak in seconds after reference time
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      # - variable: nr_boundary_points
+      #   operator: gt
+      #   value: 0
+      - variable: boundary_conditions_timeseries_shape
+        operator: eq
+        value: gaussian
+  - style: edit
+    text: Duration (s)
+    text_position: right  
+    position:
+      x: 200
+      y: 30
+      width: 50
+      height: 20
+    variable: boundary_conditions_timeseries_duration
+    tooltip: Edit duration of peak in seconds
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      # - variable: nr_boundary_points
+      #   operator: gt
+      #   value: 0
+      - variable: boundary_conditions_timeseries_shape
+        operator: eq
+        value: gaussian
+  - style: edit
+    text: Time Step (s)
+    text_position: right  
+    position:
+      x: 380
+      y: 130
+      width: 50
+      height: 20
+    variable: boundary_conditions_timeseries_time_step
+    tooltip: Edit time step for time series in file
+  - style: edit
+    text: Offset (m)
+    text_position: right  
+    position:
+      x: 380
+      y: 105
+      width: 50
+      height: 20
+    variable: boundary_conditions_timeseries_offset_custom
+    tooltip: Edit water level offset in metres
