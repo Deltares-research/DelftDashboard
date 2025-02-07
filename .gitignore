@@ -16,3 +16,4 @@ ddb_dev.yml
 environment.yml
 src/delftdashboard/delftdashboard.ini
 src/delftdashboard/delftdashboard.pth
+/src/delftdashboard.egg-info
