@@ -15,6 +15,13 @@ element:
       height: 20
     text: Zmax
     variable: global_zmax
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: use_mask_global
+        operator: eq
+        value: true
   - style: edit
     position:
       x: 35
@@ -23,6 +30,21 @@ element:
       height: 20
     text: Zmin
     variable: global_zmin
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: use_mask_global
+        operator: eq
+        value: true
+  - style: checkbox
+    position:
+      x: 10
+      y: 40
+      width: 20
+      height: 20
+    text: Use Global
+    variable: use_mask_global
 - style: panel
   title: Include Polygons
   position:
