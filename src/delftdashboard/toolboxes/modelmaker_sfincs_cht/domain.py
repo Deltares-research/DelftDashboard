@@ -18,7 +18,8 @@ def select(*args):
     # Show the grid outline layer
     app.map.layer["sfincs_cht"].layer["grid"].activate()
     app.map.layer["modelmaker_sfincs_cht"].layer["grid_outline"].activate()
-
+    # Show and deactivate the mask polygons
+    app.toolbox["modelmaker_sfincs_cht"].show_mask_polygons()
 
 def draw_grid_outline(*args):
     # Clear grid outline layer
@@ -127,3 +128,6 @@ def use_snapwave(*args):
 
 def use_subgrid(*args):
     pass
+
+def show_mask_polygons(*args):
+    app.toolbox["modelmaker_sfincs_cht"].show_mask_polygons()

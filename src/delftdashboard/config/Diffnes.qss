@@ -221,7 +221,16 @@ QLineEdit
 	padding: 3px;
 	padding-left: 5px;
 	border-radius: 4px;
+}
 
+QLineEdit::disabled
+{
+	background-color: #606060;
+	color: #959595;
+	border: 1px solid #1d1d1d;
+	padding: 3px;
+	padding-left: 5px;
+	border-radius: 4px;
 }
 
 

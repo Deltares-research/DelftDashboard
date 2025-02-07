@@ -76,6 +76,8 @@ class Toolbox(GenericToolbox):
 
         app.gui.setvar(group, "rotation", 0.0)
 
+        app.gui.setvar(group, "show_mask_polygons_in_domain_tab", False)
+
         # Refinement
         app.gui.setvar(group, "refinement_polygon_file", "quadtree.geojson")
         app.gui.setvar(group, "refinement_polygon_names", [])
@@ -93,6 +95,7 @@ class Toolbox(GenericToolbox):
         # Mask
         app.gui.setvar(group, "zmax",  1000000.0)
         app.gui.setvar(group, "zmin",  -1000000.0)
+        app.gui.setvar(group, "use_mask_global",  True)
         app.gui.setvar(group, "global_zmax",  10.0)
         app.gui.setvar(group, "global_zmin",  -10.0)
         app.gui.setvar(group, "include_polygon_file", "include.geojson")
@@ -363,8 +366,15 @@ class Toolbox(GenericToolbox):
             app.gui.window.dialog_warning("Please first generate a bathymetry !")
             return
         dlg = app.gui.window.dialog_wait("Updating mask ...")
-        mask.build(zmin=app.gui.getvar("modelmaker_sfincs_cht", "global_zmin"),
-                   zmax=app.gui.getvar("modelmaker_sfincs_cht", "global_zmax"),
+        if app.gui.getvar("modelmaker_sfincs_cht", "use_mask_global"):
+            global_zmin = app.gui.getvar("modelmaker_sfincs_cht", "global_zmin")
+            global_zmax = app.gui.getvar("modelmaker_sfincs_cht", "global_zmax")
+        else:
+            # Set zmax lower than zmin to avoid use of global mask
+            global_zmin = 10.0
+            global_zmax = -10.0
+        mask.build(zmin=global_zmin,
+                   zmax=global_zmax,
                    include_polygon=app.toolbox["modelmaker_sfincs_cht"].include_polygon,
                    include_zmin=app.gui.getvar("modelmaker_sfincs_cht", "include_zmin"),
                    include_zmax=app.gui.getvar("modelmaker_sfincs_cht", "include_zmax"),
@@ -515,7 +525,16 @@ class Toolbox(GenericToolbox):
         fname = app.gui.getvar("modelmaker_sfincs_cht", "exclude_polygon_file_snapwave")
         self.exclude_polygon_snapwave = gpd.read_file(fname)
 
-    # WRITE
+    def show_mask_polygons(self):
+        show_polygons = app.gui.getvar("modelmaker_sfincs_cht", "show_mask_polygons_in_domain_tab")
+        if show_polygons:
+            app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].show()
+            app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon"].show()
+            app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].deactivate()
+            app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon"].deactivate()
+        else:
+            app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].hide()
+            app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon"].hide()
 
     def write_refinement_polygon(self):
         if len(self.refinement_polygon) == 0:
