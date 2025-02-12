@@ -5,11 +5,7 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 
-# import math
-# import numpy as np
 import geopandas as gpd
-# import shapely
-# import json
 from pyproj import CRS
 
 from delftdashboard.operations.toolbox import GenericToolbox

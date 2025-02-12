@@ -8,7 +8,6 @@ Created on Mon May 10 12:18:09 2021
 """
 
 from delftdashboard.app import app
-# from cht_bathymetry.bathymetry_database import bathymetry_database
 from delftdashboard.operations import map
 
 def select(*args):
