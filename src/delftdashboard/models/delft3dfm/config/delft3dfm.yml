@@ -3,7 +3,7 @@ element:
   id: delft3dfm
   position:
     x: 10
-    y: 10
+    y: 1
     width: -10
     height: -10
   variable_group: delft3dfm

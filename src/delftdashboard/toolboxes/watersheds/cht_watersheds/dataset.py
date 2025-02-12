@@ -62,6 +62,7 @@ class WatershedsDataset:
             if not os.path.exists(os.path.join(self.path, file)):
                 okay = False
                 break
+        return okay    
 
     def download(self):
         if self.s3_bucket is None:
