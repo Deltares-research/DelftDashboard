@@ -6,7 +6,6 @@ Created on Mon May 10 12:18:09 2021
 """
 
 from delftdashboard.app import app
-from cht_bathymetry.bathymetry_database import bathymetry_database
 from delftdashboard.operations import map
 
 def select(*args):
@@ -31,8 +30,6 @@ def use_dataset(*args):
     index = app.gui.getvar(group, "bathymetry_dataset_index")
     name  = names[index]
     if name not in app.gui.getvar(group, "selected_bathymetry_dataset_names"):
-        # d = bathymetry_database.get_dataset(name)
-        # dataset = {"dataset": d, "zmin": -99999.0, "zmax": 99999.0}
         dataset = {"name": name, "zmin": -99999.0, "zmax": 99999.0}
         app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets.append(dataset)
         app.gui.setvar(group, "selected_bathymetry_dataset_index", len(app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets) - 1)

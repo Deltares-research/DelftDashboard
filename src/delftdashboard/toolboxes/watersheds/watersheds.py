@@ -38,7 +38,7 @@ class Toolbox(GenericToolbox):
         app.watersheds_database = WatershedsDatabase(path=app.config["watersheds_database_path"],
                                                      s3_bucket=s3_bucket,
                                                      s3_key=s3_key,
-                                                     check_online=False)
+                                                     check_online=True)
 
         short_names, long_names = app.watersheds_database.dataset_names()
 
@@ -112,6 +112,28 @@ class Toolbox(GenericToolbox):
         xmax = extent[1][0]
         ymax = extent[1][1]
         level = app.gui.getvar("watersheds", "level")
+
+        # folder="c:\\work\\delftdashboard\\data\\watersheds.ori\\hydrobasins_australia"
+        # # Make list of all files in folder (not the full path) and write to a text file like ["file1.txt", "file2.txt", ...]
+        # files = os.listdir(folder)
+        # with open("c:\\work\\delftdashboard\\data\\watersheds.ori\\hydrobasins_australia\\files.txt", "w") as f:
+        #     filestring = "["
+        #     for file in files:
+        #         filestring += f'"{file}",'
+        #     filestring = filestring[:-1] + "]"
+        #     f.write(filestring)
+
+        # First check if dataset files need to be downloaded
+        if not dataset.check_files():
+            # Ask if the user wants to download the file
+            rsp = app.gui.window.dialog_yes_no(f"Dataset {dataset_name} is not locally available. Do you want to try to download it? This may take several minutes.",
+                                               "Download dataset?")
+            if rsp:
+                wb = app.gui.window.dialog_wait("Downloading watersheds ...")
+                dataset.download()
+                wb.close()
+            else:
+                return
         # Waitbox
         wb = app.gui.window.dialog_wait("Loading watersheds ...")
         self.gdf = dataset.get_watersheds_in_bbox(xmin, ymin, xmax, ymax, level)
@@ -205,182 +227,6 @@ class Toolbox(GenericToolbox):
 
     def edit_buffer(self):
         pass
-
-# # def get_watersheds_in_bbox(gdb_path, output_path, bbox, layer, name):
-# # def get_watersheds_in_bbox(gdb_path, xmin, ymin, xmax, ymax, layer):
-
-
-# #     # Define the bounding box (xmin, ymin, xmax, ymax)
-# #     bounding_box = box(xmin, ymin, xmax, ymax)
-
-# #     # Read the specific layer from the geodatabase
-# #     filename = os.path.join(gdb_path, layer + ".shp")
-# #     gdf = gpd.read_file(filename)
-# #     # gdf = gpd.read_file(gdb_path, layer=layer)
-
-# #     # Filter the data: Keep only multipolygons that intersect with the bounding box
-# #     gdf = gdf[gdf.geometry.intersects(bounding_box)]
-
-# #     if layer=="WBDHU2":
-# #         hucstr = "huc2"
-# #     elif layer=="WBDHU4":
-# #         hucstr = "huc4"
-# #     elif layer=="WBDHU6":
-# #         hucstr = "huc6"
-# #     elif layer=="WBDHU8":
-# #         hucstr = "huc8"
-# #     elif layer=="WBDHU10":
-# #         hucstr = "huc10"
-# #     elif layer=="WBDHU12":
-# #         hucstr = "huc12"
-# #     elif layer=="WBDHU14":
-# #         hucstr = "huc14"
-# #     elif layer=="WBDHU16":
-# #         hucstr = "huc16"
-    
-
-# #     # # Drop all columns except name, geometry and huc
-# #     # gdf = gdf[["name", hucstr, "geometry"]]
-# #     # # Rename hucstr to id
-# #     gdf = gdf.rename(columns={hucstr: "id"}).to_crs(4326)
-    
-# #     # fid = open(os.path.join(output_path, name + "_watersheds_" + layer + ".pol"), "w")
-    
-# #     # for j, watershed in enumerate(watersheds):
-# #     #     if watershed.bounds[0]<bbox[2] and watershed.bounds[2]>bbox[0] and watershed.bounds[1]<bbox[3] and watershed.bounds[3]>bbox[1]:
-# #     #         gs = watershed.geoms
-# #     #         for polygon in gs:
-# #     #             crds = polygon.exterior.coords
-# #     #             huc = hucs[j]
-# #     #             fid.write(huc + "\n")
-# #     #             fid.write(str(len(crds)) + ' 2\n')
-# #     #             for crd in crds:
-# #     #                 lon = crd[0]
-# #     #                 lat = crd[1]
-# #     #                 fid.write(f'{lon:11.6f}' + ' ' + f'{lat:11.6f}' + '\n')
-    
-# #     # fid.close()
-
-# #     return gdf
-
-# def create_include_polygon(gdb_path, huc_file, output_path, name, layer="WBDHU8", dbuf=0.0, crs=None):
-
-#     if not output_path:
-#         output_path = os.getcwd()
-
-#     if crs:
-#         try:
-#             # Try epsg code
-#             crs = int(crs)            
-#         except:
-#             pass
-#         wgs84 = pyproj.CRS('EPSG:4326')
-#         crs1  = pyproj.CRS(crs)
-#         if crs1.is_geographic:
-#             # Convert metres to degrees
-#             dbuf = dbuf / 100000.0
-#         # Construct transformer    
-#         transformer = pyproj.Transformer.from_crs(wgs84,
-#                                                   crs1,
-#                                                   always_xy=True).transform
-
-#     # Read list of huc8 IDs    
-#     huc_list = []
-#     fid = open(huc_file, 'r')
-#     lines = fid.readlines()
-#     for line in lines:
-#         huc_list.append(line.strip())
-
-#     # Read gdb file and make list of polygons
-#     gdb_file = os.path.join(gdb_path, "WBD_National_GDB.gdb")
-#     source = fiona.open(gdb_file, driver='OpenFileGDB', layer=layer)
-#     polys = []
-#     wnames = []
-
-#     if layer=="WBDHU2":
-#         hucstr = "huc2"
-#     elif layer=="WBDHU4":
-#         hucstr = "huc4"
-#     elif layer=="WBDHU6":
-#         hucstr = "huc6"
-#     elif layer=="WBDHU8":
-#         hucstr = "huc8"
-#     elif layer=="WBDHU10":
-#         hucstr = "huc10"
-#     elif layer=="WBDHU12":
-#         hucstr = "huc12"
-#     elif layer=="WBDHU14":
-#         hucstr = "huc14"
-#     elif layer=="WBDHU16":
-#         hucstr = "huc16"
-    
-#     for f in source:
-#         if f["properties"][hucstr] in huc_list:
-#             print(f["properties"][hucstr])
-#             geom = f["geometry"]
-#             wnames.append(f["properties"]["name"])
-#             for crds in geom["coordinates"]:
-#                 p = Polygon(crds[0])
-#                 polys.append(p)
-#     source.close()    
-
-#     # Merge polygons
-#     merged = unary_union(polys)            
-
-#     crsgeo = True
-#     if crs:    
-#         merged = transform(transformer, merged)        
-#         if crs1.is_projected:
-#             crsgeo = False
-
-#     # Apply buffer
-#     if dbuf>0.0:
-#         merged = merged.buffer(dbuf, resolution=16)
-#         merged = merged.simplify(dbuf)
-
-#     filename_pol = os.path.join(output_path, name + ".pol")
-#     filename_txt = os.path.join(output_path, name + "_watershed_names.txt")
-
-#     # Write text file with watershed names
-#     fit = open(filename_txt, "w")
-#     for wname in wnames:
-#         fit.write(wname + '\n')
-#     fit.close()
-
-#     # Write polygon file
-
-#     fid = open(filename_pol, "w")
-
-#     if isinstance(merged, Polygon):
-
-#         crds = merged.exterior.coords
-#         fid.write("BL01\n")
-#         fid.write(str(len(crds)) + ' 2\n')
-#         for crd in crds:
-#             lon = crd[0]
-#             lat = crd[1]
-#             if crsgeo:
-#                 fid.write(f'{lon:11.6f}' + ' ' + f'{lat:11.6f}' + '\n')
-#             else:
-#                 fid.write(f'{lon:11.1f}' + ' ' + f'{lat:11.1f}' + '\n')
-
-#     else:
-        
-#         for geom in merged.geoms:
-#             crds = geom.exterior.coords
-#             fid.write("BL01\n")
-#             fid.write(str(len(crds)) + ' 2\n')
-#             for crd in crds:
-#                 lon = crd[0]
-#                 lat = crd[1]
-#                 if crsgeo:
-#                     fid.write(f'{lon:11.6f}' + ' ' + f'{lat:11.6f}' + '\n')
-#                 else:
-#                     fid.write(f'{lon:11.1f}' + ' ' + f'{lat:11.1f}' + '\n')
-            
-#     fid.close()
-        
-#     return merged
 
 def select(*args):
     app.toolbox["watersheds"].select_tab()
