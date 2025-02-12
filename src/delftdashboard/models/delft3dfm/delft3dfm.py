@@ -27,6 +27,7 @@ class Model(GenericModel):
         self.domain.fname = 'flow.mdu'
         self.set_gui_variables()
         self.observation_points_changed = False
+        self.observation_lines_changed = False
         self.discharge_points_changed = False
         self.boundaries_changed = False
         self.thin_dams_changed = False
@@ -78,6 +79,19 @@ class Model(GenericModel):
                         circle_radius_selected=4,
                         line_color_selected="white",
                         fill_color_selected="red")
+        
+        from .observation_points_crs import obs_lines_created
+        from .observation_points_crs import obs_lines_selected
+        from .observation_points_crs import obs_lines_modified
+        layer.add_layer("observation_lines",
+                            type="draw",
+                            shape="polyline",
+                            create=obs_lines_created,
+                            modify=obs_lines_modified,
+                            select=obs_lines_selected,
+                            polyline_line_color="yellow",
+                            polyline_line_width=2.0,
+                            polyline_line_opacity=1.0)
 
         # from .observation_points_spectra import select_observation_point_from_map_spectra
         # layer.add_layer("observation_points_spectra",
@@ -103,6 +117,7 @@ class Model(GenericModel):
             app.map.layer["delft3dfm"].layer["boundary_line"].deactivate()
             # Observation points are made grey
             app.map.layer["delft3dfm"].layer["observation_points"].deactivate()
+            app.map.layer["delft3dfm"].layer["observation_lines"].deactivate()
             # app.map.layer["delft3dfm"].layer["observation_points_spectra"].deactivate()
         elif mode == "invisible":
             # Everything set to invisible
@@ -162,9 +177,30 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
 
-        # app.gui.setvar(group, "observation_point_names_spectra", [])
-        # app.gui.setvar(group, "nr_observation_points_spectra", 0)
-        # app.gui.setvar(group, "active_observation_point_spectra", 0)
+        app.gui.setvar(group, "observation_line_names", [])
+        app.gui.setvar(group, "nr_observation_lines", 0)
+        app.gui.setvar(group, "active_observation_line", 0)
+        app.gui.setvar(group, "observation_line_index", 0)
+
+        app.gui.setvar(group, "boundary_line_active", 0)
+        app.gui.setvar(group, "boundary_conditions_tide_model", [])
+
+        # Boundary conditions
+        # app.gui.setvar(group, "boundary_point_names", [])
+        # app.gui.setvar(group, "nr_boundary_points", 0)
+        # app.gui.setvar(group, "active_boundary_point", 0)
+        # app.gui.setvar(group, "boundary_dx", 10000.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_shape", "constant")
+        app.gui.setvar(group, "boundary_conditions_timeseries_time_step", 600.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_offset", 0.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_offset_custom", 0.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_amplitude", 1.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_phase", 0.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_period", 43200.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_peak", 1.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
+        # app.gui.setvar(group, "boundary_conditions_tide_model", [])
 
     # def set_model_variables(self, varid=None, value=None):
     #     # Copies gui variables to delft3dfm input variables
@@ -231,12 +267,13 @@ class Model(GenericModel):
     def save(self):
         # Write flow.mdu
         self.domain.path = os.getcwd()
-        self.domain.write_input_file(input_file=self.domain.fname)
+        self.domain.write_input_file(input_file=os.path.join(self.domain.path, self.domain.fname))
         # self.domain.write_batch_file()
 
 
     def load(self):
-        self.domain.read()
+        pass
+        self.domain.read_input_file()
 
     def plot(self):
         # Grid
@@ -247,6 +284,12 @@ class Model(GenericModel):
         # Boundary points
         app.map.layer["delft3dfm"].layer["boundary_line"].clear()
         app.map.layer["delft3dfm"].layer["boundary_line"].set_data(self.domain.boundary_conditions.gdf)
+
+        # Observation points
+        app.map.layer["delft3dfm"].layer["observation_points"].set_data(app.model["delft3dfm"].domain.observation_point_gdf, 0)
+
+        # Observation cross sections
+        app.map.layer["delft3dfm"].layer["observation_lines"].set_data(app.model["delft3dfm"].domain.observation_line_gdf)
 
         # # Boundary points
         # gdf = self.domain.boundary_conditions.gdf

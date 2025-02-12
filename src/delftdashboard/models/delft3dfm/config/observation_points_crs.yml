@@ -5,41 +5,39 @@ element:
     y: 10
     width: 300
     height: 120
-  method: select_observation_point_from_list
-  variable: active_observation_point_crs
+  method: select_obs_line
+  variable: observation_line_index
   select: index
   option_string:
-    variable: observation_point_names_crs
-  tooltip: Select observation point
-  enable: False
+    variable: observation_line_names
+  tooltip: Select observation line
 - style: pushbutton
-  text: Add Point
+  text: Add Line
   position:
     x: 320
     y: 110
     width: 80
     height: 20
-  method: add_observation_point_on_map
-  tooltip: Add observation point on map
-  enable: False
-
+  method: draw_obs_line
+  tooltip: Add observation line on map
+  enable: True
 - style: pushbutton
-  text: Delete Point
+  text: Delete Line
   position:
     x: 320
     y: 85
     width: 80
     height: 20
-  method: delete_point_from_list
-  tooltip: Delete observation point from list
-  enable: False
-  # dependency:
-  # - action: enable
-  #   checkfor: all
-  #   check:
-  #   - variable: nr_observation_points_regular
-  #     operator: gt
-  #     value: 0
+  method: delete_obs_line
+  tooltip: Delete observation line from list
+  enable: True
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_observation_lines
+      operator: gt
+      value: 0
 - style: pushbutton
   text: Load
   position:
@@ -48,8 +46,8 @@ element:
     width: 80
     height: 20
   method: load
-  tooltip: Load observation points from file
-  enable: False
+  tooltip: Load observation lines from file
+  enable: True
 - style: pushbutton
   text: Save
   position:
@@ -58,12 +56,11 @@ element:
     width: 80
     height: 20
   method: save
-  tooltip: Save observation points to file
-  enable: False
-  # dependency:
-  # - action: enable
-  #   checkfor: all
-  #   check:
-  #   - variable: nr_observation_points_regular
-  #     operator: gt
-  #     value: 0
+  tooltip: Save observation lines to file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_observation_lines
+      operator: gt
+      value: 0
