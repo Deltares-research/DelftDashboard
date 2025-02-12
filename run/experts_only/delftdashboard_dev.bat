@@ -1,6 +1,6 @@
 @echo OFF
-set CONDAPATH=c:\work\miniforge3
-set ENVNAME=delftdashboard_git
+set CONDAPATH=c:\users\%USERNAME%\miniforge3
+set ENVNAME=delftdashboard_dev
 
 rem The following command activates the base environment.
 if %ENVNAME%==base (set ENVPATH=%CONDAPATH%) else (set ENVPATH=%CONDAPATH%\envs\%ENVNAME%)
@@ -14,6 +14,4 @@ echo import delftdashboard > _start_ddb.py
 echo delftdashboard.start() >> _start_ddb.py
 python _start_ddb.py
 
-rem Deactivate the environment
-call mamba deactivate
 del _start_ddb.py
