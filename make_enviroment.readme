@@ -1,9 +1,0 @@
-1 make clean environment delftdashboard
-2 cd c:\work\checkouts\git\DelftDashboard\
-3 pip install -e .    (this installs also cht_??? from pip)
-4 pip install -e c:\work\checkouts\git\cht_sfincs
-5 pip install -e c:\work\checkouts\git\cht_bathymetry
-
-etc.
-
-

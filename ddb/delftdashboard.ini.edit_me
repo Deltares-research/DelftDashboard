@@ -1,6 +1,0 @@
-# This file need to be copied to delftdashboard.ini and edited. Please do NOT edit and push this file itself.
-# Please enter correct model executable folders. 
-sfincs_exe_path: c:\\work\\checkouts\\git\\sfincs\\source\\sfincs\\x64\\Release
-hurrywave_exe_path: c:\\work\\checkouts\\git\\HurryWave\\source\\hurrywave\\x64\\Release
-auto_update_bathymetry: true
-auto_update_tide_models: true
