@@ -1,0 +1,183 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 80
+    height: 120
+  method: select_boundary_point_from_list_snapwave
+  variable: active_boundary_point_snapwave
+  select: index
+  option_string:
+    variable: boundary_point_names_snapwave
+  tooltip: Select boundary point
+- style: pushbutton
+  text: Add Point
+  position:
+    x: 100
+    y: 110
+    width: 80
+    height: 20
+  method: add_boundary_point_on_map_snapwave
+  tooltip: Add boundary point on map
+- style: pushbutton
+  text: Delete Point
+  position:
+    x: 100
+    y: 85
+    width: 80
+    height: 20
+  method: delete_point_from_list_snapwave
+  tooltip: Delete boundary point from list
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_boundary_points_snapwave
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: Load
+  position:
+    x: 100
+    y: 60
+    width: 80
+    height: 20
+  method: load
+  tooltip: Load boundary conditions
+- style: pushbutton
+  text: Save
+  position:
+    x: 100
+    y: 35
+    width: 80
+    height: 20
+  method: save
+  tooltip: Save boundary conditions
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_boundary_points_snapwave
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: View
+  position:
+    x: 100
+    y: 10
+    width: 80
+    height: 20
+  method: view_boundary_conditions_snapwave
+  tooltip: View time series of selected point
+  enable: false
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_boundary_points_snapwave
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: Create Points
+  position:
+    x: 190
+    y: 110
+    width: 80
+    height: 20
+  method: create_boundary_points_snapwave
+  tooltip: Create equally spaced boundary point along the mesh
+- style: edit
+  text: Distance (m)
+  text_position: right  
+  position:
+    x: 190
+    y: 85
+    width: 50
+    height: 20
+  variable: boundary_dx_snapwave
+  tooltip: Edit spacing between boundary point along the mesh
+- style: pushbutton
+  text: Set Boundary Conditions
+  position:
+    x: 350
+    y: 110
+    width: 120
+    height: 20
+  method: set_boundary_conditions_snapwave
+  tooltip: Generate time series for all points based on shape of time series signal
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_boundary_points_snapwave
+      operator: gt
+      value: 0
+- style: edit
+  text: Wave Height (m)
+  text_position: right  
+  position:
+    x: 350
+    y: 85
+    width: 50
+    height: 20
+  variable: boundary_conditions_timeseries_hm0_snapwave
+  tooltip: Edit Hm0 wave height
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: nr_boundary_points_snapwave
+      operator: gt
+      value: 0
+- style: edit
+  text: Wave Period (s)
+  text_position: right  
+  position:
+    x: 350
+    y: 60
+    width: 50
+    height: 20
+  variable: boundary_conditions_timeseries_tp_snapwave
+  tooltip: Edit Tp wave period
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: nr_boundary_points_snapwave
+      operator: gt
+      value: 0
+- style: edit
+  text: Wave Direction (degrees)
+  text_position: right  
+  position:
+    x: 350
+    y: 35
+    width: 50
+    height: 20
+  variable: boundary_conditions_timeseries_wd_snapwave
+  tooltip: Edit wave direction in nautical degrees (coming from)
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: nr_boundary_points_snapwave
+      operator: gt
+      value: 0
+- style: edit
+  text: Wave Directional Spreading (degrees)
+  text_position: right  
+  position:
+    x: 350
+    y: 10
+    width: 50
+    height: 20
+  variable: boundary_conditions_timeseries_ds_snapwave
+  tooltip: Edit wave directional spreading in degrees
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: nr_boundary_points_snapwave
+      operator: gt
+      value: 0

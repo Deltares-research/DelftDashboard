@@ -79,11 +79,13 @@ def delete_exclude_polygon(*args):
     update()
 
 def load_exclude_polygon(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select exclude polygon file ...", filter="*.geojson")
-    if not okay:
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select exclude polygon file ...", filter="*.geojson")
+    if not full_name:
         return
-    app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_file", fname[2])
-    app.toolbox["modelmaker_sfincs_cht"].read_exclude_polygon()
+    append = False
+    if app.gui.getvar("modelmaker_sfincs_cht", "nr_exclude_polygons"):
+        append = app.gui.window.dialog_yes_no("Add to existing exclude polygons?", " ")
+    app.toolbox["modelmaker_sfincs_cht"].read_exclude_polygon(full_name, append)
     app.toolbox["modelmaker_sfincs_cht"].plot_exclude_polygon()
     update()
 

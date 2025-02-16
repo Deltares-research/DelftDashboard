@@ -24,9 +24,19 @@ element:
   - string: Mask Boundary Cells
     module: delftdashboard.toolboxes.modelmaker_sfincs_cht.mask_boundary_cells
     element: mask_boundary_cells.yml
-  - string: Mask SnapWave
+  - string: Mask Active SnapWave
     module: delftdashboard.toolboxes.modelmaker_sfincs_cht.mask_active_cells_snapwave
     element: mask_active_cells_snapwave.yml
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: use_snapwave
+        operator: eq
+        value: true
+  - string: Mask Boundary SnapWave
+    module: delftdashboard.toolboxes.modelmaker_sfincs_cht.mask_boundary_cells_snapwave
+    element: mask_boundary_cells_snapwave.yml
     dependency:
     - action: enable
       checkfor: all

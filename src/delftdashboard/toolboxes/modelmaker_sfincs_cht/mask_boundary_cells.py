@@ -35,12 +35,16 @@ def delete_open_boundary_polygon(*args):
     update()
 
 def load_open_boundary_polygon(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select open boundary polygon file ...", filter="*.geojson")
-    if not okay:
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select open boundary polygon file ...", filter="*.geojson")
+    if not full_name:
         return
-    app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_file", fname[2])
-    app.toolbox["modelmaker_sfincs_cht"].read_open_boundary_polygon()
+    append = False
+    if app.gui.getvar("modelmaker_sfincs_cht", "nr_open_boundary_polygons"):
+        append = app.gui.window.dialog_yes_no("Add to existing open boundary polygons?", " ")
+    app.toolbox["modelmaker_sfincs_cht"].read_open_boundary_polygon(full_name, append)
     app.toolbox["modelmaker_sfincs_cht"].plot_open_boundary_polygon()
+    update()
+
 
 def save_open_boundary_polygon(*args):
     app.toolbox["modelmaker_sfincs_cht"].write_open_boundary_polygon()
@@ -77,12 +81,15 @@ def delete_outflow_boundary_polygon(*args):
     update()
 
 def load_outflow_boundary_polygon(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select outflow boundary polygon file ...", filter="*.geojson")
-    if not okay:
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select outflow boundary polygon file ...", filter="*.geojson")
+    if not full_name:
         return
-    app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_file", fname[2])
-    app.toolbox["modelmaker_sfincs_cht"].read_outflow_boundary_polygon()
+    append = False
+    if app.gui.getvar("modelmaker_sfincs_cht", "nr_outflow_boundary_polygons"):
+        append = app.gui.window.dialog_yes_no("Add to existing outflow boundary polygons?", " ")
+    app.toolbox["modelmaker_sfincs_cht"].read_outflow_boundary_polygon(full_name, append)
     app.toolbox["modelmaker_sfincs_cht"].plot_outflow_boundary_polygon()
+    update()
 
 def save_outflow_boundary_polygon(*args):
     app.toolbox["modelmaker_sfincs_cht"].write_outflow_boundary_polygon()

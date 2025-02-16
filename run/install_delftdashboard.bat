@@ -34,3 +34,5 @@ call %CONDA% activate %ENVNAME%
 
 REM Install a Python package using pip
 pip install delftdashboard@git+https://github.com/deltares-research/delftdashboard.git
+
+pause

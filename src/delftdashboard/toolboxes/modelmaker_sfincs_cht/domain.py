@@ -122,9 +122,8 @@ def build_model(*args):
     app.toolbox["modelmaker_sfincs_cht"].build_model()
 
 def use_snapwave(*args):
-    # group = "modelmaker_sfincs_cht"
-    app.gui.setvar("sfincs_cht", "snapwave", app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"))
     app.model["sfincs_cht"].domain.input.variables.snapwave = app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave")
+    app.gui.setvar("modelmaker_sfincs_cht", "snapwave", app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"))
 
 def use_subgrid(*args):
     pass

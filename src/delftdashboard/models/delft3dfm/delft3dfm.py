@@ -12,7 +12,8 @@ from delftdashboard.operations.model import GenericModel
 from delftdashboard.operations import map
 from delftdashboard.app import app
 
-from cht_delft3dfm.delft3dfm import Delft3DFM
+# from cht_delft3dfm.delft3dfm import Delft3DFM
+from cht_delft3dfm import Delft3DFM
 
 class Model(GenericModel):
     def __init__(self, name):

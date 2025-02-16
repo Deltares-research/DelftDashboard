@@ -33,3 +33,5 @@ call %CONDA% activate %ENVNAME%
 
 REM Upgrade a Python package using pip
 pip install --upgrade delftdashboard@git+https://github.com/deltares-research/delftdashboard.git
+
+pause

@@ -45,9 +45,9 @@ element:
 - style: listbox
   position:
     x: 310
-    y: 10
+    y: 35
     width: 200
-    height: 110
+    height: 85
   text: "Selected Datasets"
   text_position: "above"
   method: select_selected_bathymetry_dataset
@@ -55,6 +55,40 @@ element:
   select: index
   option_string:
     variable: selected_bathymetry_dataset_names
+- style: edit
+  position:
+    x: 340
+    y: 10
+    width: 60
+    height: 20
+  text: "Zmin"
+  method: edit_zmin_bathymetry_dataset
+  variable: selected_bathymetry_dataset_zmin
+  tooltip: Minimum elevation for this dataset (values below Zmin will not be used)
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
+- style: edit
+  position:
+    x: 450
+    y: 10
+    width: 60
+    height: 20
+  text: "Zmax"
+  method: edit_zmax_bathymetry_dataset
+  variable: selected_bathymetry_dataset_zmax
+  tooltip: Maximum elevation for this dataset (values above Zmax will not be used)
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      operator: gt
+      value: 0
 - style: pushbutton
   position:
     x: 520
@@ -101,42 +135,10 @@ element:
       operator: gt
       value: 0
 - style: edit
-  position:
-    x: 650
-    y: 100
-    width: 50
-    height: 20
-  text: "Zmax"
-  method: edit_zmax_bathymetry_dataset
-  variable: selected_bathymetry_dataset_zmax
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
-- style: edit
-  position:
-    x: 650
-    y: 75
-    width: 50
-    height: 20
-  text: "Zmin"
-  method: edit_zmin_bathymetry_dataset
-  variable: selected_bathymetry_dataset_zmin
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: nr_selected_bathymetry_datasets
-      operator: gt
-      value: 0
-- style: edit
   text: Zmax (m)
   variable: zmax
   position:
-    x: 760
+    x: 670
     y: 65
     width: 60
     height: 20
@@ -146,7 +148,7 @@ element:
   text: Zmin (m)
   variable: zmin
   position:
-    x: 760
+    x: 670
     y: 40
     width: 60
     height: 20
@@ -154,12 +156,13 @@ element:
   tooltip: Minimum bed level used in model bathymetry (used to limit extreme depths)
 - style: pushbutton
   position:
-    x: 700
+    x: 610
     y: 10
     width: 120
     height: 20
   text: "Generate Bathymetry"
   method: generate_bathymetry
+  tooltip: Generate model bathymetry
   dependency:
   - action: enable
     checkfor: all

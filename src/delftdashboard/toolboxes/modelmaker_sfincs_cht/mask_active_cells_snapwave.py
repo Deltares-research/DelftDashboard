@@ -18,7 +18,7 @@ def select(*args):
     app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon_snapwave"].activate()
     # Show the grid and mask
     app.map.layer["sfincs_cht"].layer["grid"].activate()
-    app.map.layer["sfincs_cht"].layer["mask_include_snapwave"].activate()
+    app.map.layer["sfincs_cht"].layer["mask_snapwave"].activate()
     update()
 
 def draw_include_polygon_snapwave(*args):
@@ -34,12 +34,15 @@ def delete_include_polygon_snapwave(*args):
     update()
 
 def load_include_polygon_snapwave(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select include polygon file ...", filter="*.geojson")
-    if not okay:
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select include polygon file ...", filter="*.geojson")
+    if not full_name:
         return
-    app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_file_snapwave", fname[2])
-    app.toolbox["modelmaker_sfincs_cht"].read_include_polygon_snapwave()
+    append = False
+    if app.gui.getvar("modelmaker_sfincs_cht", "nr_include_polygons_snapwave"):
+        append = app.gui.window.dialog_yes_no("Add to existing include polygons?", " ")
+    app.toolbox["modelmaker_sfincs_cht"].read_include_polygon_snapwave(full_name, append)
     app.toolbox["modelmaker_sfincs_cht"].plot_include_polygon_snapwave()
+    update()
 
 def save_include_polygon_snapwave(*args):
     app.toolbox["modelmaker_sfincs_cht"].write_include_polygon_snapwave()
@@ -74,12 +77,15 @@ def delete_exclude_polygon_snapwave(*args):
     update()
 
 def load_exclude_polygon_snapwave(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select exclude polygon file ...", filter="*.geojson")
-    if not okay:
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select exclude polygon file ...", filter="*.geojson")
+    if not full_name:
         return
-    app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_file_snapwave", fname[2])
-    app.toolbox["modelmaker_sfincs_cht"].read_exclude_polygon_snapwave()
+    append = False
+    if app.gui.getvar("modelmaker_sfincs_cht", "nr_exclude_polygons_snapwave"):
+        append = app.gui.window.dialog_yes_no("Add to existing exclude polygons?", " ")
+    app.toolbox["modelmaker_sfincs_cht"].read_exclude_polygon_snapwave(full_name, append)
     app.toolbox["modelmaker_sfincs_cht"].plot_exclude_polygon_snapwave()
+    update()
 
 def save_exclude_polygon_snapwave(*args):
     app.toolbox["modelmaker_sfincs_cht"].write_exclude_polygon_snapwave()

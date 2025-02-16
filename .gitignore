@@ -17,3 +17,5 @@ environment.yml
 src/delftdashboard/delftdashboard.ini
 src/delftdashboard/delftdashboard.pth
 /src/delftdashboard.egg-info
+run/_start_ddb.py
+run/_start_ddb.py

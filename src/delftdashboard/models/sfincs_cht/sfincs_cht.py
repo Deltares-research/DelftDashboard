@@ -30,6 +30,7 @@ class Model(GenericModel):
         self.discharge_points_changed = False
         self.boundaries_changed = False
         self.thin_dams_changed = False
+        self.wave_boundaries_changed = False
 
     def get_view_menu(self):
         model_view_menu = {}
@@ -68,12 +69,9 @@ class Model(GenericModel):
 
         layer.add_layer("mask",
                         type="image")
-
-        layer.add_layer("mask_include_snapwave",
-                        type="circle",
-                        circle_radius=3,
-                        fill_color="yellow",
-                        line_color="transparent")
+        
+        layer.add_layer("mask_snapwave",
+                        type="image")
 
         from .boundary_conditions import select_boundary_point_from_map
         layer.add_layer("boundary_points",
@@ -163,6 +161,23 @@ class Model(GenericModel):
         #                      create=boundary_enclosure_created,
         #                      modify=boundary_enclosure_modified,
         #                      polygon_line_color="red")
+        from .waves_boundary_conditions import select_boundary_point_from_map_snapwave
+        layer.add_layer("boundary_points_snapwave",
+                        type="circle_selector",
+                        select=select_boundary_point_from_map_snapwave,
+                        hover_property="name",
+                        line_color="white",
+                        line_opacity=1.0,
+                        fill_color="blue",
+                        fill_opacity=1.0,
+                        circle_radius=4,
+                        circle_radius_selected=5,
+                        line_color_selected="white",
+                        fill_color_selected="red",
+                        circle_radius_inactive=4,
+                        line_color_inactive="white",
+                        fill_color_inactive="lightgrey"
+                       )
 
         # Wave makers
         from .waves_wave_makers import wave_maker_created
@@ -187,7 +202,7 @@ class Model(GenericModel):
             layer.layer["grid_exterior"].deactivate()
             # Mask is made invisible
             layer.layer["mask"].hide()
-            layer.layer["mask_include_snapwave"].hide()
+            layer.layer["mask_snapwave"].hide()
             # Boundary points are made grey
             layer.layer["boundary_points"].deactivate()
             # Observation points are made grey
@@ -199,6 +214,7 @@ class Model(GenericModel):
             layer.layer["thin_dams"].layer["snapped"].hide()
             # # SnapWave boundary enclosure is made invisible
             # layer.layer["snapwave_boundary_enclosure"].hide()
+            layer.layer["boundary_points_snapwave"].deactivate()
             # Wave makers are made invisible
             layer.layer["wave_makers"].hide()
         elif mode == "invisible":
@@ -227,10 +243,12 @@ class Model(GenericModel):
             self.set_gui_variables()
             # Also get mask datashader dataframe (should this not happen when grid is read?)
             self.domain.mask.get_datashader_dataframe()
+            self.domain.snapwave.mask.get_datashader_dataframe()
             # Change CRS
             map.set_crs(self.domain.crs)
             self.plot()
             dlg.close()
+            app.gui.window.update()
             # Zoom to model extent
             bounds = self.domain.grid.bounds(crs=4326, buffer=0.1)
             app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
@@ -259,8 +277,10 @@ class Model(GenericModel):
         app.map.layer["sfincs_cht"].layer["boundary_points"].set_data(app.model["sfincs_cht"].domain.boundary_conditions.gdf, 0)
         # Discharge points
         app.map.layer["sfincs_cht"].layer["discharge_points"].set_data(app.model["sfincs_cht"].domain.discharge_points.gdf, 0)
-        # # SnapWave boundary enclosure
-        # app.map.layer["sfincs_cht"].layer["snapwave_boundary_enclosure"].set_data(app.model["sfincs_cht"].domain.snapwave.boundary_enclosure.gdf)
+        # Mask SnapWave
+        app.map.layer["sfincs_cht"].layer["mask_snapwave"].set_data(app.model["sfincs_cht"].domain.snapwave.mask)
+        # SnapWave Boundary points
+        app.map.layer["sfincs_cht"].layer["boundary_points_snapwave"].set_data(app.model["sfincs_cht"].domain.snapwave.boundary_conditions.gdf, 0)
         # Wave makers
         app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(app.model["sfincs_cht"].domain.wave_makers.gdf)
 
@@ -280,7 +300,6 @@ class Model(GenericModel):
 
         app.gui.setvar(group, "grid_type", "regular")
         app.gui.setvar(group, "bathymetry_type", "regular")
-        app.gui.setvar(group, "snapwave", False)
         app.gui.setvar(group, "roughness_type", "landsea")
         app.gui.setvar(group, "input_options_text", ["Binary", "ASCII"])
         app.gui.setvar(group, "input_options_values", ["bin", "asc"])
@@ -327,6 +346,25 @@ class Model(GenericModel):
         app.gui.setvar(group, "thin_dam_names", [])
         app.gui.setvar(group, "nr_thin_dams", 0)
         app.gui.setvar(group, "thin_dam_index", 0)
+
+        # SnapWave
+        app.gui.setvar("modelmaker_sfincs_cht", "use_snapwave", app.gui.getvar(group, "snapwave"))
+        app.gui.setvar(group, "boundary_point_names_snapwave", [])
+        app.gui.setvar(group, "nr_boundary_points_snapwave", 0)
+        app.gui.setvar(group, "active_boundary_point_snapwave", 0)
+        app.gui.setvar(group, "boundary_dx_snapwave", 10000.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_shape_snapwave", "constant")
+        app.gui.setvar(group, "boundary_conditions_timeseries_time_step_snapwave", 600.0)
+        # app.gui.setvar(group, "boundary_conditions_timeseries_offset", 0.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_hm0_snapwave", 1.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_tp_snapwave", 8.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_wd_snapwave", 0.0)
+        app.gui.setvar(group, "boundary_conditions_timeseries_ds_snapwave", 20.0)
+        # app.gui.setvar(group, "boundary_conditions_timeseries_phase", 0.0)
+        # app.gui.setvar(group, "boundary_conditions_timeseries_period", 43200.0)
+        # app.gui.setvar(group, "boundary_conditions_timeseries_peak", 1.0)
+        # app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
+        # app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
 
         # Wave makers  
         app.gui.setvar(group, "wave_maker_names", [])
