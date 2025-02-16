@@ -5,7 +5,6 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "1.0.1"
 name = "delftdashboard"
 authors = [
     {name = "Maarten van Ormondt", email = "maarten.vanormondt@deltares-usa.us"},
@@ -58,6 +57,7 @@ dependencies = [
     "cht_tiling@ git+https://github.com/deltares-research/cht_tiling.git",
     "cht_physics@ git+https://github.com/deltares-research/cht_physics.git",
 ]
+dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
