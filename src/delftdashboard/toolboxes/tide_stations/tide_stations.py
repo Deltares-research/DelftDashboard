@@ -198,8 +198,9 @@ class Toolbox(GenericToolbox):
         else:
             # Get all stations within polygon
             station_list = []
+            pol = app.toolbox["tide_stations"].polygon.to_crs(epsg=4326)
             for index, row in self.gdf.iterrows():
-                if app.toolbox["tide_stations"].polygon.contains(row.geometry)[0]:
+                if pol.contains(row.geometry)[0]:
                     station_list.append(row[opt])
 
         for station_name in station_list:
