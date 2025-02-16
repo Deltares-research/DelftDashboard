@@ -5,6 +5,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
+version = "1.0.1"
 name = "delftdashboard"
 authors = [
     {name = "Maarten van Ormondt", email = "maarten.vanormondt@deltares-usa.us"},
