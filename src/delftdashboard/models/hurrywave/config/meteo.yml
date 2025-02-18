@@ -15,6 +15,7 @@ element:
       height: 20
     text: File Type
     variable: wind_type
+    method: edit
     option_string:
     - Uniform
     - Spider web
@@ -33,6 +34,7 @@ element:
       height: 20
     text: Wind File
     variable: wndfile
+    method: edit
     showfilename: True
     filter: "Wind file (*.wnd)"
     title: Select wind file
@@ -52,6 +54,7 @@ element:
       height: 20
     text: Spiderweb File
     variable: spwfile
+    method: edit
     showfilename: True
     filter: "Spiderweb file (*.spw)"
     title: Select spiderweb file
@@ -74,6 +77,7 @@ element:
       height: 20
     text: AMU File
     variable: amufile
+    method: edit
     showfilename: True
     extension: "*.amu"
     title: Select AMU file
@@ -97,6 +101,7 @@ element:
       height: 20
     text: AMV File
     variable: amvfile
+    method: edit
     showfilename: True
     filter: "AMV file (*.amv)"
     title: Select AMV file
