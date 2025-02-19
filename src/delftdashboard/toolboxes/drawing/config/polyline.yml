@@ -9,6 +9,7 @@ element:
   textposition: above
   method: select_polyline
   variable: active_polyline
+  tooltip: Select polyline from list
   select: index
   option_string:
     variable: polyline_names
@@ -20,6 +21,7 @@ element:
     width: 120
     height: 20
   method: draw_polyline
+  tooltip: Draw new polyline
 - style: pushbutton
   text: Delete Polyline
   position:
@@ -28,6 +30,7 @@ element:
     width: 120
     height: 20
   method: delete_polyline
+  tooltip: Delete selected polyline
   dependency:
   - action: enable
     checkfor: all
@@ -43,6 +46,7 @@ element:
     width: 120
     height: 20
   method: load_polyline
+  tooltip: Load polylines from geojson file
 - style: pushbutton
   text: Save Polyline
   position:
@@ -51,6 +55,7 @@ element:
     width: 120
     height: 20
   method: save_polyline
+  tooltip: Save polyline(s) to geojson file
   dependency:
   - action: enable
     checkfor: all
@@ -66,6 +71,7 @@ element:
     width: 120
     height: 20
   method: apply_buffer
+  tooltip: Create polygon by applying buffer to polyline(s). The polygon will appear under the "Polygon" tab.
   dependency:
   - action: enable
     checkfor: all
@@ -81,6 +87,9 @@ element:
     height: 20
   variable: polyline_buffer_distance
   method: edit_polyline_buffer_distance
+  text: Distance (m)  
+  text_position: right
+  tooltip: Edit buffer distance in metres
   dependency:
   - action: enable
     checkfor: all

@@ -5,6 +5,7 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 import os
+import datetime
 # import math
 # import numpy as np
 # import geopandas as gpd
@@ -65,7 +66,7 @@ class Toolbox(GenericToolbox):
         self.cyclone_track_database = CycloneTrackDatabase(path,
                                                            s3_bucket=s3_bucket,
                                                            s3_key=s3_key,
-                                                           check_online=True)
+                                                           check_online=app.online)
         short_names, long_names = self.cyclone_track_database.dataset_names()
         app.gui.setvar("tropical_cyclone", "track_dataset_long_names", long_names)
         app.gui.setvar("tropical_cyclone", "track_dataset_names", short_names)
@@ -146,7 +147,6 @@ class Toolbox(GenericToolbox):
             # Add the spw file to the model
             spw_file = file_name[2] # No path
             model.domain.input.variables.spwfile = spw_file
-            app.gui.setvar("sfincs_cht", "spwfile", spw_file)
             # Do some other stuff here as well specific to SFINCS
             # Turn on barometric pressure
             model.domain.input.variables.baro = True
@@ -163,12 +163,26 @@ class Toolbox(GenericToolbox):
                     utmstr = crs_name.split(" ")[-1]
                     # Set the UTM zone variable               
                     model.domain.input.variables.utmzone = utmstr
+            model.set_gui_variables()
+
+            # Check if model simulation time is within the track time
+            t0_model = model.domain.input.variables.tstart
+            t1_model = model.domain.input.variables.tstop
+
+            date_format = "%Y%m%d %H%M%S"
+            # Get first row of track
+            date_string = self.tc.track.gdf.iloc[0]["datetime"]
+            t0_track = datetime.datetime.strptime(date_string, date_format)
+            # Get last row of track
+            date_string = self.tc.track.gdf.iloc[-1]["datetime"]
+            t1_track = datetime.datetime.strptime(date_string, date_format)
+
+            if t0_model < t0_track or t1_model > t1_track:
+                app.gui.window.dialog_warning("The time of the cyclone track does not fully cover the simulation time. Please adjust the start and/or stop time of the model simulation!")
 
         elif model.name == "hurrywave":
             # Add the spw file to the model
             model.domain.input.variables.spwfile = file_name[2]
-            # And update the GUI variable
-            app.gui.setvar("hurrywave", "spwfile", spw_file)    
             # Do some other stuff here as well specific to HurryWave
             # If the CRS of the model is a UTM zone, we need to set the utmzone variable
             if model.domain.crs.is_projected:
@@ -179,6 +193,23 @@ class Toolbox(GenericToolbox):
                     utmstr = crs_name.split(" ")[-1]
                     # Set the UTM zone variable               
                     model.domain.input.variables.utmzone = utmstr
+            model.set_gui_variables()        
+
+            # Check if model simulation time is within the track time
+            t0_model = model.domain.input.variables.tstart
+            t1_model = model.domain.input.variables.tstop
+
+            date_format = "%Y%m%d %H%M%S"
+            # Get first row of track
+            date_string = self.tc.track.gdf.iloc[0]["datetime"]
+            t0_track = datetime.datetime.strptime(date_string, date_format)
+            # Get last row of track
+            date_string = self.tc.track.gdf.iloc[-1]["datetime"]
+            t1_track = datetime.datetime.strptime(date_string, date_format)
+
+            if t0_model < t0_track or t1_model > t1_track:
+                app.gui.window.dialog_warning("The time of the cyclone track does not fully cover the simulation time. Please adjust the start and/or stop time of the model simulation!")
+
 
     def load_track(self):
         # Load the track

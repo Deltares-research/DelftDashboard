@@ -8,6 +8,7 @@ element:
   text: Polygons
   textposition: above
   method: select_polygon
+  tooltip: Select polygon from list
   variable: active_polygon
   select: index
   option_string:
@@ -20,6 +21,7 @@ element:
     width: 120
     height: 20
   method: draw_polygon
+  tooltip: Draw new polygon
 - style: pushbutton
   text: Delete Polygon
   position:
@@ -28,6 +30,7 @@ element:
     width: 120
     height: 20
   method: delete_polygon
+  tooltip: Delete selected polygon
   dependency:
   - action: enable
     checkfor: all
@@ -43,6 +46,7 @@ element:
     width: 120
     height: 20
   method: load_polygon
+  tooltip: Load polygons from geojson file
 - style: pushbutton
   text: Save Polygon
   position:
@@ -51,6 +55,7 @@ element:
     width: 120
     height: 20
   method: save_polygon
+  tooltip: Save polygon(s) to geojson file
   dependency:
   - action: enable
     checkfor: all
@@ -66,6 +71,7 @@ element:
     width: 120
     height: 20
   method: apply_buffer
+  tooltip: Adjust polygon by applying buffer
   dependency:
   - action: enable
     checkfor: all
@@ -79,8 +85,11 @@ element:
     y: 100
     width: 50
     height: 20
+  text: Distance (m)  
+  text_position: right
   variable: polygon_buffer_distance
   method: edit_polygon_buffer_distance
+  tooltip: Edit buffer distance in metres
   dependency:
   - action: enable
     checkfor: all
@@ -96,6 +105,7 @@ element:
     width: 120
     height: 20
   method: merge_polygons
+  tooltip: Merge all polygons
   dependency:
   - action: enable
     checkfor: all

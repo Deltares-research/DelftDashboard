@@ -29,3 +29,6 @@ def select(*args):
 def set_model_variables(*args):
     # All variables will be set
     app.model["sfincs_cht"].set_model_variables()
+
+    # Now check that the boundary and other forcing fully covers the simulation time
+    app.model["sfincs_cht"].check_times()

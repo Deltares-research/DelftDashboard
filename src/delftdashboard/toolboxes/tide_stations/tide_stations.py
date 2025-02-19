@@ -37,7 +37,7 @@ class Toolbox(GenericToolbox):
         app.tide_stations_database = TideStationsDatabase(path=app.config["tide_stations_database_path"],
                                                           s3_bucket=s3_bucket,
                                                           s3_key=s3_key,
-                                                          check_online=True)
+                                                          check_online=app.online)
 
         short_names, long_names = app.tide_stations_database.dataset_names()
         if len(short_names) == 0:

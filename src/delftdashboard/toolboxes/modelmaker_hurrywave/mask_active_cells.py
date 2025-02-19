@@ -17,6 +17,7 @@ def select(*args):
     app.map.layer["modelmaker_hurrywave"].layer["mask_include"].activate()
     app.map.layer["modelmaker_hurrywave"].layer["mask_exclude"].activate()
     # Show the grid and mask
+    
     app.map.layer["hurrywave"].layer["grid"].activate()
     app.map.layer["hurrywave"].layer["mask_include"].activate()
     app.map.layer["hurrywave"].layer["mask_boundary"].activate()

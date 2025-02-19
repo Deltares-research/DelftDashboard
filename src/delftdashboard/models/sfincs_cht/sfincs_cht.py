@@ -253,8 +253,9 @@ class Model(GenericModel):
             bounds = self.domain.grid.bounds(crs=4326, buffer=0.1)
             app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
 
-    def save(self):
+    def save(self):        
         # Write sfincs.inp
+        self.check_times()
         self.domain.path = os.getcwd()        
         self.domain.input.variables.epsg = app.crs.to_epsg()
         self.domain.exe_path = app.config["sfincs_exe_path"]
@@ -414,3 +415,12 @@ class Model(GenericModel):
             self.domain.input.variables.obsfile = "sfincs.obs"
             app.gui.setvar("sfincs_cht", "obsfile", self.domain.input.variables.obsfile)
         self.domain.observation_points.write()
+
+    def check_times(self):
+        ok, message_list = self.domain.check_times()
+        if not ok:
+            messages = ""
+            for message in message_list:
+                messages = messages + message + "\n"
+            app.gui.window.dialog_warning(messages, "Warning")
+

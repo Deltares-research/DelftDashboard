@@ -10,6 +10,7 @@ import yaml
 # from matplotlib.colors import ListedColormap
 import importlib
 from pyproj import CRS
+import requests
 
 from guitares.gui import GUI
 from guitares.colormap import read_color_maps
@@ -129,6 +130,16 @@ def initialize():
                   copy_map_server_folder=True
                   )
 
+    # Check for internet connection
+    app.online = True
+    try:
+        requests.get("http://www.google.com", timeout=5)
+    except requests.ConnectionError:
+        print("No internet connection available. Cannot check online databases!")
+        app.online = False
+    else:
+        app.online = False
+
     # Bathymetry database (initialize local database)
     if "bathymetry_database_path" not in app.config:
         app.config["bathymetry_database_path"] = os.path.join(app.config["data_path"], "bathymetry")
@@ -137,7 +148,7 @@ def initialize():
     app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database_path"],
                                                  s3_bucket=s3_bucket,
                                                  s3_key=s3_key,
-                                                 check_online=True)
+                                                 check_online=app.online)
 
     # Define some other variables
     app.crs = CRS(4326)
@@ -154,7 +165,7 @@ def initialize():
     app.tide_model_database = TideModelDatabase(path=app.config["tide_model_database_path"],
                                                 s3_bucket=s3_bucket,
                                                 s3_key=s3_key,
-                                                check_online=True)
+                                                check_online=app.online)
     short_names, long_names = app.tide_model_database.dataset_names()
     app.gui.setvar("tide_models", "long_names", long_names)
     app.gui.setvar("tide_models", "names", short_names)

@@ -78,10 +78,8 @@ def save(*args, **kwargs):
     # if bwvfile is None or bhsfile is None:
     #     return
 
-    app.model["sfincs_cht"].domain.input.variables.bwvfile = bwvfile # file name without path
-    # app.model["sfincs_cht"].domain.input.variables.bhsfile = bhsfile # file name without path
-    app.gui.setvar("sfincs_cht", "bwvfile", bwvfile)
-    # app.gui.setvar("sfincs_cht", "bhsfile", bhsfile)
+    app.model["sfincs_cht"].domain.input.variables.snapwave_bndfile = bwvfile # file name without path
+    app.gui.setvar("sfincs_cht", "snapwave_bndfile", bwvfile)
 
     # Write bwv and bhs files
     app.model["sfincs_cht"].domain.snapwave.boundary_conditions.write_boundary_points()

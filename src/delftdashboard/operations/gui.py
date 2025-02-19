@@ -74,7 +74,7 @@ def build_gui_config():
     mp["id"] = "map"
     mp["position"] = {}
     mp["position"]["x"] = 20
-    mp["position"]["y"] = 195
+    mp["position"]["y"] = 180
     mp["position"]["width"] = -20
     mp["position"]["height"] = -40
     mp["module"] = "delftdashboard.operations.map"

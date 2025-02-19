@@ -97,19 +97,30 @@ def edit_water_level_correction(*args):
 
 def perform_nesting_step_2(*args):
 
+    overall_model_type = app.gui.getvar("nesting", "overall_model_type")
+    overall_model_file = app.gui.getvar("nesting", "overall_model_file")
+
     if app.active_model.name == "sfincs_cht":
-        # Points were only added to the sfincs_cht model. Need to know new file name.
-        file_name = app.model["sfincs_cht"].domain.input.variables.bzsfile
-        if not file_name:
-            file_name = "sfincs.bzs"
-        rsp = app.gui.window.dialog_save_file("Select file ...",
-                                            file_name=file_name,
-                                            filter="*.bzs",
-                                            allow_directory_change=False)
-        if rsp[0]:
-            bzsfile = rsp[2] # file name without path
+
+        if overall_model_type == "hurrywave":
+            # SnapWave boundary conditions (don't ask for filenames in this case)
+            pass
+
         else:
-            return
+        
+            # Points were only added to the sfincs_cht model. Need to know new file name.
+            file_name = app.model["sfincs_cht"].domain.input.variables.bzsfile
+            if not file_name:
+                file_name = "sfincs.bzs"
+            rsp = app.gui.window.dialog_save_file("Select file ...",
+                                                file_name=file_name,
+                                                filter="*.bzs",
+                                                allow_directory_change=False)
+            if rsp[0]:
+                bzsfile = rsp[2] # file name without path
+            else:
+                return
+
     elif app.active_model.name == "hurrywave":
         # Points were only added to the sfincs_cht model. Need to know new file name.
         file_name = app.model["hurrywave"].domain.input.variables.bspfile
@@ -126,9 +137,6 @@ def perform_nesting_step_2(*args):
 
     # Add waitbox
     wb = app.gui.window.dialog_wait("Performing nesting step 2 ...")
-
-    overall_model_type = app.gui.getvar("nesting", "overall_model_type")
-    overall_model_file = app.gui.getvar("nesting", "overall_model_file")
 
     # Get the folder name of the selected file
     path = os.path.dirname(overall_model_file)
@@ -153,8 +161,11 @@ def perform_nesting_step_2(*args):
         print("Nesting step 2 completed successfully")
         # Update observations layer and save the observation points
         if app.active_model.name == "sfincs_cht":
-            app.active_model.domain.input.variables.bzsfile = bzsfile # file name without path
-            app.active_model.domain.boundary_conditions.write_boundary_conditions_timeseries()
+            if overall_model_type == "hurrywave":
+                app.active_model.domain.snapwave.boundary_conditions.write_boundary_conditions_timeseries()
+            else:
+                app.active_model.domain.input.variables.bzsfile = bzsfile # file name without path
+                app.active_model.domain.boundary_conditions.write_boundary_conditions_timeseries()
         elif app.active_model.name == "hurrywave":
             app.active_model.domain.input.variables.bspfile = bspfile # file name without path
             app.active_model.domain.boundary_conditions.write_boundary_conditions_spectra()

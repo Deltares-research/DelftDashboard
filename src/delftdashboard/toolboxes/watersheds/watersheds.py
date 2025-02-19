@@ -38,7 +38,7 @@ class Toolbox(GenericToolbox):
         app.watersheds_database = WatershedsDatabase(path=app.config["watersheds_database_path"],
                                                      s3_bucket=s3_bucket,
                                                      s3_key=s3_key,
-                                                     check_online=True)
+                                                     check_online=app.online)
 
         short_names, long_names = app.watersheds_database.dataset_names()
 
