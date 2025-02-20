@@ -56,6 +56,7 @@ dependencies = [
     "cht_tsunami@ git+https://github.com/deltares-research/cht_tsunami.git",
     "cht_tiling@ git+https://github.com/deltares-research/cht_tiling.git",
     "cht_physics@ git+https://github.com/deltares-research/cht_physics.git",
+    "cosmos@ git+https://github.com/deltares/cosmos.git",
 ]
 dynamic = ["version"]
 
