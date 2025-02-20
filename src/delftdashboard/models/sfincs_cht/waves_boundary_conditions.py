@@ -29,11 +29,11 @@ def load(*args):
     map.reset_cursor()
     # bnd file
     rsp = app.gui.window.dialog_open_file("Select file ...",
-                                          file_name="sfincs.bwv",
-                                          filter="*.bwv",
+                                          file_name="snapwave.bnd",
+                                          filter="*.bnd",
                                           allow_directory_change=False)
     if rsp[0]:
-        app.model["sfincs_cht"].domain.input.variables.bwvfile = rsp[2] # file name without path
+        app.model["sfincs_cht"].domain.input.variables.snapwave_bndfile = rsp[2] # file name without path
     else:
         # User pressed cancel
         return
@@ -42,7 +42,7 @@ def load(*args):
                                           filter="*.bhs",
                                           allow_directory_change=False)
     if rsp[0]:
-        app.model["sfincs_cht"].domain.input.variables.bhsfile = rsp[2] # file name without path
+        app.model["sfincs_cht"].domain.input.variables.snapwave_bhsfile = rsp[2] # file name without path
         read_bhs_file = True
     else:
         # User pressed cancel. Do not read bzs file, but initialize boundary conditions anyway.
@@ -72,16 +72,16 @@ def save(*args, **kwargs):
 
     # Save both bnd and bzs files (not the bca file for now)
 
-    bwvfile = get_bwv_file_name()
+    bndfile = get_bnd_file_name()
     # bhsfile = get_bhs_file_name()
 
-    # if bwvfile is None or bhsfile is None:
+    # if bndfile is None or bhsfile is None:
     #     return
 
-    app.model["sfincs_cht"].domain.input.variables.snapwave_bndfile = bwvfile # file name without path
-    app.gui.setvar("sfincs_cht", "snapwave_bndfile", bwvfile)
+    app.model["sfincs_cht"].domain.input.variables.snapwave_bndfile = bndfile # file name without path
+    app.gui.setvar("sfincs_cht", "snapwave_bndfile", bndfile)
 
-    # Write bwv and bhs files
+    # Write bnd and bhs files
     app.model["sfincs_cht"].domain.snapwave.boundary_conditions.write_boundary_points()
     app.model["sfincs_cht"].domain.snapwave.boundary_conditions.write_boundary_conditions_timeseries()
     app.model["sfincs_cht"].wave_boundaries_changed = False
@@ -183,8 +183,8 @@ def create_boundary_points_snapwave(*args):
                                     title=" ")
         return
 
-    bwvfile = get_bwv_file_name()
-    if bwvfile is None:
+    bndfile = get_bnd_file_name()
+    if bndfile is None:
         return
 
     # Create points from mask
@@ -200,8 +200,8 @@ def create_boundary_points_snapwave(*args):
     app.gui.setvar("sfincs_cht", "boundary_conditions_timeseries_shape_snapwave", "constant")
 
     # Write bnd file
-    app.model["sfincs_cht"].domain.input.variables.bwvfile = bwvfile # file name without path
-    app.gui.setvar("sfincs_cht", "bwvfile", bwvfile)
+    app.model["sfincs_cht"].domain.input.variables.snapwave_bndfile = bndfile # file name without path
+    app.gui.setvar("sfincs_cht", "snapwave_bndfile", bndfile)
     app.model["sfincs_cht"].domain.snapwave.boundary_conditions.write_boundary_points()
 
     set_boundary_conditions_snapwave()
@@ -209,13 +209,13 @@ def create_boundary_points_snapwave(*args):
     app.gui.setvar("sfincs_cht", "active_boundary_point_snapwave", 0)
     update_list()
 
-def get_bwv_file_name(*args):
-    filename = app.model["sfincs_cht"].domain.input.variables.bwvfile
+def get_bnd_file_name(*args):
+    filename = app.model["sfincs_cht"].domain.input.variables.snapwave_bndfile
     if not filename:
-        filename = "sfincs.bwv"
+        filename = "snapwave.bnd"
     rsp = app.gui.window.dialog_save_file("Select file ...",
                                         file_name=filename,
-                                        filter="*.bwv",
+                                        filter="*.bnd",
                                         allow_directory_change=False)
     if rsp[0]:
         return rsp[2]
