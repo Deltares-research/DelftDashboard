@@ -1,0 +1,17 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: View
+    module: delftdashboard.toolboxes.nesting.view
+    element: view.yml
+  - string: Export
+    module: delftdashboard.toolboxes.flood_map.export
+    element: export.yml
+  - string: Compare
+    module: delftdashboard.toolboxes.flood_map.compare
+    element: compare.yml

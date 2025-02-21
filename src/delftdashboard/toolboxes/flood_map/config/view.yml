@@ -1,0 +1,9 @@
+element:
+- style: pushbutton
+  text: Load Map Output
+  position:
+    x: 20
+    y: 100
+    width: 120
+    height: 20
+  method: load_map_output

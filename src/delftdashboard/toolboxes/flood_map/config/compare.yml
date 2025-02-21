@@ -1,0 +1,8 @@
+element:
+- style: pushbutton
+  text: Dummy
+  position:
+    x: 170
+    y: 10
+    width: 120
+    height: 20
