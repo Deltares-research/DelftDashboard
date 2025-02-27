@@ -120,7 +120,7 @@ def add_to_model(*args):
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
     if app.active_model.domain.fiat_model.exposure is not None:
         dlg = app.gui.window.dialog_wait("\nUpdating Finished Floor Height in your FIAT model...")
-        update.update_parameters("Finished Floor Height")
+        update.update_parameters("ground_flht")
         
         dlg.close()
         

@@ -23,7 +23,7 @@ element:
     text: "Display properties"
     variable: properties_to_display
     option_string: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation",] #"Social Vulnerability Index (SVI)"]
-    option_value: ["Classification", "Finished floor height", "Max potential damages", "Ground Elevation",] #"Social Vulnerability Index (SVI)"]
+    option_value: ["Classification", "ground_flht", "Max potential damages", "ground_elevtn",] #"Social Vulnerability Index (SVI)"]
     method: display_properties
   - style: popupmenu
     position:
