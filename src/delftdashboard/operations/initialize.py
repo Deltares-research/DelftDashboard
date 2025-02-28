@@ -137,8 +137,6 @@ def initialize():
     except requests.ConnectionError:
         print("No internet connection available. Cannot check online databases!")
         app.online = False
-    else:
-        app.online = False
 
     # Bathymetry database (initialize local database)
     if "bathymetry_database_path" not in app.config:
