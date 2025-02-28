@@ -19,3 +19,4 @@ src/delftdashboard/delftdashboard.pth
 /src/delftdashboard.egg-info
 run/_start_ddb.py
 run/_start_ddb.py
+src/delftdashboard/config/delftdashboard.cfg.mine

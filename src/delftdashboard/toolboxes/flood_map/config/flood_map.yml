@@ -7,7 +7,7 @@ element:
     height: 160
   tab:
   - string: View
-    module: delftdashboard.toolboxes.nesting.view
+    module: delftdashboard.toolboxes.flood_map.view
     element: view.yml
   - string: Export
     module: delftdashboard.toolboxes.flood_map.export

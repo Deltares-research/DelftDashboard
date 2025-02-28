@@ -316,13 +316,14 @@ class Toolbox(GenericToolbox):
         from .quadtree import refinement_polygon_modified
         from .quadtree import refinement_polygon_selected
         layer.add_layer("quadtree_refinement", type="draw",
-                             shape="polygon",
-                             create=refinement_polygon_created,
-                             modify=refinement_polygon_modified,
-                             select=refinement_polygon_selected,
-                             polygon_line_color="red",
-                             polygon_fill_color="orange",
-                             polygon_fill_opacity=0.1)
+                        columns={"refinement_level": 1, "zmin": -99999.0, "zmax": 99999.0},
+                        shape="polygon",
+                        create=refinement_polygon_created,
+                        modify=refinement_polygon_modified,
+                        select=refinement_polygon_selected,
+                        polygon_line_color="red",
+                        polygon_fill_color="orange",
+                        polygon_fill_opacity=0.1)
 
     def set_crs(self):
         # Called when the CRS is changed
@@ -354,13 +355,13 @@ class Toolbox(GenericToolbox):
         else:
             # Make list of separate gdfs for each polygon
             refpol = self.refinement_polygon
-            # Add refinement_level column
-            refpol["refinement_level"] = 0
-            # Iterate through rows and set refinement levels            
-            for irow, row in refpol.iterrows():
-                refpol.loc[irow, "refinement_level"] = self.refinement_levels[irow]
-                refpol.loc[irow, "zmin"] = self.refinement_zmin[irow]
-                refpol.loc[irow, "zmax"] = self.refinement_zmax[irow]
+            # # Add refinement_level column
+            # refpol["refinement_level"] = 0
+            # # Iterate through rows and set refinement levels            
+            # for irow, row in refpol.iterrows():
+            #     refpol.loc[irow, "refinement_level"] = self.refinement_levels[irow]
+            #     refpol.loc[irow, "zmin"] = self.refinement_zmin[irow]
+            #     refpol.loc[irow, "zmax"] = self.refinement_zmax[irow]
 
         # Build grid
 
@@ -528,27 +529,24 @@ class Toolbox(GenericToolbox):
 
     # READ
 
-    def read_refinement_polygon(self):
+    def read_refinement_polygon(self, file_name, append):
         # Should we make this part of cht_sfincs?
-        fname = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_file")
-        self.refinement_polygon = gpd.read_file(fname)
-        # Loop through rows in geodataframe and set refinement levels        
-        self.refinement_levels = []
-        self.refinement_zmin = []
-        self.refinement_zmax = []
-        for i in range(len(self.refinement_polygon)):
-            if "refinement_level" in self.refinement_polygon.columns:
-                self.refinement_levels.append(self.refinement_polygon["refinement_level"][i])
-            else:
-                self.refinement_levels.append(1)
-            if "zmin" in self.refinement_polygon.columns:
-                self.refinement_zmin.append(self.refinement_polygon["zmin"][i])
-            else:
-                self.refinement_zmin.append(-99999.0)
-            if "zmax" in self.refinement_polygon.columns:
-                self.refinement_zmax.append(self.refinement_polygon["zmax"][i])
-            else:
-                self.refinement_zmax.append(99999.0)    
+        # fname = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_file")
+        refinement_polygon = gpd.read_file(file_name).to_crs(app.crs)
+        # Check if the file contains a column "refinement_level"
+        if "refinement_level" not in refinement_polygon.columns:
+            refinement_polygon["refinement_level"] = 1
+        # Check if the file contains a column "zmin"
+        if "zmin" not in refinement_polygon.columns:
+            refinement_polygon["zmin"] = -99999.0
+        # Check if the file contains a column "zmax"
+        if "zmax" not in refinement_polygon.columns:
+            refinement_polygon["zmax"] = 99999.0
+
+        if append:
+            self.refinement_polygon = gpd.GeoDataFrame(pd.concat([self.refinement_polygon, refinement_polygon], ignore_index=True))
+        else:
+            self.refinement_polygon = refinement_polygon
 
     def read_include_polygon(self, fname, append):
         if not append:
@@ -645,10 +643,12 @@ class Toolbox(GenericToolbox):
         if len(self.refinement_polygon) == 0:
             print("No refinement polygons defined")
             return
-        gdf = gpd.GeoDataFrame({"geometry": self.refinement_polygon["geometry"],
-                                "refinement_level": self.refinement_levels,
-                                "zmin": self.refinement_zmin,
-                                "zmax": self.refinement_zmax})
+        # Drop the id column
+        gdf = self.refinement_polygon.drop(columns=["id"])
+        # gdf = gpd.GeoDataFrame({"geometry": self.refinement_polygon["geometry"],
+        #                         "refinement_level": self.refinement_levels,
+        #                         "zmin": self.refinement_zmin,
+        #                         "zmax": self.refinement_zmax})
         # Iterate over all polygons and add refinement level
         # refinement_level = 1 means one level of refinement
         # refinement_level = 2 means two levels of refinement
@@ -717,8 +717,9 @@ class Toolbox(GenericToolbox):
 
     def plot_refinement_polygon(self):
         layer = app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"]
-        layer.clear()
-        layer.add_feature(self.refinement_polygon)
+        layer.set_data(self.refinement_polygon)
+        # layer.clear()
+        # layer.add_feature(self.refinement_polygon)
 
     def plot_include_polygon(self):
         layer = app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"]

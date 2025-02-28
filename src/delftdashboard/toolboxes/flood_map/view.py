@@ -15,5 +15,9 @@ def select(*args):
     # Tab selected
     app.toolbox["flood_map"].set_layer_mode("active")
 
+def load_map_output(*args):
+    # Load map output
+    app.toolbox["flood_map"].load_map_output()
+
 def edit_table(*args):
     pass

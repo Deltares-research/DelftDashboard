@@ -27,6 +27,7 @@ class Model(GenericModel):
         self.domain = SFINCS(crs=app.crs)
         self.set_gui_variables()
         self.observation_points_changed = False
+        self.cross_sections_changed = False
         self.discharge_points_changed = False
         self.boundaries_changed = False
         self.thin_dams_changed = False
@@ -111,7 +112,7 @@ class Model(GenericModel):
                             circle_radius=0,
                             line_color_inactive="lightgrey")
 
-        from .observation_points import select_observation_point_from_map
+        from .observation_points_observation_points import select_observation_point_from_map
         layer.add_layer("observation_points",
                         type="circle_selector",                        
                         select=select_observation_point_from_map,
@@ -125,6 +126,25 @@ class Model(GenericModel):
                         line_color_selected="white",
                         fill_color_selected="red")
 
+        from .observation_points_cross_sections import cross_section_created
+        from .observation_points_cross_sections import cross_section_selected
+        from .observation_points_cross_sections import cross_section_modified
+        crs_layer = layer.add_layer("cross_sections") # Container layer for thin dams and snapped thin dams
+        crs_layer.add_layer("polylines",
+                            type="draw",
+                            shape="polyline",
+                            create=cross_section_created,
+                            modify=cross_section_modified,
+                            select=cross_section_selected,
+                            polyline_line_color="yellow",
+                            polyline_line_width=2.0,
+                            polyline_line_opacity=1.0)
+        crs_layer.add_layer("snapped",
+                            type="line",
+                            line_color="white",
+                            line_opacity=1.0,
+                            circle_radius=0,
+                            line_color_inactive="lightgrey")
 
             # Make the layer
         # Create geodataframe with one point at (0,0), crs(4326)    
@@ -207,6 +227,9 @@ class Model(GenericModel):
             layer.layer["boundary_points"].deactivate()
             # Observation points are made grey
             layer.layer["observation_points"].deactivate()
+            # Cross sections are made grey
+            layer.layer["cross_sections"].layer["polylines"].deactivate()
+            layer.layer["cross_sections"].layer["snapped"].hide()
             # Discharge points are made grey
             layer.layer["discharge_points"].deactivate()
             # Thin dams are made grey
@@ -337,6 +360,12 @@ class Model(GenericModel):
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
+
+        # Cross sections
+        app.gui.setvar(group, "cross_section_names", [])
+        app.gui.setvar(group, "nr_cross_sections", 0)
+        app.gui.setvar(group, "active_cross_section", 0)
+        app.gui.setvar(group, "cross_section_name", "")
 
         # Discharge points 
         app.gui.setvar(group, "discharge_point_names", [])

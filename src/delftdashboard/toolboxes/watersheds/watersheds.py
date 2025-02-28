@@ -113,16 +113,6 @@ class Toolbox(GenericToolbox):
         ymax = extent[1][1]
         level = app.gui.getvar("watersheds", "level")
 
-        folder="c:\\work\\delftdashboard\\data\\watersheds.ori\\hydrobasins_asia"
-        # Make list of all files in folder (not the full path) and write to a text file like ["file1.txt", "file2.txt", ...]
-        files = os.listdir(folder)
-        with open("c:\\work\\delftdashboard\\data\\watersheds.ori\\hydrobasins_asia\\files.txt", "w") as f:
-            filestring = "["
-            for file in files:
-                filestring += f'"{file}",'
-            filestring = filestring[:-1] + "]"
-            f.write(filestring)
-
         # First check if dataset files need to be downloaded
         if not dataset.check_files():
             # Ask if the user wants to download the file

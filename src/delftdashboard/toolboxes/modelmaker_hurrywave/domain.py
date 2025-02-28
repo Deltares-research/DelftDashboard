@@ -19,12 +19,10 @@ def select(*args):
     app.map.layer["hurrywave"].layer["grid"].show()
     app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].activate()
 
-
 def draw_grid_outline(*args):
     # Clear grid outline layer
     app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].crs = app.crs
     app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].draw()
-
 
 def grid_outline_created(gdf, index, id):
     if len(gdf) > 1:
@@ -36,16 +34,13 @@ def grid_outline_created(gdf, index, id):
     update_geometry()
     app.gui.window.update()
 
-
 def grid_outline_modified(gdf, index, id):
     app.toolbox["modelmaker_hurrywave"].grid_outline = gdf
     update_geometry()
     app.gui.window.update()
 
-
 def generate_grid(*args):
     app.toolbox["modelmaker_hurrywave"].generate_grid()
-
 
 def update_geometry():
     gdf = app.toolbox["modelmaker_hurrywave"].grid_outline
@@ -64,18 +59,14 @@ def update_geometry():
         group, "mmax", np.floor(lenx / app.gui.getvar(group, "dx")).astype(int)
     )
 
-
 def edit_origin(*args):
     redraw_rectangle()
-
 
 def edit_nmmax(*args):
     redraw_rectangle()
 
-
 def edit_rotation(*args):
     redraw_rectangle()
-
 
 def edit_dxdy(*args):
     group = "modelmaker_hurrywave"
@@ -87,7 +78,6 @@ def edit_dxdy(*args):
     app.gui.setvar(
         group, "mmax", np.floor(lenx / app.gui.getvar(group, "dx")).astype(int)
     )
-
 
 def redraw_rectangle():
     group = "modelmaker_hurrywave"
