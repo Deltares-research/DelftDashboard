@@ -1,0 +1,56 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Domain
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.domain
+    element: domain.yml
+  - string: Quadtree
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.quadtree
+    element: quadtree.yml
+  - string: Bathymetry
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.bathymetry
+    element: bathymetry.yml
+  - string: Roughness
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.roughness
+    element: roughness.yml
+  - string: Mask Active Cells
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.mask_active_cells
+    element: mask_active_cells.yml
+  - string: Mask Boundary Cells
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.mask_boundary_cells
+    element: mask_boundary_cells.yml
+  - string: Mask Active SnapWave
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.mask_active_cells_snapwave
+    element: mask_active_cells_snapwave.yml
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: use_snapwave
+        operator: eq
+        value: true
+  - string: Mask Boundary SnapWave
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.mask_boundary_cells_snapwave
+    element: mask_boundary_cells_snapwave.yml
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: use_snapwave
+        operator: eq
+        value: true
+  - string: Sub Grid
+    module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.subgrid
+    element: subgrid.yml
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: use_subgrid
+        operator: eq
+        value: true

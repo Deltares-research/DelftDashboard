@@ -1,0 +1,62 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 80
+    height: 120
+  method: select_thin_dam
+  variable: thin_dam_index
+  select: index
+  option_string:
+    variable: thin_dam_names
+- style: pushbutton
+  text: Draw Thin Dam
+  position:
+    x: 100
+    y: 110
+    width: 80
+    height: 20
+  method: draw_thin_dam
+  tooltip: Draw thin dam on map
+- style: pushbutton
+  text: Delete Thin Dam
+  position:
+    x: 100
+    y: 85
+    width: 80
+    height: 20
+  method: delete_thin_dam
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_thin_dams
+      operator: gt
+      value: 0
+  tooltip: Delete thin dam from list
+- style: pushbutton
+  text: Load
+  position:
+    x: 100
+    y: 60
+    width: 80
+    height: 20
+  method: load
+  tooltip: Load thin dams from file
+- style: pushbutton
+  text: Save
+  position:
+    x: 100
+    y: 35
+    width: 80
+    height: 20
+  method: save
+  tooltip: Save thin dams to file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_thin_dams
+      operator: gt
+      value: 0

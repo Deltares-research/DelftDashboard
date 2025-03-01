@@ -1,0 +1,74 @@
+element:
+- style: panel
+  title: Numerics
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: edit
+    position:
+      x: 100
+      y: 130
+      width: 50
+      height: 20
+    text: Alpha (-)
+    variable: alpha
+    method: set_model_variables
+    tooltipstring: Edit Courant coefficient alpha
+  - style: edit
+    position:
+      x: 100
+      y: 105
+      width: 50
+      height: 20
+    text: Theta (-)
+    variable: theta
+    method: set_model_variables
+    tooltipstring: Edit smoothing coefficient theta
+  - style: edit
+    position:
+      x: 100
+      y: 80
+      width: 50
+      height: 20
+    text: Threshold Depth (m)
+    variable: huthresh
+    method: set_model_variables
+    tooltipstring: Edit threshold depth (in metres)
+  - style: edit
+    position:
+      x: 100
+      y: 55
+      width: 50
+      height: 20
+    text: Stop Depth (m)
+    variable: stopdepth
+    method: set_model_variables
+    tooltipstring: Edit stop depth (simulation will stop when this depth is exceeded)
+  - style: edit
+    position:
+      x: 100
+      y: 30
+      width: 50
+      height: 20
+    text: Spin-up Time (s)
+    variable: tspinup
+    method: set_model_variables
+    tooltipstring: Edit spin-up time (in seconds)
+- style: checkbox
+  text: Wiggle Suppression
+  position:
+    x: 100
+    y: 10
+  variable: wiggle_suppression
+  method: set_model_variables
+  tooltip: Turn on or off wiggle suppression (only for subgrid models)
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: bathymetry_type
+      operator: eq
+      value: subgrid

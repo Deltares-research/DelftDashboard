@@ -1,0 +1,35 @@
+element:
+- style: popupmenu
+  text: Viscosity
+  position:
+    x: 80
+    y: 110
+    width: 60
+    height: 20
+  variable: viscosity
+  method: set_model_variables
+  select: item
+  option_string:
+  - "off"
+  - "on"
+  option_value:
+  - false
+  - true
+  tooltip: Turn on or off viscosity
+- style: edit
+  position:
+    x: 80
+    y: 85
+    width: 60
+    height: 20
+  text: Nuvisc
+  variable: nuvisc
+  method: set_model_variables
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: viscosity
+      operator: eq
+      value: true
+  tooltip: Edit viscosity scale (computed as nuvisc * dx) 

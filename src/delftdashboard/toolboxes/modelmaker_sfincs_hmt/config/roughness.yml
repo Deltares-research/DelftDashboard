@@ -1,0 +1,31 @@
+element:
+- style: edit
+  text: Manning Land
+  variable: manning_land
+  position:
+    x: 80
+    y: 110
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Mannings n roughness water
+- style: edit
+  text: Manning Water
+  variable: manning_water
+  position:
+    x: 80
+    y: 85
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Mannings n roughness water
+- style: edit
+  text: Manning Level
+  variable: manning_level
+  position:
+    x: 80
+    y: 60
+    width: 60
+    height: 20
+  method: edit
+  tooltip: Vertical level land-water (m)
