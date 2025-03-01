@@ -266,6 +266,7 @@ class Model(GenericModel):
             self.set_gui_variables()
             # Also get mask datashader dataframe (should this not happen when grid is read?)
             self.domain.quadtree_mask.get_datashader_dataframe()
+            # TODO: get snapwave mask datashader dataframe
             # self.domain.snapwave.mask.get_datashader_dataframe()
             # Change CRS
             map.set_crs(self.domain.crs)
@@ -273,8 +274,8 @@ class Model(GenericModel):
             dlg.close()
             app.gui.window.update()
             # Zoom to model extent
-            # bounds = self.domain.grid.bounds(crs=4326, buffer=0.1)
             # bounds = self.domain.bounds(crs=4326, buffer=0.1)
+            # TODO: add buffer and set crs
             bounds = self.domain.bounds
             app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
 
@@ -286,7 +287,8 @@ class Model(GenericModel):
         # self.domain.input.variables.epsg = app.crs.to_epsg()
         self.domain.exe_path = app.config["sfincs_exe_path"]
         self.domain.config.write()
-        self.domain.write_batch_file()
+        # TODO: write batch file
+        # self.domain.write_batch_file()
         # app.model["sfincs_hmt"].domain.config.write()
 
     def plot(self):
@@ -321,8 +323,7 @@ class Model(GenericModel):
         group = "sfincs_hmt"
 
         # Copy sfincs input variables to gui variables
-        # for var_name in vars(self.domain.config.variables):
-        for key, value in self.domain.config.data.dict(exclude_unset=False).items():
+        for key, value in self.domain.config.data.model_dump(exclude_unset=False).items():
             app.gui.setvar(group, key, value)
 
         # View  
@@ -421,11 +422,9 @@ class Model(GenericModel):
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input variables
         group = "sfincs_hmt"
-        for key, value in self.domain.config.data.dict(exclude_unset=False).items():
-        # for var_name in vars(self.domain.input.variables):
-            self.domain.config.data.set(key, app.gui.getvar(group, key)) 
-            # setattr(self.domain.input.variables, var_name, app.gui.getvar(group, var_name))
-        if self.domain.config.data.get("snapwave"):
+        for key, value in self.domain.config.data.model_dump(exclude_unset=False).items():
+            self.domain.config.set(key, app.gui.getvar(group, key)) 
+        if self.domain.config.get("snapwave"):
             app.gui.setvar("modelmaker_sfincs_hmt", "use_snapwave", True)
         else:
             app.gui.setvar("modelmaker_sfincs_hmt", "use_snapwave", False)

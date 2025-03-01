@@ -13,4 +13,4 @@ def select(*args):
     map.update()
 
 def set_model_variables(*args):
-    app.model["sfincs_cht"].set_model_variables()
+    app.model["sfincs_hmt"].set_model_variables()

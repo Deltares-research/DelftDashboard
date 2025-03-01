@@ -15,4 +15,4 @@ def select(*args):
 
 def set_model_variables(*args):
     # All variables will be set
-    app.model["sfincs_cht"].set_model_variables()
+    app.model["sfincs_hmt"].set_model_variables()

@@ -16,4 +16,4 @@ def edit(*args):
     pass
     
 def generate_subgrid(*args):
-    app.toolbox["modelmaker_sfincs_cht"].generate_subgrid()
+    app.toolbox["modelmaker_sfincs_hmt"].generate_subgrid()
