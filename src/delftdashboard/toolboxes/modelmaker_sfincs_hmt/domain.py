@@ -122,11 +122,16 @@ def build_model(*args):
     app.toolbox["modelmaker_sfincs_hmt"].build_model()
 
 def use_snapwave(*args):
-    app.model["sfincs_hmt"].domain.input.variables.snapwave = app.gui.getvar("modelmaker_sfincs_hmt", "use_snapwave")
-    app.gui.setvar("modelmaker_sfincs_hmt", "snapwave", app.gui.getvar("modelmaker_sfincs_hmt", "use_snapwave"))
+    use_snapwave = app.gui.getvar("modelmaker_sfincs_hmt", "use_snapwave")
+    app.model["sfincs_hmt"].domain.config.set("snapwave", use_snapwave)
+    app.gui.setvar("sfincs_hmt", "snapwave", use_snapwave)
 
 def use_subgrid(*args):
-    pass
+    use_subgrid = app.gui.getvar("modelmaker_sfincs_hmt", "use_subgrid")
+    if use_subgrid:
+        app.gui.setvar("sfincs_hmt", "bathymetry_type", "subgrid")
+    else:
+        app.gui.setvar("sfincs_hmt", "bathymetry_type", "regular")
 
 def show_mask_polygons(*args):
     app.toolbox["modelmaker_sfincs_hmt"].show_mask_polygons()

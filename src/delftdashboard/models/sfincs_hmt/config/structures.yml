@@ -7,10 +7,10 @@ element:
     height: 160
   tab:
   - string: Thin Dams
-    module: delftdashboard.models.sfincs_cht.structures_thin_dams
+    module: delftdashboard.models.sfincs_hmt.structures_thin_dams
     element: structures_thin_dams.yml
   - string: Weirs
-    module: delftdashboard.models.sfincs_cht.structures_weirs
+    module: delftdashboard.models.sfincs_hmt.structures_weirs
     element: structures_weirs.yml
     dependency:
     - action: enable

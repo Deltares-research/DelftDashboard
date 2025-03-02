@@ -8,10 +8,10 @@ element:
   tab:
   - string: SnapWave
     element: waves_snapwave.yml
-    module: delftdashboard.models.sfincs_cht.waves_snapwave
+    module: delftdashboard.models.sfincs_hmt.waves_snapwave
   - string: Boundary Conditions
     element: waves_boundary_conditions.yml
-    module: delftdashboard.models.sfincs_cht.waves_boundary_conditions
+    module: delftdashboard.models.sfincs_hmt.waves_boundary_conditions
   - string: Wave Makers
     element: waves_wave_makers.yml
-    module: delftdashboard.models.sfincs_cht.waves_wave_makers
+    module: delftdashboard.models.sfincs_hmt.waves_wave_makers

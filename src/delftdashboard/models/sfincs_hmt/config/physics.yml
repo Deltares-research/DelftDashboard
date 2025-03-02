@@ -7,17 +7,17 @@ element:
     height: 160
   tab:
   - string: Constants
-    module: delftdashboard.models.sfincs_cht.physics_constants
+    module: delftdashboard.models.sfincs_hmt.physics_constants
     element: physics_constants.yml
   - string: Roughness
-    module: delftdashboard.models.sfincs_cht.physics_roughness
+    module: delftdashboard.models.sfincs_hmt.physics_roughness
     element: physics_roughness.yml
   - string: Advection
-    module: delftdashboard.models.sfincs_cht.physics_advection
+    module: delftdashboard.models.sfincs_hmt.physics_advection
     element: physics_advection.yml
   - string: Viscosity
-    module: delftdashboard.models.sfincs_cht.physics_viscosity
+    module: delftdashboard.models.sfincs_hmt.physics_viscosity
     element: physics_viscosity.yml
   - string: Meteo
-    module: delftdashboard.models.sfincs_cht.physics_meteo
+    module: delftdashboard.models.sfincs_hmt.physics_meteo
     element: physics_meteo.yml

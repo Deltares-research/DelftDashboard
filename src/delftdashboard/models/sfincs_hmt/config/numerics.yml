@@ -57,18 +57,18 @@ element:
     variable: tspinup
     method: set_model_variables
     tooltipstring: Edit spin-up time (in seconds)
-- style: checkbox
-  text: Wiggle Suppression
-  position:
-    x: 100
-    y: 10
-  variable: wiggle_suppression
-  method: set_model_variables
-  tooltip: Turn on or off wiggle suppression (only for subgrid models)
-  dependency:
-  - action: enable
-    checkfor: all
-    check:
-    - variable: bathymetry_type
-      operator: eq
-      value: subgrid
+  - style: checkbox
+    text: Wiggle Suppression
+    position:
+      x: 100
+      y: 10
+    variable: wiggle_suppression
+    method: set_model_variables
+    tooltip: Turn on or off wiggle suppression (only for subgrid models)
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: bathymetry_type
+        operator: eq
+        value: subgrid
