@@ -45,18 +45,20 @@ def generate_grid(*args):
 def update_geometry():
     gdf = app.toolbox["modelmaker_hurrywave"].grid_outline
     group = "modelmaker_hurrywave"
-    app.gui.setvar(group, "x0", round(gdf["x0"][0], 3))
-    app.gui.setvar(group, "y0", round(gdf["y0"][0], 3))
-    lenx = gdf["dx"][0]
-    leny = gdf["dy"][0]
+    x0 = float(round(gdf["x0"][0], 3))
+    y0 = float(round(gdf["y0"][0], 3))
+    app.gui.setvar(group, "x0", x0)
+    app.gui.setvar(group, "y0", y0)
+    lenx = float(gdf["dx"][0])
+    leny = float(gdf["dy"][0])
     app.toolbox["modelmaker_hurrywave"].lenx = lenx
     app.toolbox["modelmaker_hurrywave"].leny = leny
-    app.gui.setvar(group, "rotation", round(gdf["rotation"][0] * 180 / math.pi, 1))
+    app.gui.setvar(group, "rotation", float(round(gdf["rotation"][0] * 180 / math.pi, 1)))
     app.gui.setvar(
-        group, "nmax", np.floor(leny / app.gui.getvar(group, "dy")).astype(int)
+        group, "nmax", int(np.floor(leny / app.gui.getvar(group, "dy")))
     )
     app.gui.setvar(
-        group, "mmax", np.floor(lenx / app.gui.getvar(group, "dx")).astype(int)
+        group, "mmax", int(np.floor(lenx / app.gui.getvar(group, "dx")))
     )
 
 def edit_origin(*args):

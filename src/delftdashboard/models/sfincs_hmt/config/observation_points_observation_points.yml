@@ -2,15 +2,32 @@ element:
 - style: listbox
   position:
     x: 10
-    y: 10
+    y: 40
     width: 300
-    height: 120
+    height: 90
   method: select_observation_point_from_list
   variable: active_observation_point
   select: index
   option_string:
     variable: observation_point_names
   tooltip: Select observation point
+- style: edit
+  text: Name
+  position:
+    x: 40
+    y: 10
+    width: 270
+    height: 20
+  method: edit_name
+  variable: observation_point_name
+  tooltip: Edit name
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_observation_points
+      operator: gt
+      value: 0
 - style: pushbutton
   text: Add Point
   position:

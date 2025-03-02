@@ -54,10 +54,29 @@ element:
     option_string: ["Time Series", "2D Spectra"]
     option_value: ["timeseries", "spectra"]
     method: select_boundary_forcing
+  - style: pushbutton
+    text: Create Points
+    position:
+      x: 190
+      y: 130
+      width: 80
+      height: 20
+    method: create_boundary_points
+    tooltip: Create equally spaced boundary point along the mesh
+  - style: edit
+    text: Distance (m)
+    text_position: right  
+    position:
+      x: 190
+      y: 105
+      width: 50
+      height: 20
+    variable: boundary_dx  
+    tooltip: Edit spacing between boundary point along the mesh
   - style: edit
     text: Hm0 (m)
     position:
-      x: 350
+      x: 400
       y: 130
       width: 50
       height: 20
@@ -77,7 +96,7 @@ element:
   - style: edit
     text: Tp (s)
     position:
-      x: 350
+      x: 400
       y: 105
       width: 50
       height: 20
@@ -97,7 +116,7 @@ element:
   - style: edit
     text: Direction (deg)
     position:
-      x: 350
+      x: 400
       y: 80
       width: 50
       height: 20
@@ -117,7 +136,7 @@ element:
   - style: edit
     text: Directional Spreading (deg)
     position:
-      x: 350
+      x: 400
       y: 55
       width: 50
       height: 20
@@ -137,7 +156,7 @@ element:
   - style: pushbutton
     text: Apply to All
     position:
-      x: 350
+      x: 400
       y: 30
       width: 80
       height: 20

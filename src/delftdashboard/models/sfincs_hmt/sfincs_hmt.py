@@ -434,6 +434,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
+        app.gui.setvar(group, "observation_point_name", "")
 
         # Cross sections
         app.gui.setvar(group, "cross_section_names", [])

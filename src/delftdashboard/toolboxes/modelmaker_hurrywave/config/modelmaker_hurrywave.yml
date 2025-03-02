@@ -19,10 +19,6 @@ element:
   - string: Mask Boundary Cells
     module: delftdashboard.toolboxes.modelmaker_hurrywave.mask_boundary_cells
     element: mask_boundary_cells.yml
-  - string: Boundary Points
-    module: delftdashboard.toolboxes.modelmaker_hurrywave.boundary_points
-    element: boundary_points.yml
-
   - string: Wave Blocking
     module: delftdashboard.toolboxes.modelmaker_hurrywave.waveblocking
     element: waveblocking.yml

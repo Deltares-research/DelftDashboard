@@ -27,9 +27,6 @@ class Model(GenericModel):
         # Add main DDB layer
         layer = app.map.add_layer("hurrywave")
 
-        # layer.add_layer("grid", type="deck_geojson",
-        #                 file_name="hurrywave_grid.geojson",
-        #                 line_color="black")
         layer.add_layer("grid", type="image")
 
         layer.add_layer("mask_include",
@@ -127,6 +124,9 @@ class Model(GenericModel):
         # Input variables
         for var_name in vars(self.domain.input.variables):
             app.gui.setvar(group, var_name, getattr(self.domain.input.variables, var_name))
+
+        # Boundary points
+        app.gui.setvar(group, "boundary_dx", 50000.0)
 
         # View settings
         app.gui.setvar(group, "view_grid", True)

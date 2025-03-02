@@ -80,6 +80,7 @@ def edit_name(*args):
     gdf = app.model["sfincs_hmt"].domain.cross_sections.data
     gdf.at[index, "name"] = name
     app.map.layer["sfincs_hmt"].layer["cross_sections"].layer["polylines"].set_data(gdf)
+    app.model["sfincs_hmt"].cross_sections_changed = True
     update()
 
 def cross_section_created(gdf, index, id):

@@ -53,14 +53,6 @@ def save(*args):
         app.model["sfincs_hmt"].domain.observation_points.write()
     app.model["sfincs_hmt"].observation_points_changed = False
 
-def update():
-    gdf = app.active_model.domain.observation_points.data
-    names = []
-    for index, row in gdf.iterrows():
-        names.append(row["name"])
-    app.gui.setvar("sfincs_hmt", "observation_point_names", names)
-    app.gui.setvar("sfincs_hmt", "nr_observation_points", len(gdf))
-    app.gui.window.update()
 
 def add_observation_point_on_map(*args):
     app.map.click_point(point_clicked)
@@ -86,6 +78,7 @@ def select_observation_point_from_list(*args):
     map.reset_cursor()
     index = app.gui.getvar("sfincs_hmt", "active_observation_point")
     app.map.layer["sfincs_hmt"].layer["observation_points"].select_by_index(index)
+    update()
 
 def select_observation_point_from_map(*args):
     map.reset_cursor()
@@ -103,3 +96,26 @@ def delete_point_from_list(*args):
     app.gui.setvar("sfincs_hmt", "active_observation_point", index)
     app.model["sfincs_hmt"].observation_points_changed = True
     update()
+
+def edit_name(*args):
+    name = app.gui.getvar("sfincs_hmt", "observation_point_name")
+    index = app.gui.getvar("sfincs_hmt", "active_observation_point")
+    gdf = app.model["sfincs_hmt"].domain.observation_points.data
+    gdf.at[index, "name"] = name
+    app.map.layer["sfincs_hmt"].layer["observation_points"].set_data(gdf, index)
+    app.model["sfincs_hmt"].observation_points_changed = True
+    update()
+
+def update():
+    gdf = app.active_model.domain.observation_points.data
+    iac = app.gui.getvar("sfincs_hmt", "active_observation_point")
+    names = []
+    for index, row in gdf.iterrows():
+        names.append(row["name"])
+    app.gui.setvar("sfincs_hmt", "observation_point_names", names)
+    app.gui.setvar("sfincs_hmt", "nr_observation_points", len(gdf))
+    if len(gdf) > 0:
+        app.gui.setvar("sfincs_hmt", "observation_point_name", names[iac])
+    else:
+        app.gui.setvar("sfincs_hmt", "observation_point_name", "")
+    app.gui.window.update()

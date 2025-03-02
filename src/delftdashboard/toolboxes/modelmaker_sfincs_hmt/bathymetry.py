@@ -96,6 +96,8 @@ def edit_zmin_bathymetry_dataset(*args):
     index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
     app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets[index]["zmin"] = args[0]
 
+def edit(*args):
+    pass
 
 def update():
     group = "modelmaker_sfincs_hmt"

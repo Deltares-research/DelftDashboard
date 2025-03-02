@@ -514,7 +514,6 @@ class Toolbox(GenericToolbox):
             outflow_boundary_zmax=app.gui.getvar(
                 "modelmaker_sfincs_hmt", "outflow_boundary_zmax"
             ),
-            update_datashader_dataframe=True,
         )
         app.map.layer["sfincs_hmt"].layer["mask"].set_data(mask)
 
@@ -524,7 +523,7 @@ class Toolbox(GenericToolbox):
 
     def update_mask_snapwave(self):
         grid = app.model["sfincs_hmt"].domain.quadtree_grid
-        mask = app.model["sfincs_hmt"].domain.snapwave_mask
+        mask = app.model["sfincs_hmt"].domain.snapwave_quadtree_mask
         if np.all(np.isnan(grid.data["z"])):
             app.gui.window.dialog_warning("Please first generate a bathymetry !")
             return
@@ -580,7 +579,6 @@ class Toolbox(GenericToolbox):
             neumann_boundary_zmax=app.gui.getvar(
                 "modelmaker_sfincs_hmt", "neumann_boundary_zmax_snapwave"
             ),
-            update_datashader_dataframe=True,
         )
 
         # mask has a method to make an overlay

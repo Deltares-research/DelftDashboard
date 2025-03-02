@@ -14,13 +14,20 @@ element:
 - style: edit
   text: Name
   position:
-    x: 100
+    x: 40
     y: 10
-    width: 200
+    width: 270
     height: 20
   method: edit_name
   variable: cross_section_name
   tooltip: Edit name
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_cross_sections
+      operator: gt
+      value: 0
 - style: pushbutton
   text: Draw Cross Section
   position:

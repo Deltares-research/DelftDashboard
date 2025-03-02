@@ -90,9 +90,6 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "boundary_zmax",  99999.0)
         app.gui.setvar(group, "boundary_zmin", -99999.0)
 
-        # Boundary points
-        app.gui.setvar(group, "boundary_dx", 50000.0)
-
         # Wave Blocking
         app.gui.setvar(group, "waveblocking_nr_dirs", 36)
         app.gui.setvar(group, "waveblocking_nr_pixels", 20)
@@ -235,31 +232,6 @@ class Toolbox(GenericToolbox):
         grid.write_msk_file()
         # GUI variables
         app.gui.setvar("hurrywave", "mskfile", app.model["hurrywave"].domain.input.variables.mskfile)
-
-        dlg.close()
-
-    def create_boundary_points(self):
-
-        dlg = app.gui.window.dialog_wait("Making boundary points ...")
-
-        # First check if there are already boundary points
-        if len(app.model["hurrywave"].domain.boundary_conditions.gdf.index)>0:
-            ok = app.gui.window.dialog_ok_cancel("Existing boundary points will be overwritten! Continue?",                                
-                                       title="Warning")
-            if not ok:
-                return
-        # Create points from mask
-        bnd_dist = app.gui.getvar("modelmaker_hurrywave", "boundary_dx")
-        app.model["hurrywave"].domain.boundary_conditions.get_boundary_points_from_mask(bnd_dist=bnd_dist)
-        # Drop time series (MapBox doesn't like it)
-        gdf = app.model["hurrywave"].domain.boundary_conditions.gdf.drop(["timeseries"], axis=1)
-        app.map.layer["hurrywave"].layer["boundary_points"].set_data(gdf, 0)
-        # Save points to bnd file
-        app.model["hurrywave"].domain.boundary_conditions.write_boundary_points()
-        # Set all boundary conditions to constant values
-        app.model["hurrywave"].domain.boundary_conditions.set_timeseries_uniform(1.0, 8.0, 45.0, 20.0)
-        # Save points to bhs, etc. files
-        app.model["hurrywave"].domain.boundary_conditions.write_boundary_conditions_timeseries()
 
         dlg.close()
 
