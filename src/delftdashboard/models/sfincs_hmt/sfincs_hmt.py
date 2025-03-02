@@ -6,6 +6,7 @@ Created on Mon May 10 12:18:09 2021
 """
 # import datetime
 import os
+from pyproj import CRS
 
 from delftdashboard.operations.model import GenericModel
 from delftdashboard.operations import map
@@ -23,6 +24,8 @@ class Model(GenericModel):
 
     def initialize(self):
         self.domain = SfincsModel(root=".", mode="r+")
+        self.domain.config.set("epsg", app.crs.to_epsg())
+        self.domain.grid_type = "quadtree"
         self.set_gui_variables()
         self.observation_points_changed = False
         self.cross_sections_changed = False
@@ -281,10 +284,10 @@ class Model(GenericModel):
 
     def set_crs(self):
         crs = app.crs
-        old_crs = self.domain.crs
+        old_crs = CRS(self.domain.config.get("epsg"))
         if old_crs != crs:
-            self.domain.crs = crs
-            self.domain.clear_spatial_attributes()
+            self.domain.config.set("epsg", crs.to_epsg())
+            self.domain.clear_spatial_components()
             self.plot()
 
     def open(self):
@@ -334,7 +337,7 @@ class Model(GenericModel):
         # app.map.add_layer("sfincs_hmt").clear()
         # Grid
         app.map.layer["sfincs_hmt"].layer["grid"].set_data(
-            app.model["sfincs_hmt"].domain.quadtree
+            app.model["sfincs_hmt"].domain.quadtree_grid
         )
         # Grid exterior
         app.map.layer["sfincs_hmt"].layer["grid_exterior"].set_data(

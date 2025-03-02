@@ -123,8 +123,8 @@ def build_quadtree_grid(*args):
     # First check if zmin and zmax are set for any of the polygons. If so, check that bathy sets have been defined. If not, give a warning.
     # Loop though polygons
     zminzmax = False
-    for i in range(len(app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon)):
-        if app.toolbox["modelmaker_sfincs_hmt"].refinement_zmin[i] > -20000.0 or app.toolbox["modelmaker_sfincs_hmt"].refinement_zmax[i] < 20000.0:
+    for i, row in app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon.iterrows():
+        if row["zmin"] > -20000.0 or row["zmax"] < 20000.0:
             zminzmax = True
     if zminzmax:
         if len(app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets) == 0:

@@ -207,7 +207,7 @@ def create_boundary_points_snapwave(*args):
         if not ok:
             return
     # Check for open boundary points in mask
-    mask = app.model["sfincs_hmt"].domain.grid.data["snapwave_mask"]
+    mask = app.model["sfincs_hmt"].domain.quadtree_grid.data["snapwave_mask"]
     if mask is None:
         ok = app.gui.window.dialog_info(
             "Please first create a mask for this domain.", title=" "

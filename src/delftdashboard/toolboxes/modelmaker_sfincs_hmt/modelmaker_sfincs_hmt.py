@@ -406,7 +406,7 @@ class Toolbox(GenericToolbox):
         group = "modelmaker_sfincs_hmt"
         dlg = app.gui.window.dialog_wait("Generating grid ...")
         model = app.model["sfincs_hmt"].domain
-        model.clear_spatial_attributes()
+        model.clear_spatial_components()
         x0 = app.gui.getvar(group, "x0")
         y0 = app.gui.getvar(group, "y0")
         dx = app.gui.getvar(group, "dx")
@@ -424,7 +424,7 @@ class Toolbox(GenericToolbox):
             refpol = self.refinement_polygon
 
         # Build grid
-        model.quadtree_grid.build(
+        model.quadtree_grid.set(
             x0,
             y0,
             nmax,
@@ -440,7 +440,7 @@ class Toolbox(GenericToolbox):
         )
 
         # Save grid
-        model.grid.write()
+        model.quadtree_grid.write()
 
         # # If SnapWave also generate SnapWave mesh and save it
         # if app.gui.getvar(group, "use_snapwave"):
