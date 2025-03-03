@@ -178,7 +178,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "manning_level", 1.0)
 
         # Subgrid
-        app.gui.setvar(group, "subgrid_nr_bins", 10)
+        app.gui.setvar(group, "subgrid_nr_levels", 10)
         app.gui.setvar(group, "subgrid_nr_pixels", 20)
         app.gui.setvar(group, "subgrid_max_dzdv", 999.0)
         app.gui.setvar(group, "subgrid_manning_max", 0.024)
@@ -485,7 +485,7 @@ class Toolbox(GenericToolbox):
         manning_land = app.gui.getvar(group, "manning_land")
         manning_water = app.gui.getvar(group, "manning_water")
         manning_level = app.gui.getvar(group, "manning_level")
-        nr_bins = app.gui.getvar(group, "subgrid_nr_bins")
+        nr_levels = app.gui.getvar(group, "subgrid_nr_levels")
         nr_pixels = app.gui.getvar(group, "subgrid_nr_pixels")
         max_dzdv = app.gui.getvar(group, "subgrid_max_dzdv")
         manning_max = app.gui.getvar(group, "subgrid_manning_max")
@@ -499,7 +499,7 @@ class Toolbox(GenericToolbox):
                                                      manning_land=manning_land,
                                                      manning_water=manning_water,
                                                      manning_level=manning_level,
-                                                     nr_bins=nr_bins,
+                                                     nr_levels=nr_levels,
                                                      nr_subgrid_pixels=nr_pixels,
                                                      max_gradient=max_dzdv,
                                                      zmin=zmin,

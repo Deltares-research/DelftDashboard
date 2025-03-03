@@ -1,14 +1,14 @@
 element:
 - style: edit
-  text: Nr Bins
-  variable: subgrid_nr_bins
+  text: Nr Levels
+  variable: subgrid_nr_levels
   position:
     x: 80
     y: 110
     width: 60
     height: 20
   method: edit
-  tooltip: Number of vertical bins in sub-grid tables
+  tooltip: Number of vertical levels in sub-grid tables
 - style: edit
   text: Nr Pixels per Cell
   variable: subgrid_nr_pixels

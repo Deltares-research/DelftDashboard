@@ -196,7 +196,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "manning_level", 1.0)
 
         # Subgrid
-        app.gui.setvar(group, "subgrid_nr_bins", 10)
+        app.gui.setvar(group, "subgrid_nr_levels", 10)
         app.gui.setvar(group, "subgrid_nr_pixels", 20)
         app.gui.setvar(group, "subgrid_max_dzdv", 999.0)
         app.gui.setvar(group, "subgrid_manning_max", 0.024)
@@ -452,10 +452,13 @@ class Toolbox(GenericToolbox):
         dlg.close()
 
     def generate_bathymetry(self):
-        dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
         bathymetry_list = app.toolbox[
             "modelmaker_sfincs_hmt"
         ].selected_bathymetry_datasets
+        # This does not work yet. Give warning that bathymetry is not yet implemented.
+        app.gui.window.dialog_warning("Sorry, bathymetry not yet implemented for SFINCS (HMT)!")
+        return
+        dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
         app.model["sfincs_hmt"].domain.quadtree_grid.set_bathymetry(
             bathymetry_list,
             bathymetry_database=app.bathymetry_database,
@@ -596,7 +599,7 @@ class Toolbox(GenericToolbox):
         manning_land = app.gui.getvar(group, "manning_land")
         manning_water = app.gui.getvar(group, "manning_water")
         manning_level = app.gui.getvar(group, "manning_level")
-        nr_bins = app.gui.getvar(group, "subgrid_nr_bins")
+        nr_levels = app.gui.getvar(group, "subgrid_nr_levels")
         nr_pixels = app.gui.getvar(group, "subgrid_nr_pixels")
         max_dzdv = app.gui.getvar(group, "subgrid_max_dzdv")
         manning_max = app.gui.getvar(group, "subgrid_manning_max")
@@ -606,22 +609,24 @@ class Toolbox(GenericToolbox):
         p = app.gui.window.dialog_progress(
             "               Generating Sub-grid Tables ...                ", 100
         )
-        app.model["sfincs_hmt"].domain.subgrid.build(
+        app.model["sfincs_hmt"].domain.quadtree_subgrid.build(
             bathymetry_sets,
             roughness_sets,
             bathymetry_database=app.bathymetry_database,
             manning_land=manning_land,
             manning_water=manning_water,
             manning_level=manning_level,
-            nr_bins=nr_bins,
+            nr_levels=nr_levels,
             nr_subgrid_pixels=nr_pixels,
             max_gradient=max_dzdv,
             zmin=zmin,
             zmax=zmax,
             progress_bar=p,
+            quiet=False,
         )
         p.close()
         app.model["sfincs_hmt"].domain.config.set("sbgfile", "sfincs.sbg")
+        app.model["sfincs_hmt"].domain.quadtree_subgrid.write()
         app.gui.setvar(
             "sfincs_hmt",
             "sbgfile",
