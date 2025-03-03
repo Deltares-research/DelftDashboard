@@ -1,0 +1,28 @@
+window:
+  title: Select other projected coordinate system
+  width: 540
+  height: 340
+  module: delftdashboard.misc.select_other_projected.callbacks
+  variable_group: select_other_projected
+  modal: True
+  cancel: True
+element:
+- style: listbox
+  position:
+    x: 20
+    y: 70
+    width: 500
+    height: 250
+  method: select_crs
+  variable: crs_index
+  select: index
+  option_string:
+    variable: filtered_names
+- style: edit
+  position:
+    x: 20
+    y: 40
+    width: 500
+    height: 20
+  method: edit_search_string
+  variable: search_string

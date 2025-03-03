@@ -23,7 +23,7 @@ def map_ready(*args):
                 utm_zone = str(ilon + 1) + "S"
             else:
                 utm_zone = str(ilon + 1) + "N"
-            utm_letter = letters[ilat]
+            # utm_letter = letters[ilat]
             polygon = shapely.geometry.Polygon([[x, y], [x + 6.0, y], [x + 6.0, y + 8.0], [x, y + 8]])
             gdf_list.append({"utm_zone": utm_zone, "utm_letter": letters[ilat], "geometry": polygon})
     gdf = gpd.GeoDataFrame(gdf_list, crs=4326)
@@ -33,7 +33,7 @@ def map_ready(*args):
                     select=select_utm_zone,
                     selection_type="single",
                     fill_opacity=0.0,
-                    fill_opacity_selected=1.0,
+                    fill_opacity_selected=0.5,
                     hover_property="utm_zone")
     polygon_layer.set_data(gdf, 0)
 

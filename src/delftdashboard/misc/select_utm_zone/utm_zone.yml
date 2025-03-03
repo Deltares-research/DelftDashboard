@@ -7,7 +7,7 @@ window:
   modal: True
   cancel: True
 element:
-- style: mapbox
+- style: map
   id: utm_map
   position:
     x: 20
