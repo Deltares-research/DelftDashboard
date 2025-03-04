@@ -85,7 +85,9 @@ class Toolbox(GenericToolbox):
                          fill_color="dodgerblue",
                          fill_opacity=0.0,
                          fill_color_selected="dodgerblue",
-                         fill_opacity_selected=0.3,
+                         fill_opacity_selected=0.6,
+                         fill_color_hover="green",
+                         fill_opacity_hover=0.35,
                          selection_type="multiple",
                          select=self.select_watershed_from_map
                         )
