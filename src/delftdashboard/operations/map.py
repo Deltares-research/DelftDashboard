@@ -33,7 +33,7 @@ def map_ready(*args):
     # app.background_topography_layer.update = update_background_topography_layer
 
     # Go to point
-    app.map.jump_to(0.0, 0.0, 1)
+    app.map.jump_to(0.0, 0.0, 0.5)
 
     # Add layers to map (we can only do this after the map has finished loading)
     for name, model in app.model.items():
