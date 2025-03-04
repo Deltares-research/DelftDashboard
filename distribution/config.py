@@ -34,7 +34,6 @@ DEPENDENCIES = [
     "charset_normalizer.md__mypyc",
     "fiona",
     "fiona.enums",
-    "plotly",
     "tomli_w",
     "numpy",
     "numpy_financial",

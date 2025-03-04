@@ -52,4 +52,6 @@ pip install -e %GITDIR%\cht_tiling
 pip install -e %GITDIR%\cht_tsunami
 pip install -e %GITDIR%\cht_utils
 pip install -e %GITDIR%\cht_xbeach
-pip install -e %GITDIR%\cosmos
+pip install -e %GITDIR%\hydromt
+pip install -e %GITDIR%\hydromt_sfincs
+

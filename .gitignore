@@ -20,3 +20,4 @@ src/delftdashboard/delftdashboard.pth
 run/_start_ddb.py
 run/_start_ddb.py
 src/delftdashboard/config/delftdashboard.cfg.mine
+run/_start_ddb.py

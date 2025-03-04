@@ -184,7 +184,7 @@ def initialize():
     app.gui.setvar("view_settings", "topography_colormap", "earth")
     app.gui.setvar("view_settings", "topography_autoscaling", True)
     app.gui.setvar("view_settings", "topography_opacity", 0.7)
-    app.gui.setvar("view_settings", "topography_quality", "medium")
+    app.gui.setvar("view_settings", "topography_quality", "high")
     app.gui.setvar("view_settings", "topography_hillshading", True)
     app.gui.setvar("view_settings", "topography_interp_method", "linear")
     # app.gui.setvar("view_settings", "topography_interp_method", "nearest")
