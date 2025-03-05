@@ -13,7 +13,6 @@ from delftdashboard.app import app
 
 from cht_sfincs import SFINCS
 
-#from hydromt_sfincs import SfincsModel
 
 class Model(GenericModel):
     def __init__(self, name):
