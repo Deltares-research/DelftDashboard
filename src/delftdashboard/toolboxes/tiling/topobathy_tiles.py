@@ -32,9 +32,10 @@ def generate_topobathy_tiles(*args):
         dlg = app.gui.window.dialog_wait("Generating topo/bathy tiles ...")
 
         dem_list = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
-        # Loop through dem_list (now only using twm)
-        for dem in dem_list:
-            dem["twm"] = app.bathymetry_database.get_dataset(dem["name"]).data
+
+        # # Loop through dem_list (now only using twm)
+        # for dem in dem_list:
+        #     dem["twm"] = app.bathymetry_database.get_dataset(dem["name"]).data
 
         # data_list = []
 
@@ -46,6 +47,7 @@ def generate_topobathy_tiles(*args):
         # Create topo bathy tiles
         twmb = TiledWebMap(path, "topobathy", parameter="elevation")
         twmb.generate_topobathy_tiles(dem_list,
+                                      bathymetry_database=app.bathymetry_database,
                                       index_path=index_path,
                                       write_metadata=False,
                                       parallel=False
