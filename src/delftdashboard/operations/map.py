@@ -10,7 +10,7 @@ from pyproj import CRS
 import matplotlib as mpl
 
 from delftdashboard.app import app
-# from cht_bathymetry.bathymetry_database import bathymetry_database
+
 
 def map_ready(*args):
 
@@ -169,9 +169,6 @@ def update_statusbar():
     # Update the status bar with the current CRS
     if app.crs.is_geographic:
         crstp = " (geographic) - " + app.crs.to_string()
-        # app.gui.window.statusbar.set_text("crs_type", "geographic")
     else:
         crstp = " (projected) - " + app.crs.to_string()
-        # app.gui.window.statusbar.set_text("crs_type", "projected")
     app.gui.window.statusbar.set_text("crs_name", "   " + app.crs.name + crstp)
-    # app.gui.window.statusbar.set_text("crs_code", app.crs.to_string())

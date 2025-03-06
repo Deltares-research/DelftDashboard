@@ -2,8 +2,16 @@
 """
 Created on Mon May 10 12:18:09 2021
 
-@author: ormondt
+This module defines the Toolbox class for handling watersheds in Delft Dashboard.
+It provides methods to initialize the toolbox, select datasets, and update boundaries on the map.
+
+Classes:
+    Toolbox: A class for handling watersheds in Delft Dashboard.
+
+Usage:
+    from delftdashboard.toolboxes.watersheds import Toolbox
 """
+
 import os
 import geopandas as gpd
 import fiona
@@ -11,8 +19,7 @@ from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from shapely.ops import transform
 import pyproj
-# import numpy as np
-# from shapely.geometry import box
+from typing import List, Dict, Any, Union
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
@@ -22,15 +29,22 @@ from delftdashboard.operations import map
 from .cht_watersheds import WatershedsDatabase
 
 class Toolbox(GenericToolbox):
-    def __init__(self, name):
+    def __init__(self, name: str):
+        """
+        Initialize the Toolbox class.
+
+        Parameters:
+        name (str): The name of the toolbox.
+        """
         super().__init__()
-        self.name = name
-        self.long_name = "Watersheds"
-        self.gdf = gpd.GeoDataFrame()
+        self.name: str = name
+        self.long_name: str = "Watersheds"
+        self.gdf: gpd.GeoDataFrame = gpd.GeoDataFrame()
 
-    def initialize(self):
-
-        # Read the database
+    def initialize(self) -> None:
+        """
+        Initialize the watersheds toolbox.
+        """
         if "watersheds_database_path" not in app.config:
             app.config["watersheds_database_path"] = os.path.join(app.config["data_path"], "watersheds")
         s3_bucket = app.config["s3_bucket"]
@@ -46,7 +60,6 @@ class Toolbox(GenericToolbox):
         group = "watersheds"
         if len(short_names) == 0:
             raise Exception("No datasets found in the watersheds database")
-            return
         else:
             app.gui.setvar(group, "dataset_names", short_names)
             app.gui.setvar(group, "dataset_long_names", long_names)
@@ -57,13 +70,21 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "level_long_names", app.watersheds_database.dataset[short_names[0]].level_long_names)
             app.gui.setvar(group, "level", app.watersheds_database.dataset[short_names[0]].level_names[0])
 
-    def select_tab(self):
+    def select_tab(self) -> None:
+        """
+        Select the watersheds tab and update the map.
+        """
         map.update()
         app.map.layer["watersheds"].show()
         app.map.layer["watersheds"].layer["boundaries"].activate()
-        # self.update_boundaries_on_map()
 
-    def set_layer_mode(self, mode):
+    def set_layer_mode(self, mode: str) -> None:
+        """
+        Set the layer mode for the watersheds.
+
+        Parameters:
+        mode (str): The mode to set the layer to ("inactive" or "invisible").
+        """
         if mode == "inactive":
             # Make all layers invisible
             app.map.layer["watersheds"].hide()
@@ -71,17 +92,18 @@ class Toolbox(GenericToolbox):
             # Make all layers invisible
             app.map.layer["watersheds"].hide()
 
-    def add_layers(self):
-        # Add Mapbox layers
+    def add_layers(self) -> None:
+        """
+        Add layers to the map for the watersheds.
+        """
         layer = app.map.add_layer("watersheds")
         layer.add_layer("boundaries",
-                         #type="polygon",
                          type="polygon_selector",
                          hover_property="name",
                          line_color="white",
-                         line_opacity = 0.5,
+                         line_opacity=0.5,
                          line_color_selected="dodgerblue",
-                         line_opacity_selected  = 1.0,
+                         line_opacity_selected=1.0,
                          fill_color="dodgerblue",
                          fill_opacity=0.0,
                          fill_color_selected="dodgerblue",
@@ -92,7 +114,14 @@ class Toolbox(GenericToolbox):
                          select=self.select_watershed_from_map
                         )
 
-    def select_watershed_from_map(self, features, layer):
+    def select_watershed_from_map(self, features: List[Dict[str, Any]], layer: Any) -> None:
+        """
+        Select watersheds from the map.
+
+        Parameters:
+        features (List[Dict[str, Any]]): List of selected features.
+        layer (Any): The layer from which the features were selected.
+        """
         indices = []
         ids = []
         for feature in features:
@@ -103,12 +132,13 @@ class Toolbox(GenericToolbox):
         app.gui.setvar("watersheds", "nr_selected_watersheds", len(indices))
         app.gui.window.update()
 
-    def update_boundaries_on_map(self):
+    def update_boundaries_on_map(self) -> None:
+        """
+        Update the boundaries of the watersheds on the map.
+        """
         dataset_name = app.gui.getvar("watersheds", "dataset")
         dataset = app.watersheds_database.dataset[dataset_name]
-        # Get map extent
         extent = app.map.map_extent
-        # bbox = [bbox[0][0], bbox[0][1], bbox[1][0], bbox[1][1]]
         xmin = extent[0][0]
         ymin = extent[0][1]
         xmax = extent[1][0]
@@ -117,7 +147,6 @@ class Toolbox(GenericToolbox):
 
         # First check if dataset files need to be downloaded
         if not dataset.check_files():
-            # Ask if the user wants to download the file
             rsp = app.gui.window.dialog_yes_no(f"Dataset {dataset_name} is not locally available. Do you want to try to download it? This may take several minutes.",
                                                "Download dataset?")
             if rsp:
@@ -132,8 +161,10 @@ class Toolbox(GenericToolbox):
         app.map.layer["watersheds"].layer["boundaries"].set_data(self.gdf)
         wb.close()
 
-    def select_dataset(self):
-        # Update level names
+    def select_dataset(self) -> None:
+        """
+        Select a dataset for the watersheds.
+        """
         dataset_name = app.gui.getvar("watersheds", "dataset")
         dataset = app.watersheds_database.dataset[dataset_name]
         app.gui.setvar("watersheds", "level_names", dataset.level_names)
@@ -142,13 +173,17 @@ class Toolbox(GenericToolbox):
         app.gui.setvar("watersheds", "nr_selected_watersheds", 0)
         app.gui.window.update()
 
-    def select_level(self):
+    def select_level(self) -> None:
+        """
+        Select a level for the watersheds.
+        """
         pass
 
-    def save(self):
-
-        if len(self.gdf)==0:
-            # No datasets loaded
+    def save(self) -> None:
+        """
+        Save the selected watersheds to a file.
+        """
+        if len(self.gdf) == 0:
             return
 
         dataset_name = app.gui.getvar("watersheds", "dataset")
@@ -166,7 +201,6 @@ class Toolbox(GenericToolbox):
             if row["id"] in app.gui.getvar("watersheds", "selected_ids"):
                 ids.append(row["id"])
                 names.append(row["name"])
-                # Check if row["geometry"] is a Polygon or MultiPolygon
                 if row["geometry"].geom_type == "Polygon":
                     p = Polygon(row["geometry"].exterior.coords)
                     polys.append(p)
@@ -176,19 +210,18 @@ class Toolbox(GenericToolbox):
                         p = Polygon(pol.exterior.coords)
                         polys.append(p)
 
-        if len(names)==0:
+        if len(names) == 0:
             return
 
-        # Get file name from user
-        if len(names)>1:
+        if len(names) > 1:
             filename = f"{dataset_name}_merged{crs_string}.geojson"
         else:
             filename = f"{dataset_name}_{ids[0]}{crs_string}.geojson"
 
         rsp = app.gui.window.dialog_save_file("Save watersheds as ...",
-                                            file_name=filename,
-                                            filter="*.geojson",
-                                            allow_directory_change=False)
+                                              file_name=filename,
+                                              filter="*.geojson",
+                                              allow_directory_change=False)
         if rsp[0]:
             filename = rsp[2]
         else:
@@ -198,8 +231,7 @@ class Toolbox(GenericToolbox):
         # Merge polygons
         merged = unary_union(polys)
 
-        if len(names)>1:
-            # Get filename without extension
+        if len(names) > 1:
             filename_txt = os.path.splitext(filename)[0] + ".txt"
             # Write text file with watershed names
             with open(filename_txt, "w") as f:
@@ -208,7 +240,7 @@ class Toolbox(GenericToolbox):
 
         # Apply buffer
         self.dbuf = app.gui.getvar("watersheds", "buffer") / 100000.0
-        if self.dbuf>0.0:
+        if self.dbuf > 0.0:
             merged = merged.buffer(self.dbuf, resolution=16)
             merged = merged.simplify(self.dbuf)
 
@@ -217,23 +249,26 @@ class Toolbox(GenericToolbox):
         gdf = gpd.GeoDataFrame(geometry=[merged]).set_crs(4326).to_crs(app.map.crs)
         gdf.to_file(filename, driver="GeoJSON")
 
-    def edit_buffer(self):
+    def edit_buffer(self) -> None:
+        """
+        Edit the buffer for the watersheds.
+        """
         pass
 
-def select(*args):
+def select(*args) -> None:
     app.toolbox["watersheds"].select_tab()
 
-def select_dataset(*args):
+def select_dataset(*args) -> None:
     app.toolbox["watersheds"].select_dataset()
 
-def select_level(*args):
+def select_level(*args) -> None:
     app.toolbox["watersheds"].select_level()
 
-def update(*args):
+def update(*args) -> None:
     app.toolbox["watersheds"].update_boundaries_on_map()
 
-def save(*args):
+def save(*args) -> None:
     app.toolbox["watersheds"].save()
 
-def edit_buffer(*args):
+def edit_buffer(*args) -> None:
     app.toolbox["watersheds"].edit_buffer()
