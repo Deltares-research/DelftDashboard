@@ -160,7 +160,10 @@ def build_gui_config():
     menu["module"] = "delftdashboard.menu.view"
     menu["menu"] = []
     menu["menu"].append({"variable_group": "view_settings", "id": "view.topography",  "text": "Topography", "method": "topography", "separator": True,  "checkable": True, "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "topography_visible", "operator": "eq", "value": True}]}]})
- 
+
+    # View settings
+    menu["menu"].append({"variable_group": "menu", "id": "view.settings",  "text": "Settings ...", "method": "edit_settings", "separator": True,  "checkable": False})
+
     # Add menu items for models
     # Loop over all models in model dict
     for model in app.model.values():
@@ -168,9 +171,6 @@ def build_gui_config():
         # Check it's not an empty dictionary
         if model_view_menu:
             menu["menu"].append(model_view_menu)
-
-    # View settings
-    menu["menu"].append({"variable_group": "menu", "id": "view.settings",  "text": "Settings ...", "method": "edit_settings", "separator": True,  "checkable": False})
 
     app.gui.config["menu"].append(menu)
 
