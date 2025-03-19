@@ -21,7 +21,7 @@ dependencies = [
     "pandas",
     "pyproj",
     "plotly",
-    "dask<2024.7.0",# The last version that still supports pandas 1.x, which we need until fiat-toolbox and noaa_cops become compatible with pandas 2.x
+    "dask==2024.11.2",# The last version that still supports pandas 1.x, which we need until fiat-toolbox and noaa_cops become compatible with pandas 2.x
     "rasterio",
     "shapely",
     "scipy",
@@ -51,7 +51,7 @@ dependencies = [
     "flood_adapt@ git+https://github.com/deltares/FloodAdapt.git",
     "cht-observations@ git+https://github.com/deltares/cht_observations.git",
     "hydromt-fiat>=0.5.3",
-    "hydromt-sfincs@ git+https://github.com/deltares/hydromt_sfincs.git@d7e1d26a58b6f5687ef47da320ea3b95faaba75a",
+    "hydromt-sfincs@ git+https://github.com/Deltares/hydromt_sfincs.git",
     "deltares-coastalhazardstoolkit@ git+https://github.com/Deltares/CoastalHazardsToolkit.git"
 ]
 dynamic = [
