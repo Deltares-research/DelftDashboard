@@ -15,7 +15,7 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "guitares",
+    "guitares<=0.0.12",
     "geopandas >=0.8",
     "numpy",
     "pandas",
