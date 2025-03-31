@@ -405,10 +405,7 @@ def get_roads(model):
     ## ROADS ##
     if app.gui.getvar(model, "include_osm_roads"):
         road_types = get_road_types()
-
         try:
-            dlg = app.gui.window.dialog_wait("\nDownloading OSM data...")
-
             # Get the roads to show in the map
             gdf = app.active_model.domain.exposure_vm.get_osm_roads(
                 road_types=road_types
@@ -434,12 +431,8 @@ def get_roads(model):
             # Set the checkbox checked
             app.gui.setvar("fiat", "show_roads", True)
 
-            dlg.close()
-        except KeyError:
-            app.gui.window.dialog_info(
-                text="No OSM roads found in this area, try another or a larger area.",
-                title="No OSM roads found",
-            )
+        except Exception as e:
+            dlg = app.gui.window.dialog_wait("\nNo roads found in the selected region")
             dlg.close()
           
 
