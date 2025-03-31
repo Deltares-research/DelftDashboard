@@ -2,25 +2,15 @@ watersheds:
   crs: 4326
   data_type: GeoDataFrame
   driver: vector
-  path: ../../../data/WaterSheds/Watersheds_US_lvl_12_crop.gpkg
+  path: ../../../data/watersheds/watersheds.gpkg
   meta:
     category: watersheds
     source: USGS
     url: https://www.usgs.gov/national-hydrography/watershed-boundary-dataset
 
-Chesapeake_Coned_16m:
+dem:
   data_type: RasterDataset
-  path: ../../../data/TopoBathy/Chesapeake_Coned_16m.tif
-  driver: raster
-  filesystem: local
-  crs: 26918
-  meta:
-    category: topography
-    source: USGS
-
-NewJersey_Delaware_Coned_16m:
-  data_type: RasterDataset
-  path: ../../../data/TopoBathy/NewJersey_Delaware_Coned_16m.tif
+  path: ../../../data/topobathy/dem.tif
   driver: raster
   filesystem: local
   crs: 26918

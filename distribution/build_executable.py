@@ -19,12 +19,13 @@ from config import (
     RTH_HOOK,
     SPEC_DIR,
     CENSUS_KEY_TXT,
-    _excluding_filter,
-    _validate_env_has_no_editable_installations,
-    _validate_path,
-    _increase_recursion_limit,
-    _copy_shapely_libs,
-    finalize_exe
+    excluding_filter,
+    validate_env_has_no_editable_installations,
+    validate_path,
+    increase_recursion_limit,
+    copy_shapely_libs,
+    add_data_dir,
+    clean_exe
 )
 
 
@@ -76,6 +77,14 @@ def parse_args():
         type=bool,
         help="Set to True to save debugging information to text files and print more information during the build process",
     )
+    parser.add_argument(
+        "--include-data",
+        required=False,
+        default=False,
+        dest="include_data",
+        action="store_true",
+        help="Include the data directory in the exe. This copies the data directory: `distribution/data` to the exe directory after building the exe.",
+    )
     return parser.parse_args()
 
 
@@ -83,14 +92,14 @@ def main():
     args = parse_args()
 
     # Increase the recursion limit for PyInstaller
-    _increase_recursion_limit()
+    increase_recursion_limit()
 
     # Define paths and variables
-    _validate_env_has_no_editable_installations()
+    validate_env_has_no_editable_installations()
 
     # Validate before running PyInstaller
     for varname, path in PYINSTALLER_DEFINES.items():
-        _validate_path(varname, path, EXPECTED_STRUCTURE_MSG_EXE)
+        validate_path(varname, path, EXPECTED_STRUCTURE_MSG_EXE)
 
     # Collect data files, dynamic libraries and hidden imports
     datas: list[tuple[str, str]] = []
@@ -102,7 +111,7 @@ def main():
             package_name, include_py_files=True, excludes=EXCLUDES
         )
         binaries += collect_dynamic_libs(package_name)
-        hidden_imports += collect_submodules(package_name, filter=_excluding_filter)
+        hidden_imports += collect_submodules(package_name, filter=excluding_filter)
 
     # Create mapbox token files
     with open(MAPBOX_TOKEN_TXT, "w") as f:
@@ -124,7 +133,7 @@ def main():
     datas.append((str(BRANCA_TEMPLATES_DIR / "*.js"), "branca/templates"))
 
     # Some packages for some reason do not include the .dll files from the .libs dir in their wheel, so we have to include them manually
-    _copy_shapely_libs()
+    copy_shapely_libs()
     for package in MANUAL_BINARIES:
         datas, binaries = collect_delvewheel_libs_directory(
             package, datas=datas, binaries=binaries
@@ -175,9 +184,12 @@ def main():
 
     PyInstaller.__main__.run(cmd_args)
 
-    finalize_exe()
+    # Make sure data catalogs + ini files are valid for distribution
+    clean_exe()
 
-
+    # Always create the structure for the data directory, optionally include the data itself in the exe
+    add_data_dir(args.include_data)
+    
 
 if __name__ == "__main__":
     main()
