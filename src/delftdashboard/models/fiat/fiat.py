@@ -781,7 +781,7 @@ class Model(GenericModel):
                     source=str(
                         app.gui.getvar("fiat", "loaded_asset_heights_files_value")[idx]
                     ),
-                    attribute_name=str(
+                    gfh_attribute_name=str(
                         app.gui.getvar("fiat", "heights_file_field_name_value")[
                             idx_attr
                         ]
