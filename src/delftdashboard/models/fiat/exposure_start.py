@@ -257,7 +257,7 @@ def build_osm_exposure(*args):
             crs=crs,
             country=country,
             max_potential_damage="jrc_damage_values",
-            ground_elevation_unit=ground_elevation_unit,
+            grnd_elev_unit=ground_elevation_unit,
             bf_conversion=bf_conversion,
             keep_unclassified=keep_unclassified,
         )
@@ -366,7 +366,7 @@ def build_user_exposure(*args):
             crs=crs,
             country=country,
             max_potential_damage=max_potential_damage,
-            ground_elevation_unit=app.gui.getvar(model, "ground_elevation_unit"),
+            grnd_elev_unit=app.gui.getvar(model, "ground_elevation_unit"),
         )
 
         # Set the buildings attribute to gdf for easy visualization of the buildings
