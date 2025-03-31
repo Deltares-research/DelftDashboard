@@ -801,7 +801,7 @@ class Model(GenericModel):
                             idx
                         ]
                     ),
-                    unit=unit,
+                    grnd_elev_unit=unit,
                 )
                 update.update_parameters("ground_elevtn")
 

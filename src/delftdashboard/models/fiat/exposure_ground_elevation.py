@@ -108,7 +108,7 @@ def add_to_model(*args):
     
     # Set the settings in HydroMT-FIAT
     app.active_model.domain.exposure_vm.set_ground_elevation(
-        source=path_ground_elevation_source, unit = unit
+        source=path_ground_elevation_source, grnd_elev_unit = unit
     )
 
     # If model already create, re-run the model to add additional attributes afterwards without aving to "create model" manually
