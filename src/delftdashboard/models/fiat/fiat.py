@@ -1077,7 +1077,7 @@ class Model(GenericModel):
         if type == "damage_struct":
             circle_color = [
                 "step",
-                ["get", "max_damages_structure"],
+                ["get", "max_damage_structure"],
                 "#FFFFFF",
                 0,
                 "#FFF4E7",
@@ -1095,7 +1095,7 @@ class Model(GenericModel):
         if type == "damage_cont":
             circle_color = [
                 "step",
-                ["get", "max_damages_content"],
+                ["get", "max_damage_content"],
                 "#FFFFFF",
                 0,
                 "#FFF4E7",
