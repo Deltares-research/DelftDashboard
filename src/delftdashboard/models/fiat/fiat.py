@@ -771,7 +771,7 @@ class Model(GenericModel):
                     max_dist=app.gui.getvar("fiat", "max_dist_damages_list"),
                     damage_types=app.gui.getvar("fiat", "damage_type_list"),
                 )
-                update.update_parameters("Max Potential Damages")
+                update.update_parameters("max_damages")
 
             ## Finished Floor Height
             if gfh_source not in ["National Structure Inventory", "User input"]:

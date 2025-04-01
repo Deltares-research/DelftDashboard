@@ -39,10 +39,10 @@ def display_properties(*args):
         display_classification()
     elif properties_to_display == "ground_flht":
         display_asset_height()
-    elif properties_to_display == "Max potential damages":
-        app.gui.setvar(model, "max_potential_damage_string", ["Structure", "Content"])
-        app.gui.setvar(model, "max_potential_damage_value", ["Structure", "Content"])
-        app.gui.setvar(model, "max_potential_damage_name", "Structure")
+    elif properties_to_display == "max_damages":
+        app.gui.setvar(model, "max_potential_damage_string", ["structure", "content"])
+        app.gui.setvar(model, "max_potential_damage_value", ["structure", "content"])
+        app.gui.setvar(model, "max_potential_damage_name", "structure")
         display_damage()
     elif properties_to_display == "ground_elevtn":
         display_ground_elevation()
