@@ -63,7 +63,7 @@ element:
       check:
       - variable: properties_to_display
         operator: eq
-        value: Max potential damages
+        value: max_damages
   - style: text
     position:
       x: 10
