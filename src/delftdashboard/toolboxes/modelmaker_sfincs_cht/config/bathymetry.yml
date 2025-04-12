@@ -8,10 +8,13 @@ element:
   text: "Available Datasets"
   text_position: "above"
   method: select_bathymetry_dataset
+  module: delftdashboard.operations.bathy_topo_selector
   variable: bathymetry_dataset_index
+  variable_group: bathy_topo_selector
   select: index
   option_string:
     variable: bathymetry_dataset_names
+    variable_group: bathy_topo_selector
 - style: popupmenu
   position:
     x: 10
@@ -19,12 +22,16 @@ element:
     width: 200
     height: 20
   method: select_bathymetry_source
+  module: delftdashboard.operations.bathy_topo_selector
   variable: active_bathymetry_source
+  variable_group: bathy_topo_selector
   select: item
   option_string:
     variable: bathymetry_source_names
+    variable_group: bathy_topo_selector
   option_value:
     variable: bathymetry_source_names
+    variable_group: bathy_topo_selector
 - style: pushbutton
   position:
     x: 220
@@ -33,6 +40,7 @@ element:
     height: 20
   text: "Use Dataset ->"
   method: use_dataset
+  module: delftdashboard.operations.bathy_topo_selector
 - style: pushbutton
   position:
     x: 220
@@ -41,6 +49,7 @@ element:
     height: 20
   text: "Info"
   method: info
+  module: delftdashboard.operations.bathy_topo_selector
   enable: False
 - style: listbox
   position:
@@ -51,10 +60,13 @@ element:
   text: "Selected Datasets"
   text_position: "above"
   method: select_selected_bathymetry_dataset
+  module: delftdashboard.operations.bathy_topo_selector
   variable: selected_bathymetry_dataset_index
+  variable_group: bathy_topo_selector
   select: index
   option_string:
     variable: selected_bathymetry_dataset_names
+    variable_group: bathy_topo_selector
 - style: edit
   position:
     x: 340
@@ -63,13 +75,16 @@ element:
     height: 20
   text: "Zmin"
   method: edit_zmin_bathymetry_dataset
+  module: delftdashboard.operations.bathy_topo_selector
   variable: selected_bathymetry_dataset_zmin
+  variable_group: bathy_topo_selector
   tooltip: Minimum elevation for this dataset (values below Zmin will not be used)
   dependency:
   - action: enable
     checkfor: all
     check:
     - variable: nr_selected_bathymetry_datasets
+      variable_group: bathy_topo_selector
       operator: gt
       value: 0
 - style: edit
@@ -80,13 +95,16 @@ element:
     height: 20
   text: "Zmax"
   method: edit_zmax_bathymetry_dataset
+  module: delftdashboard.operations.bathy_topo_selector
   variable: selected_bathymetry_dataset_zmax
+  variable_group: bathy_topo_selector
   tooltip: Maximum elevation for this dataset (values above Zmax will not be used)
   dependency:
   - action: enable
     checkfor: all
     check:
     - variable: nr_selected_bathymetry_datasets
+      variable_group: bathy_topo_selector
       operator: gt
       value: 0
 - style: pushbutton
@@ -97,11 +115,13 @@ element:
     height: 20
   text: "Remove"
   method: remove_selected_bathymetry_dataset
+  module: delftdashboard.operations.bathy_topo_selector
   dependency:
   - action: enable
     checkfor: all
     check:
     - variable: nr_selected_bathymetry_datasets
+      variable_group: bathy_topo_selector
       operator: gt
       value: 0
 - style: pushbutton
@@ -112,11 +132,13 @@ element:
     height: 20
   text: "Move Up"
   method: move_up_selected_bathymetry_dataset
+  module: delftdashboard.operations.bathy_topo_selector
   dependency:
   - action: enable
     checkfor: all
     check:
     - variable: nr_selected_bathymetry_datasets
+      variable_group: bathy_topo_selector
       operator: gt
       value: 0
 - style: pushbutton
@@ -127,11 +149,13 @@ element:
     height: 20
   text: "Move Down"
   method: move_down_selected_bathymetry_dataset
+  module: delftdashboard.operations.bathy_topo_selector
   dependency:
   - action: enable
     checkfor: all
     check:
     - variable: nr_selected_bathymetry_datasets
+      variable_group: bathy_topo_selector
       operator: gt
       value: 0
 - style: edit
@@ -168,6 +192,7 @@ element:
     checkfor: all
     check:
     - variable: nr_selected_bathymetry_datasets
+      variable_group: bathy_topo_selector
       operator: gt
       value: 0
   

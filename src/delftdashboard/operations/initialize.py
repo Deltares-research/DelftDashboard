@@ -138,6 +138,7 @@ def initialize():
         print("No internet connection available. Cannot check online databases!")
         app.online = False
 
+
     # Bathymetry database (initialize local database)
     if "bathymetry_database_path" not in app.config:
         app.config["bathymetry_database_path"] = os.path.join(app.config["data_path"], "bathymetry")
@@ -147,6 +148,25 @@ def initialize():
                                                  s3_bucket=s3_bucket,
                                                  s3_key=s3_key,
                                                  check_online=app.online)
+
+    # Selected bathy/topo datasets
+    # Using a list of dictionaries to store the datasets, e.g.:
+    # app.selected_bathymetry_datasets = [{"name": "dataset1", "zmin": -10.0, "zmax": 10.0},
+    app.selected_bathymetry_datasets = []
+    source_names, sources = app.bathymetry_database.sources()
+    dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source_names[0])
+    group = "bathy_topo_selector"
+    app.gui.setvar(group, "names", [])
+    app.gui.setvar(group, "zmin", [])
+    app.gui.setvar(group, "bathymetry_source_names", source_names)
+    app.gui.setvar(group, "active_bathymetry_source", source_names[0])
+    app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
+    app.gui.setvar(group, "bathymetry_dataset_index", 0)
+    app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
+    app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
+    app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
+    app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
+    app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
 
     # Define some other variables
     app.crs = CRS(4326)

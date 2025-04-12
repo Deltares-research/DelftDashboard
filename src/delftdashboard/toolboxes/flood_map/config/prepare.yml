@@ -1,0 +1,41 @@
+element:
+- style: pushbutton
+  text: Load Topo/Bathy GeoTiff
+  position:
+    x: 20
+    y: 100
+    width: 150
+    height: 20
+  method: load_topobathy_geotiff
+- style: pushbutton
+  text: Generate Topo/Bathy GeoTiff
+  position:
+    x: 20
+    y: 75
+    width: 150
+    height: 20
+  method: generate_topobathy_geotiff
+- style: edit
+  text: dX
+  position:
+    x: 70
+    y: 50
+    width: 100
+    height: 20
+  variable: dx_geotiff
+- style: pushbutton
+  text: Load Index GeoTiff
+  position:
+    x: 200
+    y: 100
+    width: 150
+    height: 20
+  method: load_index_geotiff
+- style: pushbutton
+  text: Generate Index GeoTiff
+  position:
+    x: 200
+    y: 75
+    width: 150
+    height: 20
+  method: generate_index_geotiff

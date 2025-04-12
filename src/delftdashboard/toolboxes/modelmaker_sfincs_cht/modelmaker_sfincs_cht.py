@@ -160,17 +160,17 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "neumann_boundary_zmin_snapwave", -99999.0)
 
         # Bathymetry
-        source_names, sources = app.bathymetry_database.sources()
-        app.gui.setvar(group, "bathymetry_source_names", source_names)
-        app.gui.setvar(group, "active_bathymetry_source", source_names[0])
-        dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source_names[0])
-        app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
-        app.gui.setvar(group, "bathymetry_dataset_index", 0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
-        app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
-        app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
+        # source_names, sources = app.bathymetry_database.sources()
+        # app.gui.setvar(group, "bathymetry_source_names", source_names)
+        # app.gui.setvar(group, "active_bathymetry_source", source_names[0])
+        # dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source_names[0])
+        # app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
+        # app.gui.setvar(group, "bathymetry_dataset_index", 0)
+        # app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
+        # app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
+        # app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
+        # app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
+        # app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
 
         # Roughness
         app.gui.setvar(group, "manning_land", 0.06)
@@ -373,9 +373,9 @@ class Toolbox(GenericToolbox):
         # Save grid 
         model.grid.write()
 
-        # If SnapWave also generate SnapWave mesh and save it
-        if app.gui.getvar(group, "use_snapwave"):
-            snapwave_quadtree2mesh(model.grid, file_name="snapwave.nc")
+        # If SnapWave also generate SnapWave mesh and save it. Why?!
+        # if app.gui.getvar(group, "use_snapwave"):
+        #     snapwave_quadtree2mesh(model.grid, file_name="snapwave.nc")
 
         # Replot everything
         app.model["sfincs_cht"].plot()
@@ -384,8 +384,9 @@ class Toolbox(GenericToolbox):
 
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
-        bathymetry_list = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
-        app.model["sfincs_cht"].domain.grid.set_bathymetry(bathymetry_list,
+        # bathymetry_list = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
+        # bathymetry_list = app.selected_bathymetry_datasets
+        app.model["sfincs_cht"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
                                                            bathymetry_database=app.bathymetry_database,
                                                            zmin=app.gui.getvar("modelmaker_sfincs_cht", "zmin"),
                                                            zmax=app.gui.getvar("modelmaker_sfincs_cht", "zmax"))
@@ -480,7 +481,8 @@ class Toolbox(GenericToolbox):
 
     def generate_subgrid(self):
         group = "modelmaker_sfincs_cht"
-        bathymetry_sets = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
+        # bathymetry_sets = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
+        bathymetry_sets = app.selected_bathymetry_datasets
         roughness_sets = []
         manning_land = app.gui.getvar(group, "manning_land")
         manning_water = app.gui.getvar(group, "manning_water")
