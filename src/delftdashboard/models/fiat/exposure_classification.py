@@ -45,11 +45,11 @@ def read_classification(*args):
         df.sort_values(object_type, inplace=True, ignore_index=True)
         app.gui.setvar(model, "exposure_categories_to_standardize", df)
         dlg.close()
-        if object_type == "Primary Object Type":
+        if object_type == "primary_object_type":
             app.gui.window.dialog_info(
                 f"Updating the primary classification, will cause the secondary classification to automatically be updated, too. This ensures that primary and secondary classification are consistent. If you wish to only update the name of the primary classification, and not the damage curve, please do so manually.<br><p>Please standardize your classification so the correct damage curves can be assigned.</p>",
                 "Please standardize",)
-        elif object_type == "Secondary Object Type":
+        elif object_type == "secondary_object_type":
             app.gui.window.dialog_info(
             f"Please standardize your classification so the correct damage curves can be assigned.",
             "Please standardize",)

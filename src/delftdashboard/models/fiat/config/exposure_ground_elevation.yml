@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: Ground elevation source
+  title: Ground Elevation source
   position:
     x: 10
     y: 10
@@ -73,7 +73,7 @@ element:
         value: upload_data
 
 - style: panel
-  title: Uploaded ground elevation sources
+  title: Uploaded Ground Elevation sources
   position:
     x: 205
     y: 10

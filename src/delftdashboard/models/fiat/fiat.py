@@ -63,7 +63,7 @@ class Model(GenericModel):
             legend_title="Buildings",
             fill_color="orange",
             line_color="transparent",
-            hover_property="Secondary Object Type",
+            hover_property="secondary_object_type",
             big_data=True,
             min_zoom=10,
         )
@@ -76,7 +76,7 @@ class Model(GenericModel):
             legend_title="Buildings",
             fill_color="orange",
             line_color="transparent",
-            hover_property="Primary Object Type",
+            hover_property="primary_object_type",
             big_data=True,
             min_zoom=10,
         )
@@ -89,7 +89,7 @@ class Model(GenericModel):
             legend_title="Buildings",
             fill_color="orange",
             line_color="transparent",
-            hover_property="Secondary Object Type",
+            hover_property="secondary_object_type",
             big_data=True,
             min_zoom=10,
         )
@@ -102,7 +102,7 @@ class Model(GenericModel):
             legend_title=f'Ground Floor Height [{app.gui.getvar("fiat", "view_tab_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
-            hover_property="Ground Floor Height",
+            hover_property="ground_flht",
             big_data=True,
             min_zoom=10,
         )
@@ -115,7 +115,7 @@ class Model(GenericModel):
             legend_title=f'Max. potential damage: Structure [{app.gui.getvar("fiat", "damage_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
-            hover_property="Max Potential Damage: Structure",
+            hover_property="max_damages_structure",
             big_data=True,
             min_zoom=10,
         )
@@ -128,7 +128,7 @@ class Model(GenericModel):
             legend_title=f'Max. potential damage: Content [{app.gui.getvar("fiat", "damage_unit")}]',
             # TODO retrieve the unit in the legend title from the data, not hardcoded
             line_color="transparent",
-            hover_property="Max Potential Damage: Content",
+            hover_property="max_damages_content",
             big_data=True,
             min_zoom=10,
         )
@@ -137,9 +137,9 @@ class Model(GenericModel):
             type="circle",
             circle_radius=3,
             legend_position="top-right",
-            legend_title=f'Ground elevation [{app.gui.getvar("fiat", "view_tab_unit")}]',
+            legend_title=f'Ground Elevation [{app.gui.getvar("fiat", "view_tab_unit")}]',
             line_color="transparent",
-            hover_property="Ground Elevation",
+            hover_property="ground_elevtn",
             big_data=True,
             min_zoom=10,
         )
@@ -164,7 +164,7 @@ class Model(GenericModel):
             line_color="purple",
             line_width=3,
             circle_radius=0,
-            hover_property="Secondary Object Type",
+            hover_property="secondary_object_type",
         )
 
         layer = app.map.add_layer("aggregation")
@@ -349,7 +349,7 @@ class Model(GenericModel):
 
         df = pd.DataFrame(
             columns=[
-                "Secondary Object Type",
+                "secondary_object_type",
                 "Assigned: Structure",
                 "Assigned: Content",
             ]
@@ -357,7 +357,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "exposure_categories_to_link", df)
 
         ## STANDARDIZING EXPOSURE CATEGORIES ##
-        df = pd.DataFrame(columns=["Primary Object Type", "Assigned"])
+        df = pd.DataFrame(columns=["primary_object_type", "Assigned"])
         app.gui.setvar(group, "exposure_categories_to_standardize", df)
         app.gui.setvar(group, "active_exposure_category_standardize", [0])
         app.gui.setvar(group, "active_related_occupancy_type", [0])
@@ -415,10 +415,10 @@ class Model(GenericModel):
             ],  # Make sure these are capitalized
         )
         app.gui.setvar(
-            group, "object_type_value", ["Primary Object Type", "Secondary Object Type"]
+            group, "object_type_value", ["primary_object_type", "secondary_object_type"]
         )  # Make sure these are capitalized
         app.gui.setvar(
-            group, "object_type", "Primary Object Type"
+            group, "object_type", "primary_object_type"
         )  # Make sure this is capitalized
         app.gui.setvar(
             group,
@@ -641,17 +641,17 @@ class Model(GenericModel):
             "view_exposure_value",
             pd.DataFrame(
                 columns=[
-                    "Object ID",
-                    "Object Name",
-                    "Primary Object Type",
-                    "Secondary Object Type",
-                    "Max Potential Damage: Structure",
-                    "Max Potential Damage: Content",
-                    "Ground Floor Height",
-                    "Ground Elevation",
-                    "Extraction Method",
-                    "Damage Function: Structure",
-                    "Damage Function: Content",
+                    "object_id",
+                    "object_name",
+                    "primary_object_type",
+                    "secondary_object_type",
+                    "max_damages_structure",
+                    "max_damages_content",
+                    "ground_flht",
+                    "ground_elevtn",
+                    "extract_method",
+                    "fn_damages_structure",
+                    "fn_damages_content",
                     "lanes",
                     "Segment Length [m]",
                     "SVI_key_domain",
@@ -771,7 +771,7 @@ class Model(GenericModel):
                     max_dist=app.gui.getvar("fiat", "max_dist_damages_list"),
                     damage_types=app.gui.getvar("fiat", "damage_type_list"),
                 )
-                update.update_parameters("Max Potential Damages")
+                update.update_parameters("max_damages")
 
             ## Finished Floor Height
             if gfh_source not in ["National Structure Inventory", "User input"]:
@@ -781,7 +781,7 @@ class Model(GenericModel):
                     source=str(
                         app.gui.getvar("fiat", "loaded_asset_heights_files_value")[idx]
                     ),
-                    attribute_name=str(
+                    gfh_attribute_name=str(
                         app.gui.getvar("fiat", "heights_file_field_name_value")[
                             idx_attr
                         ]
@@ -789,7 +789,7 @@ class Model(GenericModel):
                     gfh_method=app.gui.getvar("fiat", "method_gfh"),
                     max_dist=app.gui.getvar("fiat", "max_dist_gfh"),
                 )
-                update.update_parameters("Finished Floor Height")
+                update.update_parameters("ground_flht")
 
             ## Ground Elevation
             if ground_elevation_source not in ["National Structure Inventory", "None"]:
@@ -803,7 +803,7 @@ class Model(GenericModel):
                     ),
                     grnd_elev_unit=unit,
                 )
-                update.update_parameters("Ground Elevation")
+                update.update_parameters("ground_elevtn")
 
             ## Additional Atrributes
             if len(additional_attr) > 0:
@@ -907,7 +907,7 @@ class Model(GenericModel):
         if type == "primary":
             circle_color = [
                 "match",
-                ["get", "Primary Object Type"],
+                ["get", "primary_object_type"],
                 "AGR",
                 "#009c99",
                 "COM",
@@ -928,7 +928,7 @@ class Model(GenericModel):
         if type == "secondary":
             circle_color = [
                 "match",
-                ["get", "Secondary Object Type"],
+                ["get", "secondary_object_type"],
                 "AGR1",
                 "#009c99",
                 "COM1",
@@ -1011,7 +1011,7 @@ class Model(GenericModel):
         if type == "osm_primary":
             circle_color = [
                 "match",
-                ["get", "Primary Object Type"],
+                ["get", "primary_object_type"],
                 "commercial",
                 "#6590bb",
                 "infrastructure",
@@ -1034,7 +1034,7 @@ class Model(GenericModel):
         if type == "osm_secondary":
             circle_color = [
                 "match",
-                ["get", "Secondary Object Type"],
+                ["get", "secondary_object_type"],
                 "retail",
                 "#009c99",
                 "commercial",
@@ -1059,7 +1059,7 @@ class Model(GenericModel):
         if type == "asset_height":
             circle_color = [
                 "step",
-                ["get", "Ground Floor Height"],
+                ["get", "ground_flht"],
                 "#FFFFFF",
                 0,
                 "#EBF0FC",
@@ -1077,7 +1077,7 @@ class Model(GenericModel):
         if type == "damage_struct":
             circle_color = [
                 "step",
-                ["get", "Max Potential Damage: Structure"],
+                ["get", "max_damage_structure"],
                 "#FFFFFF",
                 0,
                 "#FFF4E7",
@@ -1095,7 +1095,7 @@ class Model(GenericModel):
         if type == "damage_cont":
             circle_color = [
                 "step",
-                ["get", "Max Potential Damage: Content"],
+                ["get", "max_damage_content"],
                 "#FFFFFF",
                 0,
                 "#FFF4E7",
@@ -1113,7 +1113,7 @@ class Model(GenericModel):
         if type == "ground_elevation":
             circle_color = [
                 "step",
-                ["get", "Ground Elevation"],
+                ["get", "ground_elevtn"],
                 "#FFFFFF",
                 0,
                 "#F7FFF6",
@@ -1341,7 +1341,7 @@ class Model(GenericModel):
             self.show_max_potential_damage_content()
 
     def show_ground_elevation(self, type="ground_elevation"):
-        """Show ground elevation"""
+        """Show Ground Elevation"""
         if not self.buildings.empty:
             paint_properties = self.get_paint_properties(type=type)
             color_items = paint_properties["circle-color"][2:]
@@ -1364,7 +1364,7 @@ class Model(GenericModel):
             app.map.layer["buildings"].layer[
                 "ground_elevation"
             ].legend_title = (
-                f'Ground elevation [{app.gui.getvar("fiat", "view_tab_unit")}]'
+                f'Ground Elevation [{app.gui.getvar("fiat", "view_tab_unit")}]'
             )
             app.map.layer["buildings"].layer["ground_elevation"].set_data(
                 self.buildings, paint_properties, legend
@@ -1644,10 +1644,10 @@ class Model(GenericModel):
         for index, row in gdf_bf.iterrows():
             centroid = row["geometry"].centroid
             list_centroid.append(centroid)
-            list_object_id.append(row["Object ID"])
-        data = {"Object ID": list_object_id, "geometry": list_centroid}
-        gdf_centroid = gpd.GeoDataFrame(data, columns=["Object ID", "geometry"])
-        gdf = gdf_bf.merge(gdf_centroid, on="Object ID", suffixes=("_gdf1", "_gdf2"))
+            list_object_id.append(row["object_id"])
+        data = {"object_id": list_object_id, "geometry": list_centroid}
+        gdf_centroid = gpd.GeoDataFrame(data, columns=["object_id", "geometry"])
+        gdf = gdf_bf.merge(gdf_centroid, on="object_id", suffixes=("_gdf1", "_gdf2"))
         gdf.drop(columns="geometry_gdf1", inplace=True)
         gdf.rename(columns={"geometry_gdf2": "geometry"}, inplace=True)
         gdf.drop_duplicates(inplace=True)

@@ -37,14 +37,14 @@ def display_properties(*args):
         app.gui.setvar(model, "classification_display_value", ["Primary", "Secondary"])
         app.gui.setvar(model, "classification_display_name", "Primary")
         display_classification()
-    elif properties_to_display == "Finished floor height":
+    elif properties_to_display == "ground_flht":
         display_asset_height()
-    elif properties_to_display == "Max potential damages":
-        app.gui.setvar(model, "max_potential_damage_string", ["Structure", "Content"])
-        app.gui.setvar(model, "max_potential_damage_value", ["Structure", "Content"])
-        app.gui.setvar(model, "max_potential_damage_name", "Structure")
+    elif properties_to_display == "max_damages":
+        app.gui.setvar(model, "max_potential_damage_string", ["structure", "content"])
+        app.gui.setvar(model, "max_potential_damage_value", ["structure", "content"])
+        app.gui.setvar(model, "max_potential_damage_name", "structure")
         display_damage()
-    elif properties_to_display == "Ground Elevation":
+    elif properties_to_display == "ground_elevtn":
         display_ground_elevation()
     elif properties_to_display == "Social Vulnerability Index (SVI)":
         display_svi()
@@ -56,19 +56,19 @@ def display_classification(*args):
         if app.gui.getvar("fiat", "classification_display_name") == "Primary":
             app.map.layer["buildings"].layer[
                 "exposure_points"
-            ].hover_property = "Primary Object Type"
+            ].hover_property = "primary_object_type"
             app.active_model.show_classification(type="primary")
         else:
             app.map.layer["buildings"].layer[
                 "exposure_points"
-            ].hover_property = "Secondary Object Type"
+            ].hover_property = "secondary_object_type"
             app.active_model.show_classification(type="secondary")
 
 
 def display_damage(*args):
     if app.gui.getvar("fiat", "show_asset_locations"):
         app.map.layer["buildings"].clear()
-        if app.gui.getvar("fiat", "max_potential_damage_name") == "Structure":
+        if app.gui.getvar("fiat", "max_potential_damage_name") == "structure":
             app.active_model.show_max_potential_damage_struct()
         else:
             app.active_model.show_max_potential_damage_cont()
