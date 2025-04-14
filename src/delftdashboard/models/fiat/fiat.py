@@ -411,7 +411,7 @@ class Model(GenericModel):
             "object_type_string",
             [
                 "Primary Object Type",
-                "Secondary_object_type",
+                "Secondary Object Type",
             ],  # Make sure these are capitalized
         )
         app.gui.setvar(
