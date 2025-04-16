@@ -60,7 +60,7 @@ def initialize():
     if not os.path.exists(pth_file_name):
         # Ask the user to enter a path to the delftdashboard folder
         print(f"Cannot find the file {pth_file_name} which contains the name of the Delft Dashboard folder where the data will be stored.")
-        print("Please enter a path to the Delft Dashboard folder (e.g. c:\work\delftdashboard):")
+        print(r"Please enter a path to the Delft Dashboard folder (e.g. c:\work\delftdashboard):")
         pth = input()
         pthfile = open(pth_file_name, "w")
         pthfile.write(pth)
