@@ -127,11 +127,13 @@ def build_gui_config():
     source_names, sources = app.bathymetry_database.sources()
     menu = {}
     menu["text"] = "Topography"
+    menu["id"] = "topography"
     menu["module"] = "delftdashboard.menu.topography"
     menu["menu"] = []
     for source in sources:
         source_menu = {}
         source_menu["text"] = source.name
+        source_menu["id"] = "topography." + source.name
         source_menu["menu"] = []
         for dataset in source.dataset:
             dependency = [{"action": "check",

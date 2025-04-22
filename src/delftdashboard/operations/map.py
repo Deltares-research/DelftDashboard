@@ -6,11 +6,12 @@ Created on Tue Jul  5 13:40:07 2022
 """
 import numpy as np
 import traceback
-from pyproj import CRS
+from pyproj import CRS, Transformer
 import matplotlib as mpl
 
 from delftdashboard.app import app
 
+transformer_4326_to_3857 = Transformer.from_crs(CRS(4326), CRS(3857), always_xy=True)
 
 def map_ready(*args):
 
@@ -59,6 +60,11 @@ def map_moved(coords, widget):
 def mouse_moved(x, y, lon, lat):
     # This method is called whenever the mouse moves over the map
     # We can use this to show the coordinates of the mouse in the status bar
+    
+    # Check if the map is ready (it's possible that the map is not yet ready when this method is called)
+    if not hasattr(app, "map"):
+        return
+
     if app.map.crs.is_geographic:
         app.gui.window.statusbar.set_text("lon", f"Lon : {lon:.6f}")
         app.gui.window.statusbar.set_text("lat", f"Lat : {lat:.6f}")
@@ -93,21 +99,36 @@ def update_background_topography_layer():
 
         if auto_update and visible:
 
-            print("Updating background topography ...")
-
             coords = app.map.map_extent
-            xl = [coords[0][0], coords[1][0]]
-            yl = [coords[0][1], coords[1][1]]
-            wdt = app.map.view.geometry().width()
-            if quality == "high":
-                npix = wdt
-            elif quality == "medium":
-                npix = int(wdt*0.5)
-            else:
-                npix = int(wdt*0.25)
 
-            dxy = (xl[1] - xl[0])/npix
-            xv = np.arange(xl[0], xl[1], dxy)
+            hgt = app.map.view.geometry().height()
+            if quality == "high":
+                npix = hgt
+            elif quality == "medium":
+                npix = int(hgt*0.5)
+            else:
+                npix = int(hgt*0.25)
+
+            # Actually easiest to use web mercator
+            # transformer_4326_to_3857 = Transformer.from_crs(CRS(4326), CRS(3857), always_xy=True)
+            if coords[1][0] - coords[0][0] > 360.0:
+                # If the map is larger than 360 degrees, we can make image of entire world
+                coords[0][0] = -180.0
+                coords[1][0] = 180.0
+            x0, y0 = transformer_4326_to_3857.transform(coords[0][0], coords[0][1])
+            x1, y1 = transformer_4326_to_3857.transform(coords[1][0], coords[1][1])
+            if x0 > x1:
+                # Subtract max size of web mercator
+                x0 -= 40075016.68557849
+            if x0 < -20037508.342789244:
+                # Add max size of web mercator
+                x0 += 40075016.68557849
+                x1 += 40075016.68557849    
+            xl = [x0, x1]
+            yl = [y0, y1]
+
+            dxy = (yl[1] - yl[0]) / npix
+            xv = np.arange(xl[0], xl[1] + dxy, dxy)
             yv = np.arange(yl[0], yl[1], dxy)
             background_topography_dataset = app.gui.getvar("view_settings", "topography_dataset")
             dataset_list = [{"name": background_topography_dataset, "zmin": -99999.9, "zmax": 99999.9}]
@@ -115,7 +136,7 @@ def update_background_topography_layer():
             try:
                 cmap = mpl.cm.get_cmap(colormap)
                 # Add wait box
-                z = app.bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(4326), dataset_list,
+                z = app.bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(3857), dataset_list,
                                                                    method=interp_method,
                                                                    waitbox=app.gui.window.dialog_wait)
 
@@ -128,7 +149,12 @@ def update_background_topography_layer():
                 app.map.layer["main"].layer["background_topography"].color_scale_cmax = zmax
                 app.map.layer["main"].layer["background_topography"].hillshading = hillshading
 
-                app.map.layer["main"].layer["background_topography"].set_data(x=xv, y=yv, z=z, colormap=cmap, decimals=0)
+                app.map.layer["main"].layer["background_topography"].set_data(x=xv,
+                                                                              y=yv,
+                                                                              z=z,
+                                                                              colormap=cmap,
+                                                                              decimals=0,
+                                                                              crs=CRS(3857))
 
             except:
                 print("Error loading background topo ...")

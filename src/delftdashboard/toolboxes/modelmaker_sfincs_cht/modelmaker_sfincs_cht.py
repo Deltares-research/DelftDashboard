@@ -17,7 +17,7 @@ from delftdashboard.misc.gdfutils import mpol2pol
 
 from cht_utils.misc_tools import dict2yaml
 from cht_utils.misc_tools import yaml2dict
-from cht_sfincs.quadtree_grid_snapwave import snapwave_quadtree2mesh
+#from cht_sfincs.quadtree_grid_snapwave import snapwave_quadtree2mesh
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):

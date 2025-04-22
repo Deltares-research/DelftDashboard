@@ -1,7 +1,14 @@
 element:
-- style: panel
+- style: tabpanel
   position:
     x: 10
     y: 10
     width: -10
     height: 160
+  tab:
+  - string: Import
+    module: delftdashboard.toolboxes.bathymetry.import
+    element: import.yml
+  - string: Export
+    module: delftdashboard.toolboxes.bathymetry.export
+    element: export.yml

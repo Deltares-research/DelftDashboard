@@ -47,6 +47,8 @@ def initialize():
 
     # Read cfg file and override stuff in default config dict
     # cfg file contains gui config stuff, but not properties that need to be edited by the user ! It always sits in the config folder.
+    # Note that values in the keyword-value pairs in the cfg file will be overwritten with
+    # values in the ini file if they are present there! 
     cfg_file_name = os.path.join(app.config_path, "delftdashboard.cfg")
     cfgfile = open(cfg_file_name, "r")
     config = yaml.load(cfgfile, Loader=yaml.FullLoader)
@@ -65,12 +67,6 @@ def initialize():
         pthfile = open(pth_file_name, "w")
         pthfile.write(pth)
         pthfile.close()
-        # print("If you have not yet created a folder for Delft Dashboard (outside of the source folder), please do so.")
-        # print("The folder should be called delftdashboard (e.g. d:\work\delftdashboard).")
-        # print("You'll need to copy the contents of the ddb folder in the GitHub repository to this new folder.")
-        # print("Then create a text file called delftdashboard.pth (in src\delftdashboard) with one line in it: the path to the Delft Dashboard folder (e.g. d:\work\delftdashboard).")
-        # print("ERROR: delftdashboard.pth file not found in main folder. Exiting.")
-        # exit()
     pthfile = open(pth_file_name, "r")
     pth = pthfile.readline().strip()
     # # Replace backslashes with forward slashes
@@ -78,11 +74,6 @@ def initialize():
     app.config["delft_dashboard_path"] = pth
     app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
     pthfile.close()
-
-    # First we check if the folder pth exists. If not, give warning and create it.
-    if not os.path.exists(app.config["delft_dashboard_path"]):
-        print("The folder specified in delftdashboard.pth does not exist. Creating it.")
-        os.mkdir(app.config["delft_dashboard_path"])
 
     # Now check if the ini file exists. If not, give warning and create it.
     ini_file_name = os.path.join(app.config["delft_dashboard_path"], "delftdashboard.ini")
@@ -100,11 +91,21 @@ def initialize():
 
     # Read ini file and override stuff in default config dict
     # ini file contains properties that need to be edited by the user !
+    # Note that values in the keyword-value pairs in the cfg file will be overwritten with
+    # values in the ini file if they are present!
     inifile = open(ini_file_name, "r")
     config = yaml.load(inifile, Loader=yaml.FullLoader)
     for key in config:
         app.config[key] = config[key]
     inifile.close()
+
+
+
+    # First we check if the folder pth exists. If not, give warning and create it.
+    if not os.path.exists(app.config["delft_dashboard_path"]):
+        print("The folder specified in delftdashboard.pth does not exist. Creating it.")
+        os.mkdir(app.config["delft_dashboard_path"])
+
 
     # The data path always sits in the delftdashboard folder
     app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
