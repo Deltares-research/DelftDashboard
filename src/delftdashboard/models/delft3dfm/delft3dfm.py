@@ -152,20 +152,24 @@ class Model(GenericModel):
         app.gui.setvar(group, "setup.dx", 0.01)
         app.gui.setvar(group, "setup.dy", 0.01)
 
-        # app.gui.setvar(group, "active_boundary_point", 0)
-        # app.gui.setvar(group, "boundary_forcing", self.domain.boundary_conditions.forcing)
-        # app.gui.setvar(group, "boundary_hm0", 1.0)
-        # app.gui.setvar(group, "boundary_tp", 6.0)
-        # app.gui.setvar(group, "boundary_wd", 0.0)
-        # app.gui.setvar(group, "boundary_ds", 30.0)
+        app.gui.setvar(group, "boundary_point_names", []) 
+        app.gui.setvar(group, "active_boundary_point", 0)
+        app.gui.setvar(group, "boundary_forcing", self.domain.boundary_conditions.forcing)
+        app.gui.setvar(group, "boundary_hm0", 1.0)
+        app.gui.setvar(group, "boundary_tp", 6.0)
+        app.gui.setvar(group, "boundary_wd", 0.0)
+        app.gui.setvar(group, "boundary_ds", 30.0)
 
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
 
-        # app.gui.setvar(group, "observation_point_names_spectra", [])
-        # app.gui.setvar(group, "nr_observation_points_spectra", 0)
-        # app.gui.setvar(group, "active_observation_point_spectra", 0)
+        app.gui.setvar(group, "observation_point_names_spectra", [])
+        app.gui.setvar(group, "nr_observation_points_spectra", 0)
+        app.gui.setvar(group, "active_observation_point_spectra", 0)
+
+        app.gui.setvar(group, "observation_point_names_crs", [])
+        app.gui.setvar(group, "active_observation_point_crs", 0)
 
     # def set_model_variables(self, varid=None, value=None):
     #     # Copies gui variables to delft3dfm input variables

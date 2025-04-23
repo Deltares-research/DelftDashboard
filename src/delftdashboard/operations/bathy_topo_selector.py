@@ -111,3 +111,6 @@ def update():
         app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
     app.gui.setvar(group, "nr_selected_bathymetry_datasets", nrd)
+
+def info(*args):
+    pass

@@ -7,6 +7,7 @@ Created on Mon May 10 12:18:09 2021
 import os
 
 from delftdashboard.app import app
+from delftdashboard.operations import map
 
 from cht_sfincs import SFINCS
 # from delft3dfm import Delft3DFM
@@ -15,7 +16,7 @@ from cht_nesting import nest1
 
 def select(*args):
     # Select the nesting toolbox
-    app.map.update()
+    map.update()
     # Set detail model loaded to False to avoid confusion
     app.gui.setvar("nesting", "detail_model_type", "")
     app.gui.setvar("nesting", "detail_model_loaded", False)
@@ -137,7 +138,6 @@ def perform_nesting_step_1(*args):
     # Add waitbox
     wb = app.gui.window.dialog_wait("Performing nesting step 1 ...")
 
-
     # Get the folder name of the selected file
     path = os.path.dirname(detail_model_file)
 
@@ -150,6 +150,19 @@ def perform_nesting_step_1(*args):
         detail_model = HurryWave()
         detail_model.path = path
         detail_model.read()
+
+    # Do some checks here
+    if detail_model_type == "sfincs_cht" and app.active_model.name == "hurrywave":
+        # Make sure that SnapWave is activated in the sfincs_cht model
+        if not detail_model.input.variables.snapwave:
+            wb.close()
+            app.gui.window.dialog_warning("SnapWave is not activated in the SFINCS model. It can not be nested in HurryWave.")
+            return
+        # Make sure that there is a bwv file in the sfincs_cht model
+        if not detail_model.input.variables.bwvfile:
+            wb.close()
+            app.gui.window.dialog_warning("No bwv file found in the SFINCS model. It can not be nested in HurryWave.")
+            return
 
     obs_point_prefix = app.gui.getvar("nesting", "obs_point_prefix") 
 

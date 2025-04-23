@@ -34,14 +34,16 @@ class Model(GenericModel):
                         file_name="hurrywave_mask_include.geojson",
                         circle_radius=3,
                         fill_color="yellow",
-                        line_color="transparent")
+                        line_color="transparent",
+                        fill_opacity=1.0)
 
         layer.add_layer("mask_boundary",
                         type="circle",
                         file_name="hurrywave_mask_boundary.geojson",
                         circle_radius=3,
                         fill_color="red",
-                        line_color="transparent")
+                        line_color="transparent",
+                        fill_opacity=1.0)
 
         # Move this to hurrywave.py
         from .boundary_conditions import select_boundary_point_from_map

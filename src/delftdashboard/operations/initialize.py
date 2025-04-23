@@ -20,6 +20,9 @@ from .gui import build_gui_config
 
 from delftdashboard.app import app
 
+import warnings
+warnings.filterwarnings("ignore", message="All-NaN slice encountered")
+
 def initialize():
 
     app.server_path = os.path.join(app.main_path, "server")

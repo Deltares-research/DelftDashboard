@@ -7,6 +7,7 @@ Created on Mon May 10 12:18:09 2021
 import os
 
 from delftdashboard.app import app
+from delftdashboard.operations import map
 
 from cht_sfincs import SFINCS
 # from delft3dfm import Delft3DFM
@@ -15,7 +16,7 @@ from cht_nesting import nest2
 
 def select(*args):
     # Select the nesting toolbox
-    app.map.update()
+    map.update()
     # Set detail model loaded to False to avoid confusion
     app.gui.setvar("nesting", "overall_model_type", "")
     app.gui.setvar("nesting", "overall_model_loaded", False)

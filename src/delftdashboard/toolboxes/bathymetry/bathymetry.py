@@ -8,11 +8,14 @@ import os
 import rasterio
 import toml
 from pyproj import CRS
+import numpy as np
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 
 from cht_utils import geotiff_to_cog, netcdf_to_cog, xyz_to_cog
+from delftdashboard.misc.select_other_projected.select_projected_crs import select_projected_crs
+from delftdashboard.misc.select_other_geographic.select_geographic_crs import select_geographic_crs
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):
@@ -39,6 +42,10 @@ class Toolbox(GenericToolbox):
 
         app.gui.setvar(group, "variable_names", [])
         app.gui.setvar(group, "variable_name", "")
+
+        app.gui.setvar(group, "vertical_datum", "unknown")
+        app.gui.setvar(group, "vertical_units", "m")
+        app.gui.setvar(group, "vertical_difference_with_msl", 0.0)
 
     def set_layer_mode(self, mode):
         pass
@@ -72,14 +79,10 @@ class Toolbox(GenericToolbox):
 
             # COG
             if fmt == "geotiff":
-                is_cog = False
-                # Check if file is cloud optimized
-                with rasterio.open(filename) as fff:
-                    if fff.is_cog:
-                        is_cog = True
-                if not is_cog:
-                    # Convert to cloud optimized GeoTIFF
-                    geotiff_to_cog.geotiff_to_cog(filename, filename_cog)
+                # Convert to cloud optimized GeoTIFF
+                wb = app.gui.window.dialog_wait("Generating Cloud Optimized GeoTIFF ...")
+                ok = geotiff_to_cog.geotiff_to_cog(filename, filename_cog)
+                wb.close()
                     
             elif fmt == "netcdf":
                 variable_name = app.gui.getvar("bathymetry", "variable_name")
@@ -87,12 +90,30 @@ class Toolbox(GenericToolbox):
                 ok = netcdf_to_cog.netcdf_to_cog(filename, variable_name, filename_cog)
                 wb.close()
 
-            elif fmt == "xyz":
-                crs = app.map.crs
-                xyz_to_cog.xyz_to_cog(filename, filename_cog, crs)
+            elif fmt == "xyz":                
+                # Read in file file and check if it's in degrees or meters. Do this by checking the first line of the file.
+                xyz = np.loadtxt(filename)
+                # Get the variance of the first column
+                xx = xyz[:, 0]
+                yy = xyz[:, 1]
+                # Estimate if the file is in degrees or meters
+                # Get distance between first two points
+                d = np.sqrt((xx[1] - xx[0])**2 + (yy[1] - yy[0])**2)
+                # Check if the variance is greater than 0.25
+                if d > 0.1:
+                    # Assume it's in meters
+                    crs = select_projected_crs(app)
+                else:
+                    # Assume it's in degrees
+                    crs = select_geographic_crs(app)
+                if crs is None:
+                    return    
+                wb = app.gui.window.dialog_wait("Generating Cloud Optimized GeoTIFF ...")
+                ok = xyz_to_cog.xyz_to_cog(filename, filename_cog, crs)
+                wb.close()
 
             # Check if output file was created
-            if not os.path.exists(filename_cog):
+            if not os.path.exists(filename_cog) or not ok:
                 # Add to database
                 app.gui.window.dialog_warning("An error occurred while importing dataset!", "Error")    
                 return
@@ -113,16 +134,15 @@ class Toolbox(GenericToolbox):
             meta["filename"] = os.path.basename(filename_cog)
             meta["coord_ref_sys_name"] = crs.name
             meta["coord_ref_sys_kind"] = "projected" if crs.is_projected else "geographic"
-            meta["vertical_reference_level"] = "unknown"
-            meta["vertical_units"] = "m"
-            meta["difference_with_msl"] = 0.0
+            meta["vertical_reference_level"] = app.gui.getvar("bathymetry", "vertical_datum")
+            meta["vertical_units"] = app.gui.getvar("bathymetry", "vertical_units")
+            meta["difference_with_msl"] = app.gui.getvar("bathymetry", "vertical_difference_with_msl")
 
             # Skip description for now
             # write meta to toml file using toml.dump
             meta_file = os.path.join(output_dir, "metadata.tml")
             with open(meta_file, "w") as f:
                 f.write(toml.dumps(meta))
-
 
         else:
             # Tiles
