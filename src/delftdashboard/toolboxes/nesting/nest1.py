@@ -159,9 +159,9 @@ def perform_nesting_step_1(*args):
             app.gui.window.dialog_warning("SnapWave is not activated in the SFINCS model. It can not be nested in HurryWave.")
             return
         # Make sure that there is a bwv file in the sfincs_cht model
-        if not detail_model.input.variables.bwvfile:
+        if not detail_model.input.variables.snapwave_bndfile:
             wb.close()
-            app.gui.window.dialog_warning("No bwv file found in the SFINCS model. It can not be nested in HurryWave.")
+            app.gui.window.dialog_warning("No snapwave bnd file found in the SFINCS model. It can not be nested in HurryWave.")
             return
 
     obs_point_prefix = app.gui.getvar("nesting", "obs_point_prefix") 
