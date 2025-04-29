@@ -13,7 +13,7 @@ element:
       y: 10
       width: 180
       height: 80
-    text: "Selected Bathyemtry Datasets"
+    text: "Selected Bathymetry Datasets"
     text_position: "above"
     tooltip: List of all selected bathymetry datasets. Note that they are merged in the order
       they appear in this list, unless specified otherwise.

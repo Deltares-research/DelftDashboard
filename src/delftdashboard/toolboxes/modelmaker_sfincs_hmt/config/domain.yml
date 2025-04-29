@@ -1,6 +1,6 @@
 element:
 - style: panel
-  title: "Model type: "
+  title: "Model type"
   position:
     x: 10
     y: 10
@@ -55,7 +55,7 @@ element:
     tooltip: "When selected, the UTM zone nearest to your area of interest is selected. 
     \n This is recommended for overland models."
 - style: panel
-  title: "Define model extent"
+  title: "Model extent"
   position:
     x: 160
     y: 10
@@ -90,7 +90,7 @@ element:
   - style: popupmenu
     position:
       x: 10
-      y: 40
+      y: 35
       width: 200
       height: 20
     tooltip: Select method to determine model extent
@@ -104,7 +104,7 @@ element:
     tooltip: Draw a bounding box around the area of interest
     position:
       x: 10
-      y: 15
+      y: 10
       width: 200
       height: 20
     method: draw_bbox
@@ -120,7 +120,7 @@ element:
     tooltip: Draw a polygon describing the area of interest
     position:
       x: 10
-      y: 15
+      y: 10
       width: 200
       height: 20
     method: draw_aio
