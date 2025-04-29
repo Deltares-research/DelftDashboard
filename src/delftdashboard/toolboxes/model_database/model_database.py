@@ -26,7 +26,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 
 # For now, we do need make a separate cht package for the watersheds. Rather, we keep it in Delft Dashboard.
-from .cht_modeldatabase import ModelDatabase
+from .cht_modeldatabase.model_database import ModelDatabase
 
 class Toolbox(GenericToolbox):
     def __init__(self, name: str):
@@ -66,13 +66,13 @@ class Toolbox(GenericToolbox):
             # app.gui.setvar(group, "level_long_names", app.watersheds_database.dataset[short_names[0]].level_long_names)
             # app.gui.setvar(group, "level", app.watersheds_database.dataset[short_names[0]].level_names[0])
 
-#     def select_tab(self) -> None:
-#         """
-#         Select the watersheds tab and update the map.
-#         """
-#         map.update()
-#         app.map.layer["watersheds"].show()
-#         app.map.layer["watersheds"].layer["boundaries"].activate()
+# #     def select_tab(self) -> None:
+# #         """
+# #         Select the watersheds tab and update the map.
+# #         """
+# #         map.update()
+# #         app.map.layer["watersheds"].show()
+# #         app.map.layer["watersheds"].layer["boundaries"].activate()
 
     def set_layer_mode(self, mode: str) -> None:
         """
@@ -156,14 +156,14 @@ class Toolbox(GenericToolbox):
 #         app.map.layer["watersheds"].layer["boundaries"].set_data(self.gdf)
 #         wb.close()
 
-    def select_collection(self) -> None:
-        """
-        Select a collections for the model database.
-        """
-        dataset_name = app.gui.getvar("models", "collection")
-        dataset = app.watersheds_database.dataset[dataset_name]
-        app.gui.setvar("collections", "nr_selected_models", 0)
-        app.gui.window.update()
+    # def select_collection(self) -> None:
+    #     """
+    #     Select a collections for the model database.
+    #     """
+    #     dataset_name = app.gui.getvar("models", "collection")
+    #     dataset = app.watersheds_database.dataset[dataset_name]
+    #     app.gui.setvar("collections", "nr_selected_models", 0)
+    #     app.gui.window.update()
 
 #     def select_level(self) -> None:
 #         """

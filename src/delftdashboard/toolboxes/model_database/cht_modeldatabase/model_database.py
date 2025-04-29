@@ -43,23 +43,27 @@ class ModelDatabase:
             print("Warning! Model database file not found: " + tml_file)
             return
 
-        datasets = toml.load(tml_file)
+        collections = toml.load(tml_file)
 
-        for d in datasets["collection"]:
+        for d in collections["collection"]:
 
             name = d["name"]
+            self.dataset[name] = name
 
             if "path" in d:
                 path = d["path"]
             else:
                 path = os.path.join(self.path, name)
 
-            # Read the metadata file
-            metadata_file = os.path.join(path, "metadata.tml")
-            if not os.path.exists(metadata_file):
-                print(f"Warning! Metadata file not found: {metadata_file}")
-                continue
-            metadata = toml.load(metadata_file)
+        
+            # # Read the metadata file
+            # metadata_file = os.path.join(path, "metadata.tml")
+            # if not os.path.exists(metadata_file):
+            #     print(f"Warning! Metadata file not found: {metadata_file}")
+            #     continue
+            # metadata = toml.load(metadata_file)
+
+
         
 
 
