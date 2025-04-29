@@ -1,6 +1,6 @@
-REM Checkout the following git repositories in e.g. c:\work\checkouts\git (or another folder)
+REM Checkout the following git repositories in e.g. c:\git (or another folder)
 
-cd c:\work\checkouts\git
+cd c:\git
 
 git -C guitares          pull 
 git -C cht_bathymetry    pull 
