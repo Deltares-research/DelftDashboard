@@ -12,6 +12,8 @@ import toml
 from botocore import UNSIGNED
 from botocore.client import Config
 
+from .collection import ModelCollection
+
 class ModelDatabase:
     """
     The main model Database class
@@ -43,28 +45,25 @@ class ModelDatabase:
             print("Warning! Model database file not found: " + tml_file)
             return
 
-        collections = toml.load(tml_file)
+        database = toml.load(tml_file)
 
-        for d in collections["collection"]:
-
+        for d in database["collection"]:
             name = d["name"]
-            self.dataset[name] = name
+            long_name = d["long_name"] if "long_name" in d else name
 
             if "path" in d:
                 path = d["path"]
             else:
                 path = os.path.join(self.path, name)
 
+            self.dataset[name] = ModelCollection(name, long_name, path)
         
             # # Read the metadata file
             # metadata_file = os.path.join(path, "metadata.tml")
             # if not os.path.exists(metadata_file):
             #     print(f"Warning! Metadata file not found: {metadata_file}")
             #     continue
-            # metadata = toml.load(metadata_file)
-
-
-        
+            # metadata = toml.load(metadata_file
 
 
     def dataset_names(self):

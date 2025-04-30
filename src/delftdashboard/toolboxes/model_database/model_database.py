@@ -53,12 +53,12 @@ class Toolbox(GenericToolbox):
         short_names, long_names = app.model_database.dataset_names()
 
         # GUI variables
-        group = "collections"
+        group = "model_database"
         if len(short_names) == 0:
-            raise Exception("No datasets found in the watersheds database")
+            raise Exception("No collections found in model database")
         else:
             app.gui.setvar(group, "collection_names", short_names)
-            app.gui.setvar(group, "colleection_long_names", long_names)
+            app.gui.setvar(group, "collection_long_names", long_names)
             app.gui.setvar(group, "collection", short_names[0])
             app.gui.setvar(group, "buffer", 100.0)
             app.gui.setvar(group, "nr_selected_models", 0)
@@ -76,38 +76,38 @@ class Toolbox(GenericToolbox):
 
     def set_layer_mode(self, mode: str) -> None:
         """
-        Set the layer mode for the collections 
+        Set the layer mode for the model collections 
         Parameters:
         mode (str): The mode to set the layer to ("inactive" or "invisible").
         """
         if mode == "inactive":
             # Make all layers invisible
-            app.map.layer["collections"].hide()
+            app.map.layer["model_database"].hide()
         if mode == "invisible":
             # Make all layers invisible
-            app.map.layer["collections"].hide()
+            app.map.layer["model_database"].hide()
 
-#     def add_layers(self) -> None:
-#         """
-#         Add layers to the map for the watersheds.
-#         """
-#         layer = app.map.add_layer("watersheds")
-#         layer.add_layer("boundaries",
-#                          type="polygon_selector",
-#                          hover_property="name",
-#                          line_color="white",
-#                          line_opacity=0.5,
-#                          line_color_selected="dodgerblue",
-#                          line_opacity_selected=1.0,
-#                          fill_color="dodgerblue",
-#                          fill_opacity=0.0,
-#                          fill_color_selected="dodgerblue",
-#                          fill_opacity_selected=0.6,
-#                          fill_color_hover="green",
-#                          fill_opacity_hover=0.35,
-#                          selection_type="multiple",
-#                          select=self.select_watershed_from_map
-#                         )
+    def add_layers(self) -> None:
+        """
+        Add layers to the map for the watersheds.
+        """
+        layer = app.map.add_layer("model_database")
+        layer.add_layer("boundaries",
+                         type="polygon_selector",
+                         hover_property="name",
+                         line_color="white",
+                         line_opacity=0.5,
+                         line_color_selected="dodgerblue",
+                         line_opacity_selected=1.0,
+                         fill_color="dodgerblue",
+                         fill_opacity=0.0,
+                         fill_color_selected="dodgerblue",
+                         fill_opacity_selected=0.6,
+                         fill_color_hover="green",
+                         fill_opacity_hover=0.35,
+                         selection_type="multiple",
+                         #select=self.select_collection
+                        )
 
 #     def select_watershed_from_map(self, features: List[Dict[str, Any]], layer: Any) -> None:
 #         """
@@ -156,14 +156,14 @@ class Toolbox(GenericToolbox):
 #         app.map.layer["watersheds"].layer["boundaries"].set_data(self.gdf)
 #         wb.close()
 
-    # def select_collection(self) -> None:
-    #     """
-    #     Select a collections for the model database.
-    #     """
-    #     dataset_name = app.gui.getvar("models", "collection")
-    #     dataset = app.watersheds_database.dataset[dataset_name]
-    #     app.gui.setvar("collections", "nr_selected_models", 0)
-    #     app.gui.window.update()
+    def select_collection(self) -> None:
+        """
+        Select a collections for the model database.
+        """
+        collection_name = app.gui.getvar("model_database", "collection")
+        collection = app.model_database.dataset[collection_name]
+        app.gui.setvar("model_database", "nr_selected_models", 0)
+        app.gui.window.update()
 
 #     def select_level(self) -> None:
 #         """
@@ -251,7 +251,7 @@ class Toolbox(GenericToolbox):
 #     app.toolbox["watersheds"].select_tab()
 
 def select_collection(*args) -> None:
-    app.toolbox["model_database"].select_dataset()
+    app.toolbox["model_database"].select_collection()
 
 # def select_level(*args) -> None:
 #     app.toolbox["watersheds"].select_level()
