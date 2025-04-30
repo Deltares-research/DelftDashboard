@@ -1,0 +1,18 @@
+output_dir = "D:/scratch/test"
+bathy_file = "D:/metocean_data/bathymetry/GEBCO/GEBCO_2022_deflate.nc"
+crs = "EPSG:4326"
+
+[[wave]]
+name = "wave_outer"
+lon = [-117.65, -117.25]
+lat = [33.1, 33.5]
+dxy = 0.012
+boundary_sides = ["west", "south"]
+ds = 0.05
+
+[[wave]]
+name = "wave_middle"
+lon = [-117.51, -117.42]
+lat = [33.25, 33.33]
+dxy = 0.002
+
