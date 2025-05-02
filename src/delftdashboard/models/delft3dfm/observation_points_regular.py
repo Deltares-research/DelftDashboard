@@ -19,10 +19,11 @@ def edit(*args):
 
 def load(*args):
     map.reset_cursor()
-    rsp = app.gui.window.dialog_open_files("Select files ...",
+    rsp = app.gui.window.dialog_open_file("Select files ...",
                                           file_name="delft3dfm.obs",
                                           filter= None, #"*.obs",
-                                          allow_directory_change=False)
+                                          allow_directory_change=False,
+                                          multiple=True)
     if rsp[0]:
         app.model["delft3dfm"].domain.input.output.obsfile = rsp[0] # file name without path
         app.model["delft3dfm"].domain.read_observation_points()
@@ -47,7 +48,7 @@ def save(*args):
         app.model["delft3dfm"].domain.write_observation_points()
 
 def update():
-    gdf = app.active_model.domain.observation_point_gdf
+    gdf = app.model["delft3dfm"].domain.observation_point_gdf
     names = []
     for index, row in gdf.iterrows():
         names.append(row["name"])
@@ -67,7 +68,7 @@ def point_clicked(x, y):
     if name in app.gui.getvar("delft3dfm", "observation_point_names"):
         app.gui.window.dialog_info("An observation point with this name already exists !")
         return
-    app.model["delft3dfm"].domain.add_observation_point(x, y, name=name)
+    # app.model["delft3dfm"].domain.add_observation_point(x, y, name=name)
     app.model["delft3dfm"].domain.add_observation_point_gdf(x, y, name=name)
     index = len(app.model["delft3dfm"].domain.observation_point_gdf) - 1
     gdf = app.model["delft3dfm"].domain.observation_point_gdf
