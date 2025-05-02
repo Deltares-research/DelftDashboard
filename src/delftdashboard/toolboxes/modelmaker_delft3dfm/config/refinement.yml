@@ -4,7 +4,7 @@ element:
   position:
     x: 10
     y: 10
-    width: 220
+    width: 320
     height: 120
   element:
   - style: listbox
@@ -36,10 +36,27 @@ element:
   #     - variable: nr_refinement_polygons
   #       operator: gt
   #       value: 0
+  - style: edit
+    position:
+      x: 160
+      y: 90
+      width: 50
+      height: 20
+    method: edit_settings
+    variable: ref_min_edge_size
+    text: Min. edge size
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_refinement_polygons
+        operator: gt
+        value: 0
+    tooltip: Edit minimum grid (edge) size within selected refinement polygon (in m)
   - style: pushbutton
     text: Draw Polygon
     position:
-      x: 100
+      x: 230
       y: 90
       width: 80
       height: 20
@@ -47,7 +64,7 @@ element:
   - style: pushbutton
     text: Delete Polygon
     position:
-      x: 100
+      x: 230
       y: 65
       width: 80
       height: 20
@@ -62,7 +79,7 @@ element:
   - style: pushbutton
     text: Load Polygons
     position:
-      x: 100
+      x: 230
       y: 40
       width: 80
       height: 20
@@ -70,7 +87,7 @@ element:
   - style: pushbutton
     text: Save Polygons
     position:
-      x: 100
+      x: 230
       y: 15
       width: 80
       height: 20
@@ -83,35 +100,64 @@ element:
         operator: gt
         value: 0
 - style: panel
-  title: Settings
+  title: Generate Grid Refinement
   position:
-    x: 250
+    x: 340
     y: 10
-    width: 150
+    width: 300
     height: 120
   element:        
+  - style: pushbutton
+    text: Polygon Refinement
+    position:
+      x: 10
+      y: 90
+      width: 140
+      height: 20
+    method: build_polygonrefined_grid
+    tooltip: Generate refinement in polygons
+  - style: pushbutton
+    text: Depth in Polygon Refinement
+    position:
+      x: 10
+      y: 65
+      width: 140
+      height: 20
+    method: build_polygondepthrefined_grid
+    tooltip: Generate refinement in polygons based on depth
+  - style: pushbutton
+    text: Depth Refinement
+    position:
+      x: 10
+      y: 40
+      width: 140
+      height: 20
+    method: build_depthrefined_grid
+    tooltip: Generate depth refinement for entire grid (enter min. edge size in panel)
   - style: edit
     position:
-      x: 80
-      y: 90
+      x: 240
+      y: 40
       width: 50
       height: 20
     text: Min. edge size
-    variable: min_edge_size
+    variable: depth_min_edge_size
     method: refine_size
-- style: pushbutton
-  text: Generate Depth Refinement
+    tooltip: Edit minimum grid (edge) for depth refinement (in m)
+- style: panel
+  title: Finalize grid
   position:
-    x: 550
-    y: 100
-    width: 170
-    height: 20
-  method: build_depthrefined_grid
-- style: pushbutton
-  text: Generate Polygon Refinement
-  position:
-    x: 550
-    y: 75
-    width: 170
-    height: 20
-  method: build_polygonrefined_grid
+    x: 650
+    y: 10
+    width: 120
+    height: 120
+  element:        
+  - style: pushbutton
+    text: Connect nodes
+    position:
+      x: 10
+      y: 90
+      width: 100
+      height: 20
+    method: connect_nodes
+    tooltip: When finished with refining, connect nodes to finalize grid
