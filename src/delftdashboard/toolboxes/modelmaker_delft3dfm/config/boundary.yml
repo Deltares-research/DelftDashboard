@@ -169,6 +169,7 @@ element:
     width: 170
     height: 20
   method: generate_bnd_polygon
+  tooltip: Generate open boundary file from polygon
 - style: pushbutton
   text: Generate bnd from coastlines
   position:
@@ -177,6 +178,7 @@ element:
     width: 170
     height: 20
   method: generate_bnd_coastline
+  tooltip: Generate open boundary file from global coastline dataset
 - style: pushbutton
   text: Load bnd
   position:
@@ -185,6 +187,7 @@ element:
     width: 170
     height: 20
   method: load_bnd
+  tooltip: Load existing open boundary file
 # - style: pushbutton
 #   text: Update Mask
 #   position:

@@ -13,7 +13,7 @@ element:
       y: 130
       width: 80
       height: 20
-    tooltipstring: Edit map output interval (in seconds)
+    tooltipstring: Edit map output interval, given as [interval, start period, end period] (in s)."
     text: Map output interval (s)
     textposition: left
     variable: output.mapinterval
@@ -24,7 +24,7 @@ element:
       y: 105
       width: 80
       height: 20
-    tooltipstring: Edit history output interval (in seconds)
+    tooltipstring: Edit history output interval, given as [interval, start period, end period] (in s)."
     text: His output interval (s)
     textposition: left
     variable: output.hisinterval
@@ -35,10 +35,10 @@ element:
       y: 80
       width: 80
       height: 20
-    tooltipstring: Edit restart output interval (in seconds)
+    tooltipstring: Edit restart output interval, given as [interval, start period, end period] (in s)."
     text: Restart output interval (s)
     textposition: left
-    variable: dtrstout
+    variable: output.rstinterval
     method: set_model_variables
   # - style: pushselectfile
   #   position:

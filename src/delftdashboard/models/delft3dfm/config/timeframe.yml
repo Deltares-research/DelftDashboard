@@ -7,29 +7,29 @@ element:
     width: -10
     height: 160
   element:
-  - style: edit
+  - style: datetimeedit
     position:
-      x: 140
+      x: 80
       y: 130
-      width: 60
+      width: 120
       height: 20
-    text: Reference Time (yyyymmdd)
+    text: Reference Time
     variable: time.refdate
     method: set_model_variables
-  - style: edit
+  - style: datetimeedit
     position:
-      x: 140
+      x: 80
       y: 105
-      width: 60
+      width: 120
       height: 20
     text: Start Time
     variable: time.tstart
     method: set_model_variables
-  - style: edit
+  - style: datetimeedit
     position:
-      x: 140
+      x: 80
       y: 80
-      width: 60
+      width: 120
       height: 20
     text: Stop Time
     variable: time.tstop
