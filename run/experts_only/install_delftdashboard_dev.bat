@@ -2,7 +2,7 @@ rem Script to create the editable delftdashboard environment
 rem The delftdashboard_dev environment only needs to be created and used if you are interested in editing the source code!
 
 rem CHANGE GITDIR to point to you local repos folder !!!
-set GITDIR=c:\work\checkouts\git
+set GITDIR=c:\git
 set ENVNAME=delftdashboard_dev
 
 :: Check if the directory C:\Users\%USERNAME%\miniconda3 exists
@@ -10,9 +10,9 @@ if exist "C:\Users\%USERNAME%\miniconda3" (
     set CONDAPATH=c:\users\%USERNAME%\miniconda3
 	set CONDA=conda
 ) else (
-    :: Check if the directory C:\Users\%USERNAME%\miniforge3 exists
-    if exist "C:\Users\%USERNAME%\miniforge3" (
-        set CONDAPATH=c:\users\%USERNAME%\miniforge3
+    :: Check if the directory c:\Users\asselt\AppData\Local\miniforge3 exists
+    if exist "c:\Users\asselt\AppData\Local\miniforge3" (
+        set CONDAPATH=c:\Users\asselt\AppData\Local\miniforge3
 		set CONDA=mamba
     ) else (
         :: Neither exist. Stop.
@@ -22,7 +22,7 @@ if exist "C:\Users\%USERNAME%\miniconda3" (
 		echo CONDAPATH=d:\work\miniconda3
 		echo set CONDA=conda
 		echo or for miniforge:
-		echo CONDAPATH=d:\work\miniforge3
+		echo CONDAPATH=c:\Users\asselt\AppData\Local\miniforge3
 		echo set CONDA=mamba
         pause
         exit

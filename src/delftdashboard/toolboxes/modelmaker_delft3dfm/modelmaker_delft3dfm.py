@@ -73,7 +73,7 @@ class Toolbox(GenericToolbox):
 
         # Refinement
         app.gui.setvar(group, "refinement_depth", 0) 
-        app.gui.setvar(group, "min_edge_size", 0) 
+        app.gui.setvar(group, "depth_min_edge_size", 0) 
 
         # Polygon refinement
         app.gui.setvar(group, "refinement_polygon_file", "refine.pli")
@@ -84,6 +84,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "refinement_polygon_smoothing", 2)
         app.gui.setvar(group, "refinement_polygon_max_courant_time", 2)
         app.gui.setvar(group, "nr_refinement_polygons", 0)
+        app.gui.setvar(group, "ref_min_edge_size", 0)
 
         # Mask
         app.gui.setvar(group, "exclude_polygon_file", "exclude.shp")
@@ -215,6 +216,7 @@ class Toolbox(GenericToolbox):
         from .refinement import refinement_polygon_modified
         from .refinement import refinement_polygon_selected
         layer.add_layer("polygon_refinement", type="draw",
+                             columns={"min_edge_size": 0},
                              shape="polygon",
                              create=refinement_polygon_created,
                              modify=refinement_polygon_modified,
@@ -289,12 +291,35 @@ class Toolbox(GenericToolbox):
 
         dlg.close()
 
+    def generate_polygon_depth_refinement(self):
+        group = "modelmaker_delft3dfm"
+        dlg = app.gui.window.dialog_wait("Generating refinement ...")
+        model = app.model["delft3dfm"].domain
+        
+        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+
+        if bathymetry_list:
+            model.grid.refine_polygon_depth(bathymetry_list, bathymetry_database=app.bathymetry_database, gdf = self.refinement_polygon)
+            
+            # Interpolate bathymetry onto the grid
+            model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
+        
+            # Save grid 
+            model.grid.write()
+
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        else:
+            print("No bathymetry selected")
+
+        dlg.close()
+
     def generate_polygon_refinement(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Generating refinement ...")
         model = app.model["delft3dfm"].domain
         
-        model.grid.refine_polygon(gdf = self.refinement_polygon.geometry)
+        model.grid.refine_polygon(gdf = self.refinement_polygon)
         
         # Interpolate bathymetry onto the grid
         bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
@@ -306,6 +331,25 @@ class Toolbox(GenericToolbox):
 
         # Replot everything
         app.model["delft3dfm"].plot()
+
+        dlg.close()
+
+    def connect_nodes(self):
+        group = "modelmaker_delft3dfm"
+        dlg = app.gui.window.dialog_wait("Connecting nodes ...")
+        model = app.model["delft3dfm"].domain
+
+        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+
+        if bathymetry_list:
+            model.grid.connect_nodes(bathymetry_list, bathymetry_database=app.bathymetry_database)
+            # Save grid 
+            model.grid.write()
+
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        else:
+            print("No bathymetry selected")
 
         dlg.close()
 
@@ -426,6 +470,8 @@ class Toolbox(GenericToolbox):
         self.refinement_polygon_names = []
         for i in range(len(self.refinement_polygon)):
             self.refinement_polygon_names.append(self.refinement_polygon["refinement_polygon_name"][i])
+        if "min_edge_size" not in self.refinement_polygon.columns:
+            self.refinement_polygon["min_edge_size"] = -99999.0
 
     def read_include_polygon(self):
         fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file")
@@ -458,7 +504,8 @@ class Toolbox(GenericToolbox):
             print("No refinement polygons defined")
             return
         gdf = gpd.GeoDataFrame({"geometry": self.refinement_polygon["geometry"],
-                                "refinement_polygon_name": self.refinement_polygon_names})
+                                "refinement_polygon_name": self.refinement_polygon_names,
+                                "min_edge_size": self.refinement_polygon["min_edge_size"]})
         # index = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_index")
         # fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_names")
         fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_file")
