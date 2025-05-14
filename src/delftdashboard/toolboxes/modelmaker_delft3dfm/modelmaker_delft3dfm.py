@@ -76,36 +76,36 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "depth_min_edge_size", 0) 
 
         # Polygon refinement
-        app.gui.setvar(group, "refinement_polygon_file", "refine.pli")
+        app.gui.setvar(group, "refinement_polygon_file", "refine.geojson")
         app.gui.setvar(group, "refinement_polygon_names", [])
         app.gui.setvar(group, "refinement_polygon_index", 0)
         app.gui.setvar(group, "refinement_polygon_refinement_type", 1) 
-        app.gui.setvar(group, "refinement_polygon_connect_hanging_nodes", 1)
-        app.gui.setvar(group, "refinement_polygon_smoothing", 2)
-        app.gui.setvar(group, "refinement_polygon_max_courant_time", 2)
+        # app.gui.setvar(group, "refinement_polygon_connect_hanging_nodes", 1)
+        # app.gui.setvar(group, "refinement_polygon_smoothing", 2)
+        # app.gui.setvar(group, "refinement_polygon_max_courant_time", 2)
         app.gui.setvar(group, "nr_refinement_polygons", 0)
         app.gui.setvar(group, "ref_min_edge_size", 0)
 
         # Mask
-        app.gui.setvar(group, "exclude_polygon_file", "exclude.shp")
+        app.gui.setvar(group, "exclude_polygon_file", "exclude.geojson")
         app.gui.setvar(group, "exclude_polygon_names", [])
         app.gui.setvar(group, "exclude_polygon_index", 0)
         app.gui.setvar(group, "nr_exclude_polygons", 0)
 
 
-        app.gui.setvar(group, "open_boundary_polygon_file", "open_boundary.pli")
+        app.gui.setvar(group, "open_boundary_polygon_file", "open_boundary.geojson")
         app.gui.setvar(group, "open_boundary_polygon_names", [])
         app.gui.setvar(group, "open_boundary_polygon_index", 0)
         app.gui.setvar(group, "nr_open_boundary_polygons", 0)
         app.gui.setvar(group, "open_boundary_zmax",  99999.0)
         app.gui.setvar(group, "open_boundary_zmin", -99999.0)
 
-        app.gui.setvar(group, "outflow_boundary_polygon_file", "outflow_boundary.geojson")
-        app.gui.setvar(group, "outflow_boundary_polygon_names", [])
-        app.gui.setvar(group, "outflow_boundary_polygon_index", 0)
-        app.gui.setvar(group, "nr_outflow_boundary_polygons", 0)
-        app.gui.setvar(group, "outflow_boundary_zmax",  99999.0)
-        app.gui.setvar(group, "outflow_boundary_zmin", -99999.0)
+        # app.gui.setvar(group, "outflow_boundary_polygon_file", "outflow_boundary.geojson")
+        # app.gui.setvar(group, "outflow_boundary_polygon_names", [])
+        # app.gui.setvar(group, "outflow_boundary_polygon_index", 0)
+        # app.gui.setvar(group, "nr_outflow_boundary_polygons", 0)
+        # app.gui.setvar(group, "outflow_boundary_zmax",  99999.0)
+        # app.gui.setvar(group, "outflow_boundary_zmin", -99999.0)
 
 
         # Bathymetry
@@ -238,7 +238,7 @@ class Toolbox(GenericToolbox):
     def generate_grid(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Generating grid ...")
-        self.clear_layers()
+        # self.clear_layers()
         model = app.model["delft3dfm"].domain
         model.clear_spatial_attributes()    
         x0       = app.gui.getvar(group, "x0")
@@ -462,7 +462,7 @@ class Toolbox(GenericToolbox):
 
     # READ
 
-    def read_refinement_polygon(self):
+    def read_refinement_polygon(self, file_name=None):
         fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_file")
         self.refinement_polygon = gpd.read_file(fname)
         # app.toolbox["modelmaker_delft3dfm"].refinement_polygon_names.append(fname)
@@ -471,11 +471,11 @@ class Toolbox(GenericToolbox):
         for i in range(len(self.refinement_polygon)):
             self.refinement_polygon_names.append(self.refinement_polygon["refinement_polygon_name"][i])
         if "min_edge_size" not in self.refinement_polygon.columns:
-            self.refinement_polygon["min_edge_size"] = -99999.0
+            self.refinement_polygon["min_edge_size"] = 0
 
-    def read_include_polygon(self):
-        fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file")
-        self.include_polygon = gpd.read_file(fname)
+    # def read_include_polygon(self):
+    #     fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file")
+    #     self.include_polygon = gpd.read_file(fname)
 
     def read_exclude_polygon(self):
         fname = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file")
@@ -485,17 +485,17 @@ class Toolbox(GenericToolbox):
         fname = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_polygon_file")
         self.open_boundary_polygon = gpd.read_file(fname)
 
-    def read_outflow_boundary_polygon(self):
-        fname = app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_polygon_file")
-        self.outflow_boundary_polygon = gpd.read_file(fname)
+    # def read_outflow_boundary_polygon(self):
+    #     fname = app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_polygon_file")
+    #     self.outflow_boundary_polygon = gpd.read_file(fname)
 
-    def read_include_polygon_snapwave(self):
-        fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file_snapwave")
-        self.include_polygon_snapwave = gpd.read_file(fname)
+    # def read_include_polygon_snapwave(self):
+    #     fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file_snapwave")
+    #     self.include_polygon_snapwave = gpd.read_file(fname)
 
-    def read_exclude_polygon_snapwave(self):
-        fname = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file_snapwave")
-        self.exclude_polygon_snapwave = gpd.read_file(fname)
+    # def read_exclude_polygon_snapwave(self):
+    #     fname = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file_snapwave")
+    #     self.exclude_polygon_snapwave = gpd.read_file(fname)
 
     # WRITE
 
@@ -511,12 +511,12 @@ class Toolbox(GenericToolbox):
         fname = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
 
-    def write_include_polygon(self):
-        if len(self.include_polygon) == 0:
-            return
-        gdf = gpd.GeoDataFrame(geometry=self.include_polygon["geometry"])
-        fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file")
-        gdf.to_file(fname, driver='GeoJSON')
+    # def write_include_polygon(self):
+    #     if len(self.include_polygon) == 0:
+    #         return
+    #     gdf = gpd.GeoDataFrame(geometry=self.include_polygon["geometry"])
+    #     fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file")
+    #     gdf.to_file(fname, driver='GeoJSON')
 
     def write_exclude_polygon(self):
         if len(self.exclude_polygon) == 0:
@@ -531,28 +531,28 @@ class Toolbox(GenericToolbox):
         gdf = gpd.GeoDataFrame(geometry=self.open_boundary_polygon["geometry"])
         fname = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
-        gdf.to_file(fname, driver='ESRI Shapefile')
+        # gdf.to_file(fname, driver='ESRI Shapefile')
 
-    def write_outflow_boundary_polygon(self):
-        if len(self.outflow_boundary_polygon) == 0:
-            return
-        gdf = gpd.GeoDataFrame(geometry=self.outflow_boundary_polygon["geometry"])
-        fname = app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_polygon_file")
-        gdf.to_file(fname, driver='GeoJSON')
+    # def write_outflow_boundary_polygon(self):
+    #     if len(self.outflow_boundary_polygon) == 0:
+    #         return
+    #     gdf = gpd.GeoDataFrame(geometry=self.outflow_boundary_polygon["geometry"])
+    #     fname = app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_polygon_file")
+    #     gdf.to_file(fname, driver='GeoJSON')
 
-    def write_include_polygon_snapwave(self):
-        if len(self.include_polygon_snapwave) == 0:
-            return
-        gdf = gpd.GeoDataFrame(geometry=self.include_polygon_snapwave["geometry"])
-        fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file_snapwave")
-        gdf.to_file(fname, driver='GeoJSON')
+    # def write_include_polygon_snapwave(self):
+    #     if len(self.include_polygon_snapwave) == 0:
+    #         return
+    #     gdf = gpd.GeoDataFrame(geometry=self.include_polygon_snapwave["geometry"])
+    #     fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file_snapwave")
+    #     gdf.to_file(fname, driver='GeoJSON')
 
-    def write_exclude_polygon_snapwave(self):
-        if len(self.exclude_polygon_snapwave) == 0:
-            return
-        gdf = gpd.GeoDataFrame(geometry=self.exclude_polygon_snapwave["geometry"])
-        fname = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file_snapwave")
-        gdf.to_file(fname, driver='GeoJSON')
+    # def write_exclude_polygon_snapwave(self):
+    #     if len(self.exclude_polygon_snapwave) == 0:
+    #         return
+    #     gdf = gpd.GeoDataFrame(geometry=self.exclude_polygon_snapwave["geometry"])
+    #     fname = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file_snapwave")
+    #     gdf.to_file(fname, driver='GeoJSON')
 
     # PLOT
 
@@ -561,10 +561,10 @@ class Toolbox(GenericToolbox):
         layer.clear()
         layer.add_feature(self.refinement_polygon)
 
-    def plot_include_polygon(self):
-        layer = app.map.layer["modelmaker_delft3dfm"].layer["include_polygon"]
-        layer.clear()
-        layer.add_feature(self.include_polygon)
+    # def plot_include_polygon(self):
+    #     layer = app.map.layer["modelmaker_delft3dfm"].layer["include_polygon"]
+    #     layer.clear()
+    #     layer.add_feature(self.include_polygon)
 
     def plot_exclude_polygon(self):
         layer = app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon"]
@@ -576,64 +576,65 @@ class Toolbox(GenericToolbox):
         layer.clear()
         layer.add_feature(self.open_boundary_polygon)
 
-    def plot_outflow_boundary_polygon(self):
-        layer = app.map.layer["modelmaker_delft3dfm"].layer["outflow_boundary_polygon"]
-        layer.clear()
-        layer.add_feature(self.outflow_boundary_polygon)
+    # def plot_outflow_boundary_polygon(self):
+    #     layer = app.map.layer["modelmaker_delft3dfm"].layer["outflow_boundary_polygon"]
+    #     layer.clear()
+    #     layer.add_feature(self.outflow_boundary_polygon)
 
-    def plot_include_polygon_snapwave(self):
-        layer = app.map.layer["modelmaker_delft3dfm"].layer["include_polygon_snapwave"]
-        layer.clear()
-        layer.add_feature(self.include_polygon_snapwave)
+    # def plot_include_polygon_snapwave(self):
+    #     layer = app.map.layer["modelmaker_delft3dfm"].layer["include_polygon_snapwave"]
+    #     layer.clear()
+    #     layer.add_feature(self.include_polygon_snapwave)
 
-    def plot_exclude_polygon_snapwave(self):
-        layer = app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon_snapwave"]
-        layer.clear()
-        layer.add_feature(self.exclude_polygon_snapwave)
+    # def plot_exclude_polygon_snapwave(self):
+    #     layer = app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon_snapwave"]
+    #     layer.clear()
+    #     layer.add_feature(self.exclude_polygon_snapwave)
 
 
     def read_setup_yaml(self, file_name):
 
         # First set some default gui variables
         group = "modelmaker_delft3dfm"
-        app.gui.setvar(group, "refinement_polygon_file", "quadtree.geojson")
-        app.gui.setvar(group, "global_zmin", -99999.0)
-        app.gui.setvar(group, "global_zmax",  99999.0)
-        app.gui.setvar(group, "include_polygon_index", 0)
-        app.gui.setvar(group, "include_zmax",  99999.0)
-        app.gui.setvar(group, "include_zmin", -99999.0)
-        app.gui.setvar(group, "include_polygon_file", "include.geojson")
+        app.gui.setvar(group, "refinement_polygon_file", "refine.geojson")
+        app.gui.setvar(group, "refinement_polygon_index", 0)
+        # app.gui.setvar(group, "global_zmin", -99999.0)
+        # app.gui.setvar(group, "global_zmax",  99999.0)
+        # app.gui.setvar(group, "include_polygon_index", 0)
+        # app.gui.setvar(group, "include_zmax",  99999.0)
+        # app.gui.setvar(group, "include_zmin", -99999.0)
+        # app.gui.setvar(group, "include_polygon_file", "include.geojson")
         app.gui.setvar(group, "exclude_polygon_index", 0)
-        app.gui.setvar(group, "exclude_zmax",  99999.0)
-        app.gui.setvar(group, "exclude_zmin", -99999.0)
+        # app.gui.setvar(group, "exclude_zmax",  99999.0)
+        # app.gui.setvar(group, "exclude_zmin", -99999.0)
         app.gui.setvar(group, "exclude_polygon_file", "exclude.geojson")
         app.gui.setvar(group, "open_boundary_polygon_index", 0)
-        app.gui.setvar(group, "open_boundary_zmax",  99999.0)
-        app.gui.setvar(group, "open_boundary_zmin", -99999.0)
+        # app.gui.setvar(group, "open_boundary_zmax",  99999.0)
+        # app.gui.setvar(group, "open_boundary_zmin", -99999.0)
         app.gui.setvar(group, "open_boundary_polygon_file", "open_boundary.geojson")
-        app.gui.setvar(group, "outflow_boundary_polygon_index", 0)
-        app.gui.setvar(group, "outflow_boundary_zmax",  99999.0)
-        app.gui.setvar(group, "outflow_boundary_zmin", -99999.0)
-        app.gui.setvar(group, "outflow_boundary_polygon_file", "outflow_boundary.geojson")
-        app.gui.setvar(group, "global_zmin_snapwave", -99999.0)
-        app.gui.setvar(group, "global_zmax_snapwave",  99999.0)
-        app.gui.setvar(group, "include_polygon_index_snapwave", 0)
-        app.gui.setvar(group, "include_zmax_snapwave",  99999.0)
-        app.gui.setvar(group, "include_zmin_snapwave", -99999.0)
-        app.gui.setvar(group, "include_polygon_file_snapwave", "include_snapwave.geojson")
-        app.gui.setvar(group, "exclude_polygon_index_snapwave", 0)
-        app.gui.setvar(group, "exclude_zmax_snapwave",  99999.0)
-        app.gui.setvar(group, "exclude_zmin_snapwave", -99999.0)
-        app.gui.setvar(group, "exclude_polygon_file_snapwave", "include_snapwave.geojson")
+        # app.gui.setvar(group, "outflow_boundary_polygon_index", 0)
+        # app.gui.setvar(group, "outflow_boundary_zmax",  99999.0)
+        # app.gui.setvar(group, "outflow_boundary_zmin", -99999.0)
+        # app.gui.setvar(group, "outflow_boundary_polygon_file", "outflow_boundary.geojson")
+        # app.gui.setvar(group, "global_zmin_snapwave", -99999.0)
+        # app.gui.setvar(group, "global_zmax_snapwave",  99999.0)
+        # app.gui.setvar(group, "include_polygon_index_snapwave", 0)
+        # app.gui.setvar(group, "include_zmax_snapwave",  99999.0)
+        # app.gui.setvar(group, "include_zmin_snapwave", -99999.0)
+        # app.gui.setvar(group, "include_polygon_file_snapwave", "include_snapwave.geojson")
+        # app.gui.setvar(group, "exclude_polygon_index_snapwave", 0)
+        # app.gui.setvar(group, "exclude_zmax_snapwave",  99999.0)
+        # app.gui.setvar(group, "exclude_zmin_snapwave", -99999.0)
+        # app.gui.setvar(group, "exclude_polygon_file_snapwave", "include_snapwave.geojson")
 
         # Empty geodataframes
-        self.include_polygon = gpd.GeoDataFrame()    
+        # self.include_polygon = gpd.GeoDataFrame()    
         self.exclude_polygon = gpd.GeoDataFrame()    
         self.open_boundary_polygon = gpd.GeoDataFrame()    
-        self.outflow_boundary_polygon = gpd.GeoDataFrame()    
-        self.snapwave_include_polygon = gpd.GeoDataFrame()    
-        self.snapwave_exclude_polygon = gpd.GeoDataFrame()    
-        self.quadtree_polygon = gpd.GeoDataFrame()    
+        # self.outflow_boundary_polygon = gpd.GeoDataFrame()    
+        # self.snapwave_include_polygon = gpd.GeoDataFrame()    
+        # self.snapwave_exclude_polygon = gpd.GeoDataFrame()    
+        self.refinement_polygon = gpd.GeoDataFrame()    
 
         # Read in yaml file
         dct = yaml2dict(file_name)
@@ -647,90 +648,40 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "dy", dct["coordinates"]["dy"])
         app.gui.setvar(group, "nmax", dct["coordinates"]["nmax"])
         app.gui.setvar(group, "mmax", dct["coordinates"]["mmax"])
-        app.gui.setvar(group, "rotation", dct["coordinates"]["rotation"])
         app.model["delft3dfm"].domain.crs = CRS(dct["coordinates"]["crs"])
-        # Quadtree refinement
-        if "quadtree" in dct:
-            if "polygon_file" in dct["quadtree"]:
-                app.gui.setvar(group, "refinement_polygon_file", dct["quadtree"]["polygon_file"])
+
+        # Refinement and polygons
+        if "refinement" in dct:
+            if "polygon_file" in dct["refinement"]:
+                app.gui.setvar(group, "refinement_polygon_file", dct["refinement"]["polygon_file"])
                 self.read_refinement_polygon()
                 self.plot_refinement_polygon()
-        # Mask
-        if "global" in dct["mask"]:
-            if "zmin" in dct["mask"]["global"]:
-                app.gui.setvar(group, "global_zmin", dct["mask"]["global"]["zmin"])
-            if "zmax" in dct["mask"]["global"]:    
-                app.gui.setvar(group, "global_zmax", dct["mask"]["global"]["zmax"])
-        if "include" in dct["mask"]:
-            if "zmin" in dct["mask"]["include"]:
-                app.gui.setvar(group, "include_zmin", dct["mask"]["include"]["zmin"])
-            if "zmax" in dct["mask"]["include"]:
-                app.gui.setvar(group, "include_zmax", dct["mask"]["include"]["zmax"])
-            if "polygon_file" in dct["mask"]["include"]:
-                app.gui.setvar(group, "include_polygon_file", dct["mask"]["include"]["polygon_file"])
-                # Now read in polygons from geojson file (or other file)
-                self.read_include_polygon()
-                self.plot_include_polygon()
-        # Now do the same for exclude polygons        
-        if "exclude" in dct["mask"]:
-            if "zmin" in dct["mask"]["exclude"]:
-                app.gui.setvar(group, "exclude_zmin", dct["mask"]["exclude"]["zmin"])
-            if "zmax" in dct["mask"]["exclude"]:
-                app.gui.setvar(group, "exclude_zmax", dct["mask"]["exclude"]["zmax"])
-            if "polygon_file" in dct["mask"]["exclude"]:
-                app.gui.setvar(group, "exclude_polygon_file", dct["mask"]["exclude"]["polygon_file"])
-                # Now read in polygons from geojson file
+                # import the function update() from refinement.py
+                from .refinement import update as update_refinement
+                update_refinement()
+
+                # nrp = len(app.toolbox["modelmaker_delft3dfm"].refinement_polygon)
+                # app.gui.setvar("modelmaker_delft3dfm", "nr_refinement_polygons", nrp)
+                # refnames = app.toolbox["modelmaker_delft3dfm"].refinement_polygon_names
+                # app.gui.setvar("modelmaker_delft3dfm", "refinement_polygon_names", refnames)
+
+        if "exclude" in dct:
+            if "polygon_file" in dct["exclude"]:
+                app.gui.setvar(group, "exclude_polygon_file", dct["exclude"]["polygon_file"])
                 self.read_exclude_polygon()
-                self.plot_exclude_polygon()     
-        # Now do the same for open boundary polygons
-        if "open_boundary" in dct["mask"]:
-            if "zmin" in dct["mask"]["open_boundary"]:
-                app.gui.setvar(group, "open_boundary_zmin", dct["mask"]["open_boundary"]["zmin"])
-            if "zmax" in dct["mask"]["open_boundary"]:
-                app.gui.setvar(group, "open_boundary_zmax", dct["mask"]["open_boundary"]["zmax"])
-            if "polygon_file" in dct["mask"]["open_boundary"]:
-                app.gui.setvar(group, "open_boundary_polygon_file", dct["mask"]["open_boundary"]["polygon_file"])
-                # Now read in polygons from geojson file
+                self.plot_exclude_polygon()  
+                # import the function update() from exclude.py
+                from .exclude import update as update_exclude
+                update_exclude()
+
+        if "open_boundary" in dct:
+            if "polygon_file" in dct["open_boundary"]:
+                app.gui.setvar(group, "open_boundary_polygon_file", dct["open_boundary"]["polygon_file"])
                 self.read_open_boundary_polygon()
                 self.plot_open_boundary_polygon()
-        # Now do the same for outflow boundary polygons
-        if "outflow_boundary" in dct["mask"]:
-            if "zmin" in dct["mask"]["outflow_boundary"]:
-                app.gui.setvar(group, "outflow_boundary_zmin", dct["mask"]["outflow_boundary"]["zmin"])
-            if "zmax" in dct["mask"]["outflow_boundary"]:
-                app.gui.setvar(group, "outflow_boundary_zmax", dct["mask"]["outflow_boundary"]["zmax"])
-            if "polygon_file" in dct["mask"]["outflow_boundary"]:
-                app.gui.setvar(group, "outflow_boundary_polygon_file", dct["mask"]["outflow_boundary"]["polygon_file"])
-                # Now read in polygons from geojson file
-                self.read_outflow_boundary_polygon()
-                self.plot_outflow_boundary_polygon()
-
-        if "mask_snapwave" in dct:
-            if "global" in dct["mask_snapwave"]:
-                if "zmin" in dct["mask_snapwave"]["global"]:
-                    app.gui.setvar(group, "global_zmin_snapwave", dct["mask_snapwave"]["global"]["zmin"])
-                if "zmax" in dct["mask_snapwave"]["global"]:    
-                    app.gui.setvar(group, "global_zmax_snapwave", dct["mask_snapwave"]["global"]["zmax"])
-            if "include" in dct["mask_snapwave"]:
-                if "zmin" in dct["mask_snapwave"]["include"]:
-                    app.gui.setvar(group, "include_zmin_snapwave", dct["mask_snapwave"]["include"]["zmin"])
-                if "zmax" in dct["mask_snapwave"]["include"]:
-                    app.gui.setvar(group, "include_zmax_snapwave", dct["mask_snapwave"]["include"]["zmax"])
-                if "polygon_file" in dct["mask_snapwave"]["include"]:
-                    app.gui.setvar(group, "include_polygon_file_snapwave", dct["mask_snapwave"]["include"]["polygon_file"])
-                    # Now read in polygons from geojson file
-                    self.read_include_polygon_snapwave()
-                    self.plot_include_polygon_snapwave()
-            if "exclude" in dct["mask_snapwave"]:
-                if "zmin" in dct["mask_snapwave"]["exclude"]:
-                    app.gui.setvar(group, "exclude_zmin_snapwave", dct["mask_snapwave"]["exclude"]["zmin"])
-                if "zmax" in dct["mask_snapwave"]["exclude"]:
-                    app.gui.setvar(group, "exclude_zmax_snapwave", dct["mask_snapwave"]["exclude"]["zmax"])
-                if "polygon_file" in dct["mask_snapwave"]["exclude"]:
-                    app.gui.setvar(group, "exclude_polygon_file_snapwave", dct["mask_snapwave"]["exclude"]["polygon_file"])
-                    # Now read in polygons from geojson file
-                    self.read_exclude_polygon_snapwave()
-                    self.plot_exclude_polygon_snapwave()        
+                # import the function update() from boundary.py
+                from .boundary import update as update_boundary
+                update_boundary()
 
         # Bathymetry
         dataset_names = []
@@ -739,11 +690,12 @@ class Toolbox(GenericToolbox):
             name = ddict["name"]
             zmin = ddict["zmin"]
             zmax = ddict["zmax"] 
-            dataset = {"dataset": name, "zmin": zmin, "zmax": zmax}
+            dataset = {"name": name, "zmin": zmin, "zmax": zmax}
             app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets.append(dataset)
             dataset_names.append(name)
         app.gui.setvar("modelmaker_delft3dfm", "selected_bathymetry_dataset_names", dataset_names)
         app.gui.setvar("modelmaker_delft3dfm", "selected_bathymetry_dataset_index", 0)
+        app.gui.setvar("modelmaker_delft3dfm", "nr_selected_bathymetry_datasets", len(dataset_names))
 
         layer = app.map.layer["modelmaker_delft3dfm"].layer["grid_outline"]
         lenx = dct["coordinates"]["mmax"] * dct["coordinates"]["dx"]
@@ -751,8 +703,7 @@ class Toolbox(GenericToolbox):
         layer.add_rectangle(dct["coordinates"]["x0"],
                             dct["coordinates"]["y0"],
                             lenx, leny,
-                            dct["coordinates"]["rotation"])
-
+                            0)
 
     def write_setup_yaml(self):
         group = "modelmaker_delft3dfm"
@@ -765,61 +716,25 @@ class Toolbox(GenericToolbox):
         dct["coordinates"]["dy"] = float(app.gui.getvar(group, "dy"))
         dct["coordinates"]["nmax"] = int(app.gui.getvar(group, "nmax"))
         dct["coordinates"]["mmax"] = int(app.gui.getvar(group, "mmax"))
-        dct["coordinates"]["rotation"] = float(app.gui.getvar(group, "rotation"))
         dct["coordinates"]["crs"] = app.model["delft3dfm"].domain.crs.name
-        # QuadTree
-        dct["quadtree"] = {}
+
+        # Refinements
+        dct["refinement"] = {}
         if len(app.toolbox["modelmaker_delft3dfm"].refinement_polygon)>0:
-            dct["quadtree"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_file")
-        # Mask
-        dct["mask"] = {}
-        dct["mask"]["global"] = {}
-        dct["mask"]["global"]["zmin"] = app.gui.getvar(group, "global_zmin")
-        dct["mask"]["global"]["zmax"] = app.gui.getvar(group, "global_zmax")
-        dct["mask"]["include"] = {}
-        if len(app.toolbox["modelmaker_delft3dfm"].include_polygon)>0:
-            dct["mask"]["include"]["zmin"] = app.gui.getvar("modelmaker_delft3dfm", "include_zmin")
-            dct["mask"]["include"]["zmax"] = app.gui.getvar("modelmaker_delft3dfm", "include_zmax")
-            dct["mask"]["include"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file")
-        dct["mask"]["exclude"] = {}
+            dct["refinement"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_file")
+        dct["exclude"] = {}
         if len(app.toolbox["modelmaker_delft3dfm"].exclude_polygon)>0:
-            dct["mask"]["exclude"]["zmin"] = app.gui.getvar("modelmaker_delft3dfm", "exclude_zmin")
-            dct["mask"]["exclude"]["zmax"] = app.gui.getvar("modelmaker_delft3dfm", "exclude_zmax")
-            dct["mask"]["exclude"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file")
-        dct["mask"]["open_boundary"] = {}
+            dct["exclude"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file")
+        dct["open_boundary"] = {}
         if len(app.toolbox["modelmaker_delft3dfm"].open_boundary_polygon)>0:
-            dct["mask"]["open_boundary"]["zmin"] = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_zmin")
-            dct["mask"]["open_boundary"]["zmax"] = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_zmax")
-            dct["mask"]["open_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_polygon_file")
-        dct["mask"]["outflow_boundary"] = {}
-        if len(app.toolbox["modelmaker_delft3dfm"].outflow_boundary_polygon)>0:
-            dct["mask"]["outflow_boundary"]["zmin"] = app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_zmin")
-            dct["mask"]["outflow_boundary"]["zmax"] = app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_zmax")
-            dct["mask"]["outflow_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_polygon_file")
-        # SnapWave
-        # Check if snapwave is enabled
-        if app.model["delft3dfm"].domain.input.variables.snapwave:  
-            dct["mask_snapwave"] = {}
-            dct["mask_snapwave"]["global"] = {}
-            dct["mask_snapwave"]["global"]["zmin"] = app.gui.getvar(group, "global_zmin_snapwave")
-            dct["mask_snapwave"]["global"]["zmax"] = app.gui.getvar(group, "global_zmax_snapwave")
-            dct["mask_snapwave"]["include"] = {}
-            if len(app.toolbox["modelmaker_delft3dfm"].include_polygon_snapwave)>0:
-                dct["mask_snapwave"]["include"]["zmin"] = app.gui.getvar("modelmaker_delft3dfm", "include_zmin_snapwave")
-                dct["mask_snapwave"]["include"]["zmax"] = app.gui.getvar("modelmaker_delft3dfm", "include_zmax_snapwave")
-                dct["mask_snapwave"]["include"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file_snapwave")
-            dct["mask_snapwave"]["exclude"] = {}
-            if len(app.toolbox["modelmaker_delft3dfm"].exclude_polygon_snapwave)>0:
-                dct["mask_snapwave"]["exclude"]["zmin"] = app.gui.getvar("modelmaker_delft3dfm", "exclude_zmin_snapwave")
-                dct["mask_snapwave"]["exclude"]["zmax"] = app.gui.getvar("modelmaker_delft3dfm", "exclude_zmax_snapwave")
-                dct["mask_snapwave"]["exclude"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file_snapwave")
+            dct["open_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_polygon_file")
 
         # Bathymetry
         dct["bathymetry"] = {}
         dct["bathymetry"]["dataset"] = []
         for d in app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets:
             dataset = {}
-            dataset["name"]   = d["dataset"].name
+            dataset["name"]   = d["name"]
             dataset["source"] = "delftdashboard"
             dataset["zmin"]   = d["zmin"]
             dataset["zmax"]   = d["zmax"]
@@ -830,14 +745,9 @@ class Toolbox(GenericToolbox):
         dict2yaml("model_setup.yml", dct)
 
         # Write out polygons 
-        app.toolbox["modelmaker_delft3dfm"].write_include_polygon()
         app.toolbox["modelmaker_delft3dfm"].write_exclude_polygon()
         app.toolbox["modelmaker_delft3dfm"].write_open_boundary_polygon()
-        app.toolbox["modelmaker_delft3dfm"].write_outflow_boundary_polygon()
         app.toolbox["modelmaker_delft3dfm"].write_refinement_polygon()
-        app.toolbox["modelmaker_delft3dfm"].write_include_polygon_snapwave()
-        app.toolbox["modelmaker_delft3dfm"].write_exclude_polygon_snapwave()
-
 
 def gdf2list(gdf_in):
    gdf_out = []

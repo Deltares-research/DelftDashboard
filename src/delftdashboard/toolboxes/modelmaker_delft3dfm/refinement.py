@@ -22,6 +22,7 @@ def select(*args):
 def draw_refinement_polygon(*args):
     app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"].crs = app.crs
     app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"].draw()
+    update()
     
 def delete_refinement_polygon(*args):
     if len(app.toolbox["modelmaker_delft3dfm"].refinement_polygon) == 0:
@@ -65,7 +66,7 @@ def select_refinement_polygon(*args):
 #    feature_id = app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"].get_feature_id(index)
 #    feature_id = app.toolbox["modelmaker_delft3dfm"].refinement_polygon.loc[index, "id"]
     app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"].activate_feature(index)
-
+     
 # def select_refinement_level(*args):
 #     level_index = args[0]
 #     # Get index of selected polygon 
