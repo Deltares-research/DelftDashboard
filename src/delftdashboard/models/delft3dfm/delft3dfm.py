@@ -162,7 +162,10 @@ class Model(GenericModel):
     def set_gui_variables(self):
         group = "delft3dfm"
         subgroups = ['numerics', 'physics', 'output', 'geometry','wind',]
-                     
+
+        # View  
+        app.gui.setvar(group, "view_grid", True)
+
         # Input variables
         for groupname in subgroups:
             subgroup = getattr(self.domain.input, groupname)
@@ -322,6 +325,7 @@ class Model(GenericModel):
             self.domain.path = path
             self.domain.fname = fname
             self.domain.read_input_file(fname)
+            self.domain.read_attribute_files()
             self.set_gui_variables()
             # Change working directory
             os.chdir(path)
