@@ -22,8 +22,9 @@ def select(*args):
     update()
 
 def draw_open_boundary_polygon(*args):
-#    app.map.layer["modelmaker_delft3dfm"].layer["open_boundary_polygon"].crs = app.crs
+    app.map.layer["modelmaker_delft3dfm"].layer["open_boundary_polygon"].crs = app.crs
     app.map.layer["modelmaker_delft3dfm"].layer["open_boundary_polygon"].draw()
+    update()
 
 def delete_open_boundary_polygon(*args):
     if len(app.toolbox["modelmaker_delft3dfm"].open_boundary_polygon) == 0:
@@ -35,15 +36,23 @@ def delete_open_boundary_polygon(*args):
     update()
 
 def load_open_boundary_polygon(*args):
-    fname = app.gui.window.dialog_open_files("Select file ...",
-                                        file_name="coastlines.shp",
+    fname = app.gui.window.dialog_open_file("Select file ...",
+                                        # file_name="coastlines.shp",
                                         filter= None, #"*.obs",
-                                        allow_directory_change=True)
+                                        allow_directory_change=True,
+                                        multiple=True)
     app.gui.setvar("modelmaker_delft3dfm", "open_boundary_polygon_file", fname[2])
     app.toolbox["modelmaker_delft3dfm"].read_open_boundary_polygon()
     app.toolbox["modelmaker_delft3dfm"].plot_open_boundary_polygon()
+    update()
 
 def save_open_boundary_polygon(*args):
+    file_name = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_polygon")
+    rsp = app.gui.window.dialog_save_file("Select file ...",
+                                    file_name=file_name,
+                                    filter="*.geojson",
+                                    allow_directory_change=False)
+    app.gui.setvar("modelmaker_delft3dfm", "open_boundary_polygon_file", rsp[2])
     app.toolbox["modelmaker_delft3dfm"].write_open_boundary_polygon()
 
 def select_open_boundary_polygon(*args):

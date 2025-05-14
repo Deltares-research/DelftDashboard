@@ -77,7 +77,7 @@ element:
     width: 120
     height: 20
   method: read_setup_yaml
-  enable: False
+  enable: True
 - style: pushbutton
   text: Write Set-up File
   position:
@@ -86,7 +86,7 @@ element:
     width: 120
     height: 20
   method: write_setup_yaml
-  enable: False
+  enable: True
 - style: pushbutton
   text: Build Model
   position:

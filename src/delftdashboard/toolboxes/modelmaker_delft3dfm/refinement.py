@@ -22,6 +22,7 @@ def select(*args):
 def draw_refinement_polygon(*args):
     app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"].crs = app.crs
     app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"].draw()
+    update()
     
 def delete_refinement_polygon(*args):
     if len(app.toolbox["modelmaker_delft3dfm"].refinement_polygon) == 0:
@@ -65,13 +66,19 @@ def select_refinement_polygon(*args):
 #    feature_id = app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"].get_feature_id(index)
 #    feature_id = app.toolbox["modelmaker_delft3dfm"].refinement_polygon.loc[index, "id"]
     app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"].activate_feature(index)
-
+     
 # def select_refinement_level(*args):
 #     level_index = args[0]
 #     # Get index of selected polygon 
 #     index = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_index")
 #     app.toolbox["modelmaker_delft3dfm"].refinement_levels[index] = level_index + 1
 #     update()
+
+def edit_settings(*args):
+    # Get index of selected polygon 
+    index = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_index")
+    app.toolbox["modelmaker_delft3dfm"].refinement_polygon.at[index, "min_edge_size"] = app.gui.getvar("modelmaker_delft3dfm", "ref_min_edge_size")
+    update()
 
 def refinement_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_delft3dfm"].refinement_polygon = gdf
@@ -102,6 +109,11 @@ def update():
     # else:
     #     app.gui.setvar("modelmaker_delft3dfm", "refinement_polygon_level", 0)
     nrp = len(app.toolbox["modelmaker_delft3dfm"].refinement_polygon)
+    if nrp > 0:
+        min_edge_size = app.toolbox["modelmaker_delft3dfm"].refinement_polygon.loc[index, "min_edge_size"]
+        app.gui.setvar("modelmaker_delft3dfm", "ref_min_edge_size", min_edge_size)
+    else:
+        app.gui.setvar("modelmaker_delft3dfm", "ref_min_edge_size", 0)
     # refnames = []
     # levstr = app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_levels")
     # if nrp>0:
@@ -120,7 +132,13 @@ def build_depthrefined_grid(*args):
 def build_polygonrefined_grid(*args):
     app.toolbox["modelmaker_delft3dfm"].generate_polygon_refinement()
 
+def build_polygondepthrefined_grid(*args):
+    app.toolbox["modelmaker_delft3dfm"].generate_polygon_depth_refinement()
+
+def connect_nodes(*args):
+    app.toolbox["modelmaker_delft3dfm"].connect_nodes()
+
 def refine_size(*args):
     # app.model["delft3dfm"].domain.grid.refinement_polygon= app.toolbox["modelmaker_delft3dfm", "refinement_polygon")
     # app.model["delft3dfm"].domain.refinement_depth= app.gui.getvar("modelmaker_delft3dfm", "refinement_depth")
-    app.model["delft3dfm"].domain.grid.min_edge_size= app.gui.getvar("modelmaker_delft3dfm", "min_edge_size")
+    app.model["delft3dfm"].domain.grid.min_edge_size= app.gui.getvar("modelmaker_delft3dfm", "depth_min_edge_size")

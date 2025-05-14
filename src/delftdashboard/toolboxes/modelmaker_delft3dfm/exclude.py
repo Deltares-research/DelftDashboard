@@ -67,8 +67,9 @@ def select(*args):
 #     update()
 
 def draw_exclude_polygon(*args):
-#    app.map.layer["modelmaker_delft3dfm"].layer["include_polygon"].crs = app.crs
+    app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon"].crs = app.crs
     app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon"].draw()
+    update()
 
 def delete_exclude_polygon(*args):
     if len(app.toolbox["modelmaker_delft3dfm"].exclude_polygon) == 0:
@@ -80,15 +81,23 @@ def delete_exclude_polygon(*args):
     update()
 
 def load_exclude_polygon(*args):
-    fname, okay = app.gui.window.dialog_open_file("Select exclude polygon file ...", filter="*.geojson")
-    if not okay:
-        return
+    fname = app.gui.window.dialog_open_file("Select file ...",
+                                        # file_name="coastlines.shp",
+                                        filter= None, #"*.obs",
+                                        allow_directory_change=True,
+                                        multiple=True)
     app.gui.setvar("modelmaker_delft3dfm", "exclude_polygon_file", fname[2])
     app.toolbox["modelmaker_delft3dfm"].read_exclude_polygon()
     app.toolbox["modelmaker_delft3dfm"].plot_exclude_polygon()
     update()
 
 def save_exclude_polygon(*args):
+    file_name = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon")
+    rsp = app.gui.window.dialog_save_file("Select file ...",
+                                    file_name=file_name,
+                                    filter="*.geojson",
+                                    allow_directory_change=False)
+    app.gui.setvar("modelmaker_delft3dfm", "exclude_polygon_file", rsp[2])
     app.toolbox["modelmaker_delft3dfm"].write_exclude_polygon()
 
 def select_exclude_polygon(*args):

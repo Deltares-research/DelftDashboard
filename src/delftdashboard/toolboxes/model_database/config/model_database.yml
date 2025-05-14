@@ -1,0 +1,21 @@
+element:
+- style: tabpanel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  tab:
+  - string: Add Model
+    module: delftdashboard.toolboxes.model_database.model_database
+    element: add_model.yml
+  - string: Generate Model Database
+    module: delftdashboard.toolboxes.model_database.model_database
+    element: generate_database.yml
+  - string: View Model Database
+    module: delftdashboard.toolboxes.model_database.model_database
+    element: view_database.yml
+
+
+ 
+
