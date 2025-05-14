@@ -34,7 +34,9 @@ def load(*args):
         app.model["delft3dfm"].domain.input.output.crsfile = rsp[0] # file name without path
         app.model["delft3dfm"].domain.read_observation_lines()
         gdf = app.model["delft3dfm"].domain.observation_line_gdf
-        app.map.layer["delft3dfm"].layer["observation_lines"].set_data(gdf, 0)
+        if gdf.crs is None:
+            gdf.crs = app.crs
+        app.map.layer["delft3dfm"].layer["observation_lines"].set_data(gdf)
         app.gui.setvar("delft3dfm", "active_observation_line", 0)
         update()
     app.model["delft3dfm"].observation_lines_changed = False
@@ -57,14 +59,14 @@ def save(*args):
 
 def update():
     gdf = app.model["delft3dfm"].domain.observation_line_gdf
-    nrt = len(gdf)
+    # nrt = len(gdf)
     names = []
     for index, row in gdf.iterrows():
         names.append(row["name"])
     app.gui.setvar("delft3dfm", "observation_line_names", names)
-    app.gui.setvar("delft3dfm", "nr_observation_lines", nrt)
-    if app.gui.getvar("delft3dfm", "active_observation_line" ) > nrt - 1:
-        app.gui.setvar("delft3dfm", "active_observation_line", max(nrt - 1, 0) )
+    app.gui.setvar("delft3dfm", "nr_observation_lines", len(gdf))
+    # if app.gui.getvar("delft3dfm", "active_observation_line" ) > nrt - 1:
+    #     app.gui.setvar("delft3dfm", "active_observation_line", max(nrt - 1, 0) )
     app.gui.window.update()
 
 def draw_obs_line(*args):
