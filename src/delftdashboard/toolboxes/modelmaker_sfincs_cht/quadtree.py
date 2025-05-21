@@ -126,11 +126,8 @@ def build_quadtree_grid(*args):
     for i, row in app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.iterrows():
         if row["zmin"] > -20000.0 or row["zmax"] < 20000.0:
             zminzmax = True
-    # for i in range(len(app.toolbox["modelmaker_sfincs_cht"].refinement_polygon)):
-    #     if app.toolbox["modelmaker_sfincs_cht"].refinement_zmin[i] > -20000.0 or app.toolbox["modelmaker_sfincs_cht"].refinement_zmax[i] < 20000.0:
-    #         zminzmax = True
     if zminzmax:
-        if len(app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets) == 0:
+        if app.gui.setvar("bathy_topo_selector", "nr_selected_bathymetry_datasets") == 0:    
             app.gui.window.dialog_warning("Please select at least one bathymetry dataset (see next tab).")
             return
     nmax = app.gui.getvar("modelmaker_sfincs_cht", "nmax")

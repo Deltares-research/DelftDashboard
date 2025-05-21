@@ -1,0 +1,45 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 300
+    height: 110
+  text: Datasets
+  text_position: above
+  method: select_dataset
+  variable: selected_dataset
+  select: item
+  option_string:
+    variable: dataset_long_names
+  option_value:
+    variable: dataset_names
+- style: datetimeedit
+  position:
+    x: 380
+    y: 100
+    width: 120
+    height: 20
+  text: Start Time
+  variable: tstart
+  method: edit_time
+  tooltip: Set first time in time range
+- style: datetimeedit
+  position:
+    x: 380
+    y: 75
+    width: 120
+    height: 20
+  text: Stop Time
+  variable: tstop
+  method: edit_time
+  tooltip: Set last time in time range
+- style: pushbutton
+  text: Download
+  position:
+    x: 340
+    y: 25
+    width: 160
+    height: 20
+  method: download
+  tooltip: Download meteo data for selected dataset and time range
