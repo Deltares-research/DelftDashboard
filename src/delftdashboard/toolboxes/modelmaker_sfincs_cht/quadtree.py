@@ -127,7 +127,7 @@ def build_quadtree_grid(*args):
         if row["zmin"] > -20000.0 or row["zmax"] < 20000.0:
             zminzmax = True
     if zminzmax:
-        if app.gui.setvar("bathy_topo_selector", "nr_selected_bathymetry_datasets") == 0:    
+        if app.gui.getvar("bathy_topo_selector", "nr_selected_bathymetry_datasets") == 0:    
             app.gui.window.dialog_warning("Please select at least one bathymetry dataset (see next tab).")
             return
     nmax = app.gui.getvar("modelmaker_sfincs_cht", "nmax")

@@ -406,7 +406,7 @@ class Toolbox(GenericToolbox):
 
         model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation,
                          refinement_polygons=refpol,
-                         bathymetry_sets=app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets,
+                         bathymetry_sets=app.selected_bathymetry_datasets,
                          bathymetry_database=app.bathymetry_database)
 
         # Save grid 
