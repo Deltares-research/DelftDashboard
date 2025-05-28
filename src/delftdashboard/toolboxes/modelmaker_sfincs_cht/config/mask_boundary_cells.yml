@@ -4,14 +4,14 @@ element:
   position:
     x: 10
     y: 10
-    width: 270
+    width: 145
     height: 120
   element:
   - style: listbox
     position:
       x: 10
       y: 10
-      width: 80
+      width: 20
       height: 100
     method: select_open_boundary_polygon
     variable: open_boundary_polygon_index
@@ -19,19 +19,19 @@ element:
     option_string:
       variable: open_boundary_polygon_names
   - style: pushbutton
-    text: Draw Polygon
+    text: Draw
     position:
-      x: 100
+      x: 40
       y: 90
-      width: 80
+      width: 40
       height: 20
     method: draw_open_boundary_polygon
   - style: pushbutton
-    text: Delete Polygon
+    text: Delete
     position:
-      x: 100
+      x: 40
       y: 65
-      width: 80
+      width: 40
       height: 20
     method: delete_open_boundary_polygon
     dependency:
@@ -42,19 +42,19 @@ element:
         operator: gt
         value: 0
   - style: pushbutton
-    text: Load Polygon
+    text: Load
     position:
-      x: 100
+      x: 40
       y: 40
-      width: 80
+      width: 40
       height: 20
     method: load_open_boundary_polygon
   - style: pushbutton
-    text: Save Polygon
+    text: Save
     position:
-      x: 100
+      x: 40
       y: 15
-      width: 80
+      width: 40
       height: 20
     method: save_open_boundary_polygon
     dependency:
@@ -66,33 +66,201 @@ element:
         value: 0
   - style: edit
     position:
-      x: 215
-      y: 90
-      width: 45
-      height: 20
-    text: Zmax
-    variable: open_boundary_zmax
-  - style: edit
-    position:
-      x: 215
+      x: 90
       y: 65
       width: 45
       height: 20
+    text: Zmax
+    text_position: above-left
+    variable: open_boundary_zmax
+  - style: edit
+    position:
+      x: 90
+      y: 15
+      width: 45
+      height: 20
     text: Zmin
+    text_position: above-left
     variable: open_boundary_zmin
 - style: panel
-  title: Outflow Boundary Polygons
+  title: Downstream Boundary Polygons
   position:
-    x: 290
+    x: 165
     y: 10
-    width: 270
+    width: 145
     height: 120
   element:
   - style: listbox
     position:
       x: 10
       y: 10
-      width: 80
+      width: 20
+      height: 100
+    method: select_downstream_boundary_polygon
+    variable: downstream_boundary_polygon_index
+    select: index
+    option_string:
+      variable: downstream_boundary_polygon_names
+  - style: pushbutton
+    text: Draw
+    position:
+      x: 40
+      y: 90
+      width: 40
+      height: 20
+    method: draw_downstream_boundary_polygon
+  - style: pushbutton
+    text: Delete
+    position:
+      x: 40
+      y: 65
+      width: 40
+      height: 20
+    method: delete_downstream_boundary_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_downstream_boundary_polygons
+        operator: gt
+        value: 0
+  - style: pushbutton
+    text: Load
+    position:
+      x: 40
+      y: 40
+      width: 40
+      height: 20
+    method: load_downstream_boundary_polygon
+  - style: pushbutton
+    text: Save
+    position:
+      x: 40
+      y: 15
+      width: 40
+      height: 20
+    method: save_downstream_boundary_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_downstream_boundary_polygons
+        operator: gt
+        value: 0
+  - style: edit
+    position:
+      x: 90
+      y: 65
+      width: 45
+      height: 20
+    text: Zmax
+    text_position: above-left
+    variable: downstream_boundary_zmax
+  - style: edit
+    position:
+      x: 90
+      y: 15
+      width: 45
+      height: 20
+    text: Zmin
+    text_position: above-left
+    variable: downstream_boundary_zmin
+- style: panel
+  title: Neumann Boundary Polygons
+  position:
+    x: 320
+    y: 10
+    width: 145
+    height: 120
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 20
+      height: 100
+    method: select_neumann_boundary_polygon
+    variable: neumann_boundary_polygon_index
+    select: index
+    option_string:
+      variable: neumann_boundary_polygon_names
+  - style: pushbutton
+    text: Draw
+    position:
+      x: 40
+      y: 90
+      width: 40
+      height: 20
+    method: draw_neumann_boundary_polygon
+  - style: pushbutton
+    text: Delete
+    position:
+      x: 40
+      y: 65
+      width: 40
+      height: 20
+    method: delete_neumann_boundary_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_neumann_boundary_polygons
+        operator: gt
+        value: 0
+  - style: pushbutton
+    text: Load
+    position:
+      x: 40
+      y: 40
+      width: 40
+      height: 20
+    method: load_neumann_boundary_polygon
+  - style: pushbutton
+    text: Save
+    position:
+      x: 40
+      y: 15
+      width: 40
+      height: 20
+    method: save_neumann_boundary_polygon
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_neumann_boundary_polygons
+        operator: gt
+        value: 0
+  - style: edit
+    position:
+      x: 90
+      y: 65
+      width: 45
+      height: 20
+    text: Zmax
+    text_position: above-left
+    variable: neumann_boundary_zmax
+  - style: edit
+    position:
+      x: 90
+      y: 15
+      width: 45
+      height: 20
+    text: Zmin
+    text_position: above-left
+    variable: neumann_boundary_zmin
+- style: panel
+  title: Neumann Boundary Polygons
+  position:
+    x: 475
+    y: 10
+    width: 145
+    height: 120
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 20
       height: 100
     method: select_outflow_boundary_polygon
     variable: outflow_boundary_polygon_index
@@ -100,19 +268,19 @@ element:
     option_string:
       variable: outflow_boundary_polygon_names
   - style: pushbutton
-    text: Draw Polygon
+    text: Draw
     position:
-      x: 100
+      x: 40
       y: 90
-      width: 80
+      width: 40
       height: 20
     method: draw_outflow_boundary_polygon
   - style: pushbutton
-    text: Delete Polygon
+    text: Delete
     position:
-      x: 100
+      x: 40
       y: 65
-      width: 80
+      width: 40
       height: 20
     method: delete_outflow_boundary_polygon
     dependency:
@@ -123,19 +291,19 @@ element:
         operator: gt
         value: 0
   - style: pushbutton
-    text: Load Polygon
+    text: Load
     position:
-      x: 100
+      x: 40
       y: 40
-      width: 80
+      width: 40
       height: 20
     method: load_outflow_boundary_polygon
   - style: pushbutton
-    text: Save Polygon
+    text: Save
     position:
-      x: 100
+      x: 40
       y: 15
-      width: 80
+      width: 40
       height: 20
     method: save_outflow_boundary_polygon
     dependency:
@@ -147,24 +315,26 @@ element:
         value: 0
   - style: edit
     position:
-      x: 215
-      y: 90
-      width: 45
-      height: 20
-    text: Zmax
-    variable: outflow_boundary_zmax
-  - style: edit
-    position:
-      x: 215
+      x: 90
       y: 65
       width: 45
       height: 20
+    text: Zmax
+    text_position: above-left
+    variable: outflow_boundary_zmax
+  - style: edit
+    position:
+      x: 90
+      y: 15
+      width: 45
+      height: 20
     text: Zmin
+    text_position: above-left
     variable: outflow_boundary_zmin
 - style: pushbutton
   text: Update Mask
   position:
-    x: 570
+    x: 640
     y: 110
     width: 100
     height: 20
@@ -172,7 +342,7 @@ element:
 - style: pushbutton
   text: Cut Inactive Cells
   position:
-    x: 570
+    x: 640
     y: 85
     width: 100
     height: 20

@@ -45,6 +45,7 @@ def point_clicked(x, y):
     )
 
     app.map.layer["hurrywave"].layer["boundary_points"].set_data(gdf, index)
+    app.gui.setvar("hurrywave", "nr_boundary_points", len(app.model["hurrywave"].domain.boundary_conditions.gdf))
     app.gui.setvar("hurrywave", "active_boundary_point", index)
     update_list()
     update_conditions()
@@ -71,6 +72,7 @@ def delete_point_from_list(*args):
     index = max(min(index, len(gdf) - 1), 0)
     app.map.layer["hurrywave"].layer["boundary_points"].set_data(gdf, index)
     app.gui.setvar("hurrywave", "active_boundary_point", index)
+    app.gui.setvar("hurrywave", "nr_boundary_points", len(gdf))
     update_conditions()
     update_list()
     write()
@@ -124,15 +126,18 @@ def update_conditions():
         and app.gui.getvar("hurrywave", "nr_boundary_points") > 0
     ):
         index = app.gui.getvar("hurrywave", "active_boundary_point")
+        # # Check if there are any points
+        # if len(app.model["hurrywave"].domain.boundary_conditions.gdf) == 0:
+        #     return  
         df = (
             app.model["hurrywave"]
             .domain.boundary_conditions.gdf["timeseries"]
             .loc[index]
         )
-        hm0 = df["hs"][0]
-        tp = df["tp"][0]
-        wd = df["wd"][0]
-        ds = df["ds"][0]
+        hm0 = df["hs"].iloc[0]
+        tp = df["tp"].iloc[0]
+        wd = df["wd"].iloc[0]
+        ds = df["ds"].iloc[0]
         app.gui.setvar("hurrywave", "boundary_hm0", hm0)
         app.gui.setvar("hurrywave", "boundary_tp", tp)
         app.gui.setvar("hurrywave", "boundary_wd", wd)

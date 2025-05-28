@@ -15,6 +15,7 @@ import requests
 from guitares.gui import GUI
 from guitares.colormap import read_color_maps
 from cht_bathymetry import BathymetryDatabase
+from cht_meteo import MeteoDatabase
 from cht_tide import TideModelDatabase
 from .gui import build_gui_config
 
@@ -102,13 +103,10 @@ def initialize():
         app.config[key] = config[key]
     inifile.close()
 
-
-
     # First we check if the folder pth exists. If not, give warning and create it.
     if not os.path.exists(app.config["delft_dashboard_path"]):
         print("The folder specified in delftdashboard.pth does not exist. Creating it.")
         os.mkdir(app.config["delft_dashboard_path"])
-
 
     # The data path always sits in the delftdashboard folder
     app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
@@ -178,6 +176,18 @@ def initialize():
         app.background_topography = app.config["default_bathymetry_dataset"]
     else:
         app.background_topography  = app.bathymetry_database.dataset_names()[0][0]
+
+    # Meteo database
+    if "meteo_database_path" not in app.config:
+        app.config["meteo_database_path"] = os.path.join(app.config["data_path"], "meteo_database")
+    s3_bucket = app.config["s3_bucket"]
+    s3_key = f"data/meteo"
+    app.meteo_database = MeteoDatabase(path=app.config["meteo_database_path"])
+                                    #    s3_bucket=s3_bucket,
+                                    #    s3_key=s3_key,
+                                    #    check_online=False)
+                                    #    check_online=app.online)
+    app.meteo_database.read_datasets()
 
     # Tide model database
     if "tide_model_database_path" not in app.config:
