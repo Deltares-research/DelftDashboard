@@ -22,9 +22,9 @@ element:
   - string: Numerics
     module: delftdashboard.models.delft3dfm.generic
     element: numerics.yml
-  # - string: Boundary Conditions
-  #   module: delftdashboard.models.delft3dfm.boundary_conditions
-    # element: boundary_conditions.yml
+  - string: Boundary Conditions
+    module: delftdashboard.models.delft3dfm.boundary_conditions
+    element: boundary_conditions.yml
   # - string: Waves
   #   element: waves.yml
   - string: Meteo
@@ -32,9 +32,8 @@ element:
     element: meteo.yml
   - string: Observations
     element: observation_points.yml
-  # - string: Structures
-  #   module: delftdashboard.models.delft3dfm.generic
-  #   element: structures.yml
+  - string: Structures
+    element: structures.yml
   - string: Output
     module: delftdashboard.models.delft3dfm.generic
     element: output.yml

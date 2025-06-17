@@ -1,8 +1,11 @@
 element:
-- style: panel
-  title: Structures
+- style: tabpanel
   position:
     x: 10
     y: 10
     width: -10
     height: 160
+  tab:
+  - string: Thin Dams
+    module: delftdashboard.models.delft3dfm.structures_thin_dams
+    element: structures_thin_dams.yml
