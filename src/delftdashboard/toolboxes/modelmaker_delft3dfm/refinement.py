@@ -81,15 +81,18 @@ def edit_settings(*args):
     update()
 
 def refinement_polygon_created(gdf, index, id):
+    while True:
+        name, okay = app.gui.window.dialog_string("Edit name for new refinement polygon")
+        if not okay:
+            app.map.layer["modelmaker_delft3dfm"].layer["polygon_refinement"].delete_feature(index)
+            return            # Cancel was clicked
+        if name in app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_names"):
+            app.gui.window.dialog_info("A refinement polygon with this name already exists !")
+        else:
+            break
     app.toolbox["modelmaker_delft3dfm"].refinement_polygon = gdf
     nrp = len(app.toolbox["modelmaker_delft3dfm"].refinement_polygon)
     app.gui.setvar("modelmaker_delft3dfm", "refinement_polygon_index", nrp - 1)
-    name, okay = app.gui.window.dialog_string("Edit name for new refinement polygon")
-    if not okay:
-        return            # Cancel was clicked
-    if name in app.gui.getvar("modelmaker_delft3dfm", "refinement_polygon_names"):
-        app.gui.window.dialog_info("A refinement polygon with this name already exists !")
-        return
     # # Add refinement polygon name
     app.toolbox["modelmaker_delft3dfm"].refinement_polygon_names.append(name)
     update()
