@@ -10,12 +10,14 @@ Created on Mon May 10 12:18:09 2021
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from pathlib import Path
+from delftdashboard.misc.gdfutils import mline2point
 
 def select(*args):
     # Set all layer inactive, except boundary_points
     map.update()
     app.map.layer["delft3dfm"].layer["boundary_line"].activate()
-
+    app.map.layer["delft3dfm"].layer["grid"].activate()
     update_list()
 
 def deselect(*args):
@@ -23,6 +25,8 @@ def deselect(*args):
         ok = app.gui.window.dialog_yes_no("The boundary conditions have changed. Would you like to save the changes?")
         if ok:
             save()
+        else:
+            app.model["delft3dfm"].boundaries_changed = False
 
 # def load(*args):
 #     """"""
@@ -154,11 +158,30 @@ def deselect(*args):
 def generate_boundary_conditions_from_tide_model(*args):
 
     map.reset_cursor()
+    rsp = app.gui.window.dialog_save_file("Select bc file file ...",
+                                          file_name='bc_new.ext',
+                                          filter = None,
+                                          allow_directory_change=False)
+    if rsp[0]:
+        tide_model_name = app.gui.getvar("delft3dfm", "boundary_conditions_tide_model")
+        gdf = app.model["delft3dfm"].domain.boundary_conditions.gdf
+        gdf = mline2point(gdf) # convert line to points
+        tide_model = app.tide_model_database.get_dataset(tide_model_name)
+        app.model["delft3dfm"].domain.boundary_conditions.gdf_points = tide_model.get_data_on_points(gdf=gdf, crs=app.model["delft3dfm"].domain.crs, format="gdf", constituents="all")
+        # app.model["delft3dfm"].domain.boundary_conditions.gdf = gdf
 
-    # poly_file = app.toolbox["modelmaker_delft3dfm"].variables["open_boundary_polygon_file"]
-    tidemodel = app.gui.getvar("delft3dfm", "boundary_conditions_tide_model")
-    ext_new= app.model["delft3dfm"].domain.boundary_conditions.generate_tide(tidemodel=tidemodel)
-    app.model["delft3dfm"].domain.input.external_forcing.extforcefilenew = ext_new
+        # Save water level forcing file 
+        app.model["delft3dfm"].domain.boundary_conditions.write_boundary_conditions_astro() # writes .bc file
+    
+        # Now save the external forcing file
+        app.model["delft3dfm"].domain.boundary_conditions.write_ext_wl() # writes .bc file
+
+        # ext_new= app.model["delft3dfm"].domain.boundary_conditions.generate_tide(tidemodel=tidemodel, ext_file_new= rsp[0])
+        # app.model["delft3dfm"].domain.input.external_forcing.extforcefilenew = ext_new
+
+        # app.model["delft3dfm"].domain.input.output.crsfile = [] # first clear obsfile list to add combined / new crs
+        # app.model["delft3dfm"].domain.input.output.crsfile.append(ObservationCrossSectionModel())
+        # app.model["delft3dfm"].domain.input.output.crsfile[0].filepath=Path(rsp[2]) # save all obs crss in 1 file
 
 def generate_boundary_conditions_custom(*args):
     pass
