@@ -20,6 +20,14 @@ def wgs84(option):
     new_crs = CRS(4326)
     if new_crs == app.crs:
         return
+
+    ok = app.gui.window.dialog_yes_no(
+        "This will clear existing model and toolbox data! Are you sure you want to proceed?",
+        "Change Coordinate System",
+    )
+    if not ok:
+        return
+    
     app.crs = new_crs
     app.map.fly_to(0.0, 0.0, 1)
     update_crs()
@@ -33,6 +41,9 @@ def utm_zone(option):
     )
     if not okay:
         return
+
+    # First ask user if she really wants to do this
+
     letters = [
         "C",
         "D",
@@ -65,6 +76,12 @@ def utm_zone(option):
     new_crs = CRS("WGS 84 / UTM zone " + utm)
     if new_crs == app.crs:
         return
+    ok = app.gui.window.dialog_yes_no(
+        "This will clear existing model and toolbox data! Are you sure you want to proceed?",
+        "Change Coordinate System",
+    )
+    if not ok:
+        return    
     app.crs = new_crs
     app.map.fly_to(lon, lat, zoom)
     update_crs()
@@ -111,12 +128,20 @@ def other_projected(option):
     if new_crs == app.crs:
         return
 
+    ok = app.gui.window.dialog_yes_no(
+        "This will clear existing model and toolbox data! Are you sure you want to proceed?",
+        "Change Coordinate System",
+    )
+    if not ok:
+        return
+
     app.crs = new_crs
 
     if new_crs.area_of_use:
         lon = (new_crs.area_of_use.west + new_crs.area_of_use.east) / 2
         lat = (new_crs.area_of_use.south + new_crs.area_of_use.north) / 2
         zoom = 4
+
     app.map.fly_to(lon, lat, zoom)
 
     app.gui.delgroup("select_other_projected")
@@ -164,6 +189,14 @@ def other_geographic(option):
     if new_crs == app.crs:
         return
 
+    # First ask user if she really wants to do this
+    ok = app.gui.window.dialog_yes_no(
+        "This will clear existing model and toolbox data! Are you sure you want to proceed?",
+        "Change Coordinate System",
+    )
+    if not ok:
+        return
+
     app.crs = new_crs
 
     app.gui.delgroup("select_other_geographic")
@@ -172,6 +205,7 @@ def other_geographic(option):
 
 def update_crs():
     app.map.crs = app.crs
+
     # Also change the model crs
     for model in app.model:
         app.model[model].set_crs()

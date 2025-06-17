@@ -70,7 +70,8 @@ def select_refinement_polygon(*args):
     app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"].activate_feature(index)
 
 def select_refinement_level(*args):
-    level_index = args[0]
+    # level_index = args[0]
+    level_index = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_level")
     # Get index of selected polygon 
     index = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_index")
     app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.at[index, "refinement_level"] = level_index + 1
@@ -117,6 +118,13 @@ def update():
         pass
     app.gui.setvar("modelmaker_sfincs_cht", "nr_refinement_polygons", nrp)
     app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_names", refnames)
+    # Now update the refinement_polygon_level
+    if nrp > 0:
+        ilev = app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.at[index, "refinement_level"]
+        app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_level", ilev - 1)
+    else:
+        app.gui.setvar("modelmaker_sfincs_cht", "refinement_polygon_level", 0)
+    # And update the GUI
     app.gui.window.update()
 
 def build_quadtree_grid(*args):
@@ -126,11 +134,8 @@ def build_quadtree_grid(*args):
     for i, row in app.toolbox["modelmaker_sfincs_cht"].refinement_polygon.iterrows():
         if row["zmin"] > -20000.0 or row["zmax"] < 20000.0:
             zminzmax = True
-    # for i in range(len(app.toolbox["modelmaker_sfincs_cht"].refinement_polygon)):
-    #     if app.toolbox["modelmaker_sfincs_cht"].refinement_zmin[i] > -20000.0 or app.toolbox["modelmaker_sfincs_cht"].refinement_zmax[i] < 20000.0:
-    #         zminzmax = True
     if zminzmax:
-        if len(app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets) == 0:
+        if app.gui.getvar("bathy_topo_selector", "nr_selected_bathymetry_datasets") == 0:    
             app.gui.window.dialog_warning("Please select at least one bathymetry dataset (see next tab).")
             return
     nmax = app.gui.getvar("modelmaker_sfincs_cht", "nmax")

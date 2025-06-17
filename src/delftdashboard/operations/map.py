@@ -50,6 +50,8 @@ def map_ready(*args):
 
     update_statusbar()
 
+    app.gui.window.resize() # Need to do this in order to get the correct size of the widgets. Should really be done by Guitares, but for some reason it does not work there.
+
     app.gui.close_splash()
 
 def map_moved(coords, widget):

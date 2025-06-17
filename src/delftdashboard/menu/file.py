@@ -24,8 +24,8 @@ def new(option):
         model.initialize()
         model.clear_layers()
 
-    app.active_model   = app.model[list(app.model)[0]]
-    app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
+    # app.active_model   = app.model[list(app.model)[0]]
+    # app.active_toolbox = app.toolbox[list(app.toolbox)[0]]
     app.active_toolbox.select()
 
 def open(option):

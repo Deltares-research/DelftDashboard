@@ -45,6 +45,17 @@ def grid_outline_modified(gdf, index, id):
 
 
 def generate_grid(*args):
+    # First check that nmax, mmax, dx, and dy are > 0
+    group = "modelmaker_sfincs_cht"
+    nmax = app.gui.getvar(group, "nmax")
+    mmax = app.gui.getvar(group, "mmax")
+    dx = app.gui.getvar(group, "dx")
+    dy = app.gui.getvar(group, "dy")
+    if nmax <= 0 or mmax <= 0 or dx <= 0.0 or dy <= 0.0:
+        app.gui.window.dialog_warning("Please first create bounding box for model domain!",
+            "Warning"
+        )
+        return
     app.toolbox["modelmaker_sfincs_cht"].generate_grid()
 
 
