@@ -75,9 +75,19 @@ def delete_exclude_polygon(*args):
     if len(app.toolbox["modelmaker_delft3dfm"].exclude_polygon) == 0:
         return
     index = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_index")
+    app.toolbox["modelmaker_delft3dfm"].exclude_polygon_names.pop(index)
+    feature_id = app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon"].get_feature_id(index)
     # Delete from map
-    gdf = app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon"].delete_feature(index)
-    app.toolbox["modelmaker_delft3dfm"].exclude_polygon = gdf
+    gdf = app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon"].delete_feature(feature_id)
+    # Delete from app
+    app.toolbox["modelmaker_delft3dfm"].exclude_polygon = app.toolbox["modelmaker_delft3dfm"].exclude_polygon.drop(index)
+    if len(app.toolbox["modelmaker_delft3dfm"].exclude_polygon) > 0:
+        app.toolbox["modelmaker_delft3dfm"].exclude_polygon = app.toolbox["modelmaker_delft3dfm"].exclude_polygon.reset_index(drop=True)
+    # If the last polygon was deleted, set index to last available polygon
+    if index > len(app.toolbox["modelmaker_delft3dfm"].exclude_polygon) - 1:
+        index = max(len(app.toolbox["modelmaker_delft3dfm"].exclude_polygon) - 1, 0)
+        app.gui.setvar("modelmaker_delft3dfm", "exclude_polygon_index", index)
+    # app.toolbox["modelmaker_delft3dfm"].exclude_polygon = gdf
     update()
 
 def load_exclude_polygon(*args):
@@ -105,9 +115,17 @@ def select_exclude_polygon(*args):
     app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon"].activate_feature(index)
 
 def exclude_polygon_created(gdf, index, id):
+    while True:
+        name, okay = app.gui.window.dialog_string("Edit name for new exclude polygon")
+        if not okay:
+            app.map.layer["modelmaker_delft3dfm"].layer["exclude_polygon"].delete_feature(index)
+            return
+        if name:
+            break
     app.toolbox["modelmaker_delft3dfm"].exclude_polygon = gdf
     nrp = len(app.toolbox["modelmaker_delft3dfm"].exclude_polygon)
     app.gui.setvar("modelmaker_delft3dfm", "exclude_polygon_index", nrp - 1)
+    app.toolbox["modelmaker_delft3dfm"].exclude_polygon_names.append(name)
     update()
 
 def exclude_polygon_modified(gdf, index, id):
@@ -131,13 +149,11 @@ def update():
     # app.gui.setvar("modelmaker_delft3dfm", "include_polygon_index", index)
 
     # Exclude
+    index = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_index")
     nrp = len(app.toolbox["modelmaker_delft3dfm"].exclude_polygon)
-    excnames = []
-    for ip in range(nrp):
-        excnames.append(str(ip + 1))
+    excnames = app.toolbox["modelmaker_delft3dfm"].exclude_polygon_names
     app.gui.setvar("modelmaker_delft3dfm", "nr_exclude_polygons", nrp)
     app.gui.setvar("modelmaker_delft3dfm", "exclude_polygon_names", excnames)
-    index = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_index")
     if index > nrp - 1:
         index = max(nrp - 1, 0)
     app.gui.setvar("modelmaker_delft3dfm", "exclude_polygon_index", index)
