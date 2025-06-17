@@ -5,35 +5,35 @@ element:
     y: 10
     width: 300
     height: 120
-  method: select_obs_line
-  variable: active_observation_line
+  method: select_cross_section_from_list
+  variable: active_cross_section
   select: index
   option_string:
-    variable: observation_line_names
-  tooltip: Select observation line
+    variable: cross_section_names
+  tooltip: Select cross section
 - style: pushbutton
-  text: Add Line
+  text: Add Cross Section
   position:
     x: 320
     y: 110
     width: 80
     height: 20
-  method: draw_obs_line
-  tooltip: Add observation line on map
+  method: draw_cross_section
+  tooltip: Add cross section on map
 - style: pushbutton
-  text: Delete Line
+  text: Delete Cross Section
   position:
     x: 320
     y: 85
     width: 80
     height: 20
-  method: delete_obs_line
-  tooltip: Delete observation line from list
+  method: delete_cross_section
+  tooltip: Delete cross section from list
   dependency:
   - action: enable
     checkfor: all
     check:
-    - variable: nr_observation_lines
+    - variable: nr_cross_sections
       operator: gt
       value: 0
 - style: pushbutton
@@ -44,7 +44,7 @@ element:
     width: 80
     height: 20
   method: load
-  tooltip: Load observation lines from file
+  tooltip: Load cross sections from file
 - style: pushbutton
   text: Save
   position:
@@ -53,11 +53,11 @@ element:
     width: 80
     height: 20
   method: save
-  tooltip: Save observation lines to file
+  tooltip: Save cross sections to file
   dependency:
   - action: enable
     checkfor: all
     check:
-    - variable: nr_observation_lines
+    - variable: nr_cross_sections
       operator: gt
       value: 0
