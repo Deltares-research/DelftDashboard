@@ -35,12 +35,15 @@ class Toolbox(GenericToolbox):
         self.selected_bathymetry_datasets = []
 
         # Include polygons
-        self.include_polygon = gpd.GeoDataFrame()
+        # self.include_polygon = gpd.GeoDataFrame()
         # Exclude polygons
         self.exclude_polygon = gpd.GeoDataFrame()
+        self.exclude_polygon_names = []
+
         # Boundary polygons
         self.open_boundary_polygon = gpd.GeoDataFrame()
-        self.outflow_boundary_polygon = gpd.GeoDataFrame()
+        self.open_boundary_polygon_names = []
+        # self.outflow_boundary_polygon = gpd.GeoDataFrame()
 
         # Refinement
         # self.refinement_levels = []
@@ -99,6 +102,7 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "nr_open_boundary_polygons", 0)
         app.gui.setvar(group, "open_boundary_zmax",  99999.0)
         app.gui.setvar(group, "open_boundary_zmin", -99999.0)
+        app.gui.setvar(group, "boundary_dx", 0.05)
 
         # app.gui.setvar(group, "outflow_boundary_polygon_file", "outflow_boundary.geojson")
         # app.gui.setvar(group, "outflow_boundary_polygon_names", [])
@@ -278,8 +282,8 @@ class Toolbox(GenericToolbox):
         if bathymetry_list:
             model.grid.refine_depth(bathymetry_list, bathymetry_database=app.bathymetry_database)
             
-            # Interpolate bathymetry onto the grid
-            model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
+            # Interpolate bathymetry onto the grid (Update: now done only for connect nodes)
+            # model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
         
             # Save grid 
             model.grid.write()
@@ -301,8 +305,8 @@ class Toolbox(GenericToolbox):
         if bathymetry_list:
             model.grid.refine_polygon_depth(bathymetry_list, bathymetry_database=app.bathymetry_database, gdf = self.refinement_polygon)
             
-            # Interpolate bathymetry onto the grid
-            model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
+            # Interpolate bathymetry onto the grid (Update: now done only for connect nodes)
+            # model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
         
             # Save grid 
             model.grid.write()
@@ -321,10 +325,10 @@ class Toolbox(GenericToolbox):
         
         model.grid.refine_polygon(gdf = self.refinement_polygon)
         
-        # Interpolate bathymetry onto the grid
-        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
-        if bathymetry_list:
-            model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
+        # Interpolate bathymetry onto the grid (Update: now done only for connect nodes)
+        # bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+        # if bathymetry_list:
+        #     model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
       
         # Save grid 
         model.grid.write()
@@ -343,6 +347,8 @@ class Toolbox(GenericToolbox):
 
         if bathymetry_list:
             model.grid.connect_nodes(bathymetry_list, bathymetry_database=app.bathymetry_database)
+            app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
+
             # Save grid 
             model.grid.write()
 
@@ -362,7 +368,10 @@ class Toolbox(GenericToolbox):
 
     def generate_bnd_coastline(self):
         dlg = app.gui.window.dialog_wait("Creating open boundary based on coastline ...")
-        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withcoastlines = True)
+        res = app.gui.getvar("modelmaker_delft3dfm", "boundary_dx")
+        if app.crs.is_geographic:
+            res = res / 111111.0
+        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withcoastlines = True, resolution = res)
         app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
         # app.model["delft3dfm"].domain.grid.write()
         # Replot everything
@@ -372,7 +381,10 @@ class Toolbox(GenericToolbox):
     def generate_bnd_polygon(self):
         dlg = app.gui.window.dialog_wait("Creating open boundary based on polygon ...")
         gdf = self.open_boundary_polygon
-        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withpolygon = gdf)
+        res = app.gui.getvar("modelmaker_delft3dfm", "boundary_dx")
+        if app.crs.is_geographic:
+            res = res / 111111.0
+        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withpolygon = gdf, resolution = res)
         app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
         # app.model["delft3dfm"].domain.grid.write()
         # Replot everything
@@ -480,10 +492,16 @@ class Toolbox(GenericToolbox):
     def read_exclude_polygon(self):
         fname = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file")
         self.exclude_polygon = gpd.read_file(fname)
+        self.exclude_polygon_names = []
+        for i in range(len(self.exclude_polygon)):
+            self.exclude_polygon_names.append(self.exclude_polygon["exclude_polygon_name"][i])
 
     def read_open_boundary_polygon(self):
         fname = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_polygon_file")
         self.open_boundary_polygon = gpd.read_file(fname)
+        self.open_boundary_polygon_names = []
+        for i in range(len(self.open_boundary_polygon)):
+            self.open_boundary_polygon_names.append(self.open_boundary_polygon["open_boundary_polygon_name"][i])
 
     # def read_outflow_boundary_polygon(self):
     #     fname = app.gui.getvar("modelmaker_delft3dfm", "outflow_boundary_polygon_file")
@@ -521,14 +539,16 @@ class Toolbox(GenericToolbox):
     def write_exclude_polygon(self):
         if len(self.exclude_polygon) == 0:
             return
-        gdf = gpd.GeoDataFrame(geometry=self.exclude_polygon["geometry"])
+        gdf = gpd.GeoDataFrame({"geometry":self.exclude_polygon["geometry"],
+                                "exclude_polygon_name": self.exclude_polygon_names})
         fname = app.gui.getvar("modelmaker_delft3dfm", "exclude_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
 
     def write_open_boundary_polygon(self):
         if len(self.open_boundary_polygon) == 0:
             return
-        gdf = gpd.GeoDataFrame(geometry=self.open_boundary_polygon["geometry"])
+        gdf = gpd.GeoDataFrame({"geometry": self.open_boundary_polygon["geometry"],
+                                "open_boundary_polygon_name": self.open_boundary_polygon_names})
         fname = app.gui.getvar("modelmaker_delft3dfm", "open_boundary_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
         # gdf.to_file(fname, driver='ESRI Shapefile')
