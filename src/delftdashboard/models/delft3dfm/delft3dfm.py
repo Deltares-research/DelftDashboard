@@ -30,9 +30,9 @@ class Model(GenericModel):
         self.domain.fname = 'flow.mdu'
         self.set_gui_variables()
         self.observation_points_changed = False
-        self.observation_lines_changed = False
-        self.discharge_points_changed = False
-        self.boundaries_changed = False
+        self.cross_sections_changed = False
+        # self.discharge_points_changed = False
+        # self.boundaries_changed = False
         self.thin_dams_changed = False
 
     def get_view_menu(self):
@@ -69,6 +69,11 @@ class Model(GenericModel):
         #                 line_color="black")
         layer.add_layer("grid", type="image")
 
+        layer.add_layer("grid_exterior",
+                        type="line",
+                        circle_radius=0,
+                        line_color="yellow")
+        
         # layer.add_layer("mask_include",
         #                 type="circle",
         #                 file_name="delft3dfm_mask_include.geojson",
@@ -107,16 +112,29 @@ class Model(GenericModel):
                         circle_radius_selected=4,
                         line_color_selected="white",
                         fill_color_selected="red")
-
-        from .observation_points_crs import obs_lines_created
-        from .observation_points_crs import obs_lines_selected
-        from .observation_points_crs import obs_lines_modified
-        layer.add_layer("observation_lines",
+        
+        from .structures_thin_dams import thin_dam_created
+        from .structures_thin_dams import thin_dam_selected
+        from .structures_thin_dams import thin_dam_modified
+        layer.add_layer("thin_dams",
+                        type="draw",
+                        shape="polyline",
+                        create=thin_dam_created,
+                        modify=thin_dam_modified,
+                        select=thin_dam_selected,
+                        polyline_line_color="yellow",
+                        polyline_line_width=2.0,
+                        polyline_line_opacity=1.0)
+        
+        from .observation_points_crs import cross_section_created
+        from .observation_points_crs import cross_section_selected
+        from .observation_points_crs import cross_section_modified
+        layer.add_layer("cross_sections",
                             type="draw",
                             shape="polyline",
-                            create=obs_lines_created,
-                            modify=obs_lines_modified,
-                            select=obs_lines_selected,
+                            create=cross_section_created,
+                            modify=cross_section_modified,
+                            select=cross_section_selected,
                             polyline_line_color="yellow",
                             polyline_line_width=2.0,
                             polyline_line_opacity=1.0)
@@ -135,21 +153,23 @@ class Model(GenericModel):
         #                 fill_color_selected="red")
 
     def set_layer_mode(self, mode):
+        layer = app.map.layer["delft3dfm"]
         if mode == "inactive":
             # Grid is made visible
-            app.map.layer["delft3dfm"].layer["grid"].deactivate()
-            # Mask is made invisible
-            # app.map.layer["delft3dfm"].layer["mask_include"].hide()
-            # app.map.layer["delft3dfm"].layer["mask_boundary"].hide()
-            # Boundary points are made grey
-            app.map.layer["delft3dfm"].layer["boundary_line"].deactivate()
+            layer.layer["grid"].deactivate()
+            # Grid exterior is made visible
+            layer.layer["grid_exterior"].deactivate()
+            # Boundary line is made visible
+            layer.layer["boundary_line"].deactivate()
             # Observation points are made grey
-            app.map.layer["delft3dfm"].layer["observation_points"].deactivate()
-            app.map.layer["delft3dfm"].layer["observation_lines"].deactivate()
+            layer.layer["observation_points"].deactivate()
+            # layer.layer["cross_sections"].deactivate()
+            # Thin dams are made grey
+            # layer.layer["thin_dams"].deactivate()
             # app.map.layer["delft3dfm"].layer["observation_points_spectra"].deactivate()
         elif mode == "invisible":
             # Everything set to invisible
-            app.map.layer["delft3dfm"].hide()
+            layer.hide()
 
     def set_crs(self):
         crs = app.crs
@@ -198,6 +218,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "time.tstart", tnow)
         app.gui.setvar(group, "time.tstop", tnow + datetime.timedelta(days=1))
 
+        # Domain variables
         app.gui.setvar(group, "setup.x0", 0)
         app.gui.setvar(group, "setup.y0", 1)
         app.gui.setvar(group, "setup.nmax", 0)
@@ -205,25 +226,28 @@ class Model(GenericModel):
         app.gui.setvar(group, "setup.dx", 0.01)
         app.gui.setvar(group, "setup.dy", 0.01)
 
-        app.gui.setvar(group, "boundary_point_names", []) 
-        app.gui.setvar(group, "active_boundary_point", 0)
-        app.gui.setvar(group, "boundary_forcing", self.domain.boundary_conditions.forcing)
-        app.gui.setvar(group, "boundary_hm0", 1.0)
-        app.gui.setvar(group, "boundary_tp", 6.0)
-        app.gui.setvar(group, "boundary_wd", 0.0)
-        app.gui.setvar(group, "boundary_ds", 30.0)
+        # Boundary conditions
+        # app.gui.setvar(group, "boundary_point_names", []) 
+        # app.gui.setvar(group, "active_boundary_point", 0)
+        # app.gui.setvar(group, "boundary_forcing", self.domain.boundary_conditions.forcing)
+        # app.gui.setvar(group, "boundary_hm0", 1.0)
+        # app.gui.setvar(group, "boundary_tp", 6.0)
+        # app.gui.setvar(group, "boundary_wd", 0.0)
+        # app.gui.setvar(group, "boundary_ds", 30.0)
 
+        # Observation points
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
 
-        app.gui.setvar(group, "observation_line_names", [])
-        app.gui.setvar(group, "nr_observation_lines", 0)
-        app.gui.setvar(group, "active_observation_line", 0)
-        app.gui.setvar(group, "observation_line_index", 0)
+        # Observation cross sections
+        app.gui.setvar(group, "cross_section_names", [])
+        app.gui.setvar(group, "nr_cross_sections", 0)
+        app.gui.setvar(group, "active_cross_section", 0)
 
+        # Open boundary line
         app.gui.setvar(group, "boundary_line_active", 0)
-        app.gui.setvar(group, "boundary_conditions_tide_model", [])
+        # app.gui.setvar(group, "boundary_conditions_tide_model", "GTSMv4.1_opendap")
 
         # Boundary conditions
         # app.gui.setvar(group, "boundary_point_names", [])
@@ -240,7 +264,12 @@ class Model(GenericModel):
         app.gui.setvar(group, "boundary_conditions_timeseries_peak", 1.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
-        # app.gui.setvar(group, "boundary_conditions_tide_model", [])
+        app.gui.setvar(group, "boundary_conditions_tide_model", app.gui.getvar("tide_models", "names")[0])
+
+        # Thin dams
+        app.gui.setvar(group, "thin_dam_names", [])
+        app.gui.setvar(group, "nr_thin_dams", 0)
+        app.gui.setvar(group, "active_thin_dam", 0)
 
     # def set_model_variables(self, varid=None, value=None):
     #     # Copies gui variables to delft3dfm input variables
@@ -354,7 +383,7 @@ class Model(GenericModel):
         app.map.layer["delft3dfm"].layer["boundary_line"].set_data(self.domain.boundary_conditions.gdf)
 
         # Observation points
-        app.map.layer["delft3dfm"].layer["observation_points"].set_data(app.model["delft3dfm"].domain.observation_point_gdf, 0)
+        app.map.layer["delft3dfm"].layer["observation_points"].set_data(app.model["delft3dfm"].domain.observation_points.gdf, 0)
 
         # Observation cross sections
         # app.map.layer["delft3dfm"].layer["observation_lines"].set_data(app.model["delft3dfm"].domain.observation_line_gdf)
@@ -368,10 +397,10 @@ class Model(GenericModel):
         # gdf = self.domain.observation_points_sp2.gdf
         # app.map.layer["delft3dfm"].layer["observation_points_spectra"].set_data(gdf, 0)
 
-    def add_stations(self, gdf_stations_to_add, naming_option="id"):
-        self.domain.observation_points.add_points(gdf_stations_to_add, name=naming_option)
-        gdf = self.domain.observation_points.gdf
-        app.map.layer["delft3dfm"].layer["observation_points"].set_data(gdf, 0)
-        if not self.domain.input.variables.obsfile:
-            self.domain.input.variables.obsfile = "delft3dfm.obs"
-        self.domain.observation_points.write()
+    # def add_stations(self, gdf_stations_to_add, naming_option="id"):
+    #     self.domain.observation_points.add_points(gdf_stations_to_add, name=naming_option)
+    #     gdf = self.domain.observation_points.gdf
+    #     app.map.layer["delft3dfm"].layer["observation_points"].set_data(gdf, 0)
+    #     if not self.domain.input.variables.obsfile:
+    #         self.domain.input.variables.obsfile = "delft3dfm.obs"
+    #     self.domain.observation_points.write()
