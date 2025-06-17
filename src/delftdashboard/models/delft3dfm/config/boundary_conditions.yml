@@ -130,18 +130,24 @@ element:
     variable: boundary_conditions_tide_model
     select: item
     method: set_model_variables
+    # option_string:
+    # # - FES2014
+    # # - FES2012
+    # # - EOT20
+    # - tpxo80
+    # - GTSMv4.1
+    # option_value:
+    # # - FES2014
+    # # - FES2012
+    # # - EOT20
+    # - tpxo80_opendap
+    # - GTSMv4.1_opendap
     option_string:
-    - FES2014
-    - FES2012
-    - EOT20
-    - GTSMv4.1
-    - tpxo80
+      variable_group: tide_models
+      variable: long_names
     option_value:
-    - FES2014
-    - FES2012
-    - EOT20
-    - GTSMv4.1_opendap
-    - tpxo80_opendap
+      variable_group: tide_models
+      variable: names
     tooltip: Select global tide model
     # dependency:
     # - action: enable
