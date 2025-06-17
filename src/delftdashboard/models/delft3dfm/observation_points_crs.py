@@ -12,14 +12,18 @@ import pandas as pd
 
 def select(*args):
     map.update()
-    app.map.layer["delft3dfm"].layer["observation_lines"].activate()
+    app.map.layer["delft3dfm"].layer["cross_sections"].activate()
     update()
 
 def deselect(*args):
-    if app.model["delft3dfm"].observation_lines_changed:
+    if app.model["delft3dfm"].cross_sections_changed:
         ok = app.gui.window.dialog_yes_no("The cross sections have changed. Would you like to save the changes?")
         if ok:
             save()
+        else:
+            app.model["delft3dfm"].cross_sections_changed = False
+    app.map.layer["delft3dfm"].layer["cross_sections"].hide()
+    update()
 
 def edit(*args):
     app.model["delft3dfm"].set_model_variables()
@@ -32,14 +36,12 @@ def load(*args):
                                           allow_directory_change=False)
     if rsp[0]:
         app.model["delft3dfm"].domain.input.output.crsfile = rsp[0] # file name without path
-        app.model["delft3dfm"].domain.read_observation_lines()
-        gdf = app.model["delft3dfm"].domain.observation_line_gdf
-        if gdf.crs is None:
-            gdf.crs = app.crs
-        app.map.layer["delft3dfm"].layer["observation_lines"].set_data(gdf)
-        app.gui.setvar("delft3dfm", "active_observation_line", 0)
+        app.model["delft3dfm"].domain.cross_sections.read()
+        gdf = app.model["delft3dfm"].domain.cross_sections.gdf
+        app.map.layer["delft3dfm"].layer["cross_sections"].set_data(gdf)
+        app.gui.setvar("delft3dfm", "active_cross_section", 0)
         update()
-    app.model["delft3dfm"].observation_lines_changed = False
+    app.model["delft3dfm"].cross_sections_changed = False
 
 def save(*args):
     from hydrolib.core.dflowfm import ObservationCrossSectionModel
@@ -54,89 +56,82 @@ def save(*args):
         app.model["delft3dfm"].domain.input.output.crsfile = [] # first clear obsfile list to add combined / new crs
         app.model["delft3dfm"].domain.input.output.crsfile.append(ObservationCrossSectionModel())
         app.model["delft3dfm"].domain.input.output.crsfile[0].filepath=Path(rsp[2]) # save all obs crss in 1 file
-        app.model["delft3dfm"].domain.write_observation_lines()
-    app.model["delft3dfm"].observation_lines_changed = False
+        app.model["delft3dfm"].domain.cross_sections.write()
+    app.model["delft3dfm"].cross_sections_changed = False
 
-def update():
-    gdf = app.model["delft3dfm"].domain.observation_line_gdf
-    # nrt = len(gdf)
-    names = []
-    for index, row in gdf.iterrows():
-        names.append(row["name"])
-    app.gui.setvar("delft3dfm", "observation_line_names", names)
-    app.gui.setvar("delft3dfm", "nr_observation_lines", len(gdf))
-    # if app.gui.getvar("delft3dfm", "active_observation_line" ) > nrt - 1:
-    #     app.gui.setvar("delft3dfm", "active_observation_line", max(nrt - 1, 0) )
-    app.gui.window.update()
-
-def draw_obs_line(*args):
-    app.map.layer["delft3dfm"].layer["observation_lines"].draw()
+def draw_cross_section(*args):
+    app.map.layer["delft3dfm"].layer["cross_sections"].draw()
     
-def delete_obs_line(*args):
-    gdf = app.model["delft3dfm"].domain.observation_line_gdf
+def delete_cross_section(*args):
+    gdf = app.model["delft3dfm"].domain.cross_sections.gdf
     if len(gdf) == 0:
         return
-    index = app.gui.getvar("delft3dfm", "active_observation_line")
+    index = app.gui.getvar("delft3dfm", "active_cross_section")
     # # Delete from map
-    # app.map.layer["delft3dfm"].layer["observation_lines"].delete_feature(index)
+    app.map.layer["delft3dfm"].layer["cross_sections"].delete_feature(index)
     # Delete from app
-    app.model["delft3dfm"].domain.observation_line_gdf = app.model["delft3dfm"].domain.observation_line_gdf.drop(index).reset_index(drop=True)
-    gdf = app.model["delft3dfm"].domain.observation_line_gdf
-    index = max(min(index, len(gdf) - 1), 0)
-    app.map.layer["delft3dfm"].layer["observation_lines"].set_data(gdf)
-    app.gui.setvar("delft3dfm", "active_observation_line", index)
-    app.model["delft3dfm"].observation_lines_changed = True
+    app.model["delft3dfm"].domain.cross_sections.delete(index)
+    app.gui.setvar("delft3dfm", "active_cross_section", index)
+    app.model["delft3dfm"].cross_sections_changed = True
     update()
 
-def select_obs_line(*args):
+def select_cross_section_from_list(*args):
     map.reset_cursor()
-    index = app.gui.getvar("delft3dfm", "active_observation_line")
-    app.map.layer["delft3dfm"].layer["observation_lines"].activate_feature(index)
-    # app.map.layer["delft3dfm"].layer["observation_lines"].select_by_index(index)
+    index = app.gui.getvar("delft3dfm", "active_cross_section")
+    app.map.layer["delft3dfm"].layer["cross_sections"].activate_feature(index)
     update()
     
-def obs_lines_created(gdf, index, id):
-    name, okay = app.gui.window.dialog_string("Edit name for new observation line")
-    if not okay:
-        # Cancel was clicked
-        # Delete from map
-        app.map.layer["delft3dfm"].layer["observation_lines"].delete_feature(index)
-        return    
-    if name in app.gui.getvar("delft3dfm", "observation_line_names"):
-        app.gui.window.dialog_info("An observation line with this name already exists !")
-        return
-    gdf.loc[index, "name"] = name
-    existing_gdf = app.model["delft3dfm"].domain.observation_line_gdf
-    if existing_gdf is None or existing_gdf.empty:
-        app.model["delft3dfm"].domain.observation_line_gdf = gdf
-    else:
-        app.model["delft3dfm"].domain.observation_line_gdf = pd.concat([existing_gdf, gdf.loc[[index]]], ignore_index=True)
+def cross_section_created(gdf, index, id):
+    while True:
+        name, okay = app.gui.window.dialog_string("Edit name for new cross section")
+        if not okay:
+            # Cancel was clicked
+            app.map.layer["delft3dfm"].layer["cross_sections"].delete_feature(index)
+            return    
+        if name in app.gui.getvar("delft3dfm", "cross_section_names"):
+            app.gui.window.dialog_info("A cross section with this name already exists !")
+        else:
+            break
+    new_crs = gdf.loc[[index]]        
+    # add "name" to gdf
+    new_crs["name"] = name         
+    app.model["delft3dfm"].domain.cross_sections.add(new_crs)
+    # Need to update map layer because name has changed
+    gdf = app.model["delft3dfm"].domain.cross_sections.gdf
+    app.map.layer["delft3dfm"].layer["cross_sections"].set_data(gdf)
     nrt = len(gdf)
-    app.gui.setvar("delft3dfm", "observation_line_index", nrt - 1)
-    app.gui.setvar("delft3dfm", "active_observation_line", nrt - 1)
-    app.model["delft3dfm"].observation_lines_changed = True
+    app.gui.setvar("delft3dfm", "active_cross_section", nrt - 1)
+    app.model["delft3dfm"].cross_sections_changed = True
     update()
-    # update_grid_snapper()
 
-def obs_lines_modified(gdf, index, id):
-    app.model["delft3dfm"].domain.observation_line_gdf = gdf
-    app.model["delft3dfm"].observation_lines_changed = True
+def cross_section_modified(gdf, index, id):
+    app.model["delft3dfm"].domain.cross_sections.gdf = gdf
+    app.model["delft3dfm"].cross_sections_changed = True
     # update_grid_snapper()
+    update()
 
-def obs_lines_selected(index):
-    app.gui.setvar("delft3dfm", "observation_line_index", index)
-    app.gui.setvar("delft3dfm", "active_observation_line", index)
+def cross_section_selected(index):
+    app.gui.setvar("delft3dfm", "active_cross_section", index)
     update()
 
 def set_model_variables(*args):
     # All variables will be set
     app.model["delft3dfm"].set_model_variables()
 
+def update():
+    nrt = len(app.model["delft3dfm"].domain.cross_sections.gdf)
+    app.gui.setvar("delft3dfm", "nr_cross_sections", nrt)
+    if app.gui.getvar("delft3dfm", "active_cross_section" ) > nrt - 1:
+        app.gui.setvar("delft3dfm", "active_cross_section", max(nrt - 1, 0) )
+    iac = app.gui.getvar("delft3dfm", "active_cross_section")    
+    names = app.model["delft3dfm"].domain.cross_sections.list_names()
+    app.gui.setvar("delft3dfm", "cross_section_names", names)
+    if nrt > 0:
+        app.gui.setvar("delft3dfm", "cross_section_name", names[iac])
+    else:
+        app.gui.setvar("delft3dfm", "cross_section_name", "")
+    app.gui.window.update()
 
-    # nrt = len(app.model["delft3dfm"].domain.observation_lines_gdf)
-    # app.gui.setvar("delft3dfm", "nr_thin_dams", nrt)
-    # app.gui.setvar("delft3dfm", "thin_dam_names", app.model["delft3dfm"].domain.observation_lines.list_names())
-    # app.gui.window.update()
 ###################
 
 # def add_observation_crs_on_map(*args):
