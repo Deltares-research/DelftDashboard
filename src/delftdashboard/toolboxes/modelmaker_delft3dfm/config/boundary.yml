@@ -161,6 +161,24 @@ element:
 #       height: 20
 #     text: Zmin
 #     variable: outflow_boundary_zmin
+- style: panel
+  title: Settings
+  position:
+    x: 240
+    y: 10
+    width: 220
+    height: 120
+  element:
+  - style: edit
+    text: Bnd resolution (m)
+    position:
+      x: 100
+      y: 90
+      width: 80
+      height: 20
+    method: set_resolution
+    variable: boundary_dx
+    tooltip: Set the resolution of the boundary points [m]
 - style: pushbutton
   text: Generate bnd from polygon
   position:
