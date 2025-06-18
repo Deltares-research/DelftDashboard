@@ -26,8 +26,8 @@ def load(*args):
                                           multiple=True)
     if rsp[0]:
         app.model["delft3dfm"].domain.input.output.obsfile = rsp[0] # file name without path
-        app.model["delft3dfm"].domain.read_observation_points()
-        gdf = app.model["delft3dfm"].domain.observation_point_gdf
+        app.model["delft3dfm"].domain.observation_points.read()
+        gdf = app.model["delft3dfm"].domain.observation_points.gdf
         app.map.layer["delft3dfm"].layer["observation_points"].set_data(gdf, 0)
         app.gui.setvar("delft3dfm", "active_observation_point", 0)
         update()
@@ -45,10 +45,11 @@ def save(*args):
         app.model["delft3dfm"].domain.input.output.obsfile = [] # first clear obsfile list to add combined / new points
         app.model["delft3dfm"].domain.input.output.obsfile.append(XYNModel())
         app.model["delft3dfm"].domain.input.output.obsfile[0].filepath=Path(rsp[2]) # save all obs points in 1 file
-        app.model["delft3dfm"].domain.write_observation_points()
+        # app.model["delft3dfm"].domain.write_observation_points()
+        app.model["delft3dfm"].domain.observation_points.write()
 
 def update():
-    gdf = app.model["delft3dfm"].domain.observation_point_gdf
+    gdf = app.model["delft3dfm"].domain.observation_points.gdf
     names = []
     for index, row in gdf.iterrows():
         names.append(row["name"])
@@ -69,9 +70,9 @@ def point_clicked(x, y):
         app.gui.window.dialog_info("An observation point with this name already exists !")
         return
     # app.model["delft3dfm"].domain.add_observation_point(x, y, name=name)
-    app.model["delft3dfm"].domain.add_observation_point_gdf(x, y, name=name)
-    index = len(app.model["delft3dfm"].domain.observation_point_gdf) - 1
-    gdf = app.model["delft3dfm"].domain.observation_point_gdf
+    app.model["delft3dfm"].domain.observation_points.add_point(x, y, name)
+    index = len(app.model["delft3dfm"].domain.observation_points.gdf) - 1
+    gdf = app.model["delft3dfm"].domain.observation_points.gdf
     app.map.layer["delft3dfm"].layer["observation_points"].set_data(gdf, index)
     app.gui.setvar("delft3dfm", "active_observation_point", index)
     update()
@@ -92,8 +93,8 @@ def select_observation_point_from_map(*args):
 def delete_point_from_list(*args):
     map.reset_cursor()
     index = app.gui.getvar("delft3dfm", "active_observation_point")
-    app.model["delft3dfm"].domain.delete_observation_point(index)
-    gdf = app.model["delft3dfm"].domain.observation_point_gdf
+    app.model["delft3dfm"].domain.observation_point.delete_point(index)
+    gdf = app.model["delft3dfm"].domain.observation_points.gdf
     index = max(min(index, len(gdf) - 1), 0)
     app.map.layer["delft3dfm"].layer["observation_points"].set_data(gdf, index)
     app.gui.setvar("delft3dfm", "active_observation_point", index)

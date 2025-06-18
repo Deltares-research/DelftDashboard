@@ -98,6 +98,7 @@ class Model(GenericModel):
         from .observation_points_regular import select_observation_point_from_map
         layer.add_layer("observation_points",
                         type="circle_selector",
+                        hover_property="name",
                         select=select_observation_point_from_map,
                         line_color="white",
                         line_opacity=1.0,
@@ -112,14 +113,14 @@ class Model(GenericModel):
         from .observation_points_crs import obs_lines_selected
         from .observation_points_crs import obs_lines_modified
         layer.add_layer("observation_lines",
-                            type="draw",
-                            shape="polyline",
-                            create=obs_lines_created,
-                            modify=obs_lines_modified,
-                            select=obs_lines_selected,
-                            polyline_line_color="yellow",
-                            polyline_line_width=2.0,
-                            polyline_line_opacity=1.0)
+                        type="draw",
+                        shape="polyline",
+                        create=obs_lines_created,
+                        modify=obs_lines_modified,
+                        select=obs_lines_selected,
+                        polyline_line_color="yellow",
+                        polyline_line_width=2.0,
+                        polyline_line_opacity=1.0)
         
         # from .observation_points_spectra import select_observation_point_from_map_spectra
         # layer.add_layer("observation_points_spectra",
@@ -354,7 +355,8 @@ class Model(GenericModel):
         app.map.layer["delft3dfm"].layer["boundary_line"].set_data(self.domain.boundary_conditions.gdf)
 
         # Observation points
-        app.map.layer["delft3dfm"].layer["observation_points"].set_data(app.model["delft3dfm"].domain.observation_point_gdf, 0)
+        # app.map.layer["delft3dfm"].layer["observation_points"].set_data(app.model["delft3dfm"].domain.observation_point_gdf, 0)
+        app.map.layer["delft3dfm"].layer["observation_points"].set_data(app.model["delft3dfm"].domain.observation_points.gdf, 0)
 
         # Observation cross sections
         # app.map.layer["delft3dfm"].layer["observation_lines"].set_data(app.model["delft3dfm"].domain.observation_line_gdf)
