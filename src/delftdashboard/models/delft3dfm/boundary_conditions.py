@@ -18,7 +18,7 @@ def select(*args):
     map.update()
     app.map.layer["delft3dfm"].layer["boundary_line"].activate()
     app.map.layer["delft3dfm"].layer["grid"].activate()
-    update_list()
+    # update_list()
 
 def deselect(*args):
     if app.model["delft3dfm"].boundaries_changed:
