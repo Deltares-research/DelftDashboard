@@ -93,7 +93,7 @@ def select_observation_point_from_map(*args):
 def delete_point_from_list(*args):
     map.reset_cursor()
     index = app.gui.getvar("delft3dfm", "active_observation_point")
-    app.model["delft3dfm"].domain.observation_point.delete_point(index)
+    app.model["delft3dfm"].domain.observation_points.delete_point(index)
     gdf = app.model["delft3dfm"].domain.observation_points.gdf
     index = max(min(index, len(gdf) - 1), 0)
     app.map.layer["delft3dfm"].layer["observation_points"].set_data(gdf, index)
