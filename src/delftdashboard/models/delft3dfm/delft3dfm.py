@@ -32,7 +32,7 @@ class Model(GenericModel):
         self.observation_points_changed = False
         self.cross_sections_changed = False
         # self.discharge_points_changed = False
-        # self.boundaries_changed = False
+        self.boundaries_changed = False
         self.thin_dams_changed = False
 
     def get_view_menu(self):
