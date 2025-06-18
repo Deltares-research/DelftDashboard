@@ -34,9 +34,12 @@ def select_track(*args):
     dataset_name = app.gui.getvar("tropical_cyclone", "selected_track_dataset")
     dataset = app.toolbox["tropical_cyclone"].cyclone_track_database.get_dataset(dataset_name)
 
+    # Get the center of the map
+    center = app.map.map_center
+
     # Open track selector
     tc, okay = track_selector(dataset,
-        app, lon=125.0, lat=11.0, distance=300.0, year_min=2000, year_max=2023
+        app, lon=center[0], lat=center[1], distance=300.0, year_min=2000, year_max=2025
     )
 
     if okay:
