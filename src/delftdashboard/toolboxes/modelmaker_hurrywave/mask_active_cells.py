@@ -16,11 +16,9 @@ def select(*args):
     # Show the mask include and exclude polygons
     app.map.layer["modelmaker_hurrywave"].layer["mask_include"].activate()
     app.map.layer["modelmaker_hurrywave"].layer["mask_exclude"].activate()
-    # Show the grid and mask
-    
+    # Show the grid and mask    
     app.map.layer["hurrywave"].layer["grid"].activate()
-    app.map.layer["hurrywave"].layer["mask_include"].activate()
-    app.map.layer["hurrywave"].layer["mask_boundary"].activate()
+    app.map.layer["hurrywave"].layer["mask"].activate()
 
 def draw_include_polygon(*args):
     app.map.layer["modelmaker_hurrywave"].layer["mask_include"].crs = app.crs
@@ -123,4 +121,6 @@ def update():
 def update_mask(*args):
     app.toolbox["modelmaker_hurrywave"].update_mask()
 
+def cut_inactive_cells(*args):
+    app.toolbox["modelmaker_hurrywave"].cut_inactive_cells()
 
