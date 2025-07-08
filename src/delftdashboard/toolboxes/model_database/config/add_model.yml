@@ -103,6 +103,7 @@ element:
   text: Choose collection
   text_position: above
   method: select_collection
+  module: delftdashboard.toolboxes.model_database.add_model
   variable: selected_collection_toml
   variable_group: model_database
   select: item

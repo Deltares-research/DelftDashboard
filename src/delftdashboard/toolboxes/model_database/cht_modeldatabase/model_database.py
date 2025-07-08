@@ -18,7 +18,7 @@ class ModelDatabase:
     """
     The main model Database class
 
-    :param path: Path name where model_database.toml is stored.
+    :param path: Path name where model_database is stored.
     :type path: string
     """
 
@@ -30,66 +30,62 @@ class ModelDatabase:
         self.initialized = True
        
     def read(self):
-        """
-        Reads meta-data of all models in the database. 
-        """
-
         if self.path is None:
-            print("Path to bathymetry database not set !")
+            print("Path to model database not set!")
             return
-        
-        # Check if the path exists. If not, create it.
+
         if not os.path.exists(self.path):
             os.makedirs(self.path)
 
-        # Read in database
+        # Always expect this file
         tml_file = os.path.join(self.path, "model_database.tml")
-
         if not os.path.exists(tml_file):
-            print("Warning! Model database file not found: " + tml_file)
+            print("Error! Required model database file not found: " + tml_file)
             return
 
-        collections = toml.load(tml_file)
+        # Load collections
+        try:
+            collections = toml.load(tml_file)["collection"]
+        except Exception as e:
+            print(f"Failed to load model_database.tml: {e}")
+            return
 
-        for d in collections["collection"]:
+        for d in collections:
+            collection_name = d["name"]
+            collection_path = d.get("path", os.path.join(self.path, collection_name))
 
-            name = d["name"]
+            if not os.path.exists(collection_path):
+                print(f"Collection path does not exist: {collection_path}")
+                continue
 
-            if "path" in d:
-                path = d["path"]
-            else:
-                path = os.path.join(self.path, name)
+            # Traverse: collection/type/model/
+            for type_name in os.listdir(collection_path):
+                type_path = os.path.join(collection_path, type_name)
+                if not os.path.isdir(type_path):
+                    continue
 
-            # Read the meta data for this collection
-            fname = os.path.join(path, "collection" + ".tml") # add type?
-
-            if os.path.exists(fname):
-                collection_metadata = toml.load(fname)
-
-                for m in collection_metadata["model"]:
-
-                    name = m["name"]
-                    type = m["type"]
-
-                    model_path = os.path.join(path, type, name)
-                    model_metadata_path = os.path.join(model_path, "model.toml")
-                    if os.path.exists(model_metadata_path):     
-                        model_metadata = toml.load(model_metadata_path)
-                        if "path" in model_metadata:
-                            model_path = model_metadata["path"]
-                            
-                    else:
-                        print("Could not find model path for " + name + " ! Skipping domain.")
+                for model_name in os.listdir(type_path):
+                    model_path = os.path.join(type_path, model_name)
+                    if not os.path.isdir(model_path):
                         continue
 
-                    model = Deltares_Model(name = f"{type}_{name}", path = model_path, type = type, collection = d["name"])
-                    #model.database = self    
-            
+                    model_metadata_path = os.path.join(model_path, "model.toml")
+                    if os.path.exists(model_metadata_path):
+                        model_metadata = toml.load(model_metadata_path)
+                        actual_model_path = model_metadata.get("path", model_path)
+                    else:
+                        print(f"Missing model.toml for model '{model_name}' in type '{type_name}' — skipping.")
+                        continue
+
+                    full_model_name = f"{type_name}_{model_name}"
+                    model = Deltares_Model(
+                        name=full_model_name,
+                        path=actual_model_path,
+                        type=type_name,
+                        collection=collection_name
+                    )
                     self.model.append(model)
 
-            else:
-                print("Could not find collection file for " + name + " ! Skipping collection.")
-                continue
 
 
 
