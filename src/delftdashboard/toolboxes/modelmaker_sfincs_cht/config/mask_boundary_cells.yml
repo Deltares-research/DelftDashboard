@@ -249,7 +249,7 @@ element:
     text_position: above-left
     variable: neumann_boundary_zmin
 - style: panel
-  title: Neumann Boundary Polygons
+  title: Outflow Boundary Polygons
   position:
     x: 475
     y: 10

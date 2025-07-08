@@ -66,7 +66,7 @@ def delete_thin_dam(*args):
     app.model["sfincs_cht"].thin_dams_changed = True
     update()
 
-    # update_grid_snapper()
+    update_grid_snapper()
 
 def select_thin_dam(*args):
     pass
@@ -77,12 +77,12 @@ def thin_dam_created(gdf, index, id):
     app.gui.setvar("sfincs_cht", "thin_dam_index", nrt - 1)
     app.model["sfincs_cht"].thin_dams_changed = True
     update()
-    # update_grid_snapper()
+    update_grid_snapper()
 
 def thin_dam_modified(gdf, index, id):
     app.model["sfincs_cht"].domain.thin_dams.gdf = gdf
     app.model["sfincs_cht"].thin_dams_changed = True
-    # update_grid_snapper()
+    update_grid_snapper()
 
 def thin_dam_selected(index):
     app.gui.setvar("sfincs_cht", "thin_dam_index", index)
@@ -96,6 +96,8 @@ def update_grid_snapper():
     snap_gdf = app.model["sfincs_cht"].domain.thin_dams.snap_to_grid()
     if len(snap_gdf) > 0:
         app.map.layer["sfincs_cht"].layer["thin_dams"].layer["snapped"].set_data(snap_gdf)
+    else:
+        app.map.layer["sfincs_cht"].layer["thin_dams"].layer["snapped"].clear()
 
 def update():
     nrt = len(app.model["sfincs_cht"].domain.thin_dams.gdf)
