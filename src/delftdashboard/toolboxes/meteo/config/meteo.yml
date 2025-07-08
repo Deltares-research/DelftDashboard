@@ -1,7 +1,17 @@
 element:
-- style: panel
+- style: tabpanel
   position:
     x: 10
     y: 10
     width: -10
     height: 160
+  tab:
+  - string: Datasets
+    module: delftdashboard.toolboxes.meteo.datasets
+    element: datasets.yml
+  - string: Download
+    module: delftdashboard.toolboxes.meteo.download
+    element: download.yml
+  - string: Model Forcing
+    module: delftdashboard.toolboxes.meteo.model_forcing
+    element: model_forcing.yml

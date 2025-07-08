@@ -15,26 +15,26 @@ element:
   - string: Geometry
     element: geometry.yml
   - string: Time Frame
-    module: delftdashboard.models.delft3dfm.generic
+    module: delftdashboard.models.delft3dfm.timeframe
     element: timeframe.yml
   - string: Physics
     element: physics.yml
   - string: Numerics
     module: delftdashboard.models.delft3dfm.generic
     element: numerics.yml
-  - string: Boundary Conditions
-    module: delftdashboard.models.delft3dfm.boundary_conditions
-    element: boundary_conditions.yml
-  - string: Waves
-    element: waves.yml
+  # - string: Boundary Conditions
+  #   module: delftdashboard.models.delft3dfm.boundary_conditions
+    # element: boundary_conditions.yml
+  # - string: Waves
+  #   element: waves.yml
   - string: Meteo
     module: delftdashboard.models.delft3dfm.meteo
     element: meteo.yml
-  - string: Observation Points
+  - string: Observations
     element: observation_points.yml
-  - string: Structures
-    module: delftdashboard.models.delft3dfm.generic
-    element: structures.yml
+  # - string: Structures
+  #   module: delftdashboard.models.delft3dfm.generic
+  #   element: structures.yml
   - string: Output
     module: delftdashboard.models.delft3dfm.generic
     element: output.yml

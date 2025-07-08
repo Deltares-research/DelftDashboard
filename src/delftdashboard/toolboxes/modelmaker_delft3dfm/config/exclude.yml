@@ -193,6 +193,7 @@ element:
     width: 170
     height: 20
   method: cut_polygon
+  tooltip: Delete cells inside polygon
 - style: pushbutton
   text: Delete cells based on coastline
   position:
@@ -201,4 +202,5 @@ element:
     width: 170
     height: 20
   method: cut_coastline
+  tooltip: Delete cells based on global coastline dataset (cells on land will be deleted)
 

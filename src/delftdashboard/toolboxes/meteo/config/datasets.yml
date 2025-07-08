@@ -1,0 +1,90 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 300
+    height: 110
+  text: Datasets
+  text_position: above
+  method: select_dataset
+  variable: selected_dataset
+  select: item
+  option_string:
+    variable: dataset_long_names
+  option_value:
+    variable: dataset_names
+- style: pushbutton
+  text: Draw Bounding Box
+  position:
+    x: 320
+    y: 100
+    width: 200
+    height: 20
+  method: draw_bounding_box
+  tooltip: Draw bounding box for new dataset
+- style: popupmenu
+  position:
+    x: 320
+    y: 75
+    width: 200
+    height: 20
+  text: Source
+  text_position: right
+  method: select_source
+  variable: selected_source
+  select: item
+  option_string:
+    variable: source_long_names
+  option_value:
+    variable: source_names
+- style: pushbutton
+  text: Add Dataset
+  position:
+    x: 320
+    y: 25
+    width: 120
+    height: 20
+  method: add_dataset
+  tooltip: Add new meteo dataset
+- style: edit
+  text: Lon Min
+  variable: lon_min
+  position:
+    x: 600
+    y: 75
+    width: 50
+    height: 20
+  method: edit_bbox
+  tooltip: Add minimum longitude
+- style: edit
+  text: Lon Max
+  textposition: right
+  variable: lon_max
+  position:
+    x: 700
+    y: 75
+    width: 50
+    height: 20
+  method: edit_bbox
+  tooltip: Add maximum longitude
+- style: edit
+  text: Lat Max
+  variable: lat_max
+  position:
+    x: 650
+    y: 100
+    width: 50
+    height: 20
+  method: edit_bbox
+  tooltip: Add maximum latitude
+- style: edit
+  text: Lat Min
+  variable: lat_min
+  position:
+    x: 650
+    y: 50
+    width: 50
+    height: 20
+  method: edit_bbox
+  tooltip: Add minimum latitude

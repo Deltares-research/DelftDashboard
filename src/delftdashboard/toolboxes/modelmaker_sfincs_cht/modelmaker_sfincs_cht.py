@@ -42,6 +42,8 @@ class Toolbox(GenericToolbox):
         self.exclude_polygon = gpd.GeoDataFrame()
         # Boundary polygons
         self.open_boundary_polygon = gpd.GeoDataFrame()
+        self.downstream_boundary_polygon = gpd.GeoDataFrame()
+        self.neumann_boundary_polygon = gpd.GeoDataFrame()
         self.outflow_boundary_polygon = gpd.GeoDataFrame()
         # Include polygons SnapWave
         self.include_polygon_snapwave = gpd.GeoDataFrame()
@@ -121,6 +123,20 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "nr_open_boundary_polygons", 0)
         app.gui.setvar(group, "open_boundary_zmax",  99999.0)
         app.gui.setvar(group, "open_boundary_zmin", -99999.0)
+
+        app.gui.setvar(group, "downstream_boundary_polygon_file", "downstream_boundary.geojson")
+        app.gui.setvar(group, "downstream_boundary_polygon_names", [])
+        app.gui.setvar(group, "downstream_boundary_polygon_index", 0)
+        app.gui.setvar(group, "nr_downstream_boundary_polygons", 0)
+        app.gui.setvar(group, "downstream_boundary_zmax",  99999.0)
+        app.gui.setvar(group, "downstream_boundary_zmin", -99999.0)
+
+        app.gui.setvar(group, "neumann_boundary_polygon_file", "neumann_boundary.geojson")
+        app.gui.setvar(group, "neumann_boundary_polygon_names", [])
+        app.gui.setvar(group, "neumann_boundary_polygon_index", 0)
+        app.gui.setvar(group, "nr_neumann_boundary_polygons", 0)
+        app.gui.setvar(group, "neumann_boundary_zmax",  99999.0)
+        app.gui.setvar(group, "neumann_boundary_zmin", -99999.0)
 
         app.gui.setvar(group, "outflow_boundary_polygon_file", "outflow_boundary.geojson")
         app.gui.setvar(group, "outflow_boundary_polygon_names", [])
@@ -236,7 +252,7 @@ class Toolbox(GenericToolbox):
                              polygon_line_color="orangered",
                              polygon_fill_color="orangered",
                              polygon_fill_opacity=0.1)
-        # Boundary
+        # Open boundary
         from .mask_boundary_cells import open_boundary_polygon_created
         from .mask_boundary_cells import open_boundary_polygon_modified
         from .mask_boundary_cells import open_boundary_polygon_selected
@@ -248,7 +264,30 @@ class Toolbox(GenericToolbox):
                              polygon_line_color="deepskyblue",
                              polygon_fill_color="deepskyblue",
                              polygon_fill_opacity=0.1)
-
+        # Downstream boundary
+        from .mask_boundary_cells import downstream_boundary_polygon_created
+        from .mask_boundary_cells import downstream_boundary_polygon_modified
+        from .mask_boundary_cells import downstream_boundary_polygon_selected
+        layer.add_layer("downstream_boundary_polygon", type="draw",
+                                shape="polygon",
+                                create=downstream_boundary_polygon_created,
+                                modify=downstream_boundary_polygon_modified,
+                                select=downstream_boundary_polygon_selected,
+                                polygon_line_color="purple",
+                                polygon_fill_color="purple",
+                                polygon_fill_opacity=0.1)
+        # Neumann boundary
+        from .mask_boundary_cells import neumann_boundary_polygon_created
+        from .mask_boundary_cells import neumann_boundary_polygon_modified
+        from .mask_boundary_cells import neumann_boundary_polygon_selected
+        layer.add_layer("neumann_boundary_polygon", type="draw",
+                                shape="polygon",
+                                create=neumann_boundary_polygon_created,
+                                modify=neumann_boundary_polygon_modified,
+                                select=neumann_boundary_polygon_selected,
+                                polygon_line_color="magenta",
+                                polygon_fill_color="magenta",
+                                polygon_fill_opacity=0.1)     
         # Outflow boundary
         from .mask_boundary_cells import outflow_boundary_polygon_created
         from .mask_boundary_cells import outflow_boundary_polygon_modified
@@ -258,7 +297,7 @@ class Toolbox(GenericToolbox):
                              create=outflow_boundary_polygon_created,
                              modify=outflow_boundary_polygon_modified,
                              select=outflow_boundary_polygon_selected,
-                             polygon_line_color="red",
+                             polygon_line_color="orange",
                              polygon_fill_color="orange",
                              polygon_fill_opacity=0.1)
 
@@ -367,7 +406,7 @@ class Toolbox(GenericToolbox):
 
         model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation,
                          refinement_polygons=refpol,
-                         bathymetry_sets=app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets,
+                         bathymetry_sets=app.selected_bathymetry_datasets,
                          bathymetry_database=app.bathymetry_database)
 
         # Save grid 
@@ -424,6 +463,12 @@ class Toolbox(GenericToolbox):
                    open_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon,
                    open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmin"),
                    open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmax"),
+                   downstream_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon,
+                   downstream_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_zmin"),
+                   downstream_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_zmax"),
+                   neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon,
+                   neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmin"),
+                   neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmax"),
                    outflow_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon,
                    outflow_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmin"),
                    outflow_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmax"),
@@ -580,6 +625,26 @@ class Toolbox(GenericToolbox):
             gdf = mpol2pol(gpd.read_file(fname))
             self.open_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.open_boundary_polygon, gdf], ignore_index=True))
 
+    def read_downstream_boundary_polygon(self, fname, append):
+        if not append:
+            # New file
+            app.gui.setvar("modelmaker_sfincs_cht", "downstream_boundary_polygon_file", fname)
+            self.downstream_boundary_polygon = mpol2pol(gpd.read_file(fname))
+        else:
+            # Append to existing file
+            gdf = mpol2pol(gpd.read_file(fname))
+            self.downstream_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.downstream_boundary_polygon, gdf], ignore_index=True))
+
+    def read_neumann_boundary_polygon(self, fname, append):
+        if not append:
+            # New file
+            app.gui.setvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_file", fname)
+            self.neumann_boundary_polygon = mpol2pol(gpd.read_file(fname))
+        else:
+            # Append to existing file
+            gdf = mpol2pol(gpd.read_file(fname))
+            self.neumann_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.neumann_boundary_polygon, gdf], ignore_index=True))
+
     def read_outflow_boundary_polygon(self, fname, append):
         if not append:
             # New file
@@ -679,6 +744,20 @@ class Toolbox(GenericToolbox):
         fname = app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
 
+    def write_downstream_boundary_polygon(self):
+        if len(self.downstream_boundary_polygon) == 0:
+            return
+        gdf = gpd.GeoDataFrame(geometry=self.downstream_boundary_polygon["geometry"])
+        fname = app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_polygon_file")
+        gdf.to_file(fname, driver='GeoJSON')
+
+    def write_neumann_boundary_polygon(self):
+        if len(self.neumann_boundary_polygon) == 0:
+            return
+        gdf = gpd.GeoDataFrame(geometry=self.neumann_boundary_polygon["geometry"])
+        fname = app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_file")
+        gdf.to_file(fname, driver='GeoJSON')    
+
     def write_outflow_boundary_polygon(self):
         if len(self.outflow_boundary_polygon) == 0:
             return
@@ -714,14 +793,10 @@ class Toolbox(GenericToolbox):
         fname = app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_file_snapwave")
         gdf.to_file(fname, driver='GeoJSON')
 
-
-    # PLOT
-
+    # Plot
     def plot_refinement_polygon(self):
         layer = app.map.layer["modelmaker_sfincs_cht"].layer["quadtree_refinement"]
         layer.set_data(self.refinement_polygon)
-        # layer.clear()
-        # layer.add_feature(self.refinement_polygon)
 
     def plot_include_polygon(self):
         layer = app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"]
@@ -737,6 +812,16 @@ class Toolbox(GenericToolbox):
         layer = app.map.layer["modelmaker_sfincs_cht"].layer["open_boundary_polygon"]
         layer.clear()
         layer.add_feature(self.open_boundary_polygon)
+
+    def plot_downstream_boundary_polygon(self):
+        layer = app.map.layer["modelmaker_sfincs_cht"].layer["downstream_boundary_polygon"]
+        layer.clear()
+        layer.add_feature(self.downstream_boundary_polygon)
+
+    def plot_neumann_boundary_polygon(self):
+        layer = app.map.layer["modelmaker_sfincs_cht"].layer["neumann_boundary_polygon"]
+        layer.clear()
+        layer.add_feature(self.neumann_boundary_polygon)    
 
     def plot_outflow_boundary_polygon(self):
         layer = app.map.layer["modelmaker_sfincs_cht"].layer["outflow_boundary_polygon"]
@@ -902,6 +987,26 @@ class Toolbox(GenericToolbox):
                 # Now read in polygons from geojson file
                 self.read_open_boundary_polygon(dct["mask"]["open_boundary"]["polygon_file"], False)
                 self.plot_open_boundary_polygon()
+        # Now do the same for downstream boundary polygons
+        if "downstream_boundary" in dct["mask"]:
+            if "zmin" in dct["mask"]["downstream_boundary"]:
+                app.gui.setvar(group, "downstream_boundary_zmin", dct["mask"]["downstream_boundary"]["zmin"])
+            if "zmax" in dct["mask"]["downstream_boundary"]:
+                app.gui.setvar(group, "downstream_boundary_zmax", dct["mask"]["downstream_boundary"]["zmax"])
+            if "polygon_file" in dct["mask"]["downstream_boundary"]:
+                # Now read in polygons from geojson file
+                self.read_downstream_boundary_polygon(dct["mask"]["downstream_boundary"]["polygon_file"], False)
+                self.plot_downstream_boundary_polygon()
+        # Now do the same for neumann boundary polygons
+        if "neumann_boundary" in dct["mask"]:
+            if "zmin" in dct["mask"]["neumann_boundary"]:
+                app.gui.setvar(group, "neumann_boundary_zmin", dct["mask"]["neumann_boundary"]["zmin"])
+            if "zmax" in dct["mask"]["neumann_boundary"]:
+                app.gui.setvar(group, "neumann_boundary_zmax", dct["mask"]["neumann_boundary"]["zmax"])
+            if "polygon_file" in dct["mask"]["neumann_boundary"]:
+                # Now read in polygons from geojson file
+                self.read_neumann_boundary_polygon(dct["mask"]["neumann_boundary"]["polygon_file"], False)
+                self.plot_neumann_boundary_polygon()        
         # Now do the same for outflow boundary polygons
         if "outflow_boundary" in dct["mask"]:
             if "zmin" in dct["mask"]["outflow_boundary"]:
@@ -1027,6 +1132,16 @@ class Toolbox(GenericToolbox):
             dct["mask"]["open_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmax")
             dct["mask"]["open_boundary"]["zmin"] = app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmin")
             dct["mask"]["open_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_polygon_file")
+        dct["mask"]["downstream_boundary"] = {}
+        if len(app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon)>0:
+            dct["mask"]["downstream_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_zmax")
+            dct["mask"]["downstream_boundary"]["zmin"] = app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_zmin")
+            dct["mask"]["downstream_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_polygon_file")
+        dct["mask"]["neumann_boundary"] = {}
+        if len(app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon)>0:
+            dct["mask"]["neumann_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmax")
+            dct["mask"]["neumann_boundary"]["zmin"] = app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmin")
+            dct["mask"]["neumann_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_file")    
         dct["mask"]["outflow_boundary"] = {}
         if len(app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon)>0:
             dct["mask"]["outflow_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmax")
@@ -1079,6 +1194,8 @@ class Toolbox(GenericToolbox):
         app.toolbox["modelmaker_sfincs_cht"].write_include_polygon()
         app.toolbox["modelmaker_sfincs_cht"].write_exclude_polygon()
         app.toolbox["modelmaker_sfincs_cht"].write_open_boundary_polygon()
+        app.toolbox["modelmaker_sfincs_cht"].write_downstream_boundary_polygon()
+        app.toolbox["modelmaker_sfincs_cht"].write_neumann_boundary_polygon()
         app.toolbox["modelmaker_sfincs_cht"].write_outflow_boundary_polygon()
         app.toolbox["modelmaker_sfincs_cht"].write_refinement_polygon()
         app.toolbox["modelmaker_sfincs_cht"].write_include_polygon_snapwave()
