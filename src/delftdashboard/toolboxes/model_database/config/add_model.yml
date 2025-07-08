@@ -103,14 +103,11 @@ element:
   text: Choose collection
   text_position: above
   method: select_collection
-  variable: active_collection
+  variable: selected_collection_toml
   variable_group: model_database
-  select: active_collection_index
+  select: item
   option_string:
-    variable: collection_names
-    variable_group: model_database
-  option_value:
-    variable: collection_names
+    variable: selected_collection_names
     variable_group: model_database
 
 

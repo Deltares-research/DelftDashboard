@@ -47,10 +47,10 @@ def select_model(*args):
 
 def select_collection(*args):
     group = "model_database"
-    names = app.gui.getvar(group, "collection_names")
-    index = app.gui.getvar(group, "active_collection_index")
+    names = app.gui.getvar(group, "selected_collection_names")
+    index = app.gui.getvar(group, "selected_collection_index")
     name  = names[index]
-    app.gui.setvar(group, "active_collection", name)
+    app.gui.setvar(group, "selected_collection_toml", name)
     pass
 
     
@@ -76,7 +76,7 @@ def write_toml_file(self) -> None:
     model_name = model_data["active_model_name"] or "model"
 
     # Go one directory up from the model path
-    toml_path = os.path.join(os.path.dirname(app.active_model.domain.path), f"model_new.toml")
+    toml_path = os.path.join(os.path.dirname(app.active_model.domain.path), f"model_new.toml") # Include the collection here if needed
 
     with open(toml_path, "w") as toml_file:
         toml.dump(model_data, toml_file)
