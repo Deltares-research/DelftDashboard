@@ -14,12 +14,15 @@ Usage:
 
 import os
 import geopandas as gpd
+import pandas as pd
 import fiona
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from shapely.ops import transform
 import pyproj
 from typing import List, Dict, Any, Union
+import matplotlib.colors as colors
+import matplotlib.cm as cm
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
@@ -38,7 +41,7 @@ class Toolbox(GenericToolbox):
         """
         super().__init__()
         self.name: str = name
-        self.long_name: str = "Model Database"
+        self.long_name: str = "Domain Database"
         self.gdf: gpd.GeoDataFrame = gpd.GeoDataFrame()
 
     def initialize(self) -> None:
@@ -48,31 +51,109 @@ class Toolbox(GenericToolbox):
         if "model_database_path" not in app.config:
             app.config["model_database_path"] = os.path.join(app.config["data_path"], "model_database")
 
-        app.model_database = ModelDatabase(path=app.config["model_database_path"],
-                                          )
-        short_names, long_names = app.model_database.dataset_names()
+        app.model_database = ModelDatabase(path=app.config["model_database_path"])
+        app.selected_collections = []
+        app.selected_domains = []
+        app.domains = []
 
+        collection_names, collections_long_names = app.model_database.collections()
+        model_names, model_long_names, model_source_names = app.model_database.model_names(collection=collection_names[0])
+        
         # GUI variables
         group = "model_database"
-        if len(short_names) == 0:
-            raise Exception("No collections found in model database")
+        if len(model_names) == 0:
+            raise Exception("No models found in model database")
         else:
-            app.gui.setvar(group, "collection_names", short_names)
-            app.gui.setvar(group, "collection_long_names", long_names)
-            app.gui.setvar(group, "collection", short_names[0])
-            app.gui.setvar(group, "buffer", 100.0)
-            app.gui.setvar(group, "nr_selected_models", 0)
+            app.gui.setvar(group, "collection_names", collection_names)
+            app.gui.setvar(group, "collection_long_names", collections_long_names)
+            app.gui.setvar(group, "collection", collection_names[0])
+            app.gui.setvar(group, "collection_index", 0)
+            
+            app.gui.setvar(group, "selected_collection_index", 0)
+            app.gui.setvar(group, "selected_collection_names", [])
+            app.gui.setvar(group, "selected_domain_index", 0)
+            app.gui.setvar(group, "selected_domain_names", [])
+            app.gui.setvar(group, "domain_index", 0)
+            app.gui.setvar(group, "domain_names", [])
+            app.gui.setvar(group, "domain_index_all", 0)
+            app.gui.setvar(group, "domain_names_all", [])
+            app.gui.setvar(group, "select_sfincs", True)
+            app.gui.setvar(group, "select_hurrywave", True)
+
+            app.gui.setvar(group, "active_model_name", [])
+            app.gui.setvar(group, "active_model_long_name", [])
+            app.gui.setvar(group, "active_model_type", [])  
+            app.gui.setvar(group, "active_model_crs", [])
+            app.gui.setvar(group, "active_collection_index", 0)
+
+            app.gui.setvar(group, "active_collection", collection_names[0])
+            app.gui.setvar(group, "flow_nested", None)
+            app.gui.setvar(group, "flow_spinup_time", 24.0)
+            app.gui.setvar(group, "station", None)
+
+            app.gui.setvar(group, "make_flood_map", True)
+            app.gui.setvar(group, "make_water_level_map", True)
+            app.gui.setvar(group, "make_precipitation_map", True)
+
+
+            model_settings = {
+                "model_name": "No model selected yet",
+                "long_name": None,
+                "type": None,
+                "crs": None,
+                "flow_nested": None,
+                "flow_spinup_time": None,
+                "wave_spinup_time": None,
+                "vertical_reference_level_name": None,
+                "vertical_reference_level_difference_with_msl": None,
+                "boundary_water_level_correction": None,
+                "station": None,
+                "make_flood_map": False,
+                "make_water_level_map": False,
+                "make_precipitation_map": False,
+                "make_wave_map": False,
+                }
+
+            df = pd.DataFrame(list(model_settings.items()), columns=["Setting", "Value"])
+            df.set_index("Setting", inplace=True)
+    
+            app.gui.setvar(group, "model_settings", df)
+
+
+            
             # app.gui.setvar(group, "level_names", app.watersheds_database.dataset[short_names[0]].level_names)
             # app.gui.setvar(group, "level_long_names", app.watersheds_database.dataset[short_names[0]].level_long_names)
             # app.gui.setvar(group, "level", app.watersheds_database.dataset[short_names[0]].level_names[0])
 
-# #     def select_tab(self) -> None:
-# #         """
-# #         Select the watersheds tab and update the map.
-# #         """
-# #         map.update()
-# #         app.map.layer["watersheds"].show()
-# #         app.map.layer["watersheds"].layer["boundaries"].activate()
+    def select_tab(self) -> None:
+        """
+        Select the domain database tab and update the map.
+        """
+        app.active_model.set_layer_mode("invisible")
+        map.update()
+
+
+    def add_layers(self) -> None:
+        """
+        Add layers to the map for the models.
+        """
+        layer = app.map.add_layer("model_database")
+        layer.add_layer("boundaries",
+                        type="polygon_selector",
+                        hover_property="name",
+                        line_color= "line_color",
+                        line_opacity=1.0,
+                        line_color_selected="dodgerblue",
+                        line_opacity_selected=1.0,
+                        fill_color="line_color",
+                        fill_opacity=0.2,
+                        fill_color_selected="dodgerblue",
+                        fill_opacity_selected=0.6,
+                        fill_color_hover="line_color",
+                        fill_opacity_hover=0.35,
+                        selection_type="single",
+                        select=self.select_model_from_map
+                        )
 
     def set_layer_mode(self, mode: str) -> None:
         """
@@ -87,180 +168,100 @@ class Toolbox(GenericToolbox):
             # Make all layers invisible
             app.map.layer["model_database"].hide()
 
-    def add_layers(self) -> None:
+
+
+    def select_model_from_map(self, feature: Dict[str, Any], layer: Any) -> None:
         """
-        Add layers to the map for the watersheds.
+        Select models from the map.
+
+        Parameters:
+        features (List[Dict[str, Any]]): List of selected features.
+        layer (Any): The layer from which the features were selected.
         """
-        layer = app.map.add_layer("model_database")
-        layer.add_layer("boundaries",
-                         type="polygon_selector",
-                         hover_property="name",
-                         line_color="white",
-                         line_opacity=0.5,
-                         line_color_selected="dodgerblue",
-                         line_opacity_selected=1.0,
-                         fill_color="dodgerblue",
-                         fill_opacity=0.0,
-                         fill_color_selected="dodgerblue",
-                         fill_opacity_selected=0.6,
-                         fill_color_hover="green",
-                         fill_opacity_hover=0.35,
-                         selection_type="multiple",
-                         #select=self.select_collection
-                        )
 
-#     def select_watershed_from_map(self, features: List[Dict[str, Any]], layer: Any) -> None:
-#         """
-#         Select watersheds from the map.
+        app.selected_domains = []
 
-#         Parameters:
-#         features (List[Dict[str, Any]]): List of selected features.
-#         layer (Any): The layer from which the features were selected.
-#         """
-#         indices = []
-#         ids = []
-#         for feature in features:
-#             indices.append(feature["properties"]["index"])
-#             ids.append(feature["properties"]["id"])
-#         app.gui.setvar("watersheds", "selected_indices", indices)
-#         app.gui.setvar("watersheds", "selected_ids", ids)    
-#         app.gui.setvar("watersheds", "nr_selected_watersheds", len(indices))
-#         app.gui.window.update()
+        domain = {"name", feature["properties"]["name"]}
+        app.selected_domains.append(feature["properties"]["name"])
+        app.gui.setvar("model_database", "selected_domain_names", feature["properties"]["name"])  
+        app.gui.setvar("model_database", "selected_domain_index", feature["properties"]["index"])
 
-#     def update_boundaries_on_map(self) -> None:
-#         """
-#         Update the boundaries of the watersheds on the map.
-#         """
-#         dataset_name = app.gui.getvar("watersheds", "dataset")
-#         dataset = app.watersheds_database.dataset[dataset_name]
-#         extent = app.map.map_extent
-#         xmin = extent[0][0]
-#         ymin = extent[0][1]
-#         xmax = extent[1][0]
-#         ymax = extent[1][1]
-#         level = app.gui.getvar("watersheds", "level")
-
-#         # First check if dataset files need to be downloaded
-#         if not dataset.check_files():
-#             rsp = app.gui.window.dialog_yes_no(f"Dataset {dataset_name} is not locally available. Do you want to try to download it? This may take several minutes.",
-#                                                "Download dataset?")
-#             if rsp:
-#                 wb = app.gui.window.dialog_wait("Downloading watersheds ...")
-#                 dataset.download()
-#                 wb.close()
-#             else:
-#                 return
-#         # Waitbox
-#         wb = app.gui.window.dialog_wait("Loading watersheds ...")
-#         self.gdf = dataset.get_watersheds_in_bbox(xmin, ymin, xmax, ymax, level)
-#         app.map.layer["watersheds"].layer["boundaries"].set_data(self.gdf)
-#         wb.close()
-
-    def select_collection(self) -> None:
-        """
-        Select a collections for the model database.
-        """
-        collection_name = app.gui.getvar("model_database", "collection")
-        collection = app.model_database.dataset[collection_name]
-        app.gui.setvar("model_database", "nr_selected_models", 0)
         app.gui.window.update()
 
-#     def select_level(self) -> None:
-#         """
-#         Select a level for the watersheds.
-#         """
-#         pass
+    
+    def update_boundaries_on_map(self) -> None:
+        """
+        Update the boundaries of the models on the map.
+        """
 
-#     def save(self) -> None:
-#         """
-#         Save the selected watersheds to a file.
-#         """
-#         if len(self.gdf) == 0:
-#             return
+        select_sfincs = app.gui.getvar("model_database", "select_sfincs")
+        select_hurrywave = app.gui.getvar("model_database", "select_hurrywave")
+        selected_collection_names = app.gui.getvar("model_database", "selected_collection_names")
 
-#         dataset_name = app.gui.getvar("watersheds", "dataset")
+        all_model_names = []
+        for collection in selected_collection_names:
+            model_names, _, _ = app.model_database.model_names(collection=collection)
+            all_model_names.extend(model_names)
 
-#         if app.map.crs.to_epsg() != 4326:
-#             crs_string = "_epsg" + str(app.map.crs.to_epsg())
-#         else:
-#             crs_string = ""
+        all_models = []
 
-#         # Loop through gdf
-#         names = []
-#         ids = []
-#         polys = []
-#         for index, row in self.gdf.iterrows():
-#             if row["id"] in app.gui.getvar("watersheds", "selected_ids"):
-#                 ids.append(row["id"])
-#                 names.append(row["name"])
-#                 if row["geometry"].geom_type == "Polygon":
-#                     p = Polygon(row["geometry"].exterior.coords)
-#                     polys.append(p)
-#                 else:
-#                     # Loop through polygons in MultiPolygon
-#                     for pol in row["geometry"].geoms:
-#                         p = Polygon(pol.exterior.coords)
-#                         polys.append(p)
+        for model_name in all_model_names:
+            model = app.model_database.get_model(name=model_name)
 
-#         if len(names) == 0:
-#             return
+            if not select_sfincs:
+                # Check if the model is a SFINCS model
+                if model.type == "sfincs":
+                    # If it is, remove it from the list of models to be displayed
+                    continue
 
-#         if len(names) > 1:
-#             filename = f"{dataset_name}_merged{crs_string}.geojson"
-#         else:
-#             filename = f"{dataset_name}_{ids[0]}{crs_string}.geojson"
+            if not select_hurrywave:
+                # Check if the model is a SFINCS model
+                if model.type == "hurrywave":
+                    # If it is, remove it from the list of models to be displayed
+                    continue
 
-#         rsp = app.gui.window.dialog_save_file("Save watersheds as ...",
-#                                               file_name=filename,
-#                                               filter="*.geojson",
-#                                               allow_directory_change=False)
-#         if rsp[0]:
-#             filename = rsp[2]
-#         else:
-#             # User pressed cancel
-#             return
+            all_models.append(model)
 
-#         # Merge polygons
-#         merged = unary_union(polys)
+        # app.gui.setvar("model_database", "selected_model_names", all_model_names)
+        # app.gui.setvar("model_database", "selected_models", all_models)
 
-#         if len(names) > 1:
-#             filename_txt = os.path.splitext(filename)[0] + ".txt"
-#             # Write text file with watershed names
-#             with open(filename_txt, "w") as f:
-#                 for index, name in enumerate(names):
-#                     f.write(ids[index] + " " + name + '\n')
+        gdf_all = gpd.GeoDataFrame()
+        # Waitbox
+        wb = app.gui.window.dialog_wait("Loading domains...")
+        for m in all_models:
+            gdf = m.get_model_gdf()
+            gdf["type"] = m.type  # Tag with model type
+            gdf_all = pd.concat([gdf_all, gdf])
 
-#         # Apply buffer
-#         self.dbuf = app.gui.getvar("watersheds", "buffer") / 100000.0
-#         if self.dbuf > 0.0:
-#             merged = merged.buffer(self.dbuf, resolution=16)
-#             merged = merged.simplify(self.dbuf)
+        if gdf_all.empty:
+            app.map.layer["model_database"].layer["boundaries"].clear()
+            wb.close()
+            return
+        
+        else:
+            gdf_all.reset_index(drop=True, inplace=True)
 
-#         # Original merged geometry is in WGS84 (because that's what the original data is in)
-#         # Convert to map crs
-#         gdf = gpd.GeoDataFrame(geometry=[merged]).set_crs(4326).to_crs(app.map.crs)
-#         gdf.to_file(filename, driver="GeoJSON")
+            # Generate unique colors by model type
+            unique_types = gdf_all["type"].unique()
+            cmap = cm.get_cmap('Set2', len(unique_types))
+            type_to_color = {t: colors.to_hex(cmap(i)) for i, t in enumerate(unique_types)}
 
-#     def edit_buffer(self) -> None:
-#         """
-#         Edit the buffer for the watersheds.
-#         """
-#         pass
+            # Map colors to each row
+            gdf_all["line_color"] = gdf_all["type"].map(type_to_color)
 
-# def select(*args) -> None:
-#     app.toolbox["watersheds"].select_tab()
+            app.map.layer["model_database"].layer["boundaries"].set_data(gdf_all)
+            wb.close()
 
-def select_collection(*args) -> None:
-    app.toolbox["model_database"].select_collection()
 
-# def select_level(*args) -> None:
-#     app.toolbox["watersheds"].select_level()
 
-# def update(*args) -> None:
-#     app.toolbox["watersheds"].update_boundaries_on_map()
+def select(*args) -> None:
+    app.toolbox["model_database"].select_tab()
 
-# def save(*args) -> None:
-#     app.toolbox["watersheds"].save()
+def select_model(*args) -> None:
+    app.toolbox["model_database"].select_model()
 
-# def edit_buffer(*args) -> None:
-#     app.toolbox["watersheds"].edit_buffer()
+def select_selected_models(*args):
+    update()
+
+def update(*args) -> None:
+    app.toolbox["model_database"].update_boundaries_on_map()

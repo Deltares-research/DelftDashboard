@@ -1,116 +1,252 @@
-# -*- coding: utf-8 -*-
-"""
-GUI methods for modelmaker_hurrywave -> domain
-
-Created on Mon May 10 12:18:09 2021
-
-@author: Maarten van Ormondt
-"""
-import numpy as np
-import math
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
+import numpy as np
+import os 
 
 def select(*args):
-    # De-activate() existing layers
+    """
+    Select the model_database tab and update the map.
+    """
     map.update()
-    # Show the grid outline layer
-    app.map.layer["hurrywave"].layer["grid"].show()
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].activate()
 
-def draw_grid_outline(*args):
-    # Clear grid outline layer
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].crs = app.crs
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].draw()
-
-def grid_outline_created(gdf, index, id):
-    if len(gdf) > 1:
-        # Remove the old grid outline
-        id0 = gdf["id"][0]
-        app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].delete_feature(id0)
-        gdf = gdf.drop([0]).reset_index()
-    app.toolbox["modelmaker_hurrywave"].grid_outline = gdf
-    update_geometry()
-    app.gui.window.update()
-
-def grid_outline_modified(gdf, index, id):
-    app.toolbox["modelmaker_hurrywave"].grid_outline = gdf
-    update_geometry()
-    app.gui.window.update()
-
-def generate_grid(*args):
-    app.toolbox["modelmaker_hurrywave"].generate_grid()
-
-def update_geometry():
-    gdf = app.toolbox["modelmaker_hurrywave"].grid_outline
-    group = "modelmaker_hurrywave"
-    x0 = float(round(gdf["x0"][0], 3))
-    y0 = float(round(gdf["y0"][0], 3))
-    app.gui.setvar(group, "x0", x0)
-    app.gui.setvar(group, "y0", y0)
-    lenx = float(gdf["dx"][0])
-    leny = float(gdf["dy"][0])
-    app.toolbox["modelmaker_hurrywave"].lenx = lenx
-    app.toolbox["modelmaker_hurrywave"].leny = leny
-    app.gui.setvar(group, "rotation", float(round(gdf["rotation"][0] * 180 / math.pi, 1)))
-    app.gui.setvar(
-        group, "nmax", int(np.floor(leny / app.gui.getvar(group, "dy")))
-    )
-    app.gui.setvar(
-        group, "mmax", int(np.floor(lenx / app.gui.getvar(group, "dx")))
-    )
-
-def edit_origin(*args):
-    redraw_rectangle()
-
-def edit_nmmax(*args):
-    redraw_rectangle()
-
-def edit_rotation(*args):
-    redraw_rectangle()
-
-def edit_dxdy(*args):
-    group = "modelmaker_hurrywave"
-    lenx = app.toolbox["modelmaker_hurrywave"].lenx
-    leny = app.toolbox["modelmaker_hurrywave"].leny
-    app.gui.setvar(
-        group, "nmax", np.floor(leny / app.gui.getvar(group, "dy")).astype(int)
-    )
-    app.gui.setvar(
-        group, "mmax", np.floor(lenx / app.gui.getvar(group, "dx")).astype(int)
-    )
-
-def redraw_rectangle():
-    group = "modelmaker_hurrywave"
-    app.toolbox["modelmaker_hurrywave"].lenx = app.gui.getvar(
-        group, "dx"
-    ) * app.gui.getvar(group, "mmax")
-    app.toolbox["modelmaker_hurrywave"].leny = app.gui.getvar(
-        group, "dy"
-    ) * app.gui.getvar(group, "nmax")
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].clear()
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].add_rectangle(
-        app.gui.getvar(group, "x0"),
-        app.gui.getvar(group, "y0"),
-        app.toolbox["modelmaker_hurrywave"].lenx,
-        app.toolbox["modelmaker_hurrywave"].leny,
-        app.gui.getvar(group, "rotation"),
-    )
-
-def read_setup_yaml(*args):
-    fname = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
-    if fname[0]:
-        app.toolbox["modelmaker_hurrywave"].read_setup_yaml(fname[0])
-
-def write_setup_yaml(*args):
-    app.toolbox["modelmaker_hurrywave"].write_setup_yaml()
-    app.toolbox["modelmaker_hurrywave"].write_include_polygon()
-    app.toolbox["modelmaker_hurrywave"].write_exclude_polygon()
-    app.toolbox["modelmaker_hurrywave"].write_boundary_polygon()
-
-def build_model(*args):
-    app.toolbox["modelmaker_hurrywave"].build_model()
-
-def info(*args):
+def select_collection(*args):
+    # collection = args[0]
+    # model_names, _, _ = app.model_database.model_names(collection=collection)
+    # group = "model_database"
+    # app.gui.setvar(group, "model_names", model_names)
+    # app.gui.setvar(group, "model_index", 0)
     pass
+
+def select_domain(*args):
+    # collection = args[0]
+    # model_names, _, _ = app.model_database.model_names(collection=collection)
+    # group = "model_database"
+    # app.gui.setvar(group, "model_names", model_names)
+    # app.gui.setvar(group, "model_index", 0)
+    pass
+
+
+def use_collection(*args):
+    group = "model_database"
+    names = app.gui.getvar(group, "collection_names")
+    index = app.gui.getvar(group, "collection_index")
+    name  = names[index]
+    if name not in app.gui.getvar(group, "selected_collection_names"):
+        # d = bathymetry_database.get_dataset(name)
+        collection = {"name": name}
+        app.selected_collections.append(name)
+        app.gui.setvar(group, "selected_collection_names", app.selected_collections)
+        app.gui.setvar(group, "selected_collection_index", len(app.selected_collections) - 1)
+
+    domain_names_all= [] 
+    for collection_name in app.selected_collections:
+        domain_names_in_collection, _, _ = app.model_database.model_names(collection=collection_name)
+        for domain_name_i in domain_names_in_collection:
+            domain_names_all.append(domain_name_i)
+
+    for name in domain_names_all:
+        if name not in app.gui.getvar(group, "domain_names"):
+            # d = bathymetry_database.get_dataset(name)
+            collection = {"name": name}
+            app.domains.append(name)
+            app.gui.setvar(group, "domain_names", app.domains)
+            app.gui.setvar(group, "domain_index", len(app.domains) - 1)
+            app.gui.setvar(group, "domain_names_all", app.domains)
+            app.gui.setvar(group, "domain_index_all", len(app.domains) - 1)
+
+
+    update()
+
+
+def remove_collection(*args):
+    group = "model_database"
+    names = app.gui.getvar(group, "selected_collection_names")
+    index = app.gui.getvar(group, "selected_collection_index")
+    name  = names[index]
+    if name in app.gui.getvar(group, "selected_collection_names"):
+        # d = bathymetry_database.get_dataset(name)
+        collection = {"name": name}
+        domain_names_in_collection, _, _ = app.model_database.model_names(collection=name)
+        app.selected_collections.remove(name)
+        app.gui.setvar(group, "selected_collection_index", len(app.selected_collections) - 1)
+
+    domain_names_all= [] 
+
+    for domain_name_i in domain_names_in_collection:
+        domain_names_all.append(domain_name_i)
+
+    for name in domain_names_all:
+        if name in app.gui.getvar(group, "domain_names"):
+            # d = bathymetry_database.get_dataset(name)
+            collection = {"name": name}
+            app.domains.remove(name)
+            app.gui.setvar(group, "domain_names", app.domains)
+            app.gui.setvar(group, "domain_index", len(app.domains) - 1)
+            app.gui.setvar(group, "domain_names_all", app.domains)
+            app.gui.setvar(group, "domain_index_all", len(app.domains) - 1)
+
+
+    
+    update()
+
+def select_sfincs(*args):
+    tag = app.gui.getvar("model_database", "select_sfincs")
+    domain_names = app.gui.getvar("model_database", "domain_names")
+    domain_names_all = app.gui.getvar("model_database", "domain_names_all")
+
+    group = "model_database"
+
+    # Get all models in domain_names_all and collect their types
+    model_types = []
+    for name in domain_names_all:
+        # Assuming app.model_database.get_model_type returns the type for a given domain/model name
+        model = app.model_database.get_model(name)
+        model_types.append(model.type)
+
+    if tag:
+        # If sfincs is selected, filter domain_names to include sfincs models and all other in domain_names 
+        app.domains = [name for name, model_type in zip(domain_names_all, model_types) if model_type == "sfincs" or name in domain_names]
+    else:
+        # If sfincs is not selected, filter domain_names to exclude sfincs models
+        app.domains = [name for name, model_type in zip(domain_names_all, model_types) if model_type != "sfincs"]
+
+    app.gui.setvar(group, "domain_names", app.domains)
+    app.gui.setvar(group, "domain_index", len(app.domains) - 1)
+
+    update_map()
+
+def select_hurrywave(*args):
+    tag = app.gui.getvar("model_database", "select_hurrywave")
+    domain_names = app.gui.getvar("model_database", "domain_names")
+    domain_names_all = app.gui.getvar("model_database", "domain_names_all")
+
+    group = "model_database"
+
+    # Get all models in domain_names_all and collect their types
+    model_types = []
+    for name in domain_names_all:
+        # Assuming app.model_database.get_model_type returns the type for a given domain/model name
+        model = app.model_database.get_model(name)
+        model_types.append(model.type)
+
+    if tag:
+        # If sfincs is selected, filter domain_names to include sfincs models and all other in domain_names 
+        app.domains = [name for name, model_type in zip(domain_names_all, model_types) if model_type == "hurrywave" or name in domain_names]
+    else:
+        # If sfincs is not selected, filter domain_names to exclude hurrywave models
+        app.domains = [name for name, model_type in zip(domain_names_all, model_types) if model_type != "hurrywave"]
+
+    app.gui.setvar(group, "domain_names", app.domains)
+    app.gui.setvar(group, "domain_index", len(app.domains) - 1)
+
+    update_map()
+
+def select_selected_collections(*args):
+    update()
+
+def select_selected_domains(*args):
+    app.selected_domains = []
+
+    group = "model_database"
+    names = app.gui.getvar(group, "domain_names")
+    index = app.gui.getvar(group, "domain_index")
+    name  = names[index]
+
+    app.selected_domains = name
+    app.gui.setvar(group, "selected_domain_names", app.selected_domains)
+    app.gui.setvar(group, "selected_domain_index", len(app.selected_domains) - 1)
+
+    update()
+
+    
+def activate_domain(self) -> None:
+    """
+    Select model to make model.toml.
+    """
+    group = "model_database"
+
+    domain_name = app.gui.getvar(group, "selected_domain_names")
+    domain = app.model_database.get_model(name=domain_name)
+    # Get domain path robustly
+    domain_path = getattr(domain, 'path', None)
+    if not domain_path or not isinstance(domain_path, str):
+        print(f"Invalid or missing domain path for domain: {domain_name}")
+        return
+
+    domain_input_folder = os.path.join(domain_path, "input")
+
+    # Check if the input folder exists, else use the original domain_path
+    if os.path.isdir(domain_input_folder):
+        domain_path = domain_input_folder
+
+    if domain_path is None:
+        print("Domain path is not set for domain: ", domain_name)
+        return
+    
+    domain_type = domain.type
+
+    # Find corresponding model in app.model
+    for model in app.model:
+        dlg = app.gui.window.dialog_wait("Activating domain ...")
+        app.active_model = app.model[model]
+
+        os.chdir(domain.path)
+        app.active_model.initialize()
+        app.active_model.domain.path = domain_path
+        app.active_model.domain.read()
+        app.active_model.set_gui_variables()
+        # Also get mask datashader dataframe (should this not happen when grid is read?)
+        app.active_model.domain.mask.get_datashader_dataframe()
+        if app.model["sfincs_cht"].domain.input.variables.snapwave:
+            # If snapwave is used, get the datashader dataframe for the snapwave mask
+            app.active_model.domain.snapwave.mask.get_datashader_dataframe()	
+
+        # Change CRS
+        map.set_crs(app.active_model.domain.crs)
+        app.active_model.plot()
+        dlg.close()
+        app.gui.window.update()
+        # Zoom to model extent
+        bounds = app.active_model.domain.grid.bounds(crs=4326, buffer=0.1)
+        app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
+
+    update_map()
+    print("Domain name: ", domain_name)
+    
+
+def update():
+    group = "model_database"
+    # Get the selected model names from the GUI
+    selected_names = []
+    nrd = len(app.selected_collections)
+    if nrd>0:
+        index = app.gui.getvar(group, "selected_collection_index")
+        for collection in app.selected_collections:
+            selected_names.append(collection)
+                                  
+        app.gui.setvar(group, "selected_collection_names", selected_names)
+        app.gui.setvar(group, "selected_collection_index", index)
+
+    #     for model in app.selected_models:
+    #         # selected_names.append(dataset["dataset"].name)
+    #         selected_names.append(model["name"])
+
+    #     app.gui.setvar(group, "selected_model_names", selected_names)
+    #     index = app.gui.getvar(group, "selected_model_index")
+    #     if index > nrd - 1:
+    #         index = nrd - 1
+    #     dataset = app.selected_models[index]
+    #     app.gui.setvar(group, "model_index", index)
+    else:
+        app.gui.setvar(group, "selected_collection_names", [])
+        app.gui.setvar(group, "selected_collection_index", 0)
+
+    app.gui.setvar(group, "nr_selected_collections", nrd)
+    update_map()
+
+    # Get selected collection
+    #app.gui.setvar(group, "active_collection", selected_names)
+
+def update_map(*args) -> None:
+    app.toolbox["model_database"].update_boundaries_on_map()

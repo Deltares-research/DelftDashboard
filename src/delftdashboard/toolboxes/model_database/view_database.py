@@ -1,116 +1,52 @@
-# -*- coding: utf-8 -*-
-"""
-GUI methods for modelmaker_hurrywave -> domain
-
-Created on Mon May 10 12:18:09 2021
-
-@author: Maarten van Ormondt
-"""
-import numpy as np
-import math
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-def select(*args):
-    # De-activate() existing layers
+def select_tab(self) -> None:
+    """
+    Select the model_database tab and update the map.
+    """
     map.update()
-    # Show the grid outline layer
-    app.map.layer["hurrywave"].layer["grid"].show()
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].activate()
+    app.map.layer["model_database"].show()
+    app.map.layer["model_database"].layer["boundaries"].activate()
+    
 
-def draw_grid_outline(*args):
-    # Clear grid outline layer
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].crs = app.crs
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].draw()
+def select_collection(*args):
+    collection = args[0]
+    model_names, _, _ = app.model_database.model_names(collection=collection)
+    group = "model_database"
+    app.gui.setvar(group, "model_names", model_names)
+    app.gui.setvar(group, "model_index", 0)
 
-def grid_outline_created(gdf, index, id):
-    if len(gdf) > 1:
-        # Remove the old grid outline
-        id0 = gdf["id"][0]
-        app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].delete_feature(id0)
-        gdf = gdf.drop([0]).reset_index()
-    app.toolbox["modelmaker_hurrywave"].grid_outline = gdf
-    update_geometry()
-    app.gui.window.update()
-
-def grid_outline_modified(gdf, index, id):
-    app.toolbox["modelmaker_hurrywave"].grid_outline = gdf
-    update_geometry()
-    app.gui.window.update()
-
-def generate_grid(*args):
-    app.toolbox["modelmaker_hurrywave"].generate_grid()
-
-def update_geometry():
-    gdf = app.toolbox["modelmaker_hurrywave"].grid_outline
-    group = "modelmaker_hurrywave"
-    x0 = float(round(gdf["x0"][0], 3))
-    y0 = float(round(gdf["y0"][0], 3))
-    app.gui.setvar(group, "x0", x0)
-    app.gui.setvar(group, "y0", y0)
-    lenx = float(gdf["dx"][0])
-    leny = float(gdf["dy"][0])
-    app.toolbox["modelmaker_hurrywave"].lenx = lenx
-    app.toolbox["modelmaker_hurrywave"].leny = leny
-    app.gui.setvar(group, "rotation", float(round(gdf["rotation"][0] * 180 / math.pi, 1)))
-    app.gui.setvar(
-        group, "nmax", int(np.floor(leny / app.gui.getvar(group, "dy")))
-    )
-    app.gui.setvar(
-        group, "mmax", int(np.floor(lenx / app.gui.getvar(group, "dx")))
-    )
-
-def edit_origin(*args):
-    redraw_rectangle()
-
-def edit_nmmax(*args):
-    redraw_rectangle()
-
-def edit_rotation(*args):
-    redraw_rectangle()
-
-def edit_dxdy(*args):
-    group = "modelmaker_hurrywave"
-    lenx = app.toolbox["modelmaker_hurrywave"].lenx
-    leny = app.toolbox["modelmaker_hurrywave"].leny
-    app.gui.setvar(
-        group, "nmax", np.floor(leny / app.gui.getvar(group, "dy")).astype(int)
-    )
-    app.gui.setvar(
-        group, "mmax", np.floor(lenx / app.gui.getvar(group, "dx")).astype(int)
-    )
-
-def redraw_rectangle():
-    group = "modelmaker_hurrywave"
-    app.toolbox["modelmaker_hurrywave"].lenx = app.gui.getvar(
-        group, "dx"
-    ) * app.gui.getvar(group, "mmax")
-    app.toolbox["modelmaker_hurrywave"].leny = app.gui.getvar(
-        group, "dy"
-    ) * app.gui.getvar(group, "nmax")
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].clear()
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].add_rectangle(
-        app.gui.getvar(group, "x0"),
-        app.gui.getvar(group, "y0"),
-        app.toolbox["modelmaker_hurrywave"].lenx,
-        app.toolbox["modelmaker_hurrywave"].leny,
-        app.gui.getvar(group, "rotation"),
-    )
-
-def read_setup_yaml(*args):
-    fname = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
-    if fname[0]:
-        app.toolbox["modelmaker_hurrywave"].read_setup_yaml(fname[0])
-
-def write_setup_yaml(*args):
-    app.toolbox["modelmaker_hurrywave"].write_setup_yaml()
-    app.toolbox["modelmaker_hurrywave"].write_include_polygon()
-    app.toolbox["modelmaker_hurrywave"].write_exclude_polygon()
-    app.toolbox["modelmaker_hurrywave"].write_boundary_polygon()
-
-def build_model(*args):
-    app.toolbox["modelmaker_hurrywave"].build_model()
-
-def info(*args):
+def select_model(*args):
     pass
+
+
+def select_selected_models(*args):
+    update()
+
+def update():
+    group = "model_database"
+    # Get the selected model names from the GUI
+    selected_names = []
+    nrd = len(app.selected_models)
+    if nrd>0:
+        for model in app.selected_models:
+            # selected_names.append(dataset["dataset"].name)
+            selected_names.append(model["name"])
+        app.gui.setvar(group, "selected_model_names", selected_names)
+        index = app.gui.getvar(group, "selected_model_index")
+        if index > nrd - 1:
+            index = nrd - 1
+        dataset = app.selected_models[index]
+        app.gui.setvar(group, "model_index", index)
+    else:
+        app.gui.setvar(group, "selected_model_names", [])
+        app.gui.setvar(group, "model_index", 0)
+    app.gui.setvar(group, "nr_selected_models", nrd)
+
+    # Get selected collection
+    #app.gui.setvar(group, "active_collection", selected_names)
+
+def update_map(*args) -> None:
+    app.toolbox["model_database"].update_boundaries_on_map()

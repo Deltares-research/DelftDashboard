@@ -5,4 +5,43 @@ element:
     y: 35
     width: 200
     height: 85
-  text: "Available Datasets"
+  text: "Available Domains"
+  text_position: "above"
+  method: select_model
+  module: delftdashboard.toolboxes.model_database.generate_database
+  variable: model_index
+  variable_group: model_database
+  select: index
+  option_string:
+    variable: model_names
+    variable_group: model_database
+
+
+- style: popupmenu
+  position:
+    x: 10
+    y: 10
+    width: 200
+    height: 20
+  method: select_collection
+  module: delftdashboard.toolboxes.model_database.generate_database
+  variable: active_collection
+  variable_group: model_database
+  select: item
+  option_string:
+    variable: collection_names
+    variable_group: model_database
+  option_value:
+    variable: collection_names
+    variable_group: model_database
+
+- style: pushbutton
+  position:
+    x: 220
+    y: 100
+    width: 100
+    height: 20
+  method: update_map
+  text: Plot all
+  module: delftdashboard.toolboxes.model_database.generate_database
+
