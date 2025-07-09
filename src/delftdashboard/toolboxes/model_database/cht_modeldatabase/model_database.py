@@ -87,30 +87,6 @@ class ModelDatabase:
                     self.model.append(model)
 
 
-
-
-    # def load_dataset(self, name):
-    #     path = os.path.join(self.path, name)
-    #     metadata = toml.load(os.path.join(path, "metadata.tml"))
-    #     dataset_format = metadata["format"]
-    #     if dataset_format == "netcdf_tiles_v1":
-    #         dataset = BathymetryDatasetNetCDFTilesV1(name, path)
-    #     elif dataset_format == "netcdf_tiles_v2":
-    #         dataset = BathymetryDatasetNetCDFTilesV2(name, path)
-    #     elif dataset_format == "tiled_web_map":
-    #         dataset = BathymetryDatasetTiledWebMap(name, path)
-    #     elif dataset_format == "cog":
-    #         dataset = BathymetryDatasetCOG(name, path)
-    #     dataset.database = self
-    #     # Check if dataset already exists in database
-    #     for d in self.dataset:
-    #         if d.name == name:
-    #             # Replace existing dataset
-    #             d = dataset
-    #             return
-    #     self.dataset.append(dataset)
-
-
     def get_model(self, name):
             for model in self.model:
                 if model.name == name:

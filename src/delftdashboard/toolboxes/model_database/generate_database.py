@@ -230,17 +230,7 @@ def update():
                                   
         app.gui.setvar(group, "selected_collection_names", selected_names)
         app.gui.setvar(group, "selected_collection_index", index)
-
-    #     for model in app.selected_models:
-    #         # selected_names.append(dataset["dataset"].name)
-    #         selected_names.append(model["name"])
-
-    #     app.gui.setvar(group, "selected_model_names", selected_names)
-    #     index = app.gui.getvar(group, "selected_model_index")
-    #     if index > nrd - 1:
-    #         index = nrd - 1
-    #     dataset = app.selected_models[index]
-    #     app.gui.setvar(group, "model_index", index)
+        
     else:
         app.gui.setvar(group, "selected_collection_names", [])
         app.gui.setvar(group, "selected_collection_index", 0)

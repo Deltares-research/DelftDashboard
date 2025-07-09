@@ -118,12 +118,6 @@ class Toolbox(GenericToolbox):
     
             app.gui.setvar(group, "model_settings", df)
 
-
-            
-            # app.gui.setvar(group, "level_names", app.watersheds_database.dataset[short_names[0]].level_names)
-            # app.gui.setvar(group, "level_long_names", app.watersheds_database.dataset[short_names[0]].level_long_names)
-            # app.gui.setvar(group, "level", app.watersheds_database.dataset[short_names[0]].level_names[0])
-
     def select_tab(self) -> None:
         """
         Select the domain database tab and update the map.
