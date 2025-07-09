@@ -265,7 +265,9 @@ class Model(GenericModel):
             self.set_gui_variables()
             # Also get mask datashader dataframe (should this not happen when grid is read?)
             self.domain.mask.get_datashader_dataframe()
-            self.domain.snapwave.mask.get_datashader_dataframe()
+            if self.domain.input.variables.snapwave:
+                # If snapwave is used, get the datashader dataframe for the snapwave mask
+                self.domain.snapwave.mask.get_datashader_dataframe()
             # Change CRS
             map.set_crs(self.domain.crs)
             self.plot()
