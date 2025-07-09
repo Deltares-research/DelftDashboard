@@ -8,6 +8,7 @@ def select(*args):
     """
     Select the model_database tab and update the map.
     """
+    app.map.layer["model_database"].layer["boundaries"].show()
     map.update()
 
 def select_collection(*args):
@@ -38,6 +39,8 @@ def use_collection(*args):
         app.selected_collections.append(name)
         app.gui.setvar(group, "selected_collection_names", app.selected_collections)
         app.gui.setvar(group, "selected_collection_index", len(app.selected_collections) - 1)
+        app.gui.setvar(group, "selected_collection_toml", app.selected_collections[0])
+
 
     domain_names_all= [] 
     for collection_name in app.selected_collections:

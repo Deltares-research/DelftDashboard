@@ -102,13 +102,16 @@ element:
     height: 20
   text: Choose collection
   text_position: above
-  method: select_collection
+  method: set_collection_toml
   module: delftdashboard.toolboxes.model_database.add_model
   variable: selected_collection_toml
   variable_group: model_database
   select: item
   option_string:
-    variable: selected_collection_names
+    variable: collection_names 
+    variable_group: model_database
+  option_value:
+    variable: collection_names 
     variable_group: model_database
 
 

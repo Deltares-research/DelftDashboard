@@ -45,12 +45,10 @@ def select_model(*args):
     app.gui.setvar(group, "make_precipitation_map", True)
     wb.close()
 
-def select_collection(*args):
-    group = "model_database"
-    names = app.gui.getvar(group, "selected_collection_names")
-    index = app.gui.getvar(group, "selected_collection_index")
-    name  = names[index]
-    app.gui.setvar(group, "selected_collection_toml", name)
+def set_collection_toml(*args):
+ 
+    """ Set the collection toml file for the model.
+    """
     pass
 
     
@@ -80,3 +78,5 @@ def write_toml_file(self) -> None:
 
     with open(toml_path, "w") as toml_file:
         toml.dump(model_data, toml_file)
+
+    print(f"Model data written to {toml_path}")

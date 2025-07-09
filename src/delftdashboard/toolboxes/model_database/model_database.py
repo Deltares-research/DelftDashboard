@@ -85,7 +85,7 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "active_model_type", [])  
             app.gui.setvar(group, "active_model_crs", [])
 
-            app.gui.setvar(group, "selected_collection_toml", [])
+            app.gui.setvar(group, "selected_collection_toml", collection_names[0])
             app.gui.setvar(group, "flow_nested", None)
             app.gui.setvar(group, "flow_spinup_time", 24.0)
             app.gui.setvar(group, "station", None)
