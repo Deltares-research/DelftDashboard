@@ -2,7 +2,7 @@ rem Script to create the editable delftdashboard environment
 rem The delftdashboard_dev environment only needs to be created and used if you are interested in editing the source code!
 
 rem CHANGE GITDIR to point to you local repos folder !!!
-set GITDIR=c:\git
+set GITDIR=c:\work\checkouts\git
 set ENVNAME=delftdashboard_dev
 
 :: Check if the directory C:\Users\%USERNAME%\miniconda3 exists
@@ -11,8 +11,8 @@ if exist "C:\Users\%USERNAME%\miniconda3" (
 	set CONDA=conda
 ) else (
     :: Check if the directory c:\Users\asselt\AppData\Local\miniforge3 exists
-    if exist "c:\Users\asselt\AppData\Local\miniforge3" (
-        set CONDAPATH=c:\Users\asselt\AppData\Local\miniforge3
+    if exist "c:\Users\%USERNAME%\miniforge3" (
+        set CONDAPATH=c:\Users\%USERNAME%\miniforge3
 		set CONDA=mamba
     ) else (
         :: Neither exist. Stop.
@@ -29,11 +29,11 @@ if exist "C:\Users\%USERNAME%\miniconda3" (
     )
 )
 
-call %CONDAPATH%\Scripts\activate.bat
+rem call %CONDAPATH%\Scripts\activate.bat
 
-call %CONDA% env remove -n %ENVNAME%
-call %CONDA% create -n %ENVNAME% python=3.12
-call %CONDA% activate %ENVNAME%
+rem call %CONDA% env remove -n %ENVNAME%
+rem call %CONDA% create -n %ENVNAME% python=3.12
+rem call %CONDA% activate %ENVNAME%
 
 pip install -e %GITDIR%\delftdashboard
 pip install -e %GITDIR%\guitares
