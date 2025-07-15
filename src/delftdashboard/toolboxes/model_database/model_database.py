@@ -51,6 +51,25 @@ class Toolbox(GenericToolbox):
         if "model_database_path" not in app.config:
             app.config["model_database_path"] = os.path.join(app.config["data_path"], "model_database")
 
+        # Create a default model.tml file if it does not exist
+        model_tml_path = os.path.join(app.config["model_database_path"], "model_database.tml")
+        if not os.path.exists(model_tml_path):
+            # Check if collections are present in the model_database_path
+            collections = []
+            for entry in os.listdir(app.config["model_database_path"] ):
+                entry_path = os.path.join(app.config["model_database_path"] , entry)
+                if os.path.isdir(entry_path):
+                    # Try to get long_name from a metadata file, else use entry as long_name
+                    long_name = entry.replace("_", " ").title()
+                    collections.append({"name": entry, "long_name": long_name})
+            
+            with open(model_tml_path, "w") as f:
+                f.write("# Default model.tml\n")
+                for col in collections:
+                    f.write('\n[[collection]]\n')
+                    f.write(f'name = "{col["name"]}"\n')
+                    f.write(f'long_name = "{col["long_name"]}"\n')
+
         app.model_database = ModelDatabase(path=app.config["model_database_path"])
         app.selected_collections = []
         app.selected_domains = []

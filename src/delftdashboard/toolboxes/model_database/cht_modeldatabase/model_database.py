@@ -46,8 +46,8 @@ class ModelDatabase:
         # Load collections
         try:
             collections = toml.load(tml_file)["collection"]
-        except Exception as e:
-            print(f"Failed to load model_database.tml: {e}")
+        except:
+            print(f"No collections found in {tml_file}")
             return
 
         for d in collections:
