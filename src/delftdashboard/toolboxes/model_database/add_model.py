@@ -7,8 +7,11 @@ def select(*args):
     """
     Select the model_database tab and update the map.
     """
-    app.map.layer["model_database"].layer["boundaries"].hide()
-    select_model(*args)
+    app.map.layer["model_database"].show()
+    app.map.layer["model_database"].layer["boundaries_sfincs"].hide()
+    app.map.layer["model_database"].layer["boundaries_hurrywave"].hide()
+    # Do we really want to immediately add active model? I think a push button is better. What if there is no active model?
+    # select_model(*args)
     
 def select_model(*args):
     """

@@ -250,14 +250,19 @@ class Model(GenericModel):
             self.domain.clear_spatial_attributes()
             self.plot()
 
-    def open(self):
+    def open(self, filename=None):
         # Open input file, and change working directory
-        fname = app.gui.window.dialog_open_file("Open file", filter="SFINCS input file (sfincs.inp)")
-        fname = fname[0]
-        if fname:
+        if filename is None:
+            # Open file dialog to select input file
+            filename = app.gui.window.dialog_open_file("Open file", filter="SFINCS input file (sfincs.inp)")
+            filename = filename[0]
+
+        if filename:
             dlg = app.gui.window.dialog_wait("Loading SFINCS model ...")
-            path = os.path.dirname(fname)
-            # Change working directory
+            path = os.path.dirname(filename)
+            # if path is and empty string, use current working directory
+            if not path:
+                path = os.getcwd()
             os.chdir(path)
             self.initialize()
             self.domain.path = path

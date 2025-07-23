@@ -113,21 +113,43 @@ class Deltares_Model(Model):
 
         # Read the specific layer from the geodatabase
         
-        filename = os.path.join(self.path, "misc", f"{self.name}.geojson")
+        # filename = os.path.join(self.path, "misc", f"{self.name}.geojson")
+        filename = os.path.join(self.path, "misc", "exterior.geojson")
+
         if not os.path.exists(filename):
+
             print(f"File {filename} does not exist, creating file...")
+
             # Create a dummy GeoDataFrame
             if self.type == "sfincs":
-                sfincs_model = SFINCS(os.path.join(self.path, "input"), crs = 4326)
-                sfincs_model.read()
-                gdf = sfincs_model.grid.exterior.to_crs(4326)
-                gdf.to_file(filename, driver="GeoJSON")
-                gdf["name"] = self.name
-                return gdf
+
+                try:
+                    sfincs_model = SFINCS(os.path.join(self.path, "input"), crs=4326)
+                    sfincs_model.read()  # Ideally we want to read the geojson directly and not all the gridded input for this model
+                    gdf = sfincs_model.grid.exterior.to_crs(4326)
+                    gdf.to_file(filename, driver="GeoJSON")
+                    gdf["name"] = self.name
+                    return gdf
+                except Exception as e:
+                    print(f"Error reading SFINCS model: {e}")
+                    gdf = gpd.GeoDataFrame(geometry=[], crs=4326)
+                    return gdf
             
-            elif self.type == "hurrywave": 
-                hw_model = HurryWave(path = os.path.join(self.path, "input"), crs = 4326)
-                hw_model.read()
+            elif self.type == "hurrywave":
+                try:
+                    hw_model = HurryWave(path=os.path.join(self.path, "input"), crs=4326)
+                    hw_model.read()  # Ideally we want to read the geojson directly and not all the gridded input for this model
+                    # Convert to GeoDataFrame
+                    gdf = hw_model.grid.data.exterior.to_crs(4326)
+                    gdf.to_file(filename, driver="GeoJSON")
+                    gdf["name"] = self.name
+                    return gdf
+                except Exception as e:
+                    print(f"Error reading HurryWave model: {e}")
+                    gdf = gpd.GeoDataFrame(geometry=[], crs=4326)
+                    return gdf
+
+            # Skip the rest?
 
             # 1. Load your DataArray
             mask = hw_model.grid.ds.mask

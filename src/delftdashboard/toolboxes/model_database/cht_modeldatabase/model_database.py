@@ -30,12 +30,34 @@ class ModelDatabase:
         self.initialized = True
        
     def read(self):
+
         if self.path is None:
             print("Path to model database not set!")
             return
 
         if not os.path.exists(self.path):
             os.makedirs(self.path)
+
+        # Create a default model.tml file if it does not exist. Why do we actually need this file?
+        model_tml_path = os.path.join(self.path, "model_database.tml")
+
+        if not os.path.exists(model_tml_path):
+            # Check if collections are present in the model_database_path
+            collections = []
+            for entry in os.listdir(self.path):
+                entry_path = os.path.join(self.path, entry)
+                if os.path.isdir(entry_path):
+                    # Try to get long_name from a metadata file, else use entry as long_name
+                    long_name = entry.replace("_", " ").title()
+                    collections.append({"name": entry, "long_name": long_name})
+            
+            with open(model_tml_path, "w") as f:
+                f.write("# Default model.tml\n")
+                for col in collections:
+                    f.write('\n[[collection]]\n')
+                    f.write(f'name = "{col["name"]}"\n')
+                    f.write(f'long_name = "{col["long_name"]}"\n')
+
 
         # Always expect this file
         tml_file = os.path.join(self.path, "model_database.tml")
@@ -86,7 +108,6 @@ class ModelDatabase:
                     )
                     self.model.append(model)
 
-
     def get_model(self, name):
             for model in self.model:
                 if model.name == name:
@@ -132,6 +153,24 @@ class ModelDatabase:
                 print("No collection found, adding collection: " + collection)
 
         return collection_names, collections
+
+    def add_collection(self, name, long_name=None):
+        """
+        Add a new collection to the model database.
+        """
+        if long_name is None:
+            long_name = name.replace("_", " ").title()
+
+        collection_path = os.path.join(self.path, name)
+        if not os.path.exists(collection_path):
+            os.makedirs(collection_path)
+
+        # # Add to model_database.tml
+        # tml_file = os.path.join(self.path, "model_database.tml")
+        # with open(tml_file, "a") as f:
+        #     f.write(f'\n[[collection]]\nname = "{name}"\nlong_name = "{long_name}"\npath = "{collection_path}"\n')
+
+        print(f"Collection '{name}' added to model database.")
 
 class ModelCollection:  
     def __init__(self, name):        

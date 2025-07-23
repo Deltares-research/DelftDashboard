@@ -202,6 +202,11 @@ def initialize():
     app.gui.setvar("tide_models", "long_names", long_names)
     app.gui.setvar("tide_models", "names", short_names)
 
+    # Model database
+    if "model_database_path" not in app.config:
+        app.config["model_database_path"] = os.path.join(app.config["data_path"], "model_database")
+        # Initializing will happen when the model database toolbox is selected
+
     # Use GUI variables to set the view settings    
 
     # Layer style

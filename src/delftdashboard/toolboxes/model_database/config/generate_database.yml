@@ -9,11 +9,14 @@ element:
   text_position: "above"
   method: select_collection
   module: delftdashboard.toolboxes.model_database.generate_database
-  variable: collection_index
+  variable: active_available_collection_name
   variable_group: model_database
-  select: collection_index
+  select: item
   option_string:
-    variable: collection_names
+    variable: available_collection_names
+    variable_group: model_database
+  option_value:
+    variable: available_collection_names
     variable_group: model_database
 
 - style: listbox
@@ -26,10 +29,13 @@ element:
   text_position: "above"
   method: select_selected_collections
   module: delftdashboard.toolboxes.model_database.generate_database
-  variable: selected_collection_index
+  variable: active_selected_collection_name
   variable_group: model_database
-  select: selected_collection_index
+  select: item
   option_string:
+    variable: selected_collection_names
+    variable_group: model_database
+  option_value:
     variable: selected_collection_names
     variable_group: model_database
 
@@ -42,12 +48,15 @@ element:
     height: 115
   text: "Available Domains"
   text_position: "above"
-  method: select_selected_domains
-  module: delftdashboard.toolboxes.model_database.generate_database
-  variable: domain_index
+  method: select_domain_from_list
+#  module: delftdashboard.toolboxes.model_database.generate_database
+  variable: active_domain_name
   variable_group: model_database
-  select: selected_domain_index
+  select: item
   option_string:
+    variable: domain_names
+    variable_group: model_database
+  option_value:
     variable: domain_names
     variable_group: model_database
 
@@ -88,9 +97,9 @@ element:
     width: 120
     height: 20
   text: SFINCS models
-  variable: select_sfincs
+  variable: show_sfincs
   variable_group: model_database
-  method: select_sfincs
+  method: toggle_sfincs
   module: delftdashboard.toolboxes.model_database.generate_database
 
 
@@ -101,9 +110,9 @@ element:
     width: 120
     height: 20
   text: HurryWave models
-  variable: select_hurrywave
+  variable: show_hurrywave
   variable_group: model_database
-  method: select_hurrywave
+  method: toggle_hurrywave
   module: delftdashboard.toolboxes.model_database.generate_database
 
 

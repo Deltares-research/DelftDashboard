@@ -107,11 +107,8 @@ element:
   variable: selected_collection_toml
   variable_group: model_database
   select: item
-  option_string:
-    variable: collection_names 
-    variable_group: model_database
   option_value:
-    variable: collection_names 
+    variable: available_collection_names 
     variable_group: model_database
 
 - style: pushbutton

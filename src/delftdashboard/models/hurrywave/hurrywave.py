@@ -158,14 +158,22 @@ class Model(GenericModel):
         for var_name in vars(self.domain.input.variables):
             setattr(self.domain.input.variables, var_name, app.gui.getvar("hurrywave", var_name))
 
-    def open(self):
+    def open(self, filename=None):
         # Open input file, and change working directory
-        fname = app.gui.window.dialog_open_file("Open file", filter="HurryWave input file (hurrywave.inp)")
-        fname = fname[0]
-        if fname:
+
+        if filename is None:
+            filename = app.gui.window.dialog_open_file("Open HurryWave input file", filter="HurryWave input file (hurrywave.inp)")
+            if not filename:
+                return
+            filename = filename[0]
+
+        if filename:
             self.domain = HurryWave()
             dlg = app.gui.window.dialog_wait("Loading HurryWave model ...")
-            path = os.path.dirname(fname)
+            path = os.path.dirname(filename)
+            # if path is and empty string, use current working directory
+            if not path:
+                path = os.getcwd()
             self.domain.path = path
             self.domain.read()
             self.set_gui_variables()
@@ -199,8 +207,10 @@ class Model(GenericModel):
         # Grid
         app.map.layer["hurrywave"].layer["grid"].set_data(self.domain.grid)
         # Mask
-        app.map.layer["hurrywave"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
-        app.map.layer["hurrywave"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
+        # app.map.layer["hurrywave"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
+        # app.map.layer["hurrywave"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
+        app.map.layer["hurrywave"].layer["mask_include"].set_data(self.domain.mask)
+        app.map.layer["hurrywave"].layer["mask_boundary"].set_data(self.domain.mask)
         # Boundary points
         gdf = self.domain.boundary_conditions.gdf
         app.map.layer["hurrywave"].layer["boundary_points"].set_data(gdf, 0)
