@@ -24,28 +24,14 @@ class Model(GenericModel):
         self.set_gui_variables()
 
     def add_layers(self):
+
         # Add main DDB layer
         layer = app.map.add_layer("hurrywave")
 
         layer.add_layer("grid", type="image")
 
-        layer.add_layer("mask_include",
-                        type="circle",
-                        file_name="hurrywave_mask_include.geojson",
-                        circle_radius=3,
-                        fill_color="yellow",
-                        line_color="transparent",
-                        fill_opacity=1.0)
+        layer.add_layer("mask", type="image")
 
-        layer.add_layer("mask_boundary",
-                        type="circle",
-                        file_name="hurrywave_mask_boundary.geojson",
-                        circle_radius=3,
-                        fill_color="red",
-                        line_color="transparent",
-                        fill_opacity=1.0)
-
-        # Move this to hurrywave.py
         from .boundary_conditions import select_boundary_point_from_map
         layer.add_layer("boundary_points",
                         type="circle_selector",
@@ -95,8 +81,7 @@ class Model(GenericModel):
             # Grid is always made visible
             app.map.layer["hurrywave"].layer["grid"].show()
             # Mask is made invisible
-            app.map.layer["hurrywave"].layer["mask_include"].hide()
-            app.map.layer["hurrywave"].layer["mask_boundary"].hide()
+            app.map.layer["hurrywave"].layer["mask"].hide()
             # Boundary points are made grey
             app.map.layer["hurrywave"].layer["boundary_points"].deactivate()
             # Observation points are made grey
@@ -176,6 +161,19 @@ class Model(GenericModel):
                 path = os.getcwd()
             self.domain.path = path
             self.domain.read()
+
+            # If the old grid format was used, we may want to write now to netcdf
+            if not self.domain.input.variables.qtrfile:
+                # Ask the user if they want to write the grid to a netCDF file
+                ok = app.gui.window.dialog_yes_no("The HurryWave input uses the older grid format. Would you like to store it in netCDF format (recommended)?")
+                if ok:
+                    # Write the grid to a netCDF file
+                    self.domain.input.variables.qtrfile = "hurrywave.nc"
+                    self.domain.input.variables.mskfile = None
+                    self.domain.input.variables.depfile = None
+                    self.domain.grid.write()
+                    self.domain.input.write()
+
             self.set_gui_variables()
             # Change working directory
             os.chdir(path)
@@ -184,7 +182,7 @@ class Model(GenericModel):
             self.plot()
             dlg.close()
             # Zoom to model extent
-            bounds = self.domain.grid.bounds(crs=4326, buffer=0.1)
+            bounds = self.domain.grid.data.bounds(crs=4326, buffer=0.1)
             app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def save(self):
@@ -207,10 +205,7 @@ class Model(GenericModel):
         # Grid
         app.map.layer["hurrywave"].layer["grid"].set_data(self.domain.grid)
         # Mask
-        # app.map.layer["hurrywave"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
-        # app.map.layer["hurrywave"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
-        app.map.layer["hurrywave"].layer["mask_include"].set_data(self.domain.mask)
-        app.map.layer["hurrywave"].layer["mask_boundary"].set_data(self.domain.mask)
+        app.map.layer["hurrywave"].layer["mask"].set_data(self.domain.mask)
         # Boundary points
         gdf = self.domain.boundary_conditions.gdf
         app.map.layer["hurrywave"].layer["boundary_points"].set_data(gdf, 0)

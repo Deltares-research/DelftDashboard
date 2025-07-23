@@ -13,8 +13,7 @@ def select(*args):
     map.update()
     # Show the grid and mask
     app.map.layer["hurrywave"].layer["grid"].activate()
-    app.map.layer["hurrywave"].layer["mask_include"].activate()
-    app.map.layer["hurrywave"].layer["mask_boundary"].activate()
+    app.map.layer["hurrywave"].layer["mask"].activate()
 
 def set_model_variables(*args):
     app.model["hurrywave"].set_input_variables()

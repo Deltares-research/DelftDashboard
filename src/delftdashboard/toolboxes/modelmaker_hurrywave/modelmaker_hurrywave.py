@@ -4,7 +4,7 @@ Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
 """
-
+import pandas as pd
 import geopandas as gpd
 from pyproj import CRS
 
@@ -41,6 +41,11 @@ class Toolbox(GenericToolbox):
         # Boundary polygons
         self.boundary_polygon = gpd.GeoDataFrame()
         self.boundary_file_name = "boundary.geojson"
+        # Refinement
+        self.refinement_levels = []
+        self.refinement_zmin = []
+        self.refinement_zmax = []
+        self.refinement_polygon = gpd.GeoDataFrame()
 
         self.setup_dict = {}
 
@@ -57,6 +62,20 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "dx", 0.1)
         app.gui.setvar(group, "dy", 0.1)
         app.gui.setvar(group, "rotation", 0.0)
+
+        # Refinement
+        app.gui.setvar(group, "refinement_polygon_file", "quadtree.geojson")
+        app.gui.setvar(group, "refinement_polygon_names", [])
+        app.gui.setvar(group, "refinement_polygon_index", 0)
+        app.gui.setvar(group, "refinement_polygon_level", 0)
+        app.gui.setvar(group, "refinement_polygon_zmin", -99999.0)
+        app.gui.setvar(group, "refinement_polygon_zmax", 99999.0)
+        app.gui.setvar(group, "nr_refinement_polygons", 0)
+        # Strings for refinement levels
+        levstr = []
+        for i in range(10):
+            levstr.append(str(i))
+        app.gui.setvar("modelmaker_hurrywave", "refinement_polygon_levels", levstr)    
 
         # Bathymetry
         source_names, sources = app.bathymetry_database.sources()
@@ -118,6 +137,20 @@ class Toolbox(GenericToolbox):
                              rotate=True
                             )
 
+        # Refinement polygons
+        from .quadtree import refinement_polygon_created
+        from .quadtree import refinement_polygon_modified
+        from .quadtree import refinement_polygon_selected
+        layer.add_layer("quadtree_refinement", type="draw",
+                        columns={"refinement_level": 1, "zmin": -99999.0, "zmax": 99999.0},
+                        shape="polygon",
+                        create=refinement_polygon_created,
+                        modify=refinement_polygon_modified,
+                        select=refinement_polygon_selected,
+                        polygon_line_color="red",
+                        polygon_fill_color="orange",
+                        polygon_fill_opacity=0.1)
+
         ### Mask
         # Include
         from .mask_active_cells import include_polygon_created
@@ -173,6 +206,7 @@ class Toolbox(GenericToolbox):
 
         dlg = app.gui.window.dialog_wait("Generating grid ...")
 
+        # Get bbox coords from toolbox, and set them in the model input variables (do we actually need them for the model when using quadtree?)
         group = "modelmaker_hurrywave"
         model.input.variables.x0       = app.gui.getvar(group, "x0")
         model.input.variables.y0       = app.gui.getvar(group, "y0")
@@ -181,17 +215,35 @@ class Toolbox(GenericToolbox):
         model.input.variables.nmax     = app.gui.getvar(group, "nmax")
         model.input.variables.mmax     = app.gui.getvar(group, "mmax")
         model.input.variables.rotation = app.gui.getvar(group, "rotation")
+               
+        app.model["hurrywave"].set_gui_variables()
+        # group = "hurrywave"
+        # app.gui.setvar(group, "x0", model.input.variables.x0)
+        # app.gui.setvar(group, "y0", model.input.variables.y0)
+        # app.gui.setvar(group, "dx", model.input.variables.dx)
+        # app.gui.setvar(group, "dy", model.input.variables.dy)
+        # app.gui.setvar(group, "nmax", model.input.variables.nmax)
+        # app.gui.setvar(group, "mmax", model.input.variables.mmax)
+        # app.gui.setvar(group, "rotation", model.input.variables.rotation)
 
-        group = "hurrywave"
-        app.gui.setvar(group, "x0", model.input.variables.x0)
-        app.gui.setvar(group, "y0", model.input.variables.y0)
-        app.gui.setvar(group, "dx", model.input.variables.dx)
-        app.gui.setvar(group, "dy", model.input.variables.dy)
-        app.gui.setvar(group, "nmax", model.input.variables.nmax)
-        app.gui.setvar(group, "mmax", model.input.variables.mmax)
-        app.gui.setvar(group, "rotation", model.input.variables.rotation)
+        x0 = model.input.variables.x0
+        y0 = model.input.variables.y0
+        dx = model.input.variables.dx
+        dy = model.input.variables.dy
+        nmax = model.input.variables.nmax
+        mmax = model.input.variables.mmax
+        rotation = model.input.variables.rotation
 
-        model.grid.build()
+        if len(self.refinement_polygon) == 0:
+            refpol = None
+        else:
+            # Make list of separate gdfs for each polygon
+            refpol = self.refinement_polygon
+
+        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation,
+                         refinement_polygons=refpol,
+                         bathymetry_sets=app.selected_bathymetry_datasets,
+                         bathymetry_database=app.bathymetry_database)
 
         app.map.layer["hurrywave"].layer["grid"].set_data(model.grid)
 
@@ -199,13 +251,9 @@ class Toolbox(GenericToolbox):
 
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
-        bathymetry_list = app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets
-        if not app.model["hurrywave"].domain.input.variables.depfile:
-            app.model["hurrywave"].domain.input.variables.depfile = "hurrywave.dep"
-        app.model["hurrywave"].domain.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
-        app.model["hurrywave"].domain.grid.write_dep_file()
-        # GUI variables
-        app.gui.setvar("hurrywave", "depfile", app.model["hurrywave"].domain.input.variables.depfile)
+        app.model["hurrywave"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
+                                                          bathymetry_database=app.bathymetry_database)
+        app.model["hurrywave"].domain.grid.write()
         dlg.close()
 
     def update_mask(self):
@@ -213,7 +261,8 @@ class Toolbox(GenericToolbox):
         dlg = app.gui.window.dialog_wait("Updating mask ...")
 
         grid = app.model["hurrywave"].domain.grid
-        grid.build_mask(zmin=app.gui.getvar("modelmaker_hurrywave", "global_zmin"),
+        mask = app.model["hurrywave"].domain.mask
+        mask.build(zmin=app.gui.getvar("modelmaker_hurrywave", "global_zmin"),
                    zmax=app.gui.getvar("modelmaker_hurrywave", "global_zmax"),
                    include_polygon=app.toolbox["modelmaker_hurrywave"].include_polygon,
                    include_zmin=app.gui.getvar("modelmaker_hurrywave", "include_zmin"),
@@ -223,16 +272,28 @@ class Toolbox(GenericToolbox):
                    exclude_zmax=app.gui.getvar("modelmaker_hurrywave", "exclude_zmax"),
                    boundary_polygon=app.toolbox["modelmaker_hurrywave"].boundary_polygon,
                    boundary_zmin=app.gui.getvar("modelmaker_hurrywave", "boundary_zmin"),
-                   boundary_zmax=app.gui.getvar("modelmaker_hurrywave", "boundary_zmax")
-                   )
-        app.map.layer["hurrywave"].layer["mask_include"].set_data(grid.mask_to_gdf(option="include"))
-        app.map.layer["hurrywave"].layer["mask_boundary"].set_data(grid.mask_to_gdf(option="boundary"))
-        if not app.model["hurrywave"].domain.input.variables.mskfile:
-            app.model["hurrywave"].domain.input.variables.mskfile = "hurrywave.msk"
-        grid.write_msk_file()
-        # GUI variables
-        app.gui.setvar("hurrywave", "mskfile", app.model["hurrywave"].domain.input.variables.mskfile)
+                   boundary_zmax=app.gui.getvar("modelmaker_hurrywave", "boundary_zmax"),
+                   update_datashader_dataframe=True
+                  )
+        # app.map.layer["hurrywave"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
+        # app.map.layer["hurrywave"].layer["mask_boundary"].set_data(mask.to_gdf(option="boundary"))
+        app.map.layer["hurrywave"].layer["mask"].set_data(mask)
+        # app.map.layer["hurrywave"].layer["mask_boundary"].set_data(mask.to_gdf(option="boundary"))
+        grid.write()
+        # if not app.model["hurrywave"].domain.input.variables.mskfile:
+        #     app.model["hurrywave"].domain.input.variables.mskfile = "hurrywave.msk"
+        # grid.write_msk_file()
+        # # GUI variables
+        # app.gui.setvar("hurrywave", "mskfile", app.model["hurrywave"].domain.input.variables.mskfile)
 
+        dlg.close()
+
+    def cut_inactive_cells(self):
+        dlg = app.gui.window.dialog_wait("Cutting Inactive Cells ...")
+        app.model["hurrywave"].domain.grid.cut_inactive_cells()
+        app.model["hurrywave"].domain.grid.write()
+        # Replot everything
+        app.model["hurrywave"].plot()
         dlg.close()
 
     def generate_waveblocking(self):
@@ -301,6 +362,23 @@ class Toolbox(GenericToolbox):
         # app.toolbox["modelmaker_hurrywave"].write_exclude_polygon()
         # app.toolbox["modelmaker_hurrywave"].write_boundary_polygon()
 
+    def read_refinement_polygon(self, file_name, append):
+        # Should we make this part of cht_hurrywave? Yes, but for now it is in the modelmaker_hurrywave toolbox.
+        refinement_polygon = gpd.read_file(file_name).to_crs(app.crs)
+        # Check if the file contains a column "refinement_level"
+        if "refinement_level" not in refinement_polygon.columns:
+            refinement_polygon["refinement_level"] = 1
+        # Check if the file contains a column "zmin"
+        if "zmin" not in refinement_polygon.columns:
+            refinement_polygon["zmin"] = -99999.0
+        # Check if the file contains a column "zmax"
+        if "zmax" not in refinement_polygon.columns:
+            refinement_polygon["zmax"] = 99999.0
+        if append:
+            self.refinement_polygon = gpd.GeoDataFrame(pd.concat([self.refinement_polygon, refinement_polygon], ignore_index=True))
+        else:
+            self.refinement_polygon = refinement_polygon
+
     def read_include_polygon(self):
         self.include_polygon = gpd.read_file(self.include_file_name)
         self.update_polygons()
@@ -312,6 +390,15 @@ class Toolbox(GenericToolbox):
     def read_boundary_polygon(self):
         self.boundary_polygon = gpd.read_file(self.boundary_file_name)
         self.update_polygons()
+
+    def write_refinement_polygon(self):
+        if len(self.refinement_polygon) == 0:
+            print("No refinement polygons defined")
+            return
+        # Drop the id column
+        gdf = self.refinement_polygon.drop(columns=["id"])
+        fname = app.gui.getvar("modelmaker_hurrywave", "refinement_polygon_file")
+        gdf.to_file(fname, driver='GeoJSON')
 
     def write_include_polygon(self):
         if len(self.include_polygon) == 0:
@@ -330,6 +417,12 @@ class Toolbox(GenericToolbox):
             return
         gdf = gpd.GeoDataFrame(geometry=self.boundary_polygon["geometry"])
         gdf.to_file(self.boundary_file_name, driver='GeoJSON')
+
+    # Plot
+
+    def plot_refinement_polygon(self):
+        layer = app.map.layer["modelmaker_hurrywave"].layer["quadtree_refinement"]
+        layer.set_data(self.refinement_polygon)
 
     def plot_include_polygon(self):
         layer = app.map.layer["modelmaker_hurrywave"].layer["mask_include"]
@@ -361,6 +454,14 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "mmax", dct["coordinates"]["mmax"])
         app.gui.setvar(group, "rotation", dct["coordinates"]["rotation"])
         app.model["hurrywave"].domain.crs = CRS(dct["coordinates"]["crs"])
+
+        # Quadtree refinement
+        if "quadtree" in dct:
+            if "polygon_file" in dct["quadtree"]:
+                app.gui.setvar(group, "refinement_polygon_file", dct["quadtree"]["polygon_file"])
+                self.read_refinement_polygon()
+                self.plot_refinement_polygon()
+
         # Mask
         app.gui.setvar(group, "global_zmin", dct["mask"]["zmin"])
         app.gui.setvar(group, "global_zmax", dct["mask"]["zmax"])
@@ -424,6 +525,7 @@ class Toolbox(GenericToolbox):
     def write_setup_yaml(self):
         group = "modelmaker_hurrywave"
         dct = {}
+
         # Coordinates
         dct["coordinates"] = {}
         dct["coordinates"]["x0"] = float(app.gui.getvar(group, "x0"))
@@ -434,6 +536,12 @@ class Toolbox(GenericToolbox):
         dct["coordinates"]["mmax"] = int(app.gui.getvar(group, "mmax"))
         dct["coordinates"]["rotation"] = float(app.gui.getvar(group, "rotation"))
         dct["coordinates"]["crs"] = app.model["hurrywave"].domain.crs.name
+
+        # QuadTree
+        dct["quadtree"] = {}
+        if len(app.toolbox["modelmaker_sfincs_cht"].refinement_polygon)>0:
+            dct["quadtree"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_file")
+
         # Mask
         dct["mask"] = {}
         dct["mask"]["zmin"] = app.gui.getvar(group, "global_zmin")

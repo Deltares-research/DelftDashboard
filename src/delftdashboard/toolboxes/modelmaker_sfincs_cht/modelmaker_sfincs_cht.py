@@ -962,7 +962,7 @@ class Toolbox(GenericToolbox):
         if "quadtree" in dct:
             if "polygon_file" in dct["quadtree"]:
                 app.gui.setvar(group, "refinement_polygon_file", dct["quadtree"]["polygon_file"])
-                self.read_refinement_polygon()
+                self.read_refinement_polygon(dct["quadtree"]["polygon_file"], False)
                 self.plot_refinement_polygon()
         # Mask
         app.gui.setvar(group, "use_mask_global", False)

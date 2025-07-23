@@ -3,7 +3,7 @@ element:
   position:
     x: 10
     y: 35
-    width: 200
+    width: 150
     height: 85
   text: "Available Datasets"
   text_position: "above"
@@ -19,7 +19,7 @@ element:
   position:
     x: 10
     y: 10
-    width: 200
+    width: 150
     height: 20
   method: select_bathymetry_source
   module: delftdashboard.operations.bathy_topo_selector
@@ -34,7 +34,7 @@ element:
     variable_group: bathy_topo_selector
 - style: pushbutton
   position:
-    x: 220
+    x: 170
     y: 100
     width: 80
     height: 20
@@ -43,7 +43,7 @@ element:
   module: delftdashboard.operations.bathy_topo_selector
 - style: pushbutton
   position:
-    x: 220
+    x: 170
     y: 75
     width: 80
     height: 20
@@ -53,9 +53,9 @@ element:
   enable: False
 - style: listbox
   position:
-    x: 310
+    x: 260
     y: 35
-    width: 200
+    width: 150
     height: 85
   text: "Selected Datasets"
   text_position: "above"
@@ -69,9 +69,9 @@ element:
     variable_group: bathy_topo_selector
 - style: edit
   position:
-    x: 340
+    x: 280
     y: 10
-    width: 60
+    width: 50
     height: 20
   text: "Zmin"
   method: edit_zmin_bathymetry_dataset
@@ -89,9 +89,9 @@ element:
       value: 0
 - style: edit
   position:
-    x: 450
+    x: 360
     y: 10
-    width: 60
+    width: 50
     height: 20
   text: "Zmax"
   method: edit_zmax_bathymetry_dataset
@@ -109,7 +109,7 @@ element:
       value: 0
 - style: pushbutton
   position:
-    x: 520
+    x: 420
     y: 100
     width: 80
     height: 20
@@ -126,7 +126,7 @@ element:
       value: 0
 - style: pushbutton
   position:
-    x: 520
+    x: 420
     y: 75
     width: 80
     height: 20
@@ -143,12 +143,29 @@ element:
       value: 0
 - style: pushbutton
   position:
-    x: 520
+    x: 420
     y: 50
     width: 80
     height: 20
   text: "Move Down"
   method: move_down_selected_bathymetry_dataset
+  module: delftdashboard.operations.bathy_topo_selector
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_selected_bathymetry_datasets
+      variable_group: bathy_topo_selector
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: Load Polygon
+  position:
+    x: 420
+    y: 10
+    width: 80
+    height: 20
+  method: load_polygon
   module: delftdashboard.operations.bathy_topo_selector
   dependency:
   - action: enable

@@ -54,6 +54,8 @@ def load_polyline(*args):
             append = False
         app.toolbox["drawing"].polyline_file_name = rsp[0]
         gdf = gpd.read_file(app.toolbox["drawing"].polyline_file_name)
+        # Convert to CRS of app
+        gdf = gdf.to_crs(app.crs)
         # Remove all rows where gdf is not a LineString
         gdf = gdf[gdf.geometry.type == "LineString"]
         if len(gdf) == 0:
@@ -61,7 +63,6 @@ def load_polyline(*args):
             return
         if append:
             # Make sure that gdf has the same crs as app.toolbox["drawing"].polyline
-            gdf = gdf.to_crs(app.toolbox["drawing"].polyline.crs)
             app.toolbox["drawing"].polyline = pd.concat([app.toolbox["drawing"].polyline, gdf])
         else:
             app.toolbox["drawing"].polyline = gdf
