@@ -6,16 +6,12 @@ element:
     width: -10
     height: 160
   tab:
-  - string: Add Model
-    module: delftdashboard.toolboxes.model_database.model_database
-    element: add_model.yml
-  - string: Generate Model Database
-    module: delftdashboard.toolboxes.model_database.model_database
+  - string: View Domain Database
+    module: delftdashboard.toolboxes.model_database.generate_database
     element: generate_database.yml
-  - string: View Model Database
-    module: delftdashboard.toolboxes.model_database.model_database
-    element: view_database.yml
-
-
- 
-
+  - string: Add Domain
+    module: delftdashboard.toolboxes.model_database.add_model
+    element: add_model.yml
+  # - string: View Domain Database
+  #   module: delftdashboard.toolboxes.model_database.model_database
+  #   element: view_database.yml

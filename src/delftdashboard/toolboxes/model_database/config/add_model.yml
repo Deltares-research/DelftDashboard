@@ -1,9 +1,121 @@
+# element:
+# - style: tableview
+#   position:
+#     x: 140
+#     y: 10
+#     width: 350
+#     height: 120
+#   selection_type: singles
+#   option_value:
+#     variable: model_settings
+#     variable_group: model_database
+
 element:
-- style: listbox
+- style: edit
   position:
-    x: 10
-    y: 35
-    width: 200
-    height: 85
-  text: "Available Models"
-  textposition: above
+    x: 40
+    y: 110
+    width: 80
+    height: 20
+  text: Name
+  variable: active_model_name
+- style: edit
+  position:
+    x: 40
+    y: 60
+    width: 80
+    height: 20
+  text: EPSG
+  variable: active_model_crs
+- style: edit
+  position:
+    x: 40
+    y: 85
+    width: 80
+    height: 20
+  text: Type
+  variable: active_model_type
+
+- style: edit
+  position:
+    x: 180
+    y: 60
+    width: 80
+    height: 20
+  text: Spinup time
+  variable: flow_spinup_time
+
+- style: edit
+  position:
+    x: 180
+    y: 85
+    width: 80
+    height: 20
+  text: Station
+  variable: station
+
+- style: edit
+  position:
+    x: 180
+    y: 110
+    width: 80
+    height: 20
+  text: Flow nested
+  variable: flow_nested
+
+- style: checkbox
+  position:
+    x: 280
+    y: 60
+    width: 120
+    height: 20
+  text: Flood map
+  variable: make_flood_map
+  variable_group: model_database
+
+- style: checkbox
+  position:
+    x: 280
+    y: 85
+    width: 120
+    height: 20
+  text: Water level map
+  variable: make_water_level_map
+  variable_group: model_database
+
+- style: checkbox
+  position:
+    x: 280
+    y: 110
+    width: 120
+    height: 20
+  text: Precipitation map
+  variable: make_precipitation_map
+  variable_group: model_database
+
+
+- style: popupmenu
+  position:
+    x: 390
+    y: 90
+    width: 150
+    height: 20
+  text: Choose collection
+  text_position: above
+  method: set_collection_toml
+  module: delftdashboard.toolboxes.model_database.add_model
+  variable: selected_collection_toml
+  variable_group: model_database
+  select: item
+  option_value:
+    variable: available_collection_names 
+    variable_group: model_database
+
+- style: pushbutton
+  position:
+    x: 550
+    y: 110
+    width: 100
+    height: 20
+  method: write_toml_file
+  text: Write model.toml

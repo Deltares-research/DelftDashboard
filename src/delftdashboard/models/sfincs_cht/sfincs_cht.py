@@ -250,14 +250,19 @@ class Model(GenericModel):
             self.domain.clear_spatial_attributes()
             self.plot()
 
-    def open(self):
+    def open(self, filename=None):
         # Open input file, and change working directory
-        fname = app.gui.window.dialog_open_file("Open file", filter="SFINCS input file (sfincs.inp)")
-        fname = fname[0]
-        if fname:
+        if filename is None:
+            # Open file dialog to select input file
+            filename = app.gui.window.dialog_open_file("Open file", filter="SFINCS input file (sfincs.inp)")
+            filename = filename[0]
+
+        if filename:
             dlg = app.gui.window.dialog_wait("Loading SFINCS model ...")
-            path = os.path.dirname(fname)
-            # Change working directory
+            path = os.path.dirname(filename)
+            # if path is and empty string, use current working directory
+            if not path:
+                path = os.getcwd()
             os.chdir(path)
             self.initialize()
             self.domain.path = path
@@ -265,7 +270,9 @@ class Model(GenericModel):
             self.set_gui_variables()
             # Also get mask datashader dataframe (should this not happen when grid is read?)
             self.domain.mask.get_datashader_dataframe()
-            self.domain.snapwave.mask.get_datashader_dataframe()
+            if self.domain.input.variables.snapwave:
+                # If snapwave is used, get the datashader dataframe for the snapwave mask
+                self.domain.snapwave.mask.get_datashader_dataframe()
             # Change CRS
             map.set_crs(self.domain.crs)
             self.plot()

@@ -23,11 +23,13 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "polygon_names", [])
         app.gui.setvar(group, "active_polygon", 0)
         app.gui.setvar(group, "polygon_buffer_distance", 0.0)
+        app.gui.setvar(group, "polygon_simplify_distance", 0.0)
 
         app.gui.setvar(group, "nr_polylines", 0)
         app.gui.setvar(group, "polyline_names", [])
         app.gui.setvar(group, "active_polyline", 0)
         app.gui.setvar(group, "polyline_buffer_distance", 0.0)
+        app.gui.setvar(group, "polyline_simplify_distance", 0.0)
 
         self.polygon = gpd.GeoDataFrame()
         self.polyline = gpd.GeoDataFrame()

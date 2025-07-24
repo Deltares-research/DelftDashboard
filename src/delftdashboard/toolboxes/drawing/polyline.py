@@ -166,6 +166,7 @@ def update_temp_layer():
 
 def get_buffered_polylines():
     buffer_distance = app.gui.getvar("drawing", "polyline_buffer_distance")
+    simplify_tolerance = 0.2 * buffer_distance
     # Check if gdf is in geographic or projected CRS
     if app.toolbox["drawing"].polyline.crs.is_geographic:
         # Convert to Azimuthal equidistant projection
@@ -174,9 +175,12 @@ def get_buffered_polylines():
         aeqd_proj = CRS.from_proj4(
                 f"+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0")                
         geom = app.toolbox["drawing"].polyline.to_crs(aeqd_proj).buffer(buffer_distance)
+        geom = geom.simplify(tolerance=simplify_tolerance)
+        # Simplify
         gdf = gpd.GeoDataFrame(geom, columns=["geometry"]).set_crs(aeqd_proj).to_crs(app.toolbox["drawing"].polyline.crs)
     else:
         geom = app.toolbox["drawing"].polyline.buffer(buffer_distance)
+        geom = geom.simplify(tolerance=simplify_tolerance)
         gdf = gpd.GeoDataFrame(geom, columns=["geometry"]).to_crs(app.toolbox["drawing"].polyline.crs)
 
     return gdf
