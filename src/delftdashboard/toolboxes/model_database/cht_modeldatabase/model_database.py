@@ -6,7 +6,7 @@ Created on Sun Apr 25 10:58:08 2021
 """
 
 import os
-
+import shutil
 import boto3
 import toml
 from botocore import UNSIGNED
@@ -171,6 +171,42 @@ class ModelDatabase:
         #     f.write(f'\n[[collection]]\nname = "{name}"\nlong_name = "{long_name}"\npath = "{collection_path}"\n')
 
         print(f"Collection '{name}' added to model database.")
+
+    def copy_model_input_files(self, domain_name, to_path):
+        """
+        Copy input files from the domain's input folder to the current working directory or a specified path.
+        """
+
+        # Ensure the destination path exists
+        if not os.path.exists(to_path):
+            os.makedirs(to_path)
+
+        # Get the domain from the model database
+        domain = self.get_model(name=domain_name)
+
+        # Get domain path robustly
+        domain_path = getattr(domain, 'path', None)
+        if not domain_path or not isinstance(domain_path, str):
+            print(f"Invalid or missing domain path for domain: {domain_name}")
+            return
+        domain_input_folder = os.path.join(domain_path, "input")
+        
+        # Copy all input files from the domain input folder to the current working directory
+        # We do not want to overwrite existing files in the model database!
+        for item in os.listdir(domain_input_folder):
+            src = os.path.join(domain_input_folder, item)
+            dst = os.path.join(os.getcwd(), item)
+            if os.path.isfile(src):
+                shutil.copy2(src, dst)
+            elif os.path.isdir(src):
+                # If it's a directory, copy recursively
+                if not os.path.exists(dst):
+                    os.makedirs(dst)
+                for sub_item in os.listdir(src):
+                    sub_src = os.path.join(src, sub_item)
+                    sub_dst = os.path.join(dst, sub_item)
+                    if os.path.isfile(sub_src):
+                        shutil.copy2(sub_src, sub_dst)
 
 class ModelCollection:  
     def __init__(self, name):        

@@ -148,33 +148,10 @@ def activate_domain(self) -> None:
         if not ok:
             return
 
-    # The next bit until reading the model should move to the model_database class
-
+    # Copy input files from the selected domain to the current working directory
     domain_name = app.gui.getvar(group, "active_domain_name")
     domain = app.model_database.get_model(name=domain_name)
-    # Get domain path robustly
-    domain_path = getattr(domain, 'path', None)
-    if not domain_path or not isinstance(domain_path, str):
-        print(f"Invalid or missing domain path for domain: {domain_name}")
-        return
-    domain_input_folder = os.path.join(domain_path, "input")
-    
-    # Copy all input files from the domain input folder to the current working directory
-    # We do not want to overwrite existing files in the model database!
-    for item in os.listdir(domain_input_folder):
-        src = os.path.join(domain_input_folder, item)
-        dst = os.path.join(os.getcwd(), item)
-        if os.path.isfile(src):
-            shutil.copy2(src, dst)
-        elif os.path.isdir(src):
-            # If it's a directory, copy recursively
-            if not os.path.exists(dst):
-                os.makedirs(dst)
-            for sub_item in os.listdir(src):
-                sub_src = os.path.join(src, sub_item)
-                sub_dst = os.path.join(dst, sub_item)
-                if os.path.isfile(sub_src):
-                    shutil.copy2(sub_src, sub_dst)
+    app.model_database.copy_model_input_files(domain_name, os.getcwd())
 
     # Now check what sort of model we are dealing with    
     if domain.type == "sfincs":
@@ -186,44 +163,6 @@ def activate_domain(self) -> None:
         app.active_model.select()
         app.active_model.open(filename="hurrywave.inp")
 
-    return
-
-    # # Check if the input folder exists, else use the original domain_path
-    # if os.path.isdir(domain_input_folder):
-    #     domain_path = domain_input_folder
-
-    # if domain_path is None:
-    #     print("Domain path is not set for domain: ", domain_name)
-    #     return
-
-    # # Find corresponding model in app.model
-    # for model in app.model:
-    #     dlg = app.gui.window.dialog_wait("Activating domain ...")
-    #     app.active_model = app.model[model]
-
-    #     os.chdir(domain.path)
-    #     app.active_model.initialize()
-    #     app.active_model.domain.path = domain_path
-    #     app.active_model.domain.read()
-    #     app.active_model.set_gui_variables()
-    #     # Also get mask datashader dataframe (should this not happen when grid is read?)
-    #     app.active_model.domain.mask.get_datashader_dataframe()
-    #     if app.model["sfincs_cht"].domain.input.variables.snapwave:
-    #         # If snapwave is used, get the datashader dataframe for the snapwave mask
-    #         app.active_model.domain.snapwave.mask.get_datashader_dataframe()	
-
-    #     # Change CRS
-    #     map.set_crs(app.active_model.domain.crs)
-    #     app.active_model.plot()
-    #     dlg.close()
-    #     app.gui.window.update()
-    #     # Zoom to model extent
-    #     bounds = app.active_model.domain.grid.bounds(crs=4326, buffer=0.1)
-    #     app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
-
-    # update_map()
-
-    # print("Domain name: ", domain_name)
     
 
 def update_map(*args) -> None:

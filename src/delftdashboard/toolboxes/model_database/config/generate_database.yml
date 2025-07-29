@@ -2,9 +2,9 @@ element:
 - style: listbox
   position:
     x: 10
-    y: 5
-    width: 100
-    height: 115
+    y: 10
+    width: 150
+    height: 110
   text: "Available Collections"
   text_position: "above"
   method: select_collection
@@ -22,9 +22,9 @@ element:
 - style: listbox
   position:
     x: 230
-    y: 5
-    width: 100
-    height: 115
+    y: 10
+    width: 150
+    height: 110
   text: "Selected Collections"
   text_position: "above"
   method: select_selected_collections
@@ -42,10 +42,10 @@ element:
 
 - style: listbox
   position:
-    x: 470
-    y: 5
+    x: 490
+    y: 10
     width: 150
-    height: 115
+    height: 110
   text: "Available Domains"
   text_position: "above"
   method: select_domain_from_list
@@ -62,22 +62,22 @@ element:
 
 - style: pushbutton
   position:
-    x: 120
+    x: 170
     y: 100
-    width: 100
+    width: 50
     height: 20
-  text: "Show Collection ->"
+  text: "Show ->"
   method: use_collection
   module: delftdashboard.toolboxes.model_database.generate_database
 
 - style: pushbutton
   position:
-    x: 120
+    x: 170
     y: 70
-    width: 100
+    width: 50
     height: 20
   method: remove_collection
-  text: <- Remove Collection
+  text: <- Hide
   module: delftdashboard.toolboxes.model_database.generate_database
 
 # - style: pushbutton
@@ -92,11 +92,11 @@ element:
 
 - style: checkbox
   position:
-    x: 340
-    y: 80
+    x: 390
+    y: 30
     width: 120
     height: 20
-  text: SFINCS models
+  text: SFINCS
   variable: show_sfincs
   variable_group: model_database
   method: toggle_sfincs
@@ -105,11 +105,11 @@ element:
 
 - style: checkbox
   position:
-    x: 340
-    y: 60
+    x: 390
+    y: 10
     width: 120
     height: 20
-  text: HurryWave models
+  text: HurryWave
   variable: show_hurrywave
   variable_group: model_database
   method: toggle_hurrywave
@@ -165,10 +165,10 @@ element:
   
 - style: pushbutton
   position:
-    x: 630
+    x: 650
     y: 100
     width: 100
     height: 20
   method: activate_domain
-  text: Activate domain
+  text: Load Domain
   module: delftdashboard.toolboxes.model_database.generate_database
