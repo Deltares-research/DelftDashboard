@@ -76,7 +76,7 @@ class Toolbox(GenericToolbox):
 
         # Refinement
         app.gui.setvar(group, "refinement_depth", 0) 
-        app.gui.setvar(group, "depth_min_edge_size", 0) 
+        app.gui.setvar(group, "depth_min_edge_size", 500) 
 
         # Polygon refinement
         app.gui.setvar(group, "refinement_polygon_file", "refine.geojson")
@@ -87,7 +87,7 @@ class Toolbox(GenericToolbox):
         # app.gui.setvar(group, "refinement_polygon_smoothing", 2)
         # app.gui.setvar(group, "refinement_polygon_max_courant_time", 2)
         app.gui.setvar(group, "nr_refinement_polygons", 0)
-        app.gui.setvar(group, "ref_min_edge_size", 0)
+        app.gui.setvar(group, "ref_min_edge_size", 500)
 
         # Mask
         app.gui.setvar(group, "exclude_polygon_file", "exclude.geojson")
@@ -220,7 +220,7 @@ class Toolbox(GenericToolbox):
         from .refinement import refinement_polygon_modified
         from .refinement import refinement_polygon_selected
         layer.add_layer("polygon_refinement", type="draw",
-                             columns={"min_edge_size": 0},
+                             columns={"min_edge_size": 500},
                              shape="polygon",
                              create=refinement_polygon_created,
                              modify=refinement_polygon_modified,
@@ -251,7 +251,6 @@ class Toolbox(GenericToolbox):
         dy       = app.gui.getvar(group, "dy")
         nmax     = app.gui.getvar(group, "nmax")
         mmax     = app.gui.getvar(group, "mmax")
-        rotation = 0
         model.input.geometry.netfile.filepath = "flow_net.nc"
         app.gui.setvar("delft3dfm", "netfile", model.input.geometry.netfile.filepath)
 
@@ -483,7 +482,7 @@ class Toolbox(GenericToolbox):
         for i in range(len(self.refinement_polygon)):
             self.refinement_polygon_names.append(self.refinement_polygon["refinement_polygon_name"][i])
         if "min_edge_size" not in self.refinement_polygon.columns:
-            self.refinement_polygon["min_edge_size"] = 0
+            self.refinement_polygon["min_edge_size"] = 500
 
     # def read_include_polygon(self):
     #     fname = app.gui.getvar("modelmaker_delft3dfm", "include_polygon_file")

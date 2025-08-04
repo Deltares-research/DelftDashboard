@@ -57,7 +57,6 @@ def update_geometry():
     leny = float(gdf["dy"][0])
     app.toolbox["modelmaker_delft3dfm"].lenx = lenx
     app.toolbox["modelmaker_delft3dfm"].leny = leny
-    app.gui.setvar(group, "rotation", float(round(gdf["rotation"][0] * 180 / math.pi, 1)))
     app.gui.setvar(
         group, "nmax", int(np.floor(leny / app.gui.getvar(group, "dy")))
     )
@@ -104,7 +103,7 @@ def redraw_rectangle():
         app.gui.getvar(group, "y0"),
         app.toolbox["modelmaker_delft3dfm"].lenx,
         app.toolbox["modelmaker_delft3dfm"].leny,
-        app.gui.getvar(group, "rotation"),
+        0,  # rotation in degrees
     )
 
 def read_setup_yaml(*args):
