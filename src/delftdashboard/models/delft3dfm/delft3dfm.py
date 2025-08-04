@@ -104,6 +104,7 @@ class Model(GenericModel):
         layer.add_layer("observation_points",
                         type="circle_selector",
                         select=select_observation_point_from_map,
+                        hover_property="name",
                         line_color="white",
                         line_opacity=1.0,
                         fill_color="blue",
@@ -265,6 +266,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
         app.gui.setvar(group, "boundary_conditions_tide_model", app.gui.getvar("tide_models", "names")[0])
+        app.gui.setvar(group, "boundary_conditions_tide_offset", 0.0)
 
         # Thin dams
         app.gui.setvar(group, "thin_dam_names", [])
@@ -362,6 +364,9 @@ class Model(GenericModel):
             app.crs = self.domain.crs
             self.plot()
             dlg.close()
+            # Zoom to model extent
+            bounds = self.domain.grid.bounds(crs=4326, buffer=0.1)
+            app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def save(self):
         # Write flow.mdu
@@ -397,10 +402,14 @@ class Model(GenericModel):
         # gdf = self.domain.observation_points_sp2.gdf
         # app.map.layer["delft3dfm"].layer["observation_points_spectra"].set_data(gdf, 0)
 
-    # def add_stations(self, gdf_stations_to_add, naming_option="id"):
-    #     self.domain.observation_points.add_points(gdf_stations_to_add, name=naming_option)
-    #     gdf = self.domain.observation_points.gdf
-    #     app.map.layer["delft3dfm"].layer["observation_points"].set_data(gdf, 0)
-    #     if not self.domain.input.variables.obsfile:
-    #         self.domain.input.variables.obsfile = "delft3dfm.obs"
-    #     self.domain.observation_points.write()
+    def add_stations(self, gdf_stations_to_add, naming_option="id"):
+        self.domain.observation_points.add_points(gdf_stations_to_add, name=naming_option)
+        gdf = self.domain.observation_points.gdf
+        app.map.layer["delft3dfm"].layer["observation_points"].set_data(gdf, 0)
+        if not self.domain.input.output.obsfile:
+            from hydrolib.core.dflowfm.xyn.models import XYNModel
+            obs = XYNModel()
+            obs.filepath = Path(self.domain.path) / "delft3dfm.obs"
+            app.model["delft3dfm"].domain.input.output.obsfile = [obs]
+        self.domain.observation_points.write()
+
