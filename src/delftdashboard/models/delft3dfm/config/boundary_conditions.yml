@@ -164,7 +164,8 @@ element:
       y: 80
       width: 50
       height: 20
-    variable: boundary_conditions_timeseries_offset
+    method: set_model_variables
+    variable: boundary_conditions_tide_offset
     tooltip: Edit water level offset in metres
   # - style: popupmenu
   #   position:

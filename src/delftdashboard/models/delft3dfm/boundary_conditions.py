@@ -11,7 +11,6 @@ Created on Mon May 10 12:18:09 2021
 from delftdashboard.app import app
 from delftdashboard.operations import map
 from pathlib import Path
-from delftdashboard.misc.gdfutils import mline2point
 
 def select(*args):
     # Set all layer inactive, except boundary_points
@@ -157,34 +156,62 @@ def deselect(*args):
 
 def generate_boundary_conditions_from_tide_model(*args):
 
-    map.reset_cursor()
-    rsp = app.gui.window.dialog_save_file("Select bc file file ...",
-                                          file_name='bc_new.ext',
-                                          filter = None,
-                                          allow_directory_change=False)
-    if rsp[0]:
-        tide_model_name = app.gui.getvar("delft3dfm", "boundary_conditions_tide_model")
-        gdf = app.model["delft3dfm"].domain.boundary_conditions.gdf
-        gdf = mline2point(gdf) # convert line to points
-        tide_model = app.tide_model_database.get_dataset(tide_model_name)
-        app.model["delft3dfm"].domain.boundary_conditions.gdf_points = tide_model.get_data_on_points(gdf=gdf, crs=app.model["delft3dfm"].domain.crs, format="gdf", constituents="all")
-        # app.model["delft3dfm"].domain.boundary_conditions.gdf = gdf
+    # map.reset_cursor()
+    # rsp = app.gui.window.dialog_save_file("Select bc file file ...",
+    #                                       file_name='bc_new.ext',
+    #                                       filter = None,
+    #                                       allow_directory_change=False)
+    # if rsp[0]:
+    tide_model_name = app.gui.getvar("delft3dfm", "boundary_conditions_tide_model")
+    gdf = app.model["delft3dfm"].domain.boundary_conditions.gdf_points
+    tide_model = app.tide_model_database.get_dataset(tide_model_name)
+    gdf_points = tide_model.get_data_on_points(gdf=gdf, crs=app.model["delft3dfm"].domain.crs, format="gdf", constituents="all")
+    app.model["delft3dfm"].domain.boundary_conditions.gdf_points = tide_model.add_offset(gdf_points, offset=app.gui.getvar("delft3dfm", "boundary_conditions_tide_offset"))
+    # app.model["delft3dfm"].domain.boundary_conditions.gdf = gdf
 
-        # Save water level forcing file 
-        app.model["delft3dfm"].domain.boundary_conditions.write_boundary_conditions_astro() # writes .bc file
-    
-        # Now save the external forcing file
-        app.model["delft3dfm"].domain.boundary_conditions.write_ext_wl() # writes .bc file
+    # Save water level forcing file 
+    app.model["delft3dfm"].domain.boundary_conditions.write_boundary_conditions_astro() # writes waterlevel_astro.bc file
 
-        # ext_new= app.model["delft3dfm"].domain.boundary_conditions.generate_tide(tidemodel=tidemodel, ext_file_new= rsp[0])
-        # app.model["delft3dfm"].domain.input.external_forcing.extforcefilenew = ext_new
+    # Now save the external forcing file
+    app.model["delft3dfm"].domain.boundary_conditions.write_ext_wl() # writes bnd_new.ext file
 
-        # app.model["delft3dfm"].domain.input.output.crsfile = [] # first clear obsfile list to add combined / new crs
-        # app.model["delft3dfm"].domain.input.output.crsfile.append(ObservationCrossSectionModel())
-        # app.model["delft3dfm"].domain.input.output.crsfile[0].filepath=Path(rsp[2]) # save all obs crss in 1 file
+    # ext_new= app.model["delft3dfm"].domain.boundary_conditions.generate_tide(tidemodel=tidemodel, ext_file_new= rsp[0])
+    # app.model["delft3dfm"].domain.input.external_forcing.extforcefilenew = ext_new
+
+    # app.model["delft3dfm"].domain.input.output.crsfile = [] # first clear obsfile list to add combined / new crs
+    # app.model["delft3dfm"].domain.input.output.crsfile.append(ObservationCrossSectionModel())
+    # app.model["delft3dfm"].domain.input.output.crsfile[0].filepath=Path(rsp[2]) # save all obs crss in 1 file
 
 def generate_boundary_conditions_custom(*args):
-    pass
+    """Set boundary conditions based on the values in the GUI"""
+
+    dlg = app.gui.window.dialog_wait("Generating boundary conditions ...")
+
+    shape = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_shape")
+    timestep = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_time_step")
+    offset = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_offset")
+    amplitude = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_amplitude")
+    phase = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_phase")
+    period = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_period")
+    peak = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_peak")
+    tpeak = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_tpeak")
+    duration = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_duration")
+    app.model["delft3dfm"].domain.boundary_conditions.set_timeseries(shape=shape,
+                                                                      timestep=timestep,
+                                                                      offset=offset,
+                                                                      amplitude=amplitude,
+                                                                      phase=phase,
+                                                                      period=period,
+                                                                      peak=peak,
+                                                                      tpeak=tpeak,
+                                                                      duration=duration)
+    dlg.close()
+
+    # Save water level forcing file 
+    app.model["delft3dfm"].domain.boundary_conditions.write_boundary_conditions_timeseries()
+
+    # Now save the external forcing file
+    app.model["delft3dfm"].domain.boundary_conditions.write_ext_wl(forcingtype='bzs') # writes bnd_new.ext file
 
     # # Ask for name of bca file
     # bcafile = get_bca_file_name()
@@ -214,41 +241,7 @@ def set_model_variables(*args):
     # All variables will be set
     app.model["delft3dfm"].set_input_variables()
 
-# def set_boundary_conditions(*args):
-#     """Set boundary conditions based on the values in the GUI"""
 
-#     bzsfile = get_bzs_file_name()
-#     if bzsfile is None:
-#         return
-
-#     app.model["delft3dfm"].domain.input.variables.bzsfile = bzsfile # file name without path
-#     app.gui.setvar("delft3dfm", "bzsfile", bzsfile)
-
-#     dlg = app.gui.window.dialog_wait("Generating boundary conditions ...")
-
-#     shape = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_shape")
-#     timestep = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_time_step")
-#     offset = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_offset")
-#     amplitude = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_amplitude")
-#     phase = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_phase")
-#     period = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_period")
-#     peak = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_peak")
-#     tpeak = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_tpeak")
-#     duration = app.gui.getvar("delft3dfm", "boundary_conditions_timeseries_duration")
-#     app.model["delft3dfm"].domain.boundary_conditions.set_timeseries(shape=shape,
-#                                                                       timestep=timestep,
-#                                                                       offset=offset,
-#                                                                       amplitude=amplitude,
-#                                                                       phase=phase,
-#                                                                       period=period,
-#                                                                       peak=peak,
-#                                                                       tpeak=tpeak,
-#                                                                       duration=duration)
-#     dlg.close()
-
-#     # Save the bzs file
-#     app.model["delft3dfm"].domain.boundary_conditions.write_boundary_conditions_timeseries()
-#     app.model["delft3dfm"].boundaries_changed = False
 
 # def view_boundary_conditions(*args):
 #     print("Viewing boundary conditions not implemented yet")
