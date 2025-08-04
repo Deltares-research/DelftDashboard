@@ -4,6 +4,7 @@ Created on Tue Jul  5 13:40:07 2022
 
 @author: ormondt
 """
+import os
 from delftdashboard.app import app
 from delftdashboard.operations.toolbox import select_toolbox
 
@@ -90,6 +91,9 @@ class GenericModel:
 
         # Make model layer visible
         app.map.layer[self.name].show()    
+
+        # Set working directory to model path
+        os.chdir(app.active_model.domain.path)
 
         app.gui.window.update()
 
