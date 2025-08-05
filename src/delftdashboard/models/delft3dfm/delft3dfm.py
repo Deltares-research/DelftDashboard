@@ -105,7 +105,6 @@ class Model(GenericModel):
                         type="circle_selector",
                         hover_property="name",
                         select=select_observation_point_from_map,
-                        hover_property="name",
                         line_color="white",
                         line_opacity=1.0,
                         fill_color="blue",
