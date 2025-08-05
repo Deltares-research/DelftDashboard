@@ -46,5 +46,6 @@ element:
     checkfor: all
     check:
     - variable: nr_selected_bathymetry_datasets
+      variable_group: bathy_topo_selector      
       operator: gt
       value: 0
