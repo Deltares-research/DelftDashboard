@@ -245,6 +245,8 @@ class Toolbox(GenericToolbox):
                          bathymetry_sets=app.selected_bathymetry_datasets,
                          bathymetry_database=app.bathymetry_database)
 
+        app.model["hurrywave"].domain.grid.write()
+
         app.map.layer["hurrywave"].layer["grid"].set_data(model.grid)
 
         dlg.close()
