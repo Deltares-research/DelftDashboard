@@ -1,116 +1,85 @@
-# -*- coding: utf-8 -*-
-"""
-GUI methods for modelmaker_hurrywave -> domain
-
-Created on Mon May 10 12:18:09 2021
-
-@author: Maarten van Ormondt
-"""
-import numpy as np
-import math
-
+import os
 from delftdashboard.app import app
 from delftdashboard.operations import map
+import toml
 
 def select(*args):
-    # De-activate() existing layers
-    map.update()
-    # Show the grid outline layer
-    app.map.layer["hurrywave"].layer["grid"].show()
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].activate()
+    """
+    Select the model_database tab and update the map.
+    """
+    app.map.layer["model_database"].show()
+    app.map.layer["model_database"].layer["boundaries_sfincs"].hide()
+    app.map.layer["model_database"].layer["boundaries_hurrywave"].hide()
+    # Do we really want to immediately add active model? I think a push button is better. What if there is no active model?
+    # select_model(*args)
+    
+def select_model(*args):
+    """
+    Select model to make model.toml.
+    """
+    group = "model_database"
+    # Get the selected model names from the GUI
+    if app.active_model.domain.grid.data is not None:
+        # If a model is already active, prompt to select a new model
+        wb = app.gui.window.dialog_wait("A model is already active")
+        app.active_model.domain.mask.get_datashader_dataframe()
+        app.active_model.plot()  
+    else:
+        wb = app.gui.window.dialog_wait("Choose domain to activate...")
+        app.active_model.open()
 
-def draw_grid_outline(*args):
-    # Clear grid outline layer
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].crs = app.crs
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].draw()
+    assert app.active_model.domain.grid.data is not None, "app.active_model.domain.grid.data is None"
 
-def grid_outline_created(gdf, index, id):
-    if len(gdf) > 1:
-        # Remove the old grid outline
-        id0 = gdf["id"][0]
-        app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].delete_feature(id0)
-        gdf = gdf.drop([0]).reset_index()
-    app.toolbox["modelmaker_hurrywave"].grid_outline = gdf
-    update_geometry()
-    app.gui.window.update()
+    wb.close()
+    wb = app.gui.window.dialog_wait("Loading metadata")
 
-def grid_outline_modified(gdf, index, id):
-    app.toolbox["modelmaker_hurrywave"].grid_outline = gdf
-    update_geometry()
-    app.gui.window.update()
+    # Get the model name from the GUI
 
-def generate_grid(*args):
-    app.toolbox["modelmaker_hurrywave"].generate_grid()
+    app.gui.setvar(group, "active_model_name", app.gui.getvar("model_database", "selected_domain_names"))
+    app.gui.setvar(group, "active_model_type", app.active_model.name)      
+    app.gui.setvar(group, "active_model_crs", app.active_model.domain.crs.to_epsg())
 
-def update_geometry():
-    gdf = app.toolbox["modelmaker_hurrywave"].grid_outline
-    group = "modelmaker_hurrywave"
-    x0 = float(round(gdf["x0"][0], 3))
-    y0 = float(round(gdf["y0"][0], 3))
-    app.gui.setvar(group, "x0", x0)
-    app.gui.setvar(group, "y0", y0)
-    lenx = float(gdf["dx"][0])
-    leny = float(gdf["dy"][0])
-    app.toolbox["modelmaker_hurrywave"].lenx = lenx
-    app.toolbox["modelmaker_hurrywave"].leny = leny
-    app.gui.setvar(group, "rotation", float(round(gdf["rotation"][0] * 180 / math.pi, 1)))
-    app.gui.setvar(
-        group, "nmax", int(np.floor(leny / app.gui.getvar(group, "dy")))
-    )
-    app.gui.setvar(
-        group, "mmax", int(np.floor(lenx / app.gui.getvar(group, "dx")))
-    )
+    app.gui.setvar(group, "flow_nested", None)
+    app.gui.setvar(group, "flow_spinup_time", 24.0)
+    app.gui.setvar(group, "station", None)
 
-def edit_origin(*args):
-    redraw_rectangle()
+    app.gui.setvar(group, "make_flood_map", True)
+    app.gui.setvar(group, "make_water_level_map", True)
+    app.gui.setvar(group, "make_precipitation_map", True)
+    wb.close()
 
-def edit_nmmax(*args):
-    redraw_rectangle()
-
-def edit_rotation(*args):
-    redraw_rectangle()
-
-def edit_dxdy(*args):
-    group = "modelmaker_hurrywave"
-    lenx = app.toolbox["modelmaker_hurrywave"].lenx
-    leny = app.toolbox["modelmaker_hurrywave"].leny
-    app.gui.setvar(
-        group, "nmax", np.floor(leny / app.gui.getvar(group, "dy")).astype(int)
-    )
-    app.gui.setvar(
-        group, "mmax", np.floor(lenx / app.gui.getvar(group, "dx")).astype(int)
-    )
-
-def redraw_rectangle():
-    group = "modelmaker_hurrywave"
-    app.toolbox["modelmaker_hurrywave"].lenx = app.gui.getvar(
-        group, "dx"
-    ) * app.gui.getvar(group, "mmax")
-    app.toolbox["modelmaker_hurrywave"].leny = app.gui.getvar(
-        group, "dy"
-    ) * app.gui.getvar(group, "nmax")
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].clear()
-    app.map.layer["modelmaker_hurrywave"].layer["grid_outline"].add_rectangle(
-        app.gui.getvar(group, "x0"),
-        app.gui.getvar(group, "y0"),
-        app.toolbox["modelmaker_hurrywave"].lenx,
-        app.toolbox["modelmaker_hurrywave"].leny,
-        app.gui.getvar(group, "rotation"),
-    )
-
-def read_setup_yaml(*args):
-    fname = app.gui.window.dialog_open_file("Select yml file", filter="*.yml")
-    if fname[0]:
-        app.toolbox["modelmaker_hurrywave"].read_setup_yaml(fname[0])
-
-def write_setup_yaml(*args):
-    app.toolbox["modelmaker_hurrywave"].write_setup_yaml()
-    app.toolbox["modelmaker_hurrywave"].write_include_polygon()
-    app.toolbox["modelmaker_hurrywave"].write_exclude_polygon()
-    app.toolbox["modelmaker_hurrywave"].write_boundary_polygon()
-
-def build_model(*args):
-    app.toolbox["modelmaker_hurrywave"].build_model()
-
-def info(*args):
+def set_collection_toml(*args):
+ 
+    """ Set the collection toml file for the model.
+    """
     pass
+
+    
+def write_toml_file(self) -> None:
+    """
+    Make toml file for the model.
+    """
+    group = "model_database"
+    # Get the model name from the GUI
+
+    model_data = {
+        "active_model_name": app.gui.getvar(group, "active_model_name"),
+        "active_model_type": app.gui.getvar(group, "active_model_type"),
+        "active_model_crs": app.gui.getvar(group, "active_model_crs"),
+        "flow_nested": app.gui.getvar(group, "flow_nested"),
+        "flow_spinup_time": app.gui.getvar(group, "flow_spinup_time"),
+        "station": app.gui.getvar(group, "station"),
+        "make_flood_map": app.gui.getvar(group, "make_flood_map"),
+        "make_water_level_map": app.gui.getvar(group, "make_water_level_map"),
+        "make_precipitation_map": app.gui.getvar(group, "make_precipitation_map"),
+    }
+
+    model_name = model_data["active_model_name"] or "model"
+
+    # Go one directory up from the model path
+    toml_path = os.path.join(os.path.dirname(app.active_model.domain.path), f"model_new.toml") # Include the collection here if needed
+
+    with open(toml_path, "w") as toml_file:
+        toml.dump(model_data, toml_file)
+
+    print(f"Model data written to {toml_path}")

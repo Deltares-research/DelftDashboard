@@ -87,6 +87,15 @@ def edit_zmin_bathymetry_dataset(*args):
     index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
     app.selected_bathymetry_datasets[index]["zmin"] = args[0]
 
+def load_polygon(*args):
+    """Load a polygon from a file"""
+    group = "bathy_topo_selector"
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select polygon file", filter="*.geojson")
+    if not full_name:
+        return
+    index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
+    app.selected_bathymetry_datasets[index]["polygon_file"] = full_name
+
 def edit(*args):
     pass
 

@@ -10,6 +10,9 @@ element:
   - string: Domain
     module: delftdashboard.toolboxes.modelmaker_hurrywave.domain
     element: domain.yml    
+  - string: Quadtree
+    module: delftdashboard.toolboxes.modelmaker_hurrywave.quadtree
+    element: quadtree.yml    
   - string: Bathymetry
     module: delftdashboard.toolboxes.modelmaker_hurrywave.bathymetry
     element: bathymetry.yml

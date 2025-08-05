@@ -57,8 +57,8 @@ def save(*args):
         app.model["delft3dfm"].domain.input.output.obsfile = [] # first clear obsfile list to add combined / new points
         app.model["delft3dfm"].domain.input.output.obsfile.append(XYNModel())
         app.model["delft3dfm"].domain.input.output.obsfile[0].filepath=Path(rsp[2]) # save all obs points in 1 file
+        # app.model["delft3dfm"].domain.write_observation_points()
         app.model["delft3dfm"].domain.observation_points.write()
-    app.model["delft3dfm"].observation_points_changed = False
 
 def update():
     gdf = app.model["delft3dfm"].domain.observation_points.gdf

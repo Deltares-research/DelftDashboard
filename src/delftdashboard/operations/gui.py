@@ -72,6 +72,7 @@ def build_gui_config():
     mp = {}
     mp["style"] = "map"
     mp["id"] = "map"
+    mp["map_projection"] = "mercator"
     mp["position"] = {}
     mp["position"]["x"] = 20
     mp["position"]["y"] = 180

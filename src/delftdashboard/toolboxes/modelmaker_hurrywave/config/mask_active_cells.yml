@@ -193,4 +193,12 @@ element:
     width: 80
     height: 20
   method: update_mask
+- style: pushbutton
+  text: Cut Inactive Cells
+  position:
+    x: 670
+    y: 75
+    width: 80
+    height: 20
+  method: cut_inactive_cells
 

@@ -103,6 +103,7 @@ class Model(GenericModel):
         from .observation_points_regular import select_observation_point_from_map
         layer.add_layer("observation_points",
                         type="circle_selector",
+                        hover_property="name",
                         select=select_observation_point_from_map,
                         hover_property="name",
                         line_color="white",

@@ -34,27 +34,12 @@ def select_track(*args):
     dataset_name = app.gui.getvar("tropical_cyclone", "selected_track_dataset")
     dataset = app.toolbox["tropical_cyclone"].cyclone_track_database.get_dataset(dataset_name)
 
-    # Open menu to either use the center point of the model or map to load tracks
-    if app.gui.module.active_model is not None and app.gui.window.dialog_yes_no(
-            "Would you like to use the center point of your active model to load tracks?"
-        ):
-        app.gui.module.active_model.domain.grid.get_exterior()
-        center = app.gui.module.active_model.domain.grid.exterior.centroid
-        if app.gui.module.active_model.domain.crs.is_projected:
-            # If the CRS is not geographic, we need to transform the coordinates to geographic
-            center = center.to_crs("EPSG:4326")
-        lon, lat = center.x[0], center.y[0]
-    else:
-        # Use map center point
-        lon = app.map.map_center[0]
-        lat = app.map.map_center[1]
-        if app.map.crs.is_projected:
-            # If the CRS is not geographic, we need to transform the coordinates to geographic
-            lon, lat = app.map.crs.to_geographic(lon, lat)
+    # Get the center of the map
+    center = app.map.map_center
 
     # Open track selector
     tc, okay = track_selector(dataset,
-        app, lon=lon, lat=lat, distance=300.0, year_min=2000, year_max=2023
+        app, lon=center[0], lat=center[1], distance=300.0, year_min=2000, year_max=2025
     )
 
     if okay:

@@ -1,64 +1,174 @@
 element:
-- style: panel
+- style: listbox
   position:
     x: 10
     y: 10
-    width: -10
-    height: 160
-  element:
-  - style: listbox
-    position:
-      x: 10
-      y: 10
-      width: 200
-      height: 110
-    text: Collections in Database
-    textposition: above
-    method: select_collection
-    variable: collection
-    select: item
-    option_string:
-      variable: collection_long_names
-    option_value:
-      variable: collection_names
-# - style: panel
+    width: 150
+    height: 110
+  text: "Available Collections"
+  text_position: "above"
+  method: select_collection
+  module: delftdashboard.toolboxes.model_database.generate_database
+  variable: active_available_collection_name
+  variable_group: model_database
+  select: item
+  option_string:
+    variable: available_collection_names
+    variable_group: model_database
+  option_value:
+    variable: available_collection_names
+    variable_group: model_database
+
+- style: listbox
+  position:
+    x: 230
+    y: 10
+    width: 150
+    height: 110
+  text: "Selected Collections"
+  text_position: "above"
+  method: select_selected_collections
+  module: delftdashboard.toolboxes.model_database.generate_database
+  variable: active_selected_collection_name
+  variable_group: model_database
+  select: item
+  option_string:
+    variable: selected_collection_names
+    variable_group: model_database
+  option_value:
+    variable: selected_collection_names
+    variable_group: model_database
+
+
+- style: listbox
+  position:
+    x: 490
+    y: 10
+    width: 150
+    height: 110
+  text: "Available Domains"
+  text_position: "above"
+  method: select_domain_from_list
+#  module: delftdashboard.toolboxes.model_database.generate_database
+  variable: active_domain_name
+  variable_group: model_database
+  select: item
+  option_string:
+    variable: domain_names
+    variable_group: model_database
+  option_value:
+    variable: domain_names
+    variable_group: model_database
+
+- style: pushbutton
+  position:
+    x: 170
+    y: 100
+    width: 50
+    height: 20
+  text: "Show ->"
+  method: use_collection
+  module: delftdashboard.toolboxes.model_database.generate_database
+
+- style: pushbutton
+  position:
+    x: 170
+    y: 70
+    width: 50
+    height: 20
+  method: remove_collection
+  text: <- Hide
+  module: delftdashboard.toolboxes.model_database.generate_database
+
+# - style: pushbutton
 #   position:
-#     x: 240
-#     y: 15
+#     x: 340
+#     y: 100
 #     width: 120
-#     height: 110
-#   text: Options
-#   textposition: above
-#   element:
-#   - style: pushbutton
-#     position:
-#       x: 10
-#       y: 10
-#       width: 100
-#       height: 20
-#     method: generate
-#     text: Generate
-#   - style: pushbutton
-#     position:
-#       x: 10
-#       y: 35
-#       width: 100
-#       height: 20
-#     method: delete
-#     text: Delete
-#   - style: pushbutton
-#     position:
-#       x: 10
-#       y: 60
-#       width: 100
-#       height: 20
-#     method: load
-#     text: Load
-#   - style: pushbutton
-#     position:
-#       x: 10
-#       y: 85
-#       width: 100
-#       height: 20
-#     method: save
-#     text: Save
+#     height: 20
+#   method: update_map
+#   text: Plot selected collection
+#   module: delftdashboard.toolboxes.model_database.generate_database
+
+- style: checkbox
+  position:
+    x: 390
+    y: 30
+    width: 120
+    height: 20
+  text: SFINCS
+  variable: show_sfincs
+  variable_group: model_database
+  method: toggle_sfincs
+  module: delftdashboard.toolboxes.model_database.generate_database
+
+
+- style: checkbox
+  position:
+    x: 390
+    y: 10
+    width: 120
+    height: 20
+  text: HurryWave
+  variable: show_hurrywave
+  variable_group: model_database
+  method: toggle_hurrywave
+  module: delftdashboard.toolboxes.model_database.generate_database
+
+
+# - style: pushbutton
+#   position:
+#     x: 540
+#     y: 100
+#     width: 140
+#     height: 20
+#   method: update_map
+#   text: Generate model database
+#   module: delftdashboard.toolboxes.model_database.generate_database
+
+# - style: pushbutton
+#   position:
+#     x: 520
+#     y: 100
+#     width: 80
+#     height: 20
+#   text: "Remove"
+#   method: remove_selected_bathymetry_dataset
+#   module: delftdashboard.operations.bathy_topo_selector
+#   dependency:
+#   - action: enable
+#     checkfor: all
+#     check:
+#     - variable: nr_selected_bathymetry_datasets
+#       variable_group: bathy_topo_selector
+#       operator: gt
+#       value: 0
+# 
+# 
+# - style: pushbutton
+#   position:
+#     x: 610
+#     y: 10
+#     width: 120
+#     height: 20
+#   text: "Generate Bathymetry"
+#   method: generate_bathymetry
+#   tooltip: Generate model bathymetry
+#   dependency:
+#   - action: enable
+#     checkfor: all
+#     check:
+#     - variable: nr_selected_bathymetry_datasets
+#       variable_group: bathy_topo_selector
+#       operator: gt
+#       value: 0
+  
+- style: pushbutton
+  position:
+    x: 650
+    y: 100
+    width: 100
+    height: 20
+  method: activate_domain
+  text: Load Domain
+  module: delftdashboard.toolboxes.model_database.generate_database
