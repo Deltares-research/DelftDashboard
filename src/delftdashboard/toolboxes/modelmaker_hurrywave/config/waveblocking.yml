@@ -31,7 +31,7 @@ element:
     width: 60
     height: 20
   method: edit
-  tooltip: Minimum bed elevation for wave blocking
+  tooltip: Minimum bed elevation (m) for wave blocking
 - style: pushbutton
   text: Generate
   position:
@@ -40,7 +40,7 @@ element:
     width: 60
     height: 20
   method: generate_waveblocking
-  tooltip: Generate wave blocking file
+  tooltip: Generate wave blocking file (first select one or more bathymetry datasets)
   dependency:
   - action: enable
     checkfor: all
