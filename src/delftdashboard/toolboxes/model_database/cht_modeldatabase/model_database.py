@@ -39,74 +39,63 @@ class ModelDatabase:
             os.makedirs(self.path)
 
         # Create a default model.tml file if it does not exist. Why do we actually need this file?
-        model_tml_path = os.path.join(self.path, "model_database.tml")
+        # model_tml_path = os.path.join(self.path, "model_database.tml")
 
-        if not os.path.exists(model_tml_path):
-            # Check if collections are present in the model_database_path
-            collections = []
-            for entry in os.listdir(self.path):
-                entry_path = os.path.join(self.path, entry)
-                if os.path.isdir(entry_path):
-                    # Try to get long_name from a metadata file, else use entry as long_name
-                    long_name = entry.replace("_", " ").title()
-                    collections.append({"name": entry, "long_name": long_name})
+        # Check if collections are present in the model_database_path
+        collections = []
+        for entry in os.listdir(self.path):
+            entry_path = os.path.join(self.path, entry)
+            if os.path.isdir(entry_path):
+                # Try to get long_name from a metadata file, else use entry as long_name
+                long_name = entry.replace("_", " ").title()
+                collections.append({"name": entry, "long_name": long_name})
             
-            with open(model_tml_path, "w") as f:
-                f.write("# Default model.tml\n")
-                for col in collections:
-                    f.write('\n[[collection]]\n')
-                    f.write(f'name = "{col["name"]}"\n')
-                    f.write(f'long_name = "{col["long_name"]}"\n')
-
-
-        # Always expect this file
-        tml_file = os.path.join(self.path, "model_database.tml")
-        if not os.path.exists(tml_file):
-            print("Error! Required model database file not found: " + tml_file)
+        # If collection list is empty, print warning
+        if not collections:
+            print("Warning! No collections found in model database.")
             return
 
-        # Load collections
-        try:
-            collections = toml.load(tml_file)["collection"]
-        except:
-            print(f"No collections found in {tml_file}")
-            return
+        else:
+            for d in collections:
+                collection_name = d["name"]
+                collection_path = d.get("path", os.path.join(self.path, collection_name))
 
-        for d in collections:
-            collection_name = d["name"]
-            collection_path = d.get("path", os.path.join(self.path, collection_name))
-
-            if not os.path.exists(collection_path):
-                print(f"Collection path does not exist: {collection_path}")
-                continue
-
-            # Traverse: collection/type/model/
-            for type_name in os.listdir(collection_path):
-                type_path = os.path.join(collection_path, type_name)
-                if not os.path.isdir(type_path):
+                if not os.path.exists(collection_path):
+                    print(f"Collection path does not exist: {collection_path}")
                     continue
 
-                for model_name in os.listdir(type_path):
-                    model_path = os.path.join(type_path, model_name)
-                    if not os.path.isdir(model_path):
+                # Traverse: collection/type/model/
+                for type_name in os.listdir(collection_path):
+                    type_path = os.path.join(collection_path, type_name)
+                    if not os.path.isdir(type_path):
                         continue
 
-                    model_metadata_path = os.path.join(model_path, "model.toml")
-                    if os.path.exists(model_metadata_path):
-                        model_metadata = toml.load(model_metadata_path)
-                        actual_model_path = model_metadata.get("path", model_path)
-                    else:
-                        print(f"Missing model.toml for model '{model_name}' in type '{type_name}' — skipping.")
-                        continue
+                    for model_name in os.listdir(type_path):
+                        model_path = os.path.join(type_path, model_name)
+                        if not os.path.isdir(model_path):
+                            continue
 
-                    full_model_name = f"{type_name}_{model_name}"
-                    model = Deltares_Model(
-                        name=full_model_name,
-                        path=actual_model_path,
-                        type=type_name,
-                        collection=collection_name
-                    )
-                    self.model.append(model)
+                        model_metadata_path = os.path.join(model_path, "model.toml")
+                        if os.path.exists(model_metadata_path):
+                            model_metadata = toml.load(model_metadata_path)
+                            actual_model_path = model_metadata.get("path", model_path)
+                        else:
+                            print(f"Missing model.toml for model '{model_name}' in type '{type_name}' — skipping.")
+                            continue
+
+                        full_model_name = f"{model_name}"
+
+                        # For now only HW and SFINCS models are supported
+                        if type_name not in ["sfincs", "hurrywave"]:
+                            continue
+
+                        model = Deltares_Model(
+                            name=full_model_name,
+                            path=actual_model_path,
+                            type=type_name,
+                            collection=collection_name
+                        )
+                        self.model.append(model)
 
     def get_model(self, name):
             for model in self.model:
@@ -137,7 +126,7 @@ class ModelDatabase:
         collection_names = []
 
         for model in self.model:
-            collection= model.collection
+            collection = model.collection
             if collection in collection_names:
                 # Existing source
                 for clt in collections:
@@ -150,7 +139,7 @@ class ModelDatabase:
                 collections.append(clt)
                 collection_names.append(collection)
 
-                print("No collection found, adding collection: " + collection)
+                # print("No collection found, adding collection: " + collection)
 
         return collection_names, collections
 
