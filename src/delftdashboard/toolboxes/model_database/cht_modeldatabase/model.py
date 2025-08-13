@@ -8,6 +8,7 @@ Created on Sun Apr 25 10:58:08 2021
 import os
 
 import geopandas as gpd
+from pyproj import CRS
 import toml
 import boto3
 from botocore import UNSIGNED
@@ -127,39 +128,22 @@ class Deltares_Model(Model):
             # Create a dummy GeoDataFrame
             if self.type == "sfincs":
 
-                try:
-                    sfincs_model = SFINCS(os.path.join(self.path, "input"), crs=4326)
-                    
-                    if self.grid.type == "regular":
+                # try:
+                sfincs_model = SFINCS(os.path.join(self.path, "input"))
 
-                        print("Reading SFINCS model with regular grid...")
-                        self.grid.build(self.input.variables.x0,
-                                        self.input.variables.y0,
-                                        self.input.variables.nmax,
-                                        self.input.variables.mmax,
-                                        self.input.variables.dx,
-                                        self.input.variables.dy,
-                                        self.input.variables.rotation)
+                # Reads sfincs.inp and attribute files
+                sfincs_model.read()
 
-                        # Read in mask, index and dep file (for quadtree the mask is stored in the quadtree file)
-                        self.mask.read()
-        
-                    else:  
-                        print("Reading SFINCS model with quadtree grid...")
-                        # This reads in quadtree netcdf file. In case of index and mask file, it will generate the quadtree grid and save the file.
-                        # The grid object contains coordinates, neighbor indices, mask, snapwave mask and bed level.
-                        self.grid.read()
-
-                    # Ideally we want to read the geojson directly and not all the gridded input for this model
-                    gdf = sfincs_model.grid.exterior.to_crs(4326)
-                    gdf.to_file(filename, driver="GeoJSON")
-                    gdf["name"] = self.name
-                    return gdf
+                # Ideally we want to read the geojson directly and not all the gridded input for this model
+                gdf = sfincs_model.grid.exterior.to_crs(4326)
+                gdf.to_file(filename, driver="GeoJSON")
+                gdf["name"] = self.name
+                return gdf
                 
-                except Exception as e:
-                    print(f"Error reading SFINCS model: {e}")
-                    gdf = gpd.GeoDataFrame(geometry=[], crs=4326)
-                    return gdf
+                # except Exception as e:
+                #     print(f"Error reading SFINCS model: {e}")
+                #     gdf = gpd.GeoDataFrame(geometry=[], crs=4326)
+                #     return gdf
             
             elif self.type == "hurrywave":
                 try:

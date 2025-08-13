@@ -82,12 +82,12 @@ element:
 
 - style: pushbutton
   position:
-    x: 120
+    x: 170
     y: 40
-    width: 100
+    width: 50
     height: 20
   method: create_collection
-  text: Create collection
+  text: Create 
   module: delftdashboard.toolboxes.model_database.generate_database
 
 # - style: pushbutton

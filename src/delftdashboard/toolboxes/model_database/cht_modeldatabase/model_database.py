@@ -142,24 +142,20 @@ class ModelDatabase:
                 # print("No collection found, adding collection: " + collection)
 
         return collection_names, collections
-
-    def add_collection(self, name, long_name=None):
+    
+    def create_collection(self, name):
+        # Create folder in model_database with new collection name
         """
         Add a new collection to the model database.
         """
-        if long_name is None:
-            long_name = name.replace("_", " ").title()
-
         collection_path = os.path.join(self.path, name)
         if not os.path.exists(collection_path):
             os.makedirs(collection_path)
+            print(f"Collection '{name}' added to model database.")
+        
+        else:
+            print(f"Collection '{name}' already exists in model database.")
 
-        # # Add to model_database.tml
-        # tml_file = os.path.join(self.path, "model_database.tml")
-        # with open(tml_file, "a") as f:
-        #     f.write(f'\n[[collection]]\nname = "{name}"\nlong_name = "{long_name}"\npath = "{collection_path}"\n')
-
-        print(f"Collection '{name}' added to model database.")
 
     def copy_model_input_files(self, domain_name, to_path):
         """

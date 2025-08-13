@@ -27,25 +27,19 @@ def select(*args):
 def select_collection(*args):
     pass
 
-
 def create_collection(*args):
-    # Create folder in model_database
-
-    # Window to add name
+    """Create a new collection in the model database."""
     name, okay = app.gui.window.dialog_string("Enter collection name:", "Create Collection")
     if okay:
-        # Create the collection folder
-        collection_path = os.path.join(app.model_database.path, name)
-        try:
-            os.makedirs(collection_path)
-            app.gui.setvar("model_database", "active_available_collection_name", name)
-            app.gui.setvar("model_database", "selected_collection_names", [name])
+        app.model_database.create_collection(name = name)
 
-        except:
-            print(f"Error creating collection folder: {collection_path}. It may already exist.")
+        collection_names = app.gui.getvar("model_database", "available_collection_names")
+        if name in collection_names:
+            print(f"Collection '{name}' already exists.")
             return
-
-       
+        else:
+            collection_names.append(name)
+            app.gui.setvar("model_database", "available_collection_names", collection_names)
 
 
 def use_collection(*args):
