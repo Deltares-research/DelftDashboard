@@ -10,32 +10,34 @@ from copy import deepcopy
 
 from delftdashboard.app import app
 
-def globe(option):
-    if app.gui.getvar("view_settings", "projection") != "globe":
-        app.gui.setvar("view_settings", "projection", "globe")    
-        app.map.set_projection("globe")
-        app.gui.window.update()
+# def globe(option):
+#     if app.gui.getvar("view_settings", "projection") != "globe":
+#         app.gui.setvar("view_settings", "projection", "globe")    
+#         app.map.set_projection("globe")
+#         app.gui.window.update()
 
-def mercator(option):
-    # if app.view["projection"] != "mercator":
-    if app.gui.getvar("view_settings", "projection") != "mercator":
-        app.gui.setvar("view_settings", "projection", "mercator")
-        app.map.set_projection("mercator")
-        app.gui.window.update()
+# def mercator(option):
+#     # if app.view["projection"] != "mercator":
+#     if app.gui.getvar("view_settings", "projection") != "mercator":
+#         app.gui.setvar("view_settings", "projection", "mercator")
+#         app.map.set_projection("mercator")
+#         app.gui.window.update()
 
 def topography(option):
     if not app.gui.getvar("view_settings", "topography_visible"):
         app.gui.setvar("view_settings", "topography_visible", True)
+        app.map.layer["main"].layer["background_topography"].show()
     else:
         app.gui.setvar("view_settings", "topography_visible", False)
-    app.map.layer["main"].layer["background_topography"].set_visibility(app.gui.getvar("view_settings", "topography_visible"))
+        app.map.layer["main"].layer["background_topography"].hide()
+    # app.map.layer["main"].layer["background_topography"].set_visibility(app.gui.getvar("view_settings", "topography_visible"))
     app.gui.window.update()
 
-def layer_style(option):
-    if app.gui.getvar("view_settings", "layer_style") != option:
-        app.gui.setvar("view_settings", "layer_style", option)
-        app.map.set_layer_style(option)
-    app.gui.window.update()
+# def layer_style(option):
+#     if app.gui.getvar("view_settings", "layer_style") != option:
+#         app.gui.setvar("view_settings", "layer_style", option)
+#         app.map.set_layer_style(option)
+#     app.gui.window.update()
 
 def terrain(option):
     if not app.gui.getvar("view_settings", "terrain_visible"):
@@ -46,7 +48,7 @@ def terrain(option):
 
 def model_view(option):
     # Get the model name (first string before . in option)
-    model_name = option.split(".")[0]
+    # model_name = option.split(".")[0]
     app.active_model.select()
 
 def edit_settings(option):

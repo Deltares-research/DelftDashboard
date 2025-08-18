@@ -1,0 +1,57 @@
+element:
+- style: pushbutton
+  text: Load Topo/Bathy GeoTiff
+  position:
+    x: 20
+    y: 110
+    width: 150
+    height: 20
+  method: load_topobathy_geotiff
+- style: pushbutton
+  text: Generate Topo/Bathy GeoTiff
+  position:
+    x: 20
+    y: 85
+    width: 150
+    height: 20
+  method: generate_topobathy_geotiff
+- style: edit
+  text: dX
+  position:
+    x: 120
+    y: 60
+    width: 50
+    height: 20
+  variable: dx_geotiff
+- style: pushbutton
+  text: Draw Bounding Box
+  position:
+    x: 20
+    y: 35
+    width: 150
+    height: 20
+  method: draw_bounding_box
+- style: pushbutton
+  text: Delete Bounding Box
+  position:
+    x: 20
+    y: 10
+    width: 150
+    height: 20
+  method: delete_bounding_box
+- style: pushbutton
+  text: Load Index GeoTiff
+  position:
+    x: 200
+    y: 110
+    width: 150
+    height: 20
+  method: load_index_geotiff
+- style: pushbutton
+  text: Generate Index GeoTiff
+  position:
+    x: 200
+    y: 85
+    width: 150
+    height: 20
+  method: generate_index_geotiff

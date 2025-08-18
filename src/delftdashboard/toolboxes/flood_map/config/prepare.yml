@@ -3,39 +3,47 @@ element:
   text: Load Topo/Bathy GeoTiff
   position:
     x: 20
-    y: 100
+    y: 110
     width: 150
     height: 20
   method: load_topobathy_geotiff
-- style: pushbutton
-  text: Generate Topo/Bathy GeoTiff
+  tooltip: Load a Topo/Bathy GeoTiff (COG) file
+- style: text
+  variable: topo_file_string  
   position:
-    x: 20
-    y: 75
+    x: 180
+    y: 110
     width: 150
     height: 20
-  method: generate_topobathy_geotiff
-- style: edit
-  text: dX
-  position:
-    x: 70
-    y: 50
-    width: 100
-    height: 20
-  variable: dx_geotiff
 - style: pushbutton
   text: Load Index GeoTiff
   position:
-    x: 200
-    y: 100
+    x: 20
+    y: 85
     width: 150
     height: 20
   method: load_index_geotiff
-- style: pushbutton
-  text: Generate Index GeoTiff
+  tooltip: Load an Index GeoTiff (COG) file
+- style: text
+  variable: index_file_string
   position:
-    x: 200
-    y: 75
+    x: 180
+    y: 85
     width: 150
     height: 20
-  method: generate_index_geotiff
+- style: pushbutton
+  text: Load Map Output
+  position:
+    x: 20
+    y: 60
+    width: 150
+    height: 20
+  method: load_map_output
+  tooltip: Load a SFINCS Map Output (netCDF) file
+- style: text
+  variable: map_file_string
+  position:
+    x: 180
+    y: 60
+    width: 150
+    height: 20

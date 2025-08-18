@@ -5,9 +5,10 @@ Created on Tue Jul  5 13:40:07 2022
 @author: ormondt
 """
 import numpy as np
+import xarray as xr
 import traceback
 from pyproj import CRS, Transformer
-import matplotlib as mpl
+# import matplotlib as mpl
 
 from delftdashboard.app import app
 
@@ -26,12 +27,12 @@ def map_ready(*args):
     main_layer = app.map.add_layer("main")
 
     # Add background topography layer
-    main_layer.add_layer("background_topography", type="raster")
-    # app.background_topography_layer = main_layer.add_layer("background_topography", type="raster")
+    main_layer.add_layer("background_topography",
+                         type="raster")
 
-    # Set update method for topography layer
-    app.map.layer["main"].layer["background_topography"].update = update_background_topography_layer
-    # app.background_topography_layer.update = update_background_topography_layer
+    # Set update method for topography layer (this is called in the layer's update method!)
+    app.map.layer["main"].layer["background_topography"].get_data = update_background_topography_data
+    app.map.layer["main"].layer["background_topography"].legend_position = "bottom-left"
 
     # Go to point
     app.map.jump_to(0.0, 0.0, 0.5)
@@ -78,9 +79,27 @@ def mouse_moved(x, y, lon, lat):
         app.gui.window.statusbar.set_text("x", f"X : {x:.1f}")
         app.gui.window.statusbar.set_text("y", f"Y : {y:.1f}")
 
-def update_background_topography_layer():
+    x3857, y3857 = transformer_4326_to_3857.transform(lon, lat) 
+
+    z = np.nan
+    if hasattr(app, "background_topography") and app.background_topography is not None:
+        # Get the z value at the mouse position
+        try:
+            z = app.background_topography.sel(x=x3857, y=y3857, method="nearest").item()
+        except Exception as e:
+            z = np.nan
+            print(f"Error getting z value: {e}")
+
+    if np.isnan(z):
+        app.gui.window.statusbar.set_text("z", "Z : N/A")
+    else:       
+        app.gui.window.statusbar.set_text("z", f"Z : {z:.2f} m")
+
+
+def update_background_topography_data():
 
     # Function that is called whenever the map has moved
+    data = {}
 
     if not app.map.map_extent:
         print("Map extent not yet available ...")
@@ -136,7 +155,6 @@ def update_background_topography_layer():
             dataset_list = [{"name": background_topography_dataset, "zmin": -99999.9, "zmax": 99999.9}]
 
             try:
-                cmap = mpl.cm.get_cmap(colormap)
                 # Add wait box
                 z = app.bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(3857), dataset_list,
                                                                    method=interp_method,
@@ -150,13 +168,16 @@ def update_background_topography_layer():
                 app.map.layer["main"].layer["background_topography"].color_scale_cmin = zmin
                 app.map.layer["main"].layer["background_topography"].color_scale_cmax = zmax
                 app.map.layer["main"].layer["background_topography"].hillshading = hillshading
+                app.map.layer["main"].layer["background_topography"].color_map = colormap
 
-                app.map.layer["main"].layer["background_topography"].set_data(x=xv,
-                                                                              y=yv,
-                                                                              z=z,
-                                                                              colormap=cmap,
-                                                                              decimals=0,
-                                                                              crs=CRS(3857))
+                data["x"] = xv
+                data["y"] = yv
+                data["z"] = z
+                data["crs"] = CRS(3857)
+
+                # Now make an xarray DataArray with the data
+                app.background_topography = xr.DataArray(data["z"], dims=["y", "x"], coords={"y": data["y"], "x": data["x"]})
+                # app.background_topography.attrs["crs"] = "EPSG:3857"
 
             except:
                 print("Error loading background topo ...")
@@ -167,6 +188,8 @@ def update_background_topography_layer():
     except:
         print("Error updating background topo ...")
         traceback.print_exc()
+
+    return data
 
 def update():
     reset_cursor()

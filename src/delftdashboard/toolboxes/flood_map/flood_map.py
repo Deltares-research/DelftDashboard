@@ -5,11 +5,14 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 import os
+import geopandas as gpd
+import xarray as xr
+
 # import datetime
 from delftdashboard.app import app
 from delftdashboard.operations.toolbox import GenericToolbox
 
-from cht_sfincs import SFINCS
+# from cht_sfincs import SFINCS
 from cht_tiling import FloodMap
 from .utils import make_topobathy_cog
 
@@ -28,16 +31,37 @@ class Toolbox(GenericToolbox):
 
         app.gui.setvar(group, "dx_geotiff", 10.0)
         app.gui.setvar(group, "map_file_name", "")
+        app.gui.setvar(group, "topo_file_string", "File : ")
+        app.gui.setvar(group, "index_file_string", "File : ")
+        app.gui.setvar(group, "map_file_string", "File : ")
+        app.gui.setvar(group, "instantaneous_or_maximum", "maximum")
+        app.gui.setvar(group, "available_time_strings", [""])
+        app.gui.setvar(group, "time_index", 0)
+        app.gui.setvar(group, "flood_map_opacity", 0.7)
 
         self.flood_map = FloodMap()
+        # Set some default values
+        self.flood_map.cmap = "jet"
+        self.flood_map.cmin = 0.0
+        self.flood_map.cmax = 1.0
+        self.flood_map.color_values = "default" # Using green, yellow, orange, red
 
+        # Exclude polygons SnapWave
+        self.polygon = gpd.GeoDataFrame()
+
+        self.instantaneous_time_strings = [""]
+        self.maximum_time_strings = [""]
+        self.nr_of_instantaneous_times = 0
+        self.nr_of_maximum_times = 0
 
     def set_layer_mode(self, mode):
         if mode == "active":
             # Make container layer visible
-            app.map.layer[self.name].show()
+            app.map.layer["flood_map"].show()
             # Always show track layer
-            app.map.layer[self.name].layer["flood_map"].show()
+            app.map.layer["flood_map"].layer["flood_map"].show()
+            app.map.layer["flood_map"].layer["polygon"].hide()
+
         elif mode == "inactive":
             # Make all layers invisible
             app.map.layer[self.name].hide()
@@ -49,7 +73,17 @@ class Toolbox(GenericToolbox):
         # Add Mapbox layers
         layer = app.map.add_layer(self.name)
         layer.add_layer("flood_map",
-                        type="image")
+                        type="image",
+                        opacity=0.7,
+                        legend_position="bottom-right")
+        # Open boundary
+        from .topobathy import polygon_created
+        layer.add_layer("polygon", type="draw",
+                             shape="polygon",
+                             create=polygon_created,
+                             polygon_line_color="deepskyblue",
+                             polygon_fill_color="deepskyblue",
+                             polygon_fill_opacity=0.1)
 
     def load_topobathy_geotiff(self):
         """Select topo/bathy geotiff file"""
@@ -60,14 +94,19 @@ class Toolbox(GenericToolbox):
         self.flood_map.set_topobathy_file(full_name)
 
     def generate_topobathy_geotiff(self):
-        # Need to get the bounding box of the model
-        # Check what type of model this is
-        if app.active_model.name == "sfincs_cht":
-            bounds = app.active_model.domain.grid.bounds()            
+
+        if self.polygon.empty:
+            # If there is no polygon, use the bounding box of the model
+
+            if app.active_model.name == "sfincs_cht":
+                bounds = app.active_model.domain.grid.bounds()            
+            else:
+                # Get the bounding box of the model
+                print("Not supported")            
+                return
         else:
-            # Get the bounding box of the model
-            print("Not supported")            
-            return
+            # Use the bounding box of the polygon
+            bounds = self.polygon.total_bounds
                 
         dx = app.gui.getvar("flood_map", "dx_geotiff")
         full_name, path, name, ext, fltr = app.gui.window.dialog_save_file("Save topo/bathy geotiff file", filter="*.tif")
@@ -95,7 +134,7 @@ class Toolbox(GenericToolbox):
 
     def generate_index_geotiff(self):
         if app.active_model.name == "sfincs_cht":
-            full_name, path, name, ext, fltr = app.gui.window.dialog_save_file("Save topo/bathy geotiff file", filter="*.tif")
+            full_name, path, name, ext, fltr = app.gui.window.dialog_save_file("Save index geotiff file", filter="*.tif")
             if not full_name:
                 return
             filename = full_name
@@ -115,16 +154,27 @@ class Toolbox(GenericToolbox):
         # Use full path
         if file_name[0]:
             # Read the map output
-            app.gui.setvar("flood_map", "map_file_name", file_name[0])
-            self.read_output()
+            self.map_file_name = file_name[0]
 
-    def read_output(self):
-        # Read the map output
-        file_name = app.gui.getvar("flood_map", "map_file_name")
-        pth = os.path.dirname(file_name)
-        sf = SFINCS(root=pth)
-        da = sf.output.read_zsmax(fmt="xarray")
+            self.dsa = xr.open_dataset(self.map_file_name)
 
+            # Read the output file lazily
+
+            # Get the time strings
+            
+            # Instantaneous
+            times = self.dsa.time.values
+            dt_list = times.astype('datetime64[s]').astype(object)
+            self.instantaneous_time_strings = [dt.strftime("%Y-%m-%d %H:%M:%S") for dt in dt_list]
+            self.nr_of_instantaneous_times = len(self.instantaneous_time_strings)
+
+            # Maximum
+            max_times = self.dsa.timemax.values
+            dt_list = max_times.astype('datetime64[s]').astype(object)
+            self.maximum_time_strings = [dt.strftime("%Y-%m-%d %H:%M:%S") for dt in dt_list]
+            self.nr_of_maximum_times = len(self.maximum_time_strings)
+
+            app.gui.setvar("flood_map", "time_index", 0)
         # return
         # Read file
 
@@ -135,8 +185,34 @@ class Toolbox(GenericToolbox):
         # app.map.layer[self.name].layer["flood_map_from_tiles"].topobathy_path = os.path.join(pth, "tiles", "topobathy")
         # app.map.layer[self.name].layer["flood_map_from_tiles"].set_data(da)
 
-        zs = da.values[:]
+        # zs = da.values[:]
+        # self.flood_map.set_water_level(zs)
+        # app.map.layer[self.name].layer["flood_map"].set_data(self.flood_map)
+
+    def update_flood_map(self):
+
+        instantaneous_or_maximum = app.gui.getvar("flood_map", "instantaneous_or_maximum")
+
+        if instantaneous_or_maximum == "instantaneous":
+            if self.nr_of_instantaneous_times == 0:
+                # Clear flood map layer
+                app.map.layer["flood_map"].layer["flood_map"].clear()
+                return
+        else:
+            if self.nr_of_maximum_times == 0:
+                # Clear flood map layer
+                app.map.layer["flood_map"].layer["flood_map"].clear()
+                return
+
+        itime = app.gui.getvar("flood_map", "time_index")
+
+        if instantaneous_or_maximum == "instantaneous":
+            zs = self.dsa.zs.isel(time=itime).values[:]
+        else:
+            zs = self.dsa.zsmax.isel(timemax=itime).values[:]
+        
         self.flood_map.set_water_level(zs)
+
         app.map.layer[self.name].layer["flood_map"].set_data(self.flood_map)
 
     def load_his_output(self):

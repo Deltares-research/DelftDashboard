@@ -1,0 +1,9 @@
+element:
+- style: pushbutton
+  text: Generate Index GeoTiff
+  position:
+    x: 10
+    y: 110
+    width: 150
+    height: 20
+  method: generate_index_geotiff

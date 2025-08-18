@@ -53,6 +53,7 @@ def build_gui_config():
     app.gui.config["statusbar"]["field"].append({"id": "lat", "text": "Lat :", "width": 4})
     app.gui.config["statusbar"]["field"].append({"id": "x", "text": "X :", "width": 4})
     app.gui.config["statusbar"]["field"].append({"id": "y", "text": "Y :", "width": 4})
+    app.gui.config["statusbar"]["field"].append({"id": "z", "text": "Z :", "width": 4})
     app.gui.config["statusbar"]["field"].append({"id": "distance", "text": "", "width": 4})
 
     # # Layer tab

@@ -12,9 +12,15 @@ element:
   - string: View
     module: delftdashboard.toolboxes.flood_map.view
     element: view.yml
-  - string: Export
-    module: delftdashboard.toolboxes.flood_map.export
-    element: export.yml
+  # - string: Export
+  #   module: delftdashboard.toolboxes.flood_map.export
+  #   element: export.yml
   - string: Compare
     module: delftdashboard.toolboxes.flood_map.compare
     element: compare.yml
+  - string: Topo/Bathy
+    module: delftdashboard.toolboxes.flood_map.topobathy
+    element: topobathy.yml
+  - string: Indices
+    module: delftdashboard.toolboxes.flood_map.indices
+    element: indices.yml
