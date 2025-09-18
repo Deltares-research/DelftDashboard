@@ -38,13 +38,20 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "available_time_strings", [""])
         app.gui.setvar(group, "time_index", 0)
         app.gui.setvar(group, "flood_map_opacity", 0.7)
+        app.gui.setvar(group, "continuous_or_discrete_colors", "discrete")
+        app.gui.setvar(group, "cmap", "jet")
+        app.gui.setvar(group, "cmin", 0.0)
+        app.gui.setvar(group, "cmax", 2.0)
+        app.gui.setvar(group, "colormaps", app.gui.getvar("view_settings", "colormaps"))
+        
 
         self.flood_map = FloodMap()
         # Set some default values
-        self.flood_map.cmap = "jet"
-        self.flood_map.cmin = 0.0
-        self.flood_map.cmax = 1.0
+        self.flood_map.cmap = app.gui.getvar(group, "cmap")
+        self.flood_map.cmin = app.gui.getvar(group, "cmin")
+        self.flood_map.cmax = app.gui.getvar(group, "cmax")
         self.flood_map.color_values = "default" # Using green, yellow, orange, red
+        self.flood_map.discrete_colors = True
 
         # Exclude polygons SnapWave
         self.polygon = gpd.GeoDataFrame()
@@ -73,7 +80,7 @@ class Toolbox(GenericToolbox):
         # Add Mapbox layers
         layer = app.map.add_layer(self.name)
         layer.add_layer("flood_map",
-                        type="image",
+                        type="raster_image",
                         opacity=0.7,
                         legend_position="bottom-right")
         # Open boundary

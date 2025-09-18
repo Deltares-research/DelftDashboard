@@ -34,6 +34,32 @@ def select_opacity(*args):
     opacity = app.gui.getvar("flood_map", "flood_map_opacity")
     app.map.layer["flood_map"].layer["flood_map"].set_opacity(opacity)
 
+def select_continuous_or_discrete_colors(*args):
+    # Update the flood map with continuous or discrete colors
+    mode = app.gui.getvar("flood_map", "continuous_or_discrete_colors")
+    if mode == "continuous":
+        app.toolbox["flood_map"].flood_map.discrete_colors = False
+    else:
+        app.toolbox["flood_map"].flood_map.discrete_colors = True
+    update()
+
+def edit_cmin_cmax(*args):
+    # Update the flood map with new cmin and cmax values
+    try:
+        cmin = float(app.gui.getvar("flood_map", "cmin"))
+        cmax = float(app.gui.getvar("flood_map", "cmax"))
+        cmap = app.gui.getvar("flood_map", "cmap")
+
+        # if cmin >= cmax:
+        #     raise ValueError("cmin must be less than cmax")
+        app.toolbox["flood_map"].flood_map.cmin = cmin
+        app.toolbox["flood_map"].flood_map.cmax = cmax
+        app.toolbox["flood_map"].flood_map.cmap = cmap
+        update()
+
+    except ValueError:
+        print("Invalid cmin or cmax value")    
+
 def update():
     # Update the flood map layer
     if app.gui.getvar("flood_map", "instantaneous_or_maximum") == "instantaneous":

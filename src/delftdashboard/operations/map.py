@@ -28,10 +28,11 @@ def map_ready(*args):
 
     # Add background topography layer
     main_layer.add_layer("background_topography",
-                         type="raster")
+                         type="raster_image")
 
     # Set update method for topography layer (this is called in the layer's update method!)
-    app.map.layer["main"].layer["background_topography"].get_data = update_background_topography_data
+    # app.map.layer["main"].layer["background_topography"].get_data = update_background_topography_data
+    app.map.layer["main"].layer["background_topography"].set_data(update_background_topography_data)
     app.map.layer["main"].layer["background_topography"].legend_position = "bottom-left"
 
     # Go to point
@@ -99,7 +100,7 @@ def mouse_moved(x, y, lon, lat):
 def update_background_topography_data():
 
     # Function that is called whenever the map has moved
-    data = {}
+    da = None
 
     if not app.map.map_extent:
         print("Map extent not yet available ...")
@@ -170,13 +171,28 @@ def update_background_topography_data():
                 app.map.layer["main"].layer["background_topography"].hillshading = hillshading
                 app.map.layer["main"].layer["background_topography"].color_map = colormap
 
-                data["x"] = xv
-                data["y"] = yv
-                data["z"] = z
-                data["crs"] = CRS(3857)
+                # color_values = []
+                # color_values.append(
+                #     {"color": "lightgreen", "lower_value": -1000.0, "upper_value": -500.0}
+                # )
+                # color_values.append(
+                #     {"color": "yellow", "lower_value": -500.0, "upper_value": 0.0}
+                # )
+                # color_values.append(
+                #     {"color": "#FFA500", "lower_value": 0.0, "upper_value": 500.0}
+                # )
+                # color_values.append({"color": "red", "lower_value": 500.0, "text": "VERY HIGH!"})
+                # app.map.layer["main"].layer["background_topography"].color_values = color_values
+
+                # data["x"] = xv
+                # data["y"] = yv
+                # data["z"] = z
+                # data["crs"] = CRS(3857)
 
                 # Now make an xarray DataArray with the data
-                app.background_topography = xr.DataArray(data["z"], dims=["y", "x"], coords={"y": data["y"], "x": data["x"]})
+                da = xr.DataArray(z, dims=["y", "x"], coords={"y": yv, "x": xv})
+                da = da.rio.write_crs("EPSG:3857")
+                app.background_topography = da
                 # app.background_topography.attrs["crs"] = "EPSG:3857"
 
             except:
@@ -189,7 +205,7 @@ def update_background_topography_data():
         print("Error updating background topo ...")
         traceback.print_exc()
 
-    return data
+    return da
 
 def update():
     reset_cursor()

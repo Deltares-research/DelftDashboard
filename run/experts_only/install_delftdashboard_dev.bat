@@ -5,35 +5,11 @@ rem CHANGE GITDIR to point to you local repos folder !!!
 set GITDIR=c:\work\checkouts\git
 set ENVNAME=delftdashboard_dev
 
-:: Check if the directory C:\Users\%USERNAME%\miniconda3 exists
-if exist "C:\Users\%USERNAME%\miniconda3" (
-    set CONDAPATH=c:\users\%USERNAME%\miniconda3
-	set CONDA=conda
-) else (
-    :: Check if the directory c:\Users\asselt\AppData\Local\miniforge3 exists
-    if exist "c:\Users\%USERNAME%\miniforge3" (
-        set CONDAPATH=c:\Users\%USERNAME%\miniforge3
-		set CONDA=mamba
-    ) else (
-        :: Neither exist. Stop.
-        echo Miniconda nor Miniforge was found. Please install either miniconda or miniforge.
-		echo If you already installed one of them, please add the path to this script!
-		echo e.g. for miniconda:
-		echo CONDAPATH=d:\work\miniconda3
-		echo set CONDA=conda
-		echo or for miniforge:
-		echo CONDAPATH=c:\Users\asselt\AppData\Local\miniforge3
-		echo set CONDA=mamba
-        pause
-        exit
-    )
-)
+call mamba env remove -n delftdashboard_dev
+call mamba create -n delftdashboard_dev python=3.12
+call mamba activate delftdashboard_dev
 
-rem call %CONDAPATH%\Scripts\activate.bat
-
-rem call %CONDA% env remove -n %ENVNAME%
-rem call %CONDA% create -n %ENVNAME% python=3.12
-rem call %CONDA% activate %ENVNAME%
+rem We first install delftdashboard, which also install some cht packages from PyPi. Then we override with editable packages.
 
 pip install -e %GITDIR%\delftdashboard
 pip install -e %GITDIR%\guitares
@@ -52,6 +28,6 @@ pip install -e %GITDIR%\cht_tiling
 pip install -e %GITDIR%\cht_tsunami
 pip install -e %GITDIR%\cht_utils
 pip install -e %GITDIR%\cht_xbeach
-pip install -e %GITDIR%\hydromt
-pip install -e %GITDIR%\hydromt_sfincs
+rem pip install -e %GITDIR%\hydromt
+rem pip install -e %GITDIR%\hydromt_sfincs
 
