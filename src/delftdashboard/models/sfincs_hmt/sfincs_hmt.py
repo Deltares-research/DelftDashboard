@@ -74,15 +74,15 @@ class Model(GenericModel):
     def add_layers(self):
         layer = app.map.add_layer("sfincs_hmt")
 
-        layer.add_layer("grid", type="image")
+        layer.add_layer("grid", type="raster_image")
 
         layer.add_layer(
             "grid_exterior", type="line", circle_radius=0, line_color="yellow"
         )
 
-        layer.add_layer("mask", type="image")
+        layer.add_layer("mask", type="raster_image")
 
-        layer.add_layer("mask_snapwave", type="image")
+        layer.add_layer("mask_snapwave", type="raster_image")
 
         from .boundary_conditions import select_boundary_point_from_map
 

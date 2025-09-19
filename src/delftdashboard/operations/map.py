@@ -34,7 +34,8 @@ def map_ready(*args):
     # app.map.layer["main"].layer["background_topography"].get_data = update_background_topography_data
     app.map.layer["main"].layer["background_topography"].set_data(update_background_topography_data)
     app.map.layer["main"].layer["background_topography"].legend_position = "bottom-left"
-
+    app.map.layer["main"].layer["background_topography"].legend_title = "XXX"
+    app.map.layer["main"].layer["background_topography"].legend_label = "bed level (m)"
     # Go to point
     app.map.jump_to(0.0, 0.0, 0.5)
 

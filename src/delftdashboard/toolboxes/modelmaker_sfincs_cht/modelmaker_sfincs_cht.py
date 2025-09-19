@@ -365,7 +365,7 @@ class Toolbox(GenericToolbox):
                         polygon_line_color="red",
                         polygon_fill_color="orange",
                         polygon_fill_opacity=0.1)
-
+        
     def set_crs(self):
         # # Called when the CRS is changed
         # # Here we should reset x0, y0, dx, dy etc.

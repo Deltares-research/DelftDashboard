@@ -28,9 +28,9 @@ class Model(GenericModel):
         # Add main DDB layer
         layer = app.map.add_layer("hurrywave")
 
-        layer.add_layer("grid", type="image")
+        layer.add_layer("grid", type="raster_image")
 
-        layer.add_layer("mask", type="image")
+        layer.add_layer("mask", type="raster_image")
 
         from .boundary_conditions import select_boundary_point_from_map
         layer.add_layer("boundary_points",

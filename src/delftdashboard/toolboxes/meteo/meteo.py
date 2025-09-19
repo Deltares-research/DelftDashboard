@@ -55,8 +55,8 @@ class Toolbox(GenericToolbox):
         pass
 
     def add_layers(self):
-        # Add Mapbox layers
-        layer = app.map.add_layer(self.name)
-        layer.add_layer("flood_map",
-                        type="image")
+        # # Add Mapbox layers
+        # layer = app.map.add_layer(self.name)
+        # layer.add_layer("flood_map",
+        #                 type="image")
         pass

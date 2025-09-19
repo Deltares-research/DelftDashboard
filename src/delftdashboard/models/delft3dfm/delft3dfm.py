@@ -67,7 +67,7 @@ class Model(GenericModel):
         # layer.add_layer("grid", type="deck_geojson",
         #                 file_name="delft3dfm_grid.geojson",
         #                 line_color="black")
-        layer.add_layer("grid", type="image")
+        layer.add_layer("grid", type="raster_image")
 
         layer.add_layer("grid_exterior",
                         type="line",
