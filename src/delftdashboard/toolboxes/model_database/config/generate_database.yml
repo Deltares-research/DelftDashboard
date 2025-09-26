@@ -80,6 +80,16 @@ element:
   text: <- Hide
   module: delftdashboard.toolboxes.model_database.generate_database
 
+- style: pushbutton
+  position:
+    x: 170
+    y: 40
+    width: 50
+    height: 20
+  method: create_collection
+  text: Create 
+  module: delftdashboard.toolboxes.model_database.generate_database
+
 # - style: pushbutton
 #   position:
 #     x: 340

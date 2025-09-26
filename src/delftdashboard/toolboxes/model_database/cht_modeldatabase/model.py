@@ -8,6 +8,7 @@ Created on Sun Apr 25 10:58:08 2021
 import os
 
 import geopandas as gpd
+from pyproj import CRS
 import toml
 import boto3
 from botocore import UNSIGNED
@@ -111,10 +112,14 @@ class Deltares_Model(Model):
 
     def get_model_gdf(self):
 
-        # Read the specific layer from the geodatabase
-        
-        # filename = os.path.join(self.path, "misc", f"{self.name}.geojson")
-        filename = os.path.join(self.path, "misc", "exterior.geojson")
+        # Check is geojson exists, if so copy and save in same folder with misc.geojson
+    
+        filename = os.path.join(self.path, "misc", f"{self.name}.geojson")
+        if os.path.exists(filename):
+            pass
+        else:
+            # Fallback to a default filename if the name is not set
+            filename = os.path.join(self.path, "misc", "exterior.geojson")
 
         if not os.path.exists(filename):
 
@@ -123,21 +128,26 @@ class Deltares_Model(Model):
             # Create a dummy GeoDataFrame
             if self.type == "sfincs":
 
-                try:
-                    sfincs_model = SFINCS(os.path.join(self.path, "input"), crs=4326)
-                    sfincs_model.read()  # Ideally we want to read the geojson directly and not all the gridded input for this model
-                    gdf = sfincs_model.grid.exterior.to_crs(4326)
-                    gdf.to_file(filename, driver="GeoJSON")
-                    gdf["name"] = self.name
-                    return gdf
-                except Exception as e:
-                    print(f"Error reading SFINCS model: {e}")
-                    gdf = gpd.GeoDataFrame(geometry=[], crs=4326)
-                    return gdf
+                # try:
+                sfincs_model = SFINCS(os.path.join(self.path, "input"))
+
+                # Reads sfincs.inp and attribute files
+                sfincs_model.read()
+
+                # Ideally we want to read the geojson directly and not all the gridded input for this model
+                gdf = sfincs_model.grid.exterior.to_crs(4326)
+                gdf.to_file(filename, driver="GeoJSON")
+                gdf["name"] = self.name
+                return gdf
+                
+                # except Exception as e:
+                #     print(f"Error reading SFINCS model: {e}")
+                #     gdf = gpd.GeoDataFrame(geometry=[], crs=4326)
+                #     return gdf
             
             elif self.type == "hurrywave":
                 try:
-                    hw_model = HurryWave(path=os.path.join(self.path, "input"), crs=4326)
+                    hw_model = HurryWave(path=os.path.join(self.path, "input"))
                     hw_model.read()  # Ideally we want to read the geojson directly and not all the gridded input for this model
                     # Convert to GeoDataFrame
                     gdf = hw_model.grid.data.exterior.to_crs(4326)
@@ -148,53 +158,7 @@ class Deltares_Model(Model):
                     print(f"Error reading HurryWave model: {e}")
                     gdf = gpd.GeoDataFrame(geometry=[], crs=4326)
                     return gdf
-
-            # Skip the rest?
-
-            # 1. Load your DataArray
-            mask = hw_model.grid.ds.mask
-            assert 'x' in mask.coords and 'y' in mask.coords
-
-            # 2. Convert mask to binary numpy array
-            mask_array = (mask.values > 0).astype(np.uint8)
-
-            # 3. Use a dummy transform (pixel grid space)
-            transform = Affine.translation(0, 0) * Affine.scale(1, 1)
-
-            # 4. Vectorize the binary mask in index space
-            shapes_gen = shapes(mask_array, mask=mask_array, transform=transform)
-
-            # 5. Map index-space polygons to real coordinates
-            x_coords = mask.x.values
-            y_coords = mask.y.values
-
-            def pixel_to_coords(poly):
-                new_coords = []
-                for x, y in poly.exterior.coords:
-                    i = int(np.clip(y, 0, x_coords.shape[0] - 1))
-                    j = int(np.clip(x, 0, x_coords.shape[1] - 1))
-                    new_coords.append((x_coords[i, j], y_coords[i, j]))
-                return Polygon(new_coords)
-
-            # 6. Generate real-world polygons
-            polygons = []
-            for geom, val in shapes_gen:
-                if val == 1:
-                    poly = shape(geom)
-                    real_poly = pixel_to_coords(poly)
-                    if real_poly.is_valid:
-                        polygons.append(real_poly)
-
-            # 7. Create GeoDataFrame
-            region = gpd.GeoDataFrame(geometry=polygons, crs=hw_model.crs)
-
-            # 8. Dissolve into single geometry
-            gdf = region.dissolve()
-            gdf["name"] = self.name
-
-            # 9. Export to GeoJSON
-            gdf.to_file(filename, driver="GeoJSON")
-            
+                
         else:
             gdf = gpd.read_file(filename).to_crs(4326)
             gdf["name"] = self.name
