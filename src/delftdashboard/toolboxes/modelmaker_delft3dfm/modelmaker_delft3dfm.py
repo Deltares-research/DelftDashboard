@@ -239,6 +239,9 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "dx", 1000.0)
             app.gui.setvar(group, "dy", 1000.0)
 
+        self.initialize()
+        self.clear_layers()
+        
     def generate_grid(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Generating grid ...")
