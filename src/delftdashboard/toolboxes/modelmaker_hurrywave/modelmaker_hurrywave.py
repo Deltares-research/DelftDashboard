@@ -253,10 +253,21 @@ class Toolbox(GenericToolbox):
 
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
-        app.model["hurrywave"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
-                                                          bathymetry_database=app.bathymetry_database)
+
+        # app.model["hurrywave"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
+        #                                                   bathymetry_database=app.bathymetry_database)
+
+        app.model["hurrywave"].domain.grid.set_bathymetry_mean_wet(
+                app.selected_bathymetry_datasets,
+                bathymetry_database=app.bathymetry_database,
+                nr_subgrid_pixels=20,
+                threshold_level=0.0,
+                quiet=False,
+                progress_bar=None)  
+
         app.model["hurrywave"].domain.grid.write()
         dlg.close()
+
 
     def update_mask(self):
 
@@ -312,14 +323,13 @@ class Toolbox(GenericToolbox):
             filename = rsp[2] # file name without path
         else:
             return
-        bathymetry_sets = app.toolbox["modelmaker_hurrywave"].selected_bathymetry_datasets
         # Set ndirs same as in hurrywave model
         # nr_dirs = app.gui.getvar(group, "waveblocking_nr_directions")
         nr_dirs = app.model["hurrywave"].domain.input.variables.ntheta
         nr_pixels = app.gui.getvar(group, "waveblocking_nr_pixels")
         threshold_level = app.gui.getvar(group, "waveblocking_threshold_level")
         p = app.gui.window.dialog_progress("               Generating Wave blocking file ...                ", 100)
-        ds_wbl = app.model["hurrywave"].domain.waveblocking.build(bathymetry_sets,
+        ds_wbl = app.model["hurrywave"].domain.waveblocking.build(app.selected_bathymetry_datasets,
                                                                   bathymetry_database=app.bathymetry_database,
                                                                   nr_dirs=nr_dirs,
                                                                   nr_subgrid_pixels=nr_pixels,

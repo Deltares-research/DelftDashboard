@@ -19,8 +19,8 @@ def select(*args):
 def generate_topobathy_tiles(*args):
     # Check what sort of model this is
     model = app.active_model
-    index_path = "./tiles/indices"
-    path = "./tiles/topobathy"
+    index_path = "./tiling/indices"
+    path = "./tiling/topobathy"
 
     # First check of index tiles exist
     if not os.path.exists(index_path):
@@ -31,7 +31,7 @@ def generate_topobathy_tiles(*args):
     
         dlg = app.gui.window.dialog_wait("Generating topo/bathy tiles ...")
 
-        dem_list = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
+        dem_list = app.selected_bathymetry_datasets
 
         # # Loop through dem_list (now only using twm)
         # for dem in dem_list:
@@ -45,13 +45,20 @@ def generate_topobathy_tiles(*args):
         # data_list.append({"twm": twm_data, "zmin": 0.1})
 
         # Create topo bathy tiles
-        twmb = TiledWebMap(path, "topobathy", parameter="elevation")
-        twmb.generate_topobathy_tiles(dem_list,
-                                      bathymetry_database=app.bathymetry_database,
-                                      index_path=index_path,
-                                      write_metadata=False,
-                                      parallel=False
-                                     )
+        # twmb = TiledWebMap(path, "topobathy", parameter="elevation")
+        # twmb.generate_topobathy_tiles(dem_list,
+        #                               bathymetry_database=app.bathymetry_database,
+        #                               index_path=index_path,
+        #                               write_metadata=False,
+        #                               parallel=False
+        #                              )
+        twmb = TiledWebMap(path,
+                           type="data",
+                           parameter="elevation",
+                           data=dem_list,
+                           bathymetry_database=app.bathymetry_database,
+                           index_path=index_path)
+        twmb.make()
 
         # make_topobathy_tiles(path,
         #                     dem_list=dem_list,

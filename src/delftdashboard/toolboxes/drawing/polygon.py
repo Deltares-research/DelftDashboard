@@ -55,8 +55,9 @@ def load_polygon(*args):
             append = False
         app.toolbox["drawing"].polygon_file_name = rsp[0]
         gdf = gpd.read_file(app.toolbox["drawing"].polygon_file_name)
-        # Remove all rows where gdf is not a Polygon
-        gdf = gdf[gdf.geometry.type == "Polygon"]
+        # Remove all rows where gdf is not a Polygon or MultiPolygon
+        gdf = gdf[gdf.geometry.type.isin(["Polygon", "MultiPolygon"])]
+        # gdf = gdf[gdf.geometry.type == "Polygon"]
         if len(gdf) == 0:
             app.gui.window.dialog_warning("No polygons found in file", "Error")
             return

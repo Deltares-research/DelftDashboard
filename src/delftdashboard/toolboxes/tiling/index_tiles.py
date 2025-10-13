@@ -26,15 +26,16 @@ def generate_index_tiles(*args):
         dlg = app.gui.window.dialog_wait("Generating index tiles ...")
     
         grid = model.domain.grid.data
-        path = "./tiles/indices"
+        path = "./tiling/indices"
         max_zoom = app.gui.getvar("tiling", "max_zoom")
         zoom_range = [0, max_zoom]
 
         # Create index tiles
-        twmi = TiledWebMap(path, "indices", parameter="index")
-        twmi.generate_index_tiles(grid,
-                                  zoom_range,
-                                  webviewer=True)
+        twmi = TiledWebMap(path, type="data", parameter="index", data=grid, zoom_range=zoom_range)
+        twmi.make()
+        # twmi.generate_index_tiles(grid,
+        #                           zoom_range,
+        #                           webviewer=True)
 
         # make_index_tiles(grid, path, zoom_range=zoom_range, format="png", webviewer=True)
         dlg.close()
@@ -43,16 +44,23 @@ def generate_index_tiles(*args):
 
         dlg = app.gui.window.dialog_wait("Generating index tiles ...")
     
-        grid = model.domain.grid.xugrid
-        path = "./tiles/indices"
+        grid = model.domain.grid.data.xuds
+        path = "./tiling/indices"
         max_zoom = app.gui.getvar("tiling", "max_zoom")
         zoom_range = [0, max_zoom]
 
         # Create index tiles
-        twmi = TiledWebMap(path, "indices", parameter="index")
-        twmi.generate_index_tiles(grid,
-                                  zoom_range,
-                                  webviewer=True)
+        twmi = TiledWebMap(path,
+                           type="data",
+                           parameter="index",
+                           data=grid,
+                           zoom_range=zoom_range,
+                           topo_path=r"c:\work\delftdashboard\data\bathymetry\gebco_2024")
+        twmi.make()
+        # twmi = TiledWebMap(path, "indices", parameter="index")
+        # twmi.generate_index_tiles(grid,
+        #                           zoom_range,
+        #                           webviewer=True)
 
         dlg.close()
 
