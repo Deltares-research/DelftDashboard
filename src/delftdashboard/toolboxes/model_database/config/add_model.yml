@@ -15,7 +15,7 @@ element:
   position:
     x: 40
     y: 110
-    width: 80
+    width: 100
     height: 20
   text: Name
   variable: active_model_name
@@ -23,7 +23,7 @@ element:
   position:
     x: 40
     y: 60
-    width: 80
+    width: 100
     height: 20
   text: EPSG
   variable: active_model_crs
@@ -31,41 +31,41 @@ element:
   position:
     x: 40
     y: 85
-    width: 80
+    width: 100
     height: 20
   text: Type
   variable: active_model_type
 
 - style: edit
   position:
-    x: 180
+    x: 200
     y: 60
-    width: 80
+    width: 100
     height: 20
   text: Spinup time
   variable: flow_spinup_time
 
 - style: edit
   position:
-    x: 180
+    x: 200
     y: 85
-    width: 80
+    width: 100
     height: 20
   text: Station
   variable: station
 
-- style: edit
-  position:
-    x: 180
-    y: 110
-    width: 80
-    height: 20
-  text: Flow nested
-  variable: flow_nested
+# - style: edit
+#   position:
+#     x: 180
+#     y: 110
+#     width: 80
+#     height: 20
+#   text: Flow nested
+#   variable: flow_nested
 
 - style: checkbox
   position:
-    x: 280
+    x: 310
     y: 60
     width: 120
     height: 20
@@ -75,7 +75,7 @@ element:
 
 - style: checkbox
   position:
-    x: 280
+    x: 310
     y: 85
     width: 120
     height: 20
@@ -85,7 +85,7 @@ element:
 
 - style: checkbox
   position:
-    x: 280
+    x: 310
     y: 110
     width: 120
     height: 20
@@ -96,7 +96,26 @@ element:
 
 - style: popupmenu
   position:
-    x: 390
+    x: 200
+    y: 110
+    width: 100
+    height: 20
+  text: Flow nested
+  method: set_nested
+  module: delftdashboard.toolboxes.model_database.add_model
+  variable: flow_nested
+  variable_group: model_database
+  select: item
+  option_value:
+    variable: domain_names 
+    variable_group: model_database
+  option_string:
+    variable: domain_names 
+    variable_group: model_database
+
+- style: popupmenu
+  position:
+    x: 410
     y: 90
     width: 150
     height: 20
@@ -110,10 +129,13 @@ element:
   option_value:
     variable: available_collection_names 
     variable_group: model_database
+  option_string:
+    variable: available_collection_names 
+    variable_group: model_database
 
 - style: pushbutton
   position:
-    x: 550
+    x: 570
     y: 110
     width: 100
     height: 20

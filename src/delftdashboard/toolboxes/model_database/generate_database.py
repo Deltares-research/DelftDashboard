@@ -27,6 +27,21 @@ def select(*args):
 def select_collection(*args):
     pass
 
+def create_collection(*args):
+    """Create a new collection in the model database."""
+    name, okay = app.gui.window.dialog_string("Enter collection name:", "Create Collection")
+    if okay:
+        app.model_database.create_collection(name = name)
+
+        collection_names = app.gui.getvar("model_database", "available_collection_names")
+        if name in collection_names:
+            print(f"Collection '{name}' already exists.")
+            return
+        else:
+            collection_names.append(name)
+            app.gui.setvar("model_database", "available_collection_names", collection_names)
+
+
 def use_collection(*args):
     """Show models in the selected collection"""
 

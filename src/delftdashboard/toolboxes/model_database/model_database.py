@@ -48,20 +48,13 @@ class Toolbox(GenericToolbox):
         collection_names, collections_long_names = app.model_database.collections()
 
         if len(collection_names) == 0:
-            model_names = []
-            model_long_names = []
-            model_source_names = []
+            # If no collections are found, set default values
             collection_names = [""]
             collections_long_names = [""]
-        else:
-            model_names, model_long_names, model_source_names = app.model_database.model_names(collection=collection_names[0])
+    
         
         # GUI variables
         group = "model_database"
-        # if len(model_names) == 0:
-        #     # This should not raise an error. The model database can be empty.
-        #     raise Exception("No models found in model database")
-        # else:
         app.gui.setvar(group, "available_collection_names", collection_names)
         if len(collections_long_names) > 0:
             app.gui.setvar(group, "active_available_collection_name", collection_names[0])
