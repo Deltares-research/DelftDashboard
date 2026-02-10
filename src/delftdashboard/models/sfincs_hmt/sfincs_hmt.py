@@ -302,6 +302,7 @@ class Model(GenericModel):
             # Change working directory
             os.chdir(path)
             self.initialize()
+            self.path = path
             self.domain.path = path
             self.domain.read()
             self.set_gui_variables()
@@ -361,11 +362,11 @@ class Model(GenericModel):
         )
         # Boundary points
         app.map.layer["sfincs_hmt"].layer["boundary_points"].set_data(
-            app.model["sfincs_hmt"].domain.boundary_conditions.data, 0
+            app.model["sfincs_hmt"].domain.water_level.gdf, 0
         )
         # Discharge points
         app.map.layer["sfincs_hmt"].layer["discharge_points"].set_data(
-            app.model["sfincs_hmt"].domain.discharge_points.data, 0
+            app.model["sfincs_hmt"].domain.discharge_points.gdf, 0
         )
         # Mask SnapWave
         # app.map.layer["sfincs_hmt"].layer["mask_snapwave"].set_data(app.model["sfincs_hmt"].domain.snapwave.mask)

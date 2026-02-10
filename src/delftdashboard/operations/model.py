@@ -13,6 +13,7 @@ class GenericModel:
         self.name      = "model"
         self.long_name = "Model"
         self.exe_path  = None
+        self.path      = os.getcwd()
 
     def open(self):
         pass
@@ -93,7 +94,7 @@ class GenericModel:
         app.map.layer[self.name].show()    
 
         # Set working directory to model path
-        os.chdir(app.active_model.domain.path)
+        os.chdir(app.active_model.path)
 
         app.gui.window.update()
 

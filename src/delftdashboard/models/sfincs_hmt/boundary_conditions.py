@@ -141,7 +141,7 @@ def delete_point_from_list(*args):
 
 def update_list():
     # Update boundary point names
-    nr_boundary_points = len(app.model["sfincs_hmt"].domain.boundary_conditions.data)
+    nr_boundary_points = app.model["sfincs_hmt"].domain.water_level.nr_points
     boundary_point_names = []
     # Loop through boundary points
     boundary_point_names = [str(i + 1) for i in range(nr_boundary_points)]
