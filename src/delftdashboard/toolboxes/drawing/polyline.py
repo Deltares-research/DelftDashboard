@@ -108,13 +108,6 @@ def apply_buffer(*args):
     gdf = get_buffered_polylines()
     app.toolbox["drawing"].polygon = pd.concat([app.toolbox["drawing"].polygon, gdf])
     app.map.layer["drawing"].layer["polygon"].set_data(app.toolbox["drawing"].polygon)
-
-
-    # app.toolbox["drawing"].polyline = gdf
-    # # Change polyline in draw layer
-    # app.map.layer["drawing"].layer["polyline"].set_data(gdf)
-    # Set buffer to 0.0, so that temp layer will be cleared
-    # app.gui.setvar("drawing", "polyline_buffer_distance", 0.0)
     update()
 
 # def merge_polylines(*args):
@@ -167,7 +160,7 @@ def update_temp_layer():
 
 def get_buffered_polylines():
     buffer_distance = app.gui.getvar("drawing", "polyline_buffer_distance")
-    simplify_tolerance = 0.2 * buffer_distance
+    simplify_tolerance = 0.1 * buffer_distance
     # Check if gdf is in geographic or projected CRS
     if app.toolbox["drawing"].polyline.crs.is_geographic:
         # Convert to Azimuthal equidistant projection

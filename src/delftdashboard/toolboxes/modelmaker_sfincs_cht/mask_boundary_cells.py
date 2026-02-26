@@ -23,6 +23,27 @@ def select(*args):
     app.map.layer["sfincs_cht"].layer["mask"].activate()
     update()
 
+def deselect(*args):
+    changed = False
+    if app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon) > 0:
+        changed = True
+    if app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon) > 0:
+        changed = True
+    if app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon) > 0:
+        changed = True
+    if app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon) > 0:
+        changed = True
+    if changed:    
+        ok = app.gui.window.dialog_yes_no("Your polygons have changed. Would you like to save the changes?")
+        if ok:
+            if app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon) > 0:
+                save_open_boundary_polygon()
+            if app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon) > 0:
+                save_downstream_boundary_polygon()
+            if app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon) > 0:
+                save_neumann_boundary_polygon()
+            if app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon) > 0:
+                save_outflow_boundary_polygon()
 
 # Open boundary (water level)
 
@@ -36,6 +57,7 @@ def delete_open_boundary_polygon(*args):
     # Delete from map
     gdf = app.map.layer["modelmaker_sfincs_cht"].layer["open_boundary_polygon"].delete_feature(index)
     app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon_changed = True
     update()
 
 def load_open_boundary_polygon(*args):
@@ -47,9 +69,15 @@ def load_open_boundary_polygon(*args):
         append = app.gui.window.dialog_yes_no("Add to existing open boundary polygons?", " ")
     app.toolbox["modelmaker_sfincs_cht"].read_open_boundary_polygon(full_name, append)
     app.toolbox["modelmaker_sfincs_cht"].plot_open_boundary_polygon()
+    if append:
+        app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon_changed = True
+    else:
+        save_open_boundary_polygon()
     update()
 
 def save_open_boundary_polygon(*args):
+    app.gui.window.dialog_fade_label("Saving open boundary polygons to open_boundary.geojson ...")
+    app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon_changed = False
     app.toolbox["modelmaker_sfincs_cht"].write_open_boundary_polygon()
 
 def select_open_boundary_polygon(*args):
@@ -60,10 +88,12 @@ def open_boundary_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon)
     app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_index", nrp - 1)
+    app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon_changed = True
     update()
 
 def open_boundary_polygon_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon_changed = True
 
 def open_boundary_polygon_selected(index):
     app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_index", index)
@@ -80,6 +110,7 @@ def delete_downstream_boundary_polygon(*args):
     # Delete from map
     gdf = app.map.layer["modelmaker_sfincs_cht"].layer["downstream_boundary_polygon"].delete_feature(index)
     app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon_changed = True
     update()
 
 def load_downstream_boundary_polygon(*args):
@@ -91,9 +122,15 @@ def load_downstream_boundary_polygon(*args):
         append = app.gui.window.dialog_yes_no("Add to existing downstream boundary polygons?", " ")
     app.toolbox["modelmaker_sfincs_cht"].read_downstream_boundary_polygon(full_name, append)
     app.toolbox["modelmaker_sfincs_cht"].plot_downstream_boundary_polygon()
+    if append:
+        app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon_changed = True
+    else:
+        save_downstream_boundary_polygon()
     update()
 
 def save_downstream_boundary_polygon(*args):
+    app.gui.window.dialog_fade_label("Saving downstream boundary polygons to downstream_boundary.geojson ...")
+    app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon_changed = False
     app.toolbox["modelmaker_sfincs_cht"].write_downstream_boundary_polygon()
 
 def select_downstream_boundary_polygon(*args):
@@ -104,10 +141,12 @@ def downstream_boundary_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon)
     app.gui.setvar("modelmaker_sfincs_cht", "downstream_boundary_polygon_index", nrp - 1)
+    app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon_changed = True
     update()
 
 def downstream_boundary_polygon_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon_changed = True
 
 def downstream_boundary_polygon_selected(index):
     app.gui.setvar("modelmaker_sfincs_cht", "downstream_boundary_polygon_index", index)
@@ -135,9 +174,15 @@ def load_neumann_boundary_polygon(*args):
         append = app.gui.window.dialog_yes_no("Add to existing neumann boundary polygons?", " ")
     app.toolbox["modelmaker_sfincs_cht"].read_neumann_boundary_polygon(full_name, append)
     app.toolbox["modelmaker_sfincs_cht"].plot_neumann_boundary_polygon()
+    if append:
+        app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon_changed = True
+    else:
+        save_neumann_boundary_polygon()
     update()
 
 def save_neumann_boundary_polygon(*args):
+    app.gui.window.dialog_fade_label("Saving neumann boundary polygons to neumann_boundary.geojson ...")
+    app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon_changed = False
     app.toolbox["modelmaker_sfincs_cht"].write_neumann_boundary_polygon()
 
 def select_neumann_boundary_polygon(*args):
@@ -148,10 +193,12 @@ def neumann_boundary_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon)
     app.gui.setvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_index", nrp - 1)
+    app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon_changed = True
     update()
 
 def neumann_boundary_polygon_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon_changed = True
 
 def neumann_boundary_polygon_selected(index):
     app.gui.setvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_index", index)
@@ -183,6 +230,8 @@ def load_outflow_boundary_polygon(*args):
     update()
 
 def save_outflow_boundary_polygon(*args):
+    app.gui.window.dialog_fade_label("Saving outflow boundary polygons to outflow_boundary.geojson ...")
+    app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon_changed = False
     app.toolbox["modelmaker_sfincs_cht"].write_outflow_boundary_polygon()
 
 def select_outflow_boundary_polygon(*args):
@@ -193,10 +242,12 @@ def outflow_boundary_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon)
     app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_index", nrp - 1)
+    app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon_changed = True
     update()
 
 def outflow_boundary_polygon_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon_changed = True
 
 def outflow_boundary_polygon_selected(index):
     app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_index", index)
