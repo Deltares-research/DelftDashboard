@@ -106,7 +106,7 @@ def edit_polyline_buffer_distance(*args):
 def apply_buffer(*args):
     # Generate buffered polylines and add them to polygon layer
     gdf = get_buffered_polylines()
-    app.toolbox["drawing"].polygon = pd.concat([app.toolbox["drawing"].polygon, gdf])
+    app.toolbox["drawing"].polygon = pd.concat([app.toolbox["drawing"].polygon, gdf]).reset_index(drop=True)
     app.map.layer["drawing"].layer["polygon"].set_data(app.toolbox["drawing"].polygon)
     update()
 
