@@ -96,4 +96,90 @@ element:
     check:
     - variable: nr_polylines
       operator: gt
+      value: 0
+- style: pushbutton
+  text: Apply Asymmetric Buffer
+  position:
+    x: 250
+    y: 75
+    width: 120
+    height: 20
+  method: apply_asym_buffer
+  tooltip: Create polygon by applying asymmetric buffer to polyline(s). The polygon will appear under the "Polygon" tab.
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polylines
+      operator: gt
       value: 0 
+- style: edit
+  position:
+    x: 380
+    y: 75
+    width: 50
+    height: 20
+  variable: polyline_buffer_distance_left
+  method: edit_polyline_buffer_distance_left
+  text: Distance left (m)  
+  text_position: right
+  tooltip: Edit asymmetric buffer distance (left) in metres
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polylines
+      operator: gt
+      value: 0
+- style: edit
+  position:
+    x: 520
+    y: 75
+    width: 50
+    height: 20
+  variable: polyline_buffer_distance_right
+  method: edit_polyline_buffer_distance_right
+  text: Distance right (m)  
+  text_position: right
+  tooltip: Edit asymmetric buffer distance (right) in metres
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polylines
+      operator: gt
+      value: 0
+- style: pushbutton
+  text: Apply Parallel Offset
+  position:
+    x: 250
+    y: 50
+    width: 120
+    height: 20
+  method: apply_parallel_offset
+  tooltip: Create polyline by applying parallel offset to polyline(s).
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polylines
+      operator: gt
+      value: 0 
+- style: edit
+  position:
+    x: 380
+    y: 50
+    width: 50
+    height: 20
+  variable: polyline_parallel_offset_distance
+  method: edit_polyline_parallel_offset_distance
+  text: Distance (m)  
+  text_position: right
+  tooltip: Edit parallel offset distance in metres. Negative values will offset to the left, positive values to the right.
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_polylines
+      operator: gt
+      value: 0

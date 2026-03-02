@@ -7,6 +7,8 @@ Created on Mon May 10 12:18:09 2021
 import geopandas as gpd
 import pandas as pd
 from pyproj import CRS
+from shapely.ops import unary_union
+import warnings
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -20,6 +22,13 @@ def select(*args):
     app.map.layer["drawing"].show()
     app.map.layer["drawing"].layer["polyline"].activate()
     app.map.layer["drawing"].layer["polyline_tmp"].show()
+    app.map.layer["drawing"].layer["polyline_asym_tmp"].show()
+    app.map.layer["drawing"].layer["polyline_parallel_offset_tmp"].show()
+
+    warnings.filterwarnings(
+        "ignore",
+        message="Geometry is in a geographic CRS"
+    )
 
 def draw_polyline(*args):
     layer = app.map.layer["drawing"].layer["polyline"]
@@ -103,11 +112,48 @@ def edit_polyline_buffer_distance(*args):
     # Buffer distance changed
     update_temp_layer()
 
+def edit_polyline_buffer_distance_left(*args):
+    # Buffer distance (left) changed
+    update_temp_layer()
+
+def edit_polyline_buffer_distance_right(*args):
+    # Buffer distance (right) changed
+    update_temp_layer()
+
+def edit_polyline_parallel_offset_distance(*args):
+    # Parallel offset distance changed
+    update_temp_layer()
+
 def apply_buffer(*args):
     # Generate buffered polylines and add them to polygon layer
+    app.toolbox["drawing"].asymmetric_buffer = False
     gdf = get_buffered_polylines()
-    app.toolbox["drawing"].polygon = pd.concat([app.toolbox["drawing"].polygon, gdf]).reset_index(drop=True)
+    app.toolbox["drawing"].polygon = concat_gdfs(app.toolbox["drawing"].polygon, gdf)
     app.map.layer["drawing"].layer["polygon"].set_data(app.toolbox["drawing"].polygon)
+    update()
+
+def apply_asym_buffer(*args):    
+    # Generate asymmetric buffered polylines and add them to polygon layer
+    app.toolbox["drawing"].asymmetric_buffer = True
+    gdf = get_asym_buffered_polylines()
+    app.toolbox["drawing"].polygon = concat_gdfs(app.toolbox["drawing"].polygon, gdf)
+    app.map.layer["drawing"].layer["polygon"].set_data(app.toolbox["drawing"].polygon)
+    update()
+
+def apply_parallel_offset(*args):    
+    # Generate parallel offset polylines and add them to polygon layer
+    distance = app.gui.getvar("drawing", "polyline_parallel_offset_distance")
+    gdf = get_parallel_offset_polylines(app.toolbox["drawing"].polyline, distance)
+    # Unlike the buffer approach, we do not generate polygons in polygon layer.
+    # Here we open a file save menu to save the shifted polylines
+    rsp = app.gui.window.dialog_save_file("Select file ...",
+                                          file_name=app.toolbox["drawing"].shifted_polyline_file_name,
+                                          filter="*.geojson",
+                                          allow_directory_change=True)
+    if rsp[0]:
+        app.toolbox["drawing"].shifted_polyline_file_name = rsp[0]
+        gdf.to_file(app.toolbox["drawing"].shifted_polyline_file_name, driver="GeoJSON")
+
     update()
 
 # def merge_polylines(*args):
@@ -150,13 +196,49 @@ def update_temp_layer():
     # Clear temp layer
     layer = app.map.layer["drawing"].layer["polyline_tmp"]
     layer.clear()
+
     if len(app.toolbox["drawing"].polyline) > 0:
+
+        # Do both symmetric and asymmetric buffers
+
+        # Regular 
         buffer_distance = app.gui.getvar("drawing", "polyline_buffer_distance")
         if buffer_distance > 0.0:
             # Loop through polylines
             gdf = get_buffered_polylines()
             # Add to temp layer
             layer.set_data(gdf)
+
+    # Clear temp layer
+    layer = app.map.layer["drawing"].layer["polyline_asym_tmp"]
+    layer.clear()
+
+    if len(app.toolbox["drawing"].polyline) > 0:
+
+        # Asymmetric
+        buffer_distance_left = app.gui.getvar("drawing", "polyline_buffer_distance_left")
+        buffer_distance_right = app.gui.getvar("drawing", "polyline_buffer_distance_right")
+        if buffer_distance_left > 0.0 or buffer_distance_right > 0.0:
+            # Loop through polylines
+            gdf = get_asym_buffered_polylines()
+            # Add to temp layer
+            layer.set_data(gdf)
+
+
+    # Clear temp layer
+    layer = app.map.layer["drawing"].layer["polyline_parallel_offset_tmp"]
+    layer.clear()
+
+    if len(app.toolbox["drawing"].polyline) > 0:
+
+        # Parallel offset
+        distance = app.gui.getvar("drawing", "polyline_parallel_offset_distance")
+        if abs(distance) > 0.0:
+            # Loop through polylines
+            gdf = get_parallel_offset_polylines(app.toolbox["drawing"].polyline, distance)
+            # Add to temp layer
+            layer.set_data(gdf)
+
 
 def get_buffered_polylines():
     buffer_distance = app.gui.getvar("drawing", "polyline_buffer_distance")
@@ -178,3 +260,94 @@ def get_buffered_polylines():
         gdf = gpd.GeoDataFrame(geom, columns=["geometry"]).to_crs(app.toolbox["drawing"].polyline.crs)
 
     return gdf
+
+def get_asym_buffered_polylines():
+    buffer_distance_left = app.gui.getvar("drawing", "polyline_buffer_distance_left")
+    buffer_distance_right = app.gui.getvar("drawing", "polyline_buffer_distance_right")
+    simplify_tolerance = 0.1 * max(buffer_distance_left, buffer_distance_right)
+    # Check if gdf is in geographic or projected CRS
+    if app.toolbox["drawing"].polyline.crs.is_geographic:
+
+        # Convert to Azimuthal equidistant projection
+        lon = app.toolbox["drawing"].polyline.centroid.x.mean()
+        lat = app.toolbox["drawing"].polyline.centroid.y.mean()
+        aeqd_proj = CRS.from_proj4(
+                f"+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0")
+
+        line = app.toolbox["drawing"].polyline.to_crs(aeqd_proj)
+        left = line.buffer(buffer_distance_left, single_sided=True)
+        right = line.buffer(-buffer_distance_right, single_sided=True)
+        geom = unary_union([left, right])
+        geom = geom.simplify(tolerance=simplify_tolerance)
+        # if geom is a multipolygon, turn into multiple polygons
+        if geom.geom_type == "MultiPolygon":
+            geom = list(geom.geoms)
+        else:
+            geom = [geom]
+        gdf = gpd.GeoDataFrame(geom, columns=["geometry"]).set_crs(aeqd_proj).to_crs(app.toolbox["drawing"].polyline.crs)
+
+    else:
+
+        line = app.toolbox["drawing"].polyline
+        left = line.buffer(buffer_distance_left, single_sided=True)
+        right = line.buffer(-buffer_distance_right, single_sided=True)
+        geom = unary_union([left, right])
+        geom = geom.simplify(tolerance=simplify_tolerance)
+        # if geom is a multipolygon, turn into multiple polygons
+        if geom.geom_type == "MultiPolygon":
+            geom = list(geom.geoms)
+        else:
+            geom = [geom]
+        gdf = gpd.GeoDataFrame(geom, columns=["geometry"]).set_crs(app.toolbox["drawing"].polyline.crs)
+
+    return gdf
+
+def get_parallel_offset_polylines(gdf, offset_distance):
+
+    # If gdf is empty, return empty gdf
+    if len(gdf) == 0:
+        return gpd.GeoDataFrame()
+
+    # offset_distance = app.gui.getvar("drawing", "polyline_parallel_offset_distance")
+    if offset_distance < 0.0:
+        side = "left"
+    else:
+        side = "right"
+    offset_distance = abs(offset_distance)      
+    # simplify_tolerance = simplify_tolerance_factor * offset_distance
+
+    if gdf.crs.is_geographic:
+        # Loop through line_list and convert to Azimuthal equidistant projection
+        lon = gdf.centroid.x.mean()
+        lat = gdf.centroid.y.mean()
+        aeqd_proj = CRS.from_proj4(
+                f"+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0")
+        gdf_local = gdf.to_crs(aeqd_proj)
+    else:
+        gdf_local = gdf
+
+    # Make list of linestring geometries
+    line_list = gdf_local[gdf_local.geom_type == "LineString"].geometry.tolist()
+
+    # Now apply parallel offset to each line
+    line_list = [line.parallel_offset(offset_distance, side=side) for line in line_list]
+
+    # # And simplify? Is this necessary for parallel offset?
+    # line_list = [line.simplify(tolerance=simplify_tolerance) for line in line_list]
+
+    if gdf.crs.is_geographic:
+        gdf_out = gpd.GeoDataFrame(line_list, columns=["geometry"]).set_crs(aeqd_proj).to_crs(gdf.crs)
+    else:
+        gdf_out = gpd.GeoDataFrame(line_list, columns=["geometry"]).set_crs(gdf.crs)
+
+    return gdf_out
+
+def concat_gdfs(gdf0, gdf1):
+    # Check if gdf0 is empty
+    if len(gdf0) == 0:
+        return gdf1.to_crs(app.map.crs)
+    # Check if gdf1 is empty
+    if len(gdf1) == 0:
+        return gdf0.to_crs(app.map.crs)
+    # Concatenate and reset index
+    return pd.concat([gdf0.to_crs(app.map.crs), gdf1.to_crs(app.map.crs)]).reset_index(drop=True)
