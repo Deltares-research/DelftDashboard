@@ -423,8 +423,10 @@ class Toolbox(GenericToolbox):
             # Make list of separate gdfs for each polygon
             refpol = self.refinement_polygon
 
+        epsg = app.crs.to_epsg()
+        
         # Build grid
-        model.quadtree_grid.set(
+        model.quadtree_grid.create(
             x0,
             y0,
             nmax,
@@ -432,10 +434,11 @@ class Toolbox(GenericToolbox):
             dx,
             dy,
             rotation,
+            epsg,
             refinement_polygons=refpol,
-            bathymetry_sets=app.toolbox[
-                "modelmaker_sfincs_hmt"
-            ].selected_bathymetry_datasets,
+            # bathymetry_sets=app.toolbox[
+            #     "modelmaker_sfincs_hmt"
+            # ].selected_bathymetry_datasets,
             bathymetry_database=app.bathymetry_database,
         )
 
