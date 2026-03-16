@@ -353,13 +353,16 @@ class Model(GenericModel):
         if fname:
             dlg = app.gui.window.dialog_wait("Loading Delft3D-FM model ...")
             path = os.path.dirname(fname)
+            # if path is and empty string, use current working directory
+            if not path:
+                path = os.getcwd()
             self.domain.path = path
+            # Change working directory
+            os.chdir(path)
             self.domain.fname = fname
             self.domain.read_input_file(fname)
             self.domain.read_attribute_files()
             self.set_gui_variables()
-            # Change working directory
-            os.chdir(path)
             # Change CRS
             app.crs = self.domain.crs
             self.plot()

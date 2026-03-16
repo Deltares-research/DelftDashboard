@@ -10,6 +10,7 @@ from pyproj import CRS
 
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
+from delftdashboard.misc.gdfutils import mpol2pol
 
 # from cht_bathymetry.bathymetry_database import bathymetry_database
 from cht_utils.misc_tools import dict2yaml
@@ -35,18 +36,22 @@ class Toolbox(GenericToolbox):
         # Include polygons
         self.include_polygon = gpd.GeoDataFrame()
         self.include_file_name = "include.geojson"
+        self.include_polygon_changed = False
         # Exclude polygons
         self.exclude_polygon = gpd.GeoDataFrame()
         self.exclude_file_name = "exclude.geojson"
+        self.exclude_polygon_changed = False
         # Boundary polygons
         self.boundary_polygon = gpd.GeoDataFrame()
         self.boundary_file_name = "boundary.geojson"
+        self.boundary_polygon_changed = False
         # Refinement
         self.refinement_levels = []
         self.refinement_zmin = []
         self.refinement_zmax = []
         self.refinement_polygon = gpd.GeoDataFrame()
-
+        self.refinement_polygons_changed = False
+        
         self.setup_dict = {}
 
         # Set GUI variable
@@ -347,32 +352,32 @@ class Toolbox(GenericToolbox):
         self.update_mask()
         self.generate_waveblocking()
 
-    def update_polygons(self):
+    # def update_polygons(self):
 
-        nrp = len(self.include_polygon)
-        incnames = []
-        for ip in range(nrp):
-            incnames.append(str(ip + 1))
-        app.gui.setvar("modelmaker_hurrywave", "nr_include_polygons", nrp)
-        app.gui.setvar("modelmaker_hurrywave", "include_polygon_names", incnames)
+    #     nrp = len(self.include_polygon)
+    #     incnames = []
+    #     for ip in range(nrp):
+    #         incnames.append(str(ip + 1))
+    #     app.gui.setvar("modelmaker_hurrywave", "nr_include_polygons", nrp)
+    #     app.gui.setvar("modelmaker_hurrywave", "include_polygon_names", incnames)
 
-        nrp = len(self.exclude_polygon)
-        excnames = []
-        for ip in range(nrp):
-            excnames.append(str(ip + 1))
-        app.gui.setvar("modelmaker_hurrywave", "nr_exclude_polygons", nrp)
-        app.gui.setvar("modelmaker_hurrywave", "exclude_polygon_names", excnames)
+    #     nrp = len(self.exclude_polygon)
+    #     excnames = []
+    #     for ip in range(nrp):
+    #         excnames.append(str(ip + 1))
+    #     app.gui.setvar("modelmaker_hurrywave", "nr_exclude_polygons", nrp)
+    #     app.gui.setvar("modelmaker_hurrywave", "exclude_polygon_names", excnames)
 
-        nrp = len(self.boundary_polygon)
-        bndnames = []
-        for ip in range(nrp):
-            bndnames.append(str(ip + 1))
-        app.gui.setvar("modelmaker_hurrywave", "nr_boundary_polygons", nrp)
-        app.gui.setvar("modelmaker_hurrywave", "boundary_polygon_names", bndnames)
+    #     nrp = len(self.boundary_polygon)
+    #     bndnames = []
+    #     for ip in range(nrp):
+    #         bndnames.append(str(ip + 1))
+    #     app.gui.setvar("modelmaker_hurrywave", "nr_boundary_polygons", nrp)
+    #     app.gui.setvar("modelmaker_hurrywave", "boundary_polygon_names", bndnames)
 
-        # app.toolbox["modelmaker_hurrywave"].write_include_polygon()
-        # app.toolbox["modelmaker_hurrywave"].write_exclude_polygon()
-        # app.toolbox["modelmaker_hurrywave"].write_boundary_polygon()
+    #     # app.toolbox["modelmaker_hurrywave"].write_include_polygon()
+    #     # app.toolbox["modelmaker_hurrywave"].write_exclude_polygon()
+    #     # app.toolbox["modelmaker_hurrywave"].write_boundary_polygon()
 
     def read_refinement_polygon(self, file_name, append):
         # Should we make this part of cht_hurrywave? Yes, but for now it is in the modelmaker_hurrywave toolbox.
@@ -391,24 +396,43 @@ class Toolbox(GenericToolbox):
         else:
             self.refinement_polygon = refinement_polygon
 
-    def read_include_polygon(self):
-        self.include_polygon = gpd.read_file(self.include_file_name)
-        self.update_polygons()
+    def read_include_polygon(self, fname, append):
+        if not append:
+            # New file
+            # The include polygon should always be called include.geojson and saved to the
+            # current working directory
+            self.include_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+        else:
+            # Append to existing file
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.include_polygon = gpd.GeoDataFrame(pd.concat([self.include_polygon, gdf], ignore_index=True))
+        # self.update_polygons()
 
-    def read_exclude_polygon(self):
-        self.exclude_polygon = gpd.read_file(self.exclude_file_name)
-        self.update_polygons()
+    def read_exclude_polygon(self, fname, append):
+        if not append:
+            self.exclude_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+        else:
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.exclude_polygon = gpd.GeoDataFrame(pd.concat([self.exclude_polygon, gdf], ignore_index=True))
+        # self.update_polygons()
 
-    def read_boundary_polygon(self):
-        self.boundary_polygon = gpd.read_file(self.boundary_file_name)
-        self.update_polygons()
+    def read_boundary_polygon(self, fname, append):
+        if not append:
+            self.boundary_polygon = gpd.read_file(fname).to_crs(app.crs)
+        else:
+            gdf = gpd.read_file(fname).to_crs(app.crs)
+            self.boundary_polygon = gpd.GeoDataFrame(pd.concat([self.boundary_polygon, gdf], ignore_index=True))
+        # self.update_polygons()
 
     def write_refinement_polygon(self):
         if len(self.refinement_polygon) == 0:
             print("No refinement polygons defined")
             return
-        # Drop the id column
-        gdf = self.refinement_polygon.drop(columns=["id"])
+        # Drop the id column if it exists (it is created by the drawing tool, but we don't want to save it in the geojson file)
+        if "id" in self.refinement_polygon.columns:
+            gdf = self.refinement_polygon.drop(columns=["id"])
+        else:
+            gdf = self.refinement_polygon
         fname = app.gui.getvar("modelmaker_hurrywave", "refinement_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
 

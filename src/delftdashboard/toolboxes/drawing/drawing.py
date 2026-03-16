@@ -30,12 +30,18 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "active_polyline", 0)
         app.gui.setvar(group, "polyline_buffer_distance", 0.0)
         app.gui.setvar(group, "polyline_simplify_distance", 0.0)
+        app.gui.setvar(group, "polyline_buffer_distance_left", 0.0)
+        app.gui.setvar(group, "polyline_buffer_distance_right", 0.0)
+        app.gui.setvar(group, "polyline_parallel_offset_distance", 0.0)
 
         self.polygon = gpd.GeoDataFrame()
         self.polyline = gpd.GeoDataFrame()
 
         self.polygon_file_name = "polygon.geojson"
         self.polyline_file_name = "polyline.geojson"
+        self.shifted_polyline_file_name = "shifted_polylines.geojson"
+
+        self.asymmetric_buffer = False
 
     def add_layers(self):
         # Add Mapbox layers
@@ -66,6 +72,14 @@ class Toolbox(GenericToolbox):
                         type="polygon",
                         line_color="white",
                         line_style="--")
+        layer.add_layer("polyline_asym_tmp",
+                        type="polygon",
+                        line_color="yellow",
+                        line_style="--")
+        layer.add_layer("polyline_parallel_offset_tmp",
+                        type="line",
+                        line_color="white",
+                        line_style=":")
 
     def plot(self):
         pass
@@ -77,11 +91,15 @@ class Toolbox(GenericToolbox):
             app.map.layer["drawing"].layer["polygon_tmp"].hide()
             app.map.layer["drawing"].layer["polyline"].hide()
             app.map.layer["drawing"].layer["polyline_tmp"].hide()
+            app.map.layer["drawing"].layer["polyline_asym_tmp"].hide()
+            app.map.layer["drawing"].layer["polyline_parallel_offset_tmp"].hide()
         elif mode == "invisible":
             app.map.layer["drawing"].hide()
             app.map.layer["drawing"].layer["polygon"].hide()
             app.map.layer["drawing"].layer["polygon_tmp"].hide()
             app.map.layer["drawing"].layer["polyline"].hide()
             app.map.layer["drawing"].layer["polyline_tmp"].hide()
+            app.map.layer["drawing"].layer["polyline_asym_tmp"].hide()
+            app.map.layer["drawing"].layer["polyline_parallel_offset_tmp"].hide()
         else:
             app.map.layer["drawing"].show()

@@ -34,7 +34,6 @@ def select_polygon(*args):
     app.map.layer["drawing"].layer["polygon"].activate_feature(iac)
 
 def delete_polygon(*args):
-    # if app.toolbox["drawing"].polygon:
     iac = app.gui.getvar("drawing", "active_polygon")
     # Remove polygon with index iac from gdf
     app.toolbox["drawing"].polygon = app.toolbox["drawing"].polygon.drop(index=iac).reset_index(drop=True)

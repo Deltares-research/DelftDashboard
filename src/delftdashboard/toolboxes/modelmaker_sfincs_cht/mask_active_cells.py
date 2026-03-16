@@ -21,6 +21,20 @@ def select(*args):
     app.map.layer["sfincs_cht"].layer["mask"].activate()
     update()
 
+def deselect(*args):
+    changed = False
+    if app.toolbox["modelmaker_sfincs_cht"].include_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].include_polygon) > 0:
+        changed = True
+    if app.toolbox["modelmaker_sfincs_cht"].exclude_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].exclude_polygon) > 0:
+        changed = True
+    if changed:    
+        ok = app.gui.window.dialog_yes_no("Your polygons have changed. Would you like to save the changes?")
+        if ok:
+            if app.toolbox["modelmaker_sfincs_cht"].include_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].include_polygon) > 0:
+                save_include_polygon()
+            if app.toolbox["modelmaker_sfincs_cht"].exclude_polygon_changed and len(app.toolbox["modelmaker_sfincs_cht"].exclude_polygon) > 0:
+                save_exclude_polygon()
+
 def draw_include_polygon(*args):
     app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].crs = app.crs
     app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].draw()
@@ -31,6 +45,7 @@ def delete_include_polygon(*args):
     index = app.gui.getvar("modelmaker_sfincs_cht", "include_polygon_index")
     gdf = app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].delete_feature(index)
     app.toolbox["modelmaker_sfincs_cht"].include_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].include_polygon_changed = True
     update()
 
 def load_include_polygon(*args):
@@ -42,10 +57,16 @@ def load_include_polygon(*args):
         append = app.gui.window.dialog_yes_no("Add to existing include polygons?", " ")
     app.toolbox["modelmaker_sfincs_cht"].read_include_polygon(full_name, append)
     app.toolbox["modelmaker_sfincs_cht"].plot_include_polygon()
+    if append:
+        app.toolbox["modelmaker_sfincs_cht"].include_polygon_changed = True
+    else:
+        save_include_polygon()    
     update()
 
 def save_include_polygon(*args):
+    app.gui.window.dialog_fade_label("Saving include polygons to include.geojson ...")
     app.toolbox["modelmaker_sfincs_cht"].write_include_polygon()
+    app.toolbox["modelmaker_sfincs_cht"].include_polygon_changed = False
 
 def select_include_polygon(*args):
     index = args[0]
@@ -55,10 +76,12 @@ def include_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].include_polygon = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_cht"].include_polygon)
     app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_index", nrp - 1)
+    app.toolbox["modelmaker_sfincs_cht"].include_polygon_changed = True
     update()
 
 def include_polygon_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].include_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].include_polygon_changed = True
 
 def include_polygon_selected(index):
     # Selected from map
@@ -66,7 +89,6 @@ def include_polygon_selected(index):
     update()
 
 def draw_exclude_polygon(*args):
-#    app.map.layer["modelmaker_sfincs_cht"].layer["include_polygon"].crs = app.crs
     app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon"].draw()
 
 def delete_exclude_polygon(*args):
@@ -76,6 +98,7 @@ def delete_exclude_polygon(*args):
     # Delete from map
     gdf = app.map.layer["modelmaker_sfincs_cht"].layer["exclude_polygon"].delete_feature(index)
     app.toolbox["modelmaker_sfincs_cht"].exclude_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].exclude_polygon_changed = True
     update()
 
 def load_exclude_polygon(*args):
@@ -86,11 +109,17 @@ def load_exclude_polygon(*args):
     if app.gui.getvar("modelmaker_sfincs_cht", "nr_exclude_polygons"):
         append = app.gui.window.dialog_yes_no("Add to existing exclude polygons?", " ")
     app.toolbox["modelmaker_sfincs_cht"].read_exclude_polygon(full_name, append)
+    if append:
+        app.toolbox["modelmaker_sfincs_cht"].exclude_polygon_changed = True
+    else:
+        save_exclude_polygon()
     app.toolbox["modelmaker_sfincs_cht"].plot_exclude_polygon()
     update()
 
 def save_exclude_polygon(*args):
+    app.gui.window.dialog_fade_label("Saving exclude polygons to exclude.geojson ...")
     app.toolbox["modelmaker_sfincs_cht"].write_exclude_polygon()
+    app.toolbox["modelmaker_sfincs_cht"].exclude_polygon_changed = False
 
 def select_exclude_polygon(*args):
     index = args[0]
@@ -100,16 +129,19 @@ def exclude_polygon_created(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].exclude_polygon = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_cht"].exclude_polygon)
     app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_index", nrp - 1)
+    app.toolbox["modelmaker_sfincs_cht"].exclude_polygon_changed = True
     update()
 
 def exclude_polygon_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_cht"].exclude_polygon = gdf
+    app.toolbox["modelmaker_sfincs_cht"].exclude_polygon_changed = True
 
 def exclude_polygon_selected(index):
     app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_index", index)
     update()
 
 def update():
+
     # Include
     nrp = len(app.toolbox["modelmaker_sfincs_cht"].include_polygon)
     incnames = []

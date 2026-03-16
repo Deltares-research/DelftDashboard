@@ -6,9 +6,9 @@ element:
     width: -10
     height: 160
   tab:
-  - string: Polygon
-    module: delftdashboard.toolboxes.drawing.polygon
-    element: polygon.yml
   - string: Polyline
     module: delftdashboard.toolboxes.drawing.polyline
     element: polyline.yml
+  - string: Polygon
+    module: delftdashboard.toolboxes.drawing.polygon
+    element: polygon.yml

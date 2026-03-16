@@ -38,25 +38,42 @@ class Toolbox(GenericToolbox):
 
         # Include polygons
         self.include_polygon = gpd.GeoDataFrame()
+        self.include_polygon_changed = False
+
         # Exclude polygons
         self.exclude_polygon = gpd.GeoDataFrame()
+        self.exclude_polygon_changed = False
+
         # Boundary polygons
         self.open_boundary_polygon = gpd.GeoDataFrame()
         self.downstream_boundary_polygon = gpd.GeoDataFrame()
         self.neumann_boundary_polygon = gpd.GeoDataFrame()
         self.outflow_boundary_polygon = gpd.GeoDataFrame()
+        self.open_boundary_polygon_changed = False
+        self.downstream_boundary_polygon_changed = False
+        self.neumann_boundary_polygon_changed = False
+        self.outflow_boundary_polygon_changed = False
+
         # Include polygons SnapWave
         self.include_polygon_snapwave = gpd.GeoDataFrame()
+        self.include_polygon_snapwave_changed = False
+
         # Exclude polygons SnapWave
         self.exclude_polygon_snapwave = gpd.GeoDataFrame()
+        self.exclude_polygon_snapwave_changed = False
+
         # Boundary polygons SnapWave
         self.open_boundary_polygon_snapwave = gpd.GeoDataFrame()
         self.neumann_boundary_polygon_snapwave = gpd.GeoDataFrame()
+        self.open_boundary_polygon_snapwave_changed = False
+        self.neumann_boundary_polygon_snapwave_changed = False
+
         # Refinement
         self.refinement_levels = []
         self.refinement_zmin = []
         self.refinement_zmax = []
         self.refinement_polygon = gpd.GeoDataFrame()
+        self.refinement_polygon_changed = False
 
         self.setup_dict = {}
 
@@ -613,18 +630,18 @@ class Toolbox(GenericToolbox):
     def read_include_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_file", fname)
-            self.include_polygon = mpol2pol(gpd.read_file(fname))
+            # The include polygon should always be called include.geojson and saved to the
+            # current working directory
+            self.include_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
             self.include_polygon = gpd.GeoDataFrame(pd.concat([self.include_polygon, gdf], ignore_index=True))
 
     def read_exclude_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_file", fname)
-            self.exclude_polygon = mpol2pol(gpd.read_file(fname))
+            self.exclude_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
             gdf = mpol2pol(gpd.read_file(fname))
@@ -633,81 +650,81 @@ class Toolbox(GenericToolbox):
     def read_open_boundary_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_file", fname)
-            self.open_boundary_polygon = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_file", fname)
+            self.open_boundary_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs
             self.open_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.open_boundary_polygon, gdf], ignore_index=True))
 
     def read_downstream_boundary_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "downstream_boundary_polygon_file", fname)
-            self.downstream_boundary_polygon = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_cht", "downstream_boundary_polygon_file", fname)
+            self.downstream_boundary_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
             self.downstream_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.downstream_boundary_polygon, gdf], ignore_index=True))
 
     def read_neumann_boundary_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_file", fname)
-            self.neumann_boundary_polygon = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_file", fname)
+            self.neumann_boundary_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
             self.neumann_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.neumann_boundary_polygon, gdf], ignore_index=True))
 
     def read_outflow_boundary_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_file", fname)
-            self.outflow_boundary_polygon = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_cht", "outflow_boundary_polygon_file", fname)
+            self.outflow_boundary_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
             self.outflow_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.outflow_boundary_polygon, gdf], ignore_index=True))
 
     def read_include_polygon_snapwave(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_file_snapwave", fname)
-            self.include_polygon_snapwave = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_cht", "include_polygon_file_snapwave", fname)
+            self.include_polygon_snapwave = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
             self.include_polygon_snapwave = gpd.GeoDataFrame(pd.concat([self.include_polygon_snapwave, gdf], ignore_index=True))
 
     def read_exclude_polygon_snapwave(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_file_snapwave", fname)
-            self.exclude_polygon_snapwave = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_cht", "exclude_polygon_file_snapwave", fname)
+            self.exclude_polygon_snapwave = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
             self.exclude_polygon_snapwave = gpd.GeoDataFrame(pd.concat([self.exclude_polygon_snapwave, gdf], ignore_index=True))
 
     def read_open_boundary_polygon_snapwave(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_file_snapwave", fname)
-            self.open_boundary_polygon_snapwave = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_cht", "open_boundary_polygon_file_snapwave", fname)
+            self.open_boundary_polygon_snapwave = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
             self.open_boundary_polygon_snapwave = gpd.GeoDataFrame(pd.concat([self.open_boundary_polygon_snapwave, gdf], ignore_index=True))
 
     def read_neumann_boundary_polygon_snapwave(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_file_snapwave", fname)
-            self.neumann_boundary_polygon_snapwave = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_cht", "neumann_boundary_polygon_file_snapwave", fname)
+            self.neumann_boundary_polygon_snapwave = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
             self.neumann_boundary_polygon_snapwave = gpd.GeoDataFrame(pd.concat([self.neumann_boundary_polygon_snapwave, gdf], ignore_index=True))
 
     def show_mask_polygons(self):
@@ -723,18 +740,12 @@ class Toolbox(GenericToolbox):
 
     def write_refinement_polygon(self):
         if len(self.refinement_polygon) == 0:
-            print("No refinement polygons defined")
             return
-        # Drop the id column
-        gdf = self.refinement_polygon.drop(columns=["id"])
-        # gdf = gpd.GeoDataFrame({"geometry": self.refinement_polygon["geometry"],
-        #                         "refinement_level": self.refinement_levels,
-        #                         "zmin": self.refinement_zmin,
-        #                         "zmax": self.refinement_zmax})
-        # Iterate over all polygons and add refinement level
-        # refinement_level = 1 means one level of refinement
-        # refinement_level = 2 means two levels of refinement
-        # etc.
+        # Drop the id column (if it exists)
+        if "id" in self.refinement_polygon.columns:
+            gdf = self.refinement_polygon.drop(columns=["id"])
+        else:
+            gdf = self.refinement_polygon
         fname = app.gui.getvar("modelmaker_sfincs_cht", "refinement_polygon_file")
         gdf.to_file(fname, driver='GeoJSON')
 

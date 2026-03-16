@@ -4,6 +4,7 @@ Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
 """
+import geopandas as gpd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -65,6 +66,23 @@ def load(*args):
         app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(gdf)
         app.gui.setvar("sfincs_cht", "active_wave_maker", 0)
         app.model["sfincs_cht"].wave_makers_changed = False
+        update()
+
+def import_geojson(*args):
+
+    map.reset_cursor()
+
+    rsp = app.gui.window.dialog_open_file("Select file ...",
+                                        #   file_name="sfincs.wvm",
+                                          filter="*.geojson",
+                                          allow_directory_change=False)
+    if rsp[0]:
+        filename = rsp[0]
+        gdf = gpd.read_file(filename)
+        app.model["sfincs_cht"].domain.wave_makers.gdf = gdf
+        app.map.layer["sfincs_cht"].layer["wave_makers"].set_data(gdf)
+        app.gui.setvar("sfincs_cht", "active_wave_maker", 0)
+        app.model["sfincs_cht"].wave_makers_changed = True
         update()
 
 def save(*args):
