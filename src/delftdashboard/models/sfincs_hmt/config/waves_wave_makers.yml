@@ -16,16 +16,16 @@ element:
   position:
     x: 100
     y: 110
-    width: 80
+    width: 100
     height: 20
   method: add_on_map
-  tooltip: Add wave maker on map
+  tooltip: Draw wave maker on map. Note that wave makers should be drawn in counter clockwise direction. I.e. when looking at the coast from the water, they should be drawn from left to right. 
 - style: pushbutton
   text: Delete Polyline
   position:
     x: 100
     y: 85
-    width: 80
+    width: 100
     height: 20
   method: delete_from_list
   tooltip: Delete wave maker from list
@@ -41,16 +41,25 @@ element:
   position:
     x: 100
     y: 60
-    width: 80
+    width: 100
     height: 20
   method: load
   tooltip: Load wave makers from file
 - style: pushbutton
-  text: Save
+  text: Import (*.geojson)
   position:
     x: 100
     y: 35
-    width: 80
+    width: 100
+    height: 20
+  method: import_geojson
+  tooltip: Import wave makers from geojsonfile
+- style: pushbutton
+  text: Save
+  position:
+    x: 100
+    y: 10
+    width: 100
     height: 20
   method: save
   tooltip: Save wave maker to file

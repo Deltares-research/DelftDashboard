@@ -45,6 +45,17 @@ def grid_outline_modified(gdf, index, id):
 
 
 def generate_grid(*args):
+    # First check that nmax, mmax, dx, and dy are > 0
+    group = "modelmaker_sfincs_hmt"
+    nmax = app.gui.getvar(group, "nmax")
+    mmax = app.gui.getvar(group, "mmax")
+    dx = app.gui.getvar(group, "dx")
+    dy = app.gui.getvar(group, "dy")
+    if nmax <= 0 or mmax <= 0 or dx <= 0.0 or dy <= 0.0:
+        app.gui.window.dialog_warning("Please first create bounding box for model domain!",
+            "Warning"
+        )
+        return
     app.toolbox["modelmaker_sfincs_hmt"].generate_grid()
 
 
@@ -124,16 +135,14 @@ def build_model(*args):
     app.toolbox["modelmaker_sfincs_hmt"].build_model()
 
 def use_snapwave(*args):
-    use_snapwave = app.gui.getvar("modelmaker_sfincs_hmt", "use_snapwave")
-    app.model["sfincs_hmt"].domain.config.set("snapwave", use_snapwave)
-    app.gui.setvar("sfincs_hmt", "snapwave", use_snapwave)
+    use = app.gui.getvar("modelmaker_sfincs_hmt", "use_snapwave")
+    # Update domain
+    app.model["sfincs_hmt"].domain.config.set("snapwave", use)
+    # Update GUI variable
+    app.gui.setvar("sfincs_hmt", "snapwave", use)
 
 def use_subgrid(*args):
-    use_subgrid = app.gui.getvar("modelmaker_sfincs_hmt", "use_subgrid")
-    if use_subgrid:
-        app.gui.setvar("sfincs_hmt", "bathymetry_type", "subgrid")
-    else:
-        app.gui.setvar("sfincs_hmt", "bathymetry_type", "regular")
+    pass
 
 def show_mask_polygons(*args):
     app.toolbox["modelmaker_sfincs_hmt"].show_mask_polygons()

@@ -21,6 +21,20 @@ def select(*args):
     app.map.layer["sfincs_hmt"].layer["mask_snapwave"].activate()
     update()
 
+def deselect(*args):
+    changed = False
+    if app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave_changed and len(app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave) > 0:
+        changed = True
+    if app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave_changed and len(app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave) > 0:
+        changed = True
+    if changed:    
+        ok = app.gui.window.dialog_yes_no("Your polygons have changed. Would you like to save the changes?")
+        if ok:
+            if app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave_changed and len(app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave) > 0:
+                save_open_boundary_polygon_snapwave()
+            if app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave_changed and len(app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave) > 0:
+                save_neumann_boundary_polygon_snapwave()
+
 def draw_open_boundary_polygon_snapwave(*args):
     app.map.layer["modelmaker_sfincs_hmt"].layer["open_boundary_polygon_snapwave"].draw()
 
@@ -31,6 +45,7 @@ def delete_open_boundary_polygon_snapwave(*args):
     # Delete from map
     gdf = app.map.layer["modelmaker_sfincs_hmt"].layer["open_boundary_polygon_snapwave"].delete_feature(index)
     app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave = gdf
+    app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave_changed = True
     update()
 
 def load_open_boundary_polygon_snapwave(*args):
@@ -42,10 +57,16 @@ def load_open_boundary_polygon_snapwave(*args):
         append = app.gui.window.dialog_yes_no("Add to existing open boundary polygons?", " ")
     app.toolbox["modelmaker_sfincs_hmt"].read_open_boundary_polygon_snapwave(full_name, append)
     app.toolbox["modelmaker_sfincs_hmt"].plot_open_boundary_polygon_snapwave()
+    if append:
+        app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave_changed = True
+    else:
+        save_open_boundary_polygon_snapwave()
     update()
 
 
 def save_open_boundary_polygon_snapwave(*args):
+    app.gui.window.dialog_fade_label("Saving open boundary polygons to open_boundary_snapwave.geojson ...")
+    app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave_changed = False
     app.toolbox["modelmaker_sfincs_hmt"].write_open_boundary_polygon_snapwave()
 
 def select_open_boundary_polygon_snapwave(*args):
@@ -56,10 +77,12 @@ def open_boundary_polygon_created_snapwave(gdf, index, id):
     app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave)
     app.gui.setvar("modelmaker_sfincs_hmt", "open_boundary_polygon_index_snapwave", nrp - 1)
+    app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave_changed = True
     update()
 
 def open_boundary_polygon_modified_snapwave(gdf, index, id):
     app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave = gdf
+    app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave_changed = True
 
 def open_boundary_polygon_selected_snapwave(index):
     app.gui.setvar("modelmaker_sfincs_hmt", "open_boundary_polygon_index_snapwave", index)
@@ -77,6 +100,7 @@ def delete_neumann_boundary_polygon_snapwave(*args):
     # Delete from map
     gdf = app.map.layer["modelmaker_sfincs_hmt"].layer["neumann_boundary_polygon_snapwave"].delete_feature(index)
     app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave = gdf
+    app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave_changed = True
     update()
 
 def load_neumann_boundary_polygon_snapwave(*args):
@@ -88,9 +112,19 @@ def load_neumann_boundary_polygon_snapwave(*args):
         append = app.gui.window.dialog_yes_no("Add to existing neumann boundary polygons?", " ")
     app.toolbox["modelmaker_sfincs_hmt"].read_neumann_boundary_polygon_snapwave(full_name, append)
     app.toolbox["modelmaker_sfincs_hmt"].plot_neumann_boundary_polygon_snapwave()
+    if append:
+        app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave_changed = True
+    else:
+        save_neumann_boundary_polygon_snapwave()
+    update()
+
+    app.toolbox["modelmaker_sfincs_hmt"].read_neumann_boundary_polygon_snapwave(full_name, append)
+    app.toolbox["modelmaker_sfincs_hmt"].plot_neumann_boundary_polygon_snapwave()
     update()
 
 def save_neumann_boundary_polygon_snapwave(*args):
+    app.gui.window.dialog_fade_label("Saving neumann boundary polygons to neumann_boundary_snapwave.geojson ...")
+    app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave_changed = False
     app.toolbox["modelmaker_sfincs_hmt"].write_neumann_boundary_polygon_snapwave()
 
 def select_neumann_boundary_polygon_snapwave(*args):
@@ -101,16 +135,16 @@ def neumann_boundary_polygon_created_snapwave(gdf, index, id):
     app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave)
     app.gui.setvar("modelmaker_sfincs_hmt", "neumann_boundary_polygon_index_snapwave", nrp - 1)
+    app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave_changed = True
     update()
 
 def neumann_boundary_polygon_modified_snapwave(gdf, index, id):
     app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave = gdf
+    app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave_changed = True
 
 def neumann_boundary_polygon_selected_snapwave(index):
     app.gui.setvar("modelmaker_sfincs_hmt", "neumann_boundary_polygon_index_snapwave", index)
     update()
-
-
 
 def update():
     # Open

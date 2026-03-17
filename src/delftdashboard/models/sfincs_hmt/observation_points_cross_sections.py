@@ -18,6 +18,10 @@ def select(*args):
 
 def deselect(*args):
     if app.model["sfincs_hmt"].cross_sections_changed:
+        if app.model["sfincs_hmt"].domain.cross_sections.nr_lines == 0:
+            # No cross sections, so just reset the flag and return
+            app.model["sfincs_hmt"].cross_sections_changed = False
+            return
         ok = app.gui.window.dialog_yes_no("The cross sections have changed. Would you like to save the changes?")
         if ok:
             save()
@@ -31,7 +35,7 @@ def load(*args):
     if rsp[0]:
         app.model["sfincs_hmt"].domain.config.set("crsfile", rsp[2]) # file name without path
         app.model["sfincs_hmt"].domain.cross_sections.read()
-        gdf = app.model["sfincs_hmt"].domain.cross_sections.data
+        gdf = app.model["sfincs_hmt"].domain.cross_sections.gdf
         app.map.layer["sfincs_hmt"].layer["cross_sections"].layer["polylines"].set_data(gdf)
         app.gui.setvar("sfincs_hmt", "active_cross_section", 0)
         update()
@@ -55,7 +59,7 @@ def draw_cross_section(*args):
     app.map.layer["sfincs_hmt"].layer["cross_sections"].layer["polylines"].draw()
 
 def delete_cross_section(*args):
-    gdf = app.model["sfincs_hmt"].domain.cross_sections.data
+    gdf = app.model["sfincs_hmt"].domain.cross_sections.gdf
     if len(gdf) == 0:
         return
     index = app.gui.getvar("sfincs_hmt", "active_cross_section")
@@ -77,10 +81,18 @@ def select_cross_section_from_list(*args):
 def edit_name(*args):
     name = app.gui.getvar("sfincs_hmt", "cross_section_name")
     index = app.gui.getvar("sfincs_hmt", "active_cross_section")
-    gdf = app.model["sfincs_hmt"].domain.cross_sections.data
+    # Trim the name
+    name = name.strip()
+    # Check that name is not empty
+    if len(name) == 0:
+        return
+    # Check it does not already exist
+    if name in app.model["sfincs_hmt"].domain.cross_sections.list_names:
+        app.gui.window.dialog_info("A cross section with this name already exists !")
+        return    
+    gdf = app.model["sfincs_hmt"].domain.cross_sections.gdf
     gdf.at[index, "name"] = name
     app.map.layer["sfincs_hmt"].layer["cross_sections"].layer["polylines"].set_data(gdf)
-    app.model["sfincs_hmt"].cross_sections_changed = True
     update()
 
 def cross_section_created(gdf, index, id):
@@ -98,21 +110,20 @@ def cross_section_created(gdf, index, id):
                 return
     new_crs = gdf.loc[[index]]        
     # add "name" to gdf
-    new_crs["name"] = name         
-    app.model["sfincs_hmt"].domain.cross_sections.set(new_crs, merge=True)
+    new_crs["name"] = name
+    # app.model["sfincs_hmt"].domain.cross_sections.add(new_crs)
+    app.model["sfincs_hmt"].domain.cross_sections.create(new_crs, merge=True)
     # Need to update map layer because name has changed
-    gdf = app.model["sfincs_hmt"].domain.cross_sections.data
+    gdf = app.model["sfincs_hmt"].domain.cross_sections.gdf
     app.map.layer["sfincs_hmt"].layer["cross_sections"].layer["polylines"].set_data(gdf)
     nrt = len(gdf)
     app.gui.setvar("sfincs_hmt", "active_cross_section", nrt - 1)
     app.model["sfincs_hmt"].cross_sections_changed = True
     update()
-    # update_grid_snapper()
 
 def cross_section_modified(gdf, index, id):
-    app.model["sfincs_hmt"].domain.cross_sections.data = gdf
+    app.model["sfincs_hmt"].domain.cross_sections.set(gdf, merge=False)
     app.model["sfincs_hmt"].cross_sections_changed = True
-    # update_grid_snapper()
     update()
 
 def cross_section_selected(index):
@@ -129,12 +140,12 @@ def update_grid_snapper():
         app.map.layer["sfincs_hmt"].layer["cross_sections"].layer["snapped"].set_data(snap_gdf)
 
 def update():
-    nrt = len(app.model["sfincs_hmt"].domain.cross_sections.data)
+    nrt = len(app.model["sfincs_hmt"].domain.cross_sections.gdf)
     app.gui.setvar("sfincs_hmt", "nr_cross_sections", nrt)
     if app.gui.getvar("sfincs_hmt", "active_cross_section" ) > nrt - 1:
         app.gui.setvar("sfincs_hmt", "active_cross_section", max(nrt - 1, 0) )
     iac = app.gui.getvar("sfincs_hmt", "active_cross_section")    
-    names = app.model["sfincs_hmt"].domain.cross_sections.list_names()
+    names = app.model["sfincs_hmt"].domain.cross_sections.list_names
     app.gui.setvar("sfincs_hmt", "cross_section_names", names)
     if nrt > 0:
         app.gui.setvar("sfincs_hmt", "cross_section_name", names[iac])

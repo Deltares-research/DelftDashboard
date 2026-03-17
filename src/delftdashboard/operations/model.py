@@ -90,10 +90,16 @@ class GenericModel:
             select_toolbox(toolboxes_to_add[0])
 
         # Make model layer visible
-        app.map.layer[self.name].show()    
+        app.map.layer[self.name].show()
 
         # Set working directory to model path
-        os.chdir(app.active_model.domain.path)
+        # sfincs_cht and hurrywave domains have a path, but sfincs_hmt does not.
+        # Maybe the generic model object should have a path?
+        # First just check if the model has a path, and if so, change to it.
+        # TODO: maybe add a path attribute to the generic model object, and set it to None if there is no path. Then we can just check if the path is not None.
+        # Following lines give error with HydroMT-SFINCS
+        # if hasattr(app.active_model.domain, "path"): 
+        #     os.chdir(app.active_model.domain.path)
 
         app.gui.window.update()
 

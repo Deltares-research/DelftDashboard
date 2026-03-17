@@ -50,7 +50,7 @@ def load(*args):
         return
 
     app.model["sfincs_hmt"].domain.discharge_points.read()
-    gdf = app.model["sfincs_hmt"].domain.discharge_points.data
+    gdf = app.model["sfincs_hmt"].domain.discharge_points.gdf
     app.map.layer["sfincs_hmt"].layer["discharge_points"].set_data(gdf, 0)
     app.gui.setvar("sfincs_hmt", "active_discharge_point", 0)
     update()
@@ -84,7 +84,7 @@ def save(*args):
                                             filter="*.dis",
                                             allow_directory_change=False)
     if rsp[0]:
-        app.model["sfincs_hmt"].domain.config.set("disfile", rsp[2])
+        app.model["sfincs_hmt"].domain.config.set("disfile", rsp[2]) # file name without path
     else:
         return
 
@@ -93,7 +93,7 @@ def save(*args):
     app.model["sfincs_hmt"].discharge_points_changed = False
 
 def update():
-    gdf = app.active_model.domain.discharge_points.data
+    gdf = app.active_model.domain.discharge_points.gdf
     names = []
     for index, row in gdf.iterrows():
         names.append(row["name"])
@@ -125,9 +125,9 @@ def point_clicked(x, y):
     except:
         app.gui.window.dialog_info("Invalid discharge value !")
         return
-    app.model["sfincs_hmt"].domain.discharge_points.add_point(x=x, y=y, name=name, q=q)
-    gdf = app.model["sfincs_hmt"].domain.discharge_points.data
-    index = len(gdf) - 1
+    app.model["sfincs_hmt"].domain.discharge_points.add_point(x, y, name=name, value=q)
+    index = len(app.model["sfincs_hmt"].domain.discharge_points.gdf) - 1
+    gdf = app.model["sfincs_hmt"].domain.discharge_points.gdf
     app.map.layer["sfincs_hmt"].layer["discharge_points"].set_data(gdf, index)
     app.gui.setvar("sfincs_hmt", "active_discharge_point", index)
     update()
@@ -148,7 +148,7 @@ def delete_point_from_list(*args):
     map.reset_cursor()
     index = app.gui.getvar("sfincs_hmt", "active_discharge_point")
     app.model["sfincs_hmt"].domain.discharge_points.delete(index)
-    gdf = app.model["sfincs_hmt"].domain.discharge_points.data
+    gdf = app.model["sfincs_hmt"].domain.discharge_points.gdf
     index = max(min(index, len(gdf) - 1), 0)
     app.map.layer["sfincs_hmt"].layer["discharge_points"].set_data(gdf, index)
     app.gui.setvar("sfincs_hmt", "active_discharge_point", index)

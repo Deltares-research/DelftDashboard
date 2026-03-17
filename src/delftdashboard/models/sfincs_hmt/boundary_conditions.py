@@ -4,10 +4,6 @@ Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
 """
-# import shapely
-# import pandas as pd
-# import geopandas as gpd
-
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
@@ -49,17 +45,17 @@ def load(*args):
         read_bzs_file = False
 
     # Read boundary points from bnd file
-    app.model["sfincs_hmt"].domain.boundary_conditions.read_boundary_points()
+    app.model["sfincs_hmt"].domain.water_level.read()
 
     if read_bzs_file:
         # Read boundary conditions from bzs file
-        app.model["sfincs_hmt"].domain.boundary_conditions.read_boundary_conditions_timeseries()
+        app.model["sfincs_hmt"].domain.water_level.read_boundary_conditions_timeseries()
     else:
         # Set uniform conditions
         set_boundary_conditions()
 
     # Add boundary points to map
-    gdf = app.model["sfincs_hmt"].domain.boundary_conditions.data
+    gdf = app.model["sfincs_hmt"].domain.water_level.gdf
     app.map.layer["sfincs_hmt"].layer["boundary_points"].set_data(gdf, 0)
 
     # Set active boundary point and update list
@@ -92,7 +88,7 @@ def save(*args, **kwargs):
     # However, if points were added or removed, the astro components should be generated again. But we're not doing that now. Maybe later.
     if app.model["sfincs_hmt"].domain.config.get("bcafile") is not None:
         astro_okay = True
-        for index, row in app.model["sfincs_hmt"].domain.boundary_conditions.data.iterrows():
+        for index, row in app.model["sfincs_hmt"].domain.water_level.gdf.iterrows():
             if len(row["astro"]) == 0:
                 astro_okay = False
                 break
@@ -101,8 +97,8 @@ def save(*args, **kwargs):
             app.gui.window.dialog_info("Astronomical constituents are missing in some points. You'll need to generate them again to avoid possible errors.", title="Warning")
 
     # Write bnd and bzs files
-    app.model["sfincs_hmt"].domain.boundary_conditions.write_boundary_points()
-    app.model["sfincs_hmt"].domain.boundary_conditions.write_boundary_conditions_timeseries()
+    app.model["sfincs_hmt"].domain.water_level.write()
+    app.model["sfincs_hmt"].domain.water_level.write_boundary_conditions_timeseries()
     app.model["sfincs_hmt"].boundaries_changed = False
 
 
@@ -112,9 +108,9 @@ def add_boundary_point_on_map(*args):
 def point_clicked(x, y):
     # Point clicked on map. Add boundary point with constant water level.
     wl = app.gui.getvar("sfincs_hmt", "boundary_conditions_timeseries_offset")
-    app.model["sfincs_hmt"].domain.boundary_conditions.add_point(x=x, y=y, wl=wl)
-    index = len(app.model["sfincs_hmt"].domain.boundary_conditions.data) - 1
-    gdf = app.model["sfincs_hmt"].domain.boundary_conditions.data
+    app.model["sfincs_hmt"].domain.water_level.add_point(x, y, value=wl)
+    index = len(app.model["sfincs_hmt"].domain.water_level.gdf) - 1
+    gdf = app.model["sfincs_hmt"].domain.water_level.gdf
     app.map.layer["sfincs_hmt"].layer["boundary_points"].set_data(gdf, index)
     app.gui.setvar("sfincs_hmt", "active_boundary_point", index)
     update_list()
@@ -131,20 +127,30 @@ def select_boundary_point_from_map(*args):
 
 def delete_point_from_list(*args):
     index = app.gui.getvar("sfincs_hmt", "active_boundary_point")
-    app.model["sfincs_hmt"].domain.boundary_conditions.delete(index)
-    gdf = app.model["sfincs_hmt"].domain.boundary_conditions.data
+    app.model["sfincs_hmt"].domain.water_level.delete(index)
+    gdf = app.model["sfincs_hmt"].domain.water_level.gdf
     index = max(min(index, len(gdf) - 1), 0)
     app.map.layer["sfincs_hmt"].layer["boundary_points"].set_data(gdf, index)
     app.gui.setvar("sfincs_hmt", "active_boundary_point", index)
     update_list()
     app.model["sfincs_hmt"].boundaries_changed = True
 
+def select_timeseries_or_astro(*args):
+    app.gui.window.update()
+
 def update_list():
     # Update boundary point names
-    nr_boundary_points = len(app.model["sfincs_hmt"].domain.boundary_conditions.data)
+    nr_boundary_points = len(app.model["sfincs_hmt"].domain.water_level.gdf)
     boundary_point_names = []
     # Loop through boundary points
-    boundary_point_names = [str(i + 1) for i in range(nr_boundary_points)]
+    for index, row in app.model["sfincs_hmt"].domain.water_level.gdf.iterrows():
+        if "name" in row and row["name"] is not None:
+            boundary_point_names.append(row["name"])
+        else:
+            name = f"Point {index+1:03d}" 
+            boundary_point_names.append(name)
+            # Add name to gdf for display purposes (not saved to file, just for display in list)
+            app.model["sfincs_hmt"].domain.water_level.gdf.at[index, "name"] = name
     app.gui.setvar("sfincs_hmt", "boundary_point_names", boundary_point_names)
     app.gui.setvar("sfincs_hmt", "nr_boundary_points", nr_boundary_points)
     app.gui.window.update()
@@ -164,13 +170,14 @@ def generate_boundary_conditions_from_tide_model(*args):
 
     # Now interpolate tidal data to boundary points
     tide_model_name = app.gui.getvar("sfincs_hmt", "boundary_conditions_tide_model")
-    gdf = app.model["sfincs_hmt"].domain.boundary_conditions.data
-    tide_model = app.tide_model_database.get_dataset(tide_model_name)    
+    gdf = app.model["sfincs_hmt"].domain.water_level.gdf
+    tide_model = app.tide_model_database.get_dataset(tide_model_name)
     gdf = tide_model.get_data_on_points(gdf=gdf, crs=app.model["sfincs_hmt"].domain.crs, format="gdf", constituents="all")
-    app.model["sfincs_hmt"].domain.boundary_conditions.data = gdf
+    # TODO: Following still needs to be built into HydroMT-SFINCS
+    app.model["sfincs_hmt"].domain.water_level.from_gdf(gdf)
 
     # Save bca file
-    app.model["sfincs_hmt"].domain.boundary_conditions.write_boundary_conditions_astro()
+    app.model["sfincs_hmt"].domain.water_level.write_boundary_conditions_astro()
     app.gui.setvar("sfincs_hmt", "boundary_conditions_timeseries_shape", "astronomical")
 
     set_boundary_conditions() # This is where the bzs file gets saved
@@ -198,19 +205,20 @@ def set_boundary_conditions(*args):
     peak = app.gui.getvar("sfincs_hmt", "boundary_conditions_timeseries_peak")
     tpeak = app.gui.getvar("sfincs_hmt", "boundary_conditions_timeseries_tpeak")
     duration = app.gui.getvar("sfincs_hmt", "boundary_conditions_timeseries_duration")
-    app.model["sfincs_hmt"].domain.boundary_conditions.set_timeseries(shape=shape,
-                                                                      timestep=timestep,
-                                                                      offset=offset,
-                                                                      amplitude=amplitude,
-                                                                      phase=phase,
-                                                                      period=period,
-                                                                      peak=peak,
-                                                                      tpeak=tpeak,
-                                                                      duration=duration)
+
+    app.model["sfincs_hmt"].domain.water_level.create_timeseries(shape=shape,
+                                                                 timestep=timestep,
+                                                                 offset=offset,
+                                                                 amplitude=amplitude,
+                                                                 phase=phase,
+                                                                 period=period,
+                                                                 peak=peak,
+                                                                 tpeak=tpeak,
+                                                                 duration=duration)
     dlg.close()
 
     # Save the bzs file
-    app.model["sfincs_hmt"].domain.boundary_conditions.write_boundary_conditions_timeseries()
+    app.model["sfincs_hmt"].domain.water_level.write_boundary_conditions_timeseries()
     app.model["sfincs_hmt"].boundaries_changed = False
 
 def view_boundary_conditions(*args):
@@ -219,7 +227,7 @@ def view_boundary_conditions(*args):
 def create_boundary_points(*args):
     
     # First check if there are already boundary points
-    if len(app.model["sfincs_hmt"].domain.boundary_conditions.data.index)>0:
+    if len(app.model["sfincs_hmt"].domain.water_level.gdf.index)>0:
         ok = app.gui.window.dialog_ok_cancel("Existing boundary points will be overwritten! Continue?",                                
                                     title="Warning")
         if not ok:
@@ -230,7 +238,7 @@ def create_boundary_points(*args):
         ok = app.gui.window.dialog_info("Please first create a mask for this domain.",                                
                                     title=" ")
         return
-    if not app.model["sfincs_hmt"].domain.mask.has_open_boundaries():
+    if not app.model["sfincs_hmt"].domain.quadtree_mask.has_open_boundaries():
         ok = app.gui.window.dialog_info("The mask for this domain does not have any open boundary points !",                                
                                     title=" ")
         return
@@ -241,8 +249,8 @@ def create_boundary_points(*args):
 
     # Create points from mask
     bnd_dist = app.gui.getvar("sfincs_hmt", "boundary_dx")
-    app.model["sfincs_hmt"].domain.boundary_conditions.get_boundary_points_from_mask(bnd_dist=bnd_dist)
-    gdf = app.model["sfincs_hmt"].domain.boundary_conditions.data
+    app.model["sfincs_hmt"].domain.water_level.create_boundary_points_from_mask(bnd_dist=bnd_dist)
+    gdf = app.model["sfincs_hmt"].domain.water_level.gdf
     if len(gdf) == 0:
         app.gui.window.dialog_info("No boundary points found in mask. Please check mask settings.", title="Warning")        
         return
@@ -254,7 +262,7 @@ def create_boundary_points(*args):
     # Write bnd file
     app.model["sfincs_hmt"].domain.config.set("bndfile", bndfile) # file name without path
     app.gui.setvar("sfincs_hmt", "bndfile", bndfile)
-    app.model["sfincs_hmt"].domain.boundary_conditions.write_boundary_points()
+    app.model["sfincs_hmt"].domain.water_level.write_boundary_points()
 
     set_boundary_conditions()
 

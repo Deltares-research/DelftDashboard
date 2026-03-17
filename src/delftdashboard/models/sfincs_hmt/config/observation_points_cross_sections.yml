@@ -2,9 +2,9 @@ element:
 - style: listbox
   position:
     x: 10
-    y: 40
+    y: 35
     width: 300
-    height: 90
+    height: 95
   method: select_cross_section_from_list
   variable: active_cross_section
   select: index
@@ -14,9 +14,9 @@ element:
 - style: edit
   text: Name
   position:
-    x: 40
+    x: 50
     y: 10
-    width: 270
+    width: 260
     height: 20
   method: edit_name
   variable: cross_section_name

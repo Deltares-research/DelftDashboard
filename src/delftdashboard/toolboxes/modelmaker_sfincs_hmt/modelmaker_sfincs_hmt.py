@@ -17,9 +17,7 @@ from delftdashboard.misc.gdfutils import mpol2pol
 
 from cht_utils.misc_tools import dict2yaml
 from cht_utils.misc_tools import yaml2dict
-
-# from hmt_sfincs.quadtree_grid_snapwave import snapwave_quadtree2mesh
-
+#from hmt_sfincs.quadtree_grid_snapwave import snapwave_quadtree2mesh
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):
@@ -40,23 +38,42 @@ class Toolbox(GenericToolbox):
 
         # Include polygons
         self.include_polygon = gpd.GeoDataFrame()
+        self.include_polygon_changed = False
+
         # Exclude polygons
         self.exclude_polygon = gpd.GeoDataFrame()
+        self.exclude_polygon_changed = False
+
         # Boundary polygons
         self.open_boundary_polygon = gpd.GeoDataFrame()
+        self.downstream_boundary_polygon = gpd.GeoDataFrame()
+        self.neumann_boundary_polygon = gpd.GeoDataFrame()
         self.outflow_boundary_polygon = gpd.GeoDataFrame()
+        self.open_boundary_polygon_changed = False
+        self.downstream_boundary_polygon_changed = False
+        self.neumann_boundary_polygon_changed = False
+        self.outflow_boundary_polygon_changed = False
+
         # Include polygons SnapWave
         self.include_polygon_snapwave = gpd.GeoDataFrame()
+        self.include_polygon_snapwave_changed = False
+
         # Exclude polygons SnapWave
         self.exclude_polygon_snapwave = gpd.GeoDataFrame()
+        self.exclude_polygon_snapwave_changed = False
+
         # Boundary polygons SnapWave
         self.open_boundary_polygon_snapwave = gpd.GeoDataFrame()
         self.neumann_boundary_polygon_snapwave = gpd.GeoDataFrame()
+        self.open_boundary_polygon_snapwave_changed = False
+        self.neumann_boundary_polygon_snapwave_changed = False
+
         # Refinement
         self.refinement_levels = []
         self.refinement_zmin = []
         self.refinement_zmax = []
         self.refinement_polygon = gpd.GeoDataFrame()
+        self.refinement_polygon_changed = False
 
         self.setup_dict = {}
 
@@ -79,6 +96,8 @@ class Toolbox(GenericToolbox):
         else:
             app.gui.setvar(group, "dx", 1000.0)
             app.gui.setvar(group, "dy", 1000.0)
+        self.lenx = 0.0
+        self.leny = 0.0            
 
         app.gui.setvar(group, "rotation", 0.0)
 
@@ -96,99 +115,84 @@ class Toolbox(GenericToolbox):
         levstr = []
         for i in range(10):
             levstr.append(str(i))
-        app.gui.setvar("modelmaker_sfincs_hmt", "refinement_polygon_levels", levstr)
+        app.gui.setvar("modelmaker_sfincs_hmt", "refinement_polygon_levels", levstr)    
 
         # Mask
-        app.gui.setvar(group, "zmax", 100000.0)
-        app.gui.setvar(group, "zmin", -100000.0)
-        app.gui.setvar(group, "use_mask_global", False)
-        app.gui.setvar(group, "global_zmax", 10.0)
-        app.gui.setvar(group, "global_zmin", -10.0)
+        app.gui.setvar(group, "zmax",  100000.0)
+        app.gui.setvar(group, "zmin",  -100000.0)
+        app.gui.setvar(group, "use_mask_global",  False)
+        app.gui.setvar(group, "global_zmax",  10.0)
+        app.gui.setvar(group, "global_zmin",  -10.0)
         app.gui.setvar(group, "include_polygon_file", "include.geojson")
         app.gui.setvar(group, "include_polygon_names", [])
         app.gui.setvar(group, "include_polygon_index", 0)
         app.gui.setvar(group, "nr_include_polygons", 0)
-        app.gui.setvar(group, "include_zmax", 99999.0)
+        app.gui.setvar(group, "include_zmax",  99999.0)
         app.gui.setvar(group, "include_zmin", -99999.0)
         app.gui.setvar(group, "exclude_polygon_file", "exclude.geojson")
         app.gui.setvar(group, "exclude_polygon_names", [])
         app.gui.setvar(group, "exclude_polygon_index", 0)
         app.gui.setvar(group, "nr_exclude_polygons", 0)
-        app.gui.setvar(group, "exclude_zmax", 99999.0)
+        app.gui.setvar(group, "exclude_zmax",  99999.0)
         app.gui.setvar(group, "exclude_zmin", -99999.0)
 
         app.gui.setvar(group, "open_boundary_polygon_file", "open_boundary.geojson")
         app.gui.setvar(group, "open_boundary_polygon_names", [])
         app.gui.setvar(group, "open_boundary_polygon_index", 0)
         app.gui.setvar(group, "nr_open_boundary_polygons", 0)
-        app.gui.setvar(group, "open_boundary_zmax", 99999.0)
+        app.gui.setvar(group, "open_boundary_zmax",  99999.0)
         app.gui.setvar(group, "open_boundary_zmin", -99999.0)
 
-        app.gui.setvar(
-            group, "outflow_boundary_polygon_file", "outflow_boundary.geojson"
-        )
+        app.gui.setvar(group, "downstream_boundary_polygon_file", "downstream_boundary.geojson")
+        app.gui.setvar(group, "downstream_boundary_polygon_names", [])
+        app.gui.setvar(group, "downstream_boundary_polygon_index", 0)
+        app.gui.setvar(group, "nr_downstream_boundary_polygons", 0)
+        app.gui.setvar(group, "downstream_boundary_zmax",  99999.0)
+        app.gui.setvar(group, "downstream_boundary_zmin", -99999.0)
+
+        app.gui.setvar(group, "neumann_boundary_polygon_file", "neumann_boundary.geojson")
+        app.gui.setvar(group, "neumann_boundary_polygon_names", [])
+        app.gui.setvar(group, "neumann_boundary_polygon_index", 0)
+        app.gui.setvar(group, "nr_neumann_boundary_polygons", 0)
+        app.gui.setvar(group, "neumann_boundary_zmax",  99999.0)
+        app.gui.setvar(group, "neumann_boundary_zmin", -99999.0)
+
+        app.gui.setvar(group, "outflow_boundary_polygon_file", "outflow_boundary.geojson")
         app.gui.setvar(group, "outflow_boundary_polygon_names", [])
         app.gui.setvar(group, "outflow_boundary_polygon_index", 0)
         app.gui.setvar(group, "nr_outflow_boundary_polygons", 0)
-        app.gui.setvar(group, "outflow_boundary_zmax", 99999.0)
+        app.gui.setvar(group, "outflow_boundary_zmax",  99999.0)
         app.gui.setvar(group, "outflow_boundary_zmin", -99999.0)
 
-        app.gui.setvar(group, "use_mask_snapwave_global", True)
-        app.gui.setvar(group, "global_zmax_snapwave", 2.0)
+        app.gui.setvar(group, "use_mask_snapwave_global",  True)
+        app.gui.setvar(group, "global_zmax_snapwave",     2.0)
         app.gui.setvar(group, "global_zmin_snapwave", -99999.0)
-        app.gui.setvar(
-            group, "include_polygon_file_snapwave", "include_snapwave.geojson"
-        )
+        app.gui.setvar(group, "include_polygon_file_snapwave", "include_snapwave.geojson")
         app.gui.setvar(group, "include_polygon_names_snapwave", [])
         app.gui.setvar(group, "include_polygon_index_snapwave", 0)
         app.gui.setvar(group, "nr_include_polygons_snapwave", 0)
-        app.gui.setvar(group, "include_zmax_snapwave", 99999.0)
+        app.gui.setvar(group, "include_zmax_snapwave",  99999.0)
         app.gui.setvar(group, "include_zmin_snapwave", -99999.0)
-        app.gui.setvar(
-            group, "exclude_polygon_file_snapwave", "exclude_snapwave.geojson"
-        )
+        app.gui.setvar(group, "exclude_polygon_file_snapwave", "exclude_snapwave.geojson")
         app.gui.setvar(group, "exclude_polygon_names_snapwave", [])
         app.gui.setvar(group, "exclude_polygon_index_snapwave", 0)
         app.gui.setvar(group, "nr_exclude_polygons_snapwave", 0)
-        app.gui.setvar(group, "exclude_zmax_snapwave", 99999.0)
+        app.gui.setvar(group, "exclude_zmax_snapwave",  99999.0)
         app.gui.setvar(group, "exclude_zmin_snapwave", -99999.0)
 
-        app.gui.setvar(
-            group,
-            "open_boundary_polygon_file_snapwave",
-            "open_boundary_snapwave.geojson",
-        )
+        app.gui.setvar(group, "open_boundary_polygon_file_snapwave", "open_boundary_snapwave.geojson")
         app.gui.setvar(group, "open_boundary_polygon_names_snapwave", [])
         app.gui.setvar(group, "open_boundary_polygon_index_snapwave", 0)
         app.gui.setvar(group, "nr_open_boundary_polygons_snapwave", 0)
-        app.gui.setvar(group, "open_boundary_zmax_snapwave", 99999.0)
+        app.gui.setvar(group, "open_boundary_zmax_snapwave",  99999.0)
         app.gui.setvar(group, "open_boundary_zmin_snapwave", -99999.0)
 
-        app.gui.setvar(
-            group,
-            "neumann_boundary_polygon_file_snapwave",
-            "neumann_boundary_snapwave.geojson",
-        )
+        app.gui.setvar(group, "neumann_boundary_polygon_file_snapwave", "neumann_boundary_snapwave.geojson")
         app.gui.setvar(group, "neumann_boundary_polygon_names_snapwave", [])
         app.gui.setvar(group, "neumann_boundary_polygon_index_snapwave", 0)
         app.gui.setvar(group, "nr_neumann_boundary_polygons_snapwave", 0)
-        app.gui.setvar(group, "neumann_boundary_zmax_snapwave", 99999.0)
+        app.gui.setvar(group, "neumann_boundary_zmax_snapwave",  99999.0)
         app.gui.setvar(group, "neumann_boundary_zmin_snapwave", -99999.0)
-
-        # Bathymetry
-        source_names, sources = app.bathymetry_database.sources()
-        app.gui.setvar(group, "bathymetry_source_names", source_names)
-        app.gui.setvar(group, "active_bathymetry_source", source_names[0])
-        dataset_names, dataset_long_names, dataset_source_names = (
-            app.bathymetry_database.dataset_names(source=source_names[0])
-        )
-        app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
-        app.gui.setvar(group, "bathymetry_dataset_index", 0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
-        app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
-        app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
-        app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
 
         # Roughness
         app.gui.setvar(group, "manning_land", 0.06)
@@ -220,201 +224,191 @@ class Toolbox(GenericToolbox):
         # Grid outline
         from .domain import grid_outline_created
         from .domain import grid_outline_modified
-
-        layer.add_layer(
-            "grid_outline",
-            type="draw",
-            shape="rectangle",
-            create=grid_outline_created,
-            modify=grid_outline_modified,
-            polygon_line_color="mediumblue",
-            polygon_fill_opacity=0.1,
-            rotate=True,
-        )
+        layer.add_layer("grid_outline", type="draw",
+                             shape="rectangle",
+                             create=grid_outline_created,
+                             modify=grid_outline_modified,
+                             polygon_line_color="mediumblue",
+                             polygon_fill_opacity=0.1,
+                             rotate=True
+                            )
 
         ### Mask
         # Include
         from .mask_active_cells import include_polygon_created
         from .mask_active_cells import include_polygon_modified
         from .mask_active_cells import include_polygon_selected
-
-        layer.add_layer(
-            "include_polygon",
-            type="draw",
-            shape="polygon",
-            create=include_polygon_created,
-            modify=include_polygon_modified,
-            select=include_polygon_selected,
-            polygon_line_color="limegreen",
-            polygon_fill_color="limegreen",
-            polygon_fill_opacity=0.1,
-        )
+        layer.add_layer("include_polygon", type="draw",
+                             shape="polygon",
+                             create=include_polygon_created,
+                             modify=include_polygon_modified,
+                             select=include_polygon_selected,
+                             polygon_line_color="limegreen",
+                             polygon_fill_color="limegreen",
+                             polygon_fill_opacity=0.1)
         # Exclude
         from .mask_active_cells import exclude_polygon_created
         from .mask_active_cells import exclude_polygon_modified
         from .mask_active_cells import exclude_polygon_selected
-
-        layer.add_layer(
-            "exclude_polygon",
-            type="draw",
-            shape="polygon",
-            create=exclude_polygon_created,
-            modify=exclude_polygon_modified,
-            select=exclude_polygon_selected,
-            polygon_line_color="orangered",
-            polygon_fill_color="orangered",
-            polygon_fill_opacity=0.1,
-        )
-        # Boundary
+        layer.add_layer("exclude_polygon", type="draw",
+                             shape="polygon",
+                             create=exclude_polygon_created,
+                             modify=exclude_polygon_modified,
+                             select=exclude_polygon_selected,
+                             polygon_line_color="orangered",
+                             polygon_fill_color="orangered",
+                             polygon_fill_opacity=0.1)
+        # Open boundary
         from .mask_boundary_cells import open_boundary_polygon_created
         from .mask_boundary_cells import open_boundary_polygon_modified
         from .mask_boundary_cells import open_boundary_polygon_selected
-
-        layer.add_layer(
-            "open_boundary_polygon",
-            type="draw",
-            shape="polygon",
-            create=open_boundary_polygon_created,
-            modify=open_boundary_polygon_modified,
-            select=open_boundary_polygon_selected,
-            polygon_line_color="deepskyblue",
-            polygon_fill_color="deepskyblue",
-            polygon_fill_opacity=0.1,
-        )
-
+        layer.add_layer("open_boundary_polygon", type="draw",
+                             shape="polygon",
+                             create=open_boundary_polygon_created,
+                             modify=open_boundary_polygon_modified,
+                             select=open_boundary_polygon_selected,
+                             polygon_line_color="deepskyblue",
+                             polygon_fill_color="deepskyblue",
+                             polygon_fill_opacity=0.1)
+        # Downstream boundary
+        from .mask_boundary_cells import downstream_boundary_polygon_created
+        from .mask_boundary_cells import downstream_boundary_polygon_modified
+        from .mask_boundary_cells import downstream_boundary_polygon_selected
+        layer.add_layer("downstream_boundary_polygon", type="draw",
+                                shape="polygon",
+                                create=downstream_boundary_polygon_created,
+                                modify=downstream_boundary_polygon_modified,
+                                select=downstream_boundary_polygon_selected,
+                                polygon_line_color="purple",
+                                polygon_fill_color="purple",
+                                polygon_fill_opacity=0.1)
+        # Neumann boundary
+        from .mask_boundary_cells import neumann_boundary_polygon_created
+        from .mask_boundary_cells import neumann_boundary_polygon_modified
+        from .mask_boundary_cells import neumann_boundary_polygon_selected
+        layer.add_layer("neumann_boundary_polygon", type="draw",
+                                shape="polygon",
+                                create=neumann_boundary_polygon_created,
+                                modify=neumann_boundary_polygon_modified,
+                                select=neumann_boundary_polygon_selected,
+                                polygon_line_color="magenta",
+                                polygon_fill_color="magenta",
+                                polygon_fill_opacity=0.1)     
         # Outflow boundary
         from .mask_boundary_cells import outflow_boundary_polygon_created
         from .mask_boundary_cells import outflow_boundary_polygon_modified
         from .mask_boundary_cells import outflow_boundary_polygon_selected
-
-        layer.add_layer(
-            "outflow_boundary_polygon",
-            type="draw",
-            shape="polygon",
-            create=outflow_boundary_polygon_created,
-            modify=outflow_boundary_polygon_modified,
-            select=outflow_boundary_polygon_selected,
-            polygon_line_color="red",
-            polygon_fill_color="orange",
-            polygon_fill_opacity=0.1,
-        )
+        layer.add_layer("outflow_boundary_polygon", type="draw",
+                             shape="polygon",
+                             create=outflow_boundary_polygon_created,
+                             modify=outflow_boundary_polygon_modified,
+                             select=outflow_boundary_polygon_selected,
+                             polygon_line_color="orange",
+                             polygon_fill_color="orange",
+                             polygon_fill_opacity=0.1)
 
         ### Mask SnapWave
         # Include
         from .mask_active_cells_snapwave import include_polygon_created_snapwave
         from .mask_active_cells_snapwave import include_polygon_modified_snapwave
         from .mask_active_cells_snapwave import include_polygon_selected_snapwave
-
-        layer.add_layer(
-            "include_polygon_snapwave",
-            type="draw",
-            shape="polygon",
-            create=include_polygon_created_snapwave,
-            modify=include_polygon_modified_snapwave,
-            select=include_polygon_selected_snapwave,
-            polygon_line_color="limegreen",
-            polygon_fill_color="limegreen",
-            polygon_fill_opacity=0.1,
-        )
+        layer.add_layer("include_polygon_snapwave", type="draw",
+                             shape="polygon",
+                             create=include_polygon_created_snapwave,
+                             modify=include_polygon_modified_snapwave,
+                             select=include_polygon_selected_snapwave,
+                             polygon_line_color="limegreen",
+                             polygon_fill_color="limegreen",
+                             polygon_fill_opacity=0.1)
         # Exclude
         from .mask_active_cells_snapwave import exclude_polygon_created_snapwave
         from .mask_active_cells_snapwave import exclude_polygon_modified_snapwave
         from .mask_active_cells_snapwave import exclude_polygon_selected_snapwave
-
-        layer.add_layer(
-            "exclude_polygon_snapwave",
-            type="draw",
-            shape="polygon",
-            create=exclude_polygon_created_snapwave,
-            modify=exclude_polygon_modified_snapwave,
-            select=exclude_polygon_selected_snapwave,
-            polygon_line_color="orangered",
-            polygon_fill_color="orangered",
-            polygon_fill_opacity=0.1,
-        )
+        layer.add_layer("exclude_polygon_snapwave", type="draw",
+                             shape="polygon",
+                             create=exclude_polygon_created_snapwave,
+                             modify=exclude_polygon_modified_snapwave,
+                             select=exclude_polygon_selected_snapwave,
+                             polygon_line_color="orangered",
+                             polygon_fill_color="orangered",
+                             polygon_fill_opacity=0.1)
         # SnapWave boundaries
         from .mask_boundary_cells_snapwave import open_boundary_polygon_created_snapwave
-        from .mask_boundary_cells_snapwave import (
-            open_boundary_polygon_modified_snapwave,
-        )
-        from .mask_boundary_cells_snapwave import (
-            open_boundary_polygon_selected_snapwave,
-        )
-
-        layer.add_layer(
-            "open_boundary_polygon_snapwave",
-            type="draw",
-            shape="polygon",
-            create=open_boundary_polygon_created_snapwave,
-            modify=open_boundary_polygon_modified_snapwave,
-            select=open_boundary_polygon_selected_snapwave,
-            polygon_line_color="deepskyblue",
-            polygon_fill_color="deepskyblue",
-            polygon_fill_opacity=0.1,
-        )
-        from .mask_boundary_cells_snapwave import (
-            neumann_boundary_polygon_created_snapwave,
-        )
-        from .mask_boundary_cells_snapwave import (
-            neumann_boundary_polygon_modified_snapwave,
-        )
-        from .mask_boundary_cells_snapwave import (
-            neumann_boundary_polygon_selected_snapwave,
-        )
-
-        layer.add_layer(
-            "neumann_boundary_polygon_snapwave",
-            type="draw",
-            shape="polygon",
-            create=neumann_boundary_polygon_created_snapwave,
-            modify=neumann_boundary_polygon_modified_snapwave,
-            select=neumann_boundary_polygon_selected_snapwave,
-            polygon_line_color="red",
-            polygon_fill_color="orange",
-            polygon_fill_opacity=0.1,
-        )
+        from .mask_boundary_cells_snapwave import open_boundary_polygon_modified_snapwave
+        from .mask_boundary_cells_snapwave import open_boundary_polygon_selected_snapwave
+        layer.add_layer("open_boundary_polygon_snapwave", type="draw",
+                                shape="polygon",
+                                create=open_boundary_polygon_created_snapwave,
+                                modify=open_boundary_polygon_modified_snapwave,
+                                select=open_boundary_polygon_selected_snapwave,
+                                polygon_line_color="deepskyblue",
+                                polygon_fill_color="deepskyblue",
+                                polygon_fill_opacity=0.1)
+        from .mask_boundary_cells_snapwave import neumann_boundary_polygon_created_snapwave
+        from .mask_boundary_cells_snapwave import neumann_boundary_polygon_modified_snapwave
+        from .mask_boundary_cells_snapwave import neumann_boundary_polygon_selected_snapwave
+        layer.add_layer("neumann_boundary_polygon_snapwave", type="draw",
+                                shape="polygon",
+                                create=neumann_boundary_polygon_created_snapwave,
+                                modify=neumann_boundary_polygon_modified_snapwave,
+                                select=neumann_boundary_polygon_selected_snapwave,
+                                polygon_line_color="red",
+                                polygon_fill_color="orange",
+                                polygon_fill_opacity=0.1)
 
         # Refinement polygons
         from .quadtree import refinement_polygon_created
         from .quadtree import refinement_polygon_modified
         from .quadtree import refinement_polygon_selected
-
-        layer.add_layer(
-            "quadtree_refinement",
-            type="draw",
-            columns={"refinement_level": 1, "zmin": -99999.0, "zmax": 99999.0},
-            shape="polygon",
-            create=refinement_polygon_created,
-            modify=refinement_polygon_modified,
-            select=refinement_polygon_selected,
-            polygon_line_color="red",
-            polygon_fill_color="orange",
-            polygon_fill_opacity=0.1,
-        )
-
+        layer.add_layer("quadtree_refinement", type="draw",
+                        columns={"refinement_level": 1, "zmin": -99999.0, "zmax": 99999.0},
+                        shape="polygon",
+                        create=refinement_polygon_created,
+                        modify=refinement_polygon_modified,
+                        select=refinement_polygon_selected,
+                        polygon_line_color="red",
+                        polygon_fill_color="orange",
+                        polygon_fill_opacity=0.1)
+        
     def set_crs(self):
-        # Called when the CRS is changed
-        group = "modelmaker_sfincs_hmt"
-        if app.crs.is_geographic:
-            app.gui.setvar(group, "dx", 0.1)
-            app.gui.setvar(group, "dy", 0.1)
-        else:
-            app.gui.setvar(group, "dx", 1000.0)
-            app.gui.setvar(group, "dy", 1000.0)
+        # # Called when the CRS is changed
+        # # Here we should reset x0, y0, dx, dy etc.
+        # # Also clear the grid outline
+        # group = "modelmaker_sfincs_hmt"
+        # app.gui.setvar(group, "x0", 0.0)
+        # app.gui.setvar(group, "y0", 0.0)
+        # app.gui.setvar(group, "nmax", 0)
+        # app.gui.setvar(group, "mmax", 0)
+        # if app.crs.is_geographic:
+        #     app.gui.setvar(group, "dx", 0.1)
+        #     app.gui.setvar(group, "dy", 0.1)
+        # else:
+        #     app.gui.setvar(group, "dx", 1000.0)
+        #     app.gui.setvar(group, "dy", 1000.0)
+        # self.lenx = 0.0
+        # self.leny = 0.0            
+        # # Clear the grid outline
+        # app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"].clear()
+        # # Should we also remove all existing polygons? Refinement and mask?
+        self.initialize()
+        self.clear_layers()
 
     def generate_grid(self):
         group = "modelmaker_sfincs_hmt"
         dlg = app.gui.window.dialog_wait("Generating grid ...")
         model = app.model["sfincs_hmt"].domain
-        model.clear_spatial_components()
-        x0 = app.gui.getvar(group, "x0")
-        y0 = app.gui.getvar(group, "y0")
-        dx = app.gui.getvar(group, "dx")
-        dy = app.gui.getvar(group, "dy")
-        nmax = app.gui.getvar(group, "nmax")
-        mmax = app.gui.getvar(group, "mmax")
+        epsg = app.crs.to_epsg()
+        # TODO: Following method does not exist. Is there an alternative?
+        # model.clear_spatial_attributes()
+        x0       = app.gui.getvar(group, "x0")
+        y0       = app.gui.getvar(group, "y0")
+        dx       = app.gui.getvar(group, "dx")
+        dy       = app.gui.getvar(group, "dy")
+        nmax     = app.gui.getvar(group, "nmax")
+        mmax     = app.gui.getvar(group, "mmax")
         rotation = app.gui.getvar(group, "rotation")
         model.config.set("qtrfile", "sfincs.nc")
+        # model.input.variables.qtrfile = "sfincs.nc"
         app.gui.setvar("sfincs_hmt", "qtrfile", "sfincs.nc")
 
         if len(self.refinement_polygon) == 0:
@@ -424,7 +418,9 @@ class Toolbox(GenericToolbox):
             refpol = self.refinement_polygon
 
         # Build grid
-        model.quadtree_grid.set(
+
+        # Build grid
+        model.quadtree_grid.create(
             x0,
             y0,
             nmax,
@@ -432,17 +428,18 @@ class Toolbox(GenericToolbox):
             dx,
             dy,
             rotation,
+            epsg,
             refinement_polygons=refpol,
-            bathymetry_sets=app.toolbox[
-                "modelmaker_sfincs_hmt"
-            ].selected_bathymetry_datasets,
+            # bathymetry_sets=app.toolbox[
+            #     "modelmaker_sfincs_hmt"
+            # ].selected_bathymetry_datasets,
             bathymetry_database=app.bathymetry_database,
         )
 
-        # Save grid
+        # Save grid 
         model.quadtree_grid.write()
 
-        # # If SnapWave also generate SnapWave mesh and save it
+        # If SnapWave also generate SnapWave mesh and save it. Why?!
         # if app.gui.getvar(group, "use_snapwave"):
         #     snapwave_quadtree2mesh(model.grid, file_name="snapwave.nc")
 
@@ -452,33 +449,29 @@ class Toolbox(GenericToolbox):
         dlg.close()
 
     def generate_bathymetry(self):
-        bathymetry_list = app.toolbox[
-            "modelmaker_sfincs_hmt"
-        ].selected_bathymetry_datasets
-        # This does not work yet. Give warning that bathymetry is not yet implemented.
-        app.gui.window.dialog_warning("Sorry, bathymetry not yet implemented for SFINCS (HMT)!")
-        return
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
-        app.model["sfincs_hmt"].domain.quadtree_grid.set_bathymetry(
-            bathymetry_list,
-            bathymetry_database=app.bathymetry_database,
-            zmin=app.gui.getvar("modelmaker_sfincs_hmt", "zmin"),
-            zmax=app.gui.getvar("modelmaker_sfincs_hmt", "zmax"),
-        )
-        # app.model["sfincs_hmt"].domain.input.variables.qtrfile="sfincs_adjusted.nc"
-        app.model["sfincs_hmt"].domain.quadtree_grid.write()
 
+        # app.model["sfincs_hmt"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
+        #                                                    bathymetry_database=app.bathymetry_database,
+        #                                                    zmin=app.gui.getvar("modelmaker_sfincs_hmt", "zmin"),
+        #                                                    zmax=app.gui.getvar("modelmaker_sfincs_hmt", "zmax"))
+
+        app.model["sfincs_hmt"].domain.quadtree_elevation.create(app.selected_bathymetry_datasets,
+                                                                 bathymetry_database=app.bathymetry_database,
+                                                                 zmin=app.gui.getvar("modelmaker_sfincs_hmt", "zmin"),
+                                                                 zmax=app.gui.getvar("modelmaker_sfincs_hmt", "zmax"))
+
+        app.model["sfincs_hmt"].domain.quadtree_grid.write()
         # # If SnapWave also generate SnapWave mesh and save it
         # if app.gui.getvar("modelmaker_sfincs_hmt", "use_snapwave"):
         #     snapwave_quadtree2mesh(app.model["sfincs_hmt"].domain.grid, file_name="snapwave.nc")
-
         dlg.close()
 
     def update_mask(self):
         # Should improve on this check
         grid = app.model["sfincs_hmt"].domain.quadtree_grid
         mask = app.model["sfincs_hmt"].domain.quadtree_mask
-        z = app.model["sfincs_hmt"].domain.quadtree_grid.data["z"]
+        z    = app.model["sfincs_hmt"].domain.quadtree_elevation.data["z"]
         if np.all(np.isnan(z)):
             app.gui.window.dialog_warning("Please first generate a bathymetry !")
             return
@@ -490,111 +483,86 @@ class Toolbox(GenericToolbox):
             # Set zmax lower than zmin to avoid use of global mask
             global_zmin = 10.0
             global_zmax = -10.0
-        mask.build(
-            zmin=global_zmin,
-            zmax=global_zmax,
-            include_polygon=app.toolbox["modelmaker_sfincs_hmt"].include_polygon,
-            include_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmin"),
-            include_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmax"),
-            exclude_polygon=app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon,
-            exclude_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmin"),
-            exclude_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmax"),
-            open_boundary_polygon=app.toolbox[
-                "modelmaker_sfincs_hmt"
-            ].open_boundary_polygon,
-            open_boundary_zmin=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "open_boundary_zmin"
-            ),
-            open_boundary_zmax=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "open_boundary_zmax"
-            ),
-            outflow_boundary_polygon=app.toolbox[
-                "modelmaker_sfincs_hmt"
-            ].outflow_boundary_polygon,
-            outflow_boundary_zmin=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "outflow_boundary_zmin"
-            ),
-            outflow_boundary_zmax=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "outflow_boundary_zmax"
-            ),
-        )
+
+        mask.create(model="sfincs", 
+                    zmin=global_zmin,
+                    zmax=global_zmax,
+                    include_polygon=app.toolbox["modelmaker_sfincs_hmt"].include_polygon,
+                    include_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmin"),
+                    include_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmax"),
+                    exclude_polygon=app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon,
+                    exclude_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmin"),
+                    exclude_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmax"),
+                    open_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon,
+                    open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmin"),
+                    open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmax"),
+                    downstream_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].downstream_boundary_polygon,
+                    downstream_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_zmin"),
+                    downstream_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_zmax"),
+                    neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon,
+                    neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmin"),
+                    neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmax"),
+                    outflow_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].outflow_boundary_polygon,
+                    outflow_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_zmin"),
+                    outflow_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_zmax"),
+                    update_datashader_dataframe=True
+                   )
+
         app.map.layer["sfincs_hmt"].layer["mask"].set_data(mask)
 
-        grid.write()  # Write new qtr file
+        # if app.model["sfincs_hmt"].domain.grid_type == "quadtree":
+        grid.write() # Write new qtr file
+        # else:
+        #     mask.write() # Write mask, index and depth files    
 
         dlg.close()
 
     def update_mask_snapwave(self):
         grid = app.model["sfincs_hmt"].domain.quadtree_grid
-        mask = app.model["sfincs_hmt"].domain.snapwave_quadtree_mask
+        mask = app.model["sfincs_hmt"].domain.quadtree_snapwave_mask
         if np.all(np.isnan(grid.data["z"])):
             app.gui.window.dialog_warning("Please first generate a bathymetry !")
             return
         dlg = app.gui.window.dialog_wait("Updating SnapWave mask ...")
         if app.gui.getvar("modelmaker_sfincs_hmt", "use_mask_snapwave_global"):
-            global_zmin = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "global_zmin_snapwave"
-            )
-            global_zmax = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "global_zmax_snapwave"
-            )
+            global_zmin = app.gui.getvar("modelmaker_sfincs_hmt", "global_zmin_snapwave")
+            global_zmax = app.gui.getvar("modelmaker_sfincs_hmt", "global_zmax_snapwave")
         else:
             # Set zmax lower than zmin to avoid use of global mask
             global_zmin = 10.0
             global_zmax = -10.0
 
         mask.build(
-            zmin=global_zmin,
-            zmax=global_zmax,
-            include_polygon=app.toolbox[
-                "modelmaker_sfincs_hmt"
-            ].include_polygon_snapwave,
-            include_zmin=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "include_zmin_snapwave"
-            ),
-            include_zmax=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "include_zmax_snapwave"
-            ),
-            exclude_polygon=app.toolbox[
-                "modelmaker_sfincs_hmt"
-            ].exclude_polygon_snapwave,
-            exclude_zmin=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "exclude_zmin_snapwave"
-            ),
-            exclude_zmax=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "exclude_zmax_snapwave"
-            ),
-            open_boundary_polygon=app.toolbox[
-                "modelmaker_sfincs_hmt"
-            ].open_boundary_polygon_snapwave,
-            open_boundary_zmin=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "open_boundary_zmin_snapwave"
-            ),
-            open_boundary_zmax=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "open_boundary_zmax_snapwave"
-            ),
-            neumann_boundary_polygon=app.toolbox[
-                "modelmaker_sfincs_hmt"
-            ].neumann_boundary_polygon_snapwave,
-            neumann_boundary_zmin=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "neumann_boundary_zmin_snapwave"
-            ),
-            neumann_boundary_zmax=app.gui.getvar(
-                "modelmaker_sfincs_hmt", "neumann_boundary_zmax_snapwave"
-            ),
-        )
+                   zmin=global_zmin,
+                   zmax=global_zmax,
+                   include_polygon=app.toolbox["modelmaker_sfincs_hmt"].include_polygon_snapwave,
+                   include_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmin_snapwave"),
+                   include_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmax_snapwave"),
+                   exclude_polygon=app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon_snapwave,
+                   exclude_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmin_snapwave"),
+                   exclude_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmax_snapwave"),
+                   open_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave,
+                   open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmin_snapwave"),
+                   open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmax_snapwave"),
+                   neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave,
+                   neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmin_snapwave"),
+                   neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmax_snapwave"),
+                   update_datashader_dataframe=True
+                  )
 
         # mask has a method to make an overlay
         app.map.layer["sfincs_hmt"].layer["mask_snapwave"].set_data(mask)
+        # if not app.model["sfincs_hmt"].domain.input.variables.snapwave_mskfile:
+        #     app.model["sfincs_hmt"].domain.input.variables.snapwave_mskfile = "snapwave.msk"
         grid.write()
-
+        # # GUI variables
+        # app.gui.setvar("sfincs_hmt", "snapwave_mskfile", app.model["sfincs_hmt"].domain.input.variables.snapwave_mskfile)
         dlg.close()
 
     def generate_subgrid(self):
         group = "modelmaker_sfincs_hmt"
-        bathymetry_sets = app.toolbox[
-            "modelmaker_sfincs_hmt"
-        ].selected_bathymetry_datasets
+        # bathymetry_sets = app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets
+        bathymetry_sets = app.selected_bathymetry_datasets
         roughness_sets = []
         manning_land = app.gui.getvar(group, "manning_land")
         manning_water = app.gui.getvar(group, "manning_water")
@@ -606,32 +574,38 @@ class Toolbox(GenericToolbox):
         manning_z_cutoff = app.gui.getvar(group, "subgrid_manning_z_cutoff")
         zmin = app.gui.getvar(group, "zmin")
         zmax = app.gui.getvar(group, "zmax")
-        p = app.gui.window.dialog_progress(
-            "               Generating Sub-grid Tables ...                ", 100
-        )
-        app.model["sfincs_hmt"].domain.quadtree_subgrid.build(
-            bathymetry_sets,
-            roughness_sets,
-            bathymetry_database=app.bathymetry_database,
-            manning_land=manning_land,
-            manning_water=manning_water,
-            manning_level=manning_level,
-            nr_levels=nr_levels,
-            nr_subgrid_pixels=nr_pixels,
-            max_gradient=max_dzdv,
-            zmin=zmin,
-            zmax=zmax,
-            progress_bar=p,
-            quiet=False,
-        )
-        p.close()
-        app.model["sfincs_hmt"].domain.config.set("sbgfile", "sfincs.sbg")
-        app.model["sfincs_hmt"].domain.quadtree_subgrid.write()
-        app.gui.setvar(
-            "sfincs_hmt",
-            "sbgfile",
-            "sfincs.sbg",
-        )
+        p = app.gui.window.dialog_progress("               Generating Sub-grid Tables ...                ", 100)
+
+        try:
+
+            sbgfile = "sfincs_subgrid.nc"
+
+            app.model["sfincs_hmt"].domain.quadtree_subgrid.create(bathymetry_sets,
+                                                        roughness_sets,
+                                                        bathymetry_database=app.bathymetry_database,
+                                                        manning_land=manning_land,
+                                                        manning_water=manning_water,
+                                                        manning_level=manning_level,
+                                                        nr_levels=nr_levels,
+                                                        nr_subgrid_pixels=nr_pixels,
+                                                        max_gradient=max_dzdv,
+                                                        zmin=zmin,
+                                                        zmax=zmax,
+                                                        write_dep_tif=False,
+                                                        progress_bar=p)
+
+            # Now write the subgrid tables to a netCDF file
+            app.model["sfincs_hmt"].domain.quadtree_subgrid.write(sbgfile)
+
+            p.close()
+
+        except Exception as e:
+            p.close()
+            app.gui.window.dialog_critical(f"Error generating sub-grid tables: {str(e)}")
+            return
+
+        app.model["sfincs_hmt"].domain.config.set("sbgfile", sbgfile)
+        app.gui.setvar("sfincs_hmt", "sbgfile", sbgfile)
         app.gui.setvar("sfincs_hmt", "bathymetry_type", "subgrid")
 
     def cut_inactive_cells(self):
@@ -668,126 +642,112 @@ class Toolbox(GenericToolbox):
             refinement_polygon["zmax"] = 99999.0
 
         if append:
-            self.refinement_polygon = gpd.GeoDataFrame(
-                pd.concat(
-                    [self.refinement_polygon, refinement_polygon], ignore_index=True
-                )
-            )
+            self.refinement_polygon = gpd.GeoDataFrame(pd.concat([self.refinement_polygon, refinement_polygon], ignore_index=True))
         else:
             self.refinement_polygon = refinement_polygon
 
     def read_include_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_hmt", "include_polygon_file", fname)
-            self.include_polygon = mpol2pol(gpd.read_file(fname))
+            # The include polygon should always be called include.geojson and saved to the
+            # current working directory
+            self.include_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
-            self.include_polygon = gpd.GeoDataFrame(
-                pd.concat([self.include_polygon, gdf], ignore_index=True)
-            )
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.include_polygon = gpd.GeoDataFrame(pd.concat([self.include_polygon, gdf], ignore_index=True))
 
     def read_exclude_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_hmt", "exclude_polygon_file", fname)
-            self.exclude_polygon = mpol2pol(gpd.read_file(fname))
+            self.exclude_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
             gdf = mpol2pol(gpd.read_file(fname))
-            self.exclude_polygon = gpd.GeoDataFrame(
-                pd.concat([self.exclude_polygon, gdf], ignore_index=True)
-            )
+            self.exclude_polygon = gpd.GeoDataFrame(pd.concat([self.exclude_polygon, gdf], ignore_index=True))
 
     def read_open_boundary_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar("modelmaker_sfincs_hmt", "open_boundary_polygon_file", fname)
-            self.open_boundary_polygon = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_hmt", "open_boundary_polygon_file", fname)
+            self.open_boundary_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
-            self.open_boundary_polygon = gpd.GeoDataFrame(
-                pd.concat([self.open_boundary_polygon, gdf], ignore_index=True)
-            )
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs
+            self.open_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.open_boundary_polygon, gdf], ignore_index=True))
+
+    def read_downstream_boundary_polygon(self, fname, append):
+        if not append:
+            # New file
+            # app.gui.setvar("modelmaker_sfincs_hmt", "downstream_boundary_polygon_file", fname)
+            self.downstream_boundary_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+        else:
+            # Append to existing file
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.downstream_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.downstream_boundary_polygon, gdf], ignore_index=True))
+
+    def read_neumann_boundary_polygon(self, fname, append):
+        if not append:
+            # New file
+            # app.gui.setvar("modelmaker_sfincs_hmt", "neumann_boundary_polygon_file", fname)
+            self.neumann_boundary_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+        else:
+            # Append to existing file
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.neumann_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.neumann_boundary_polygon, gdf], ignore_index=True))
 
     def read_outflow_boundary_polygon(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar(
-                "modelmaker_sfincs_hmt", "outflow_boundary_polygon_file", fname
-            )
-            self.outflow_boundary_polygon = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_hmt", "outflow_boundary_polygon_file", fname)
+            self.outflow_boundary_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
-            self.outflow_boundary_polygon = gpd.GeoDataFrame(
-                pd.concat([self.outflow_boundary_polygon, gdf], ignore_index=True)
-            )
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.outflow_boundary_polygon = gpd.GeoDataFrame(pd.concat([self.outflow_boundary_polygon, gdf], ignore_index=True))
 
     def read_include_polygon_snapwave(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar(
-                "modelmaker_sfincs_hmt", "include_polygon_file_snapwave", fname
-            )
-            self.include_polygon_snapwave = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_hmt", "include_polygon_file_snapwave", fname)
+            self.include_polygon_snapwave = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
-            self.include_polygon_snapwave = gpd.GeoDataFrame(
-                pd.concat([self.include_polygon_snapwave, gdf], ignore_index=True)
-            )
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.include_polygon_snapwave = gpd.GeoDataFrame(pd.concat([self.include_polygon_snapwave, gdf], ignore_index=True))
 
     def read_exclude_polygon_snapwave(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar(
-                "modelmaker_sfincs_hmt", "exclude_polygon_file_snapwave", fname
-            )
-            self.exclude_polygon_snapwave = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_hmt", "exclude_polygon_file_snapwave", fname)
+            self.exclude_polygon_snapwave = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
-            self.exclude_polygon_snapwave = gpd.GeoDataFrame(
-                pd.concat([self.exclude_polygon_snapwave, gdf], ignore_index=True)
-            )
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.exclude_polygon_snapwave = gpd.GeoDataFrame(pd.concat([self.exclude_polygon_snapwave, gdf], ignore_index=True))
 
     def read_open_boundary_polygon_snapwave(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar(
-                "modelmaker_sfincs_hmt", "open_boundary_polygon_file_snapwave", fname
-            )
-            self.open_boundary_polygon_snapwave = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_hmt", "open_boundary_polygon_file_snapwave", fname)
+            self.open_boundary_polygon_snapwave = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
-            self.open_boundary_polygon_snapwave = gpd.GeoDataFrame(
-                pd.concat([self.open_boundary_polygon_snapwave, gdf], ignore_index=True)
-            )
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.open_boundary_polygon_snapwave = gpd.GeoDataFrame(pd.concat([self.open_boundary_polygon_snapwave, gdf], ignore_index=True))
 
     def read_neumann_boundary_polygon_snapwave(self, fname, append):
         if not append:
             # New file
-            app.gui.setvar(
-                "modelmaker_sfincs_hmt", "neumann_boundary_polygon_file_snapwave", fname
-            )
-            self.neumann_boundary_polygon_snapwave = mpol2pol(gpd.read_file(fname))
+            # app.gui.setvar("modelmaker_sfincs_hmt", "neumann_boundary_polygon_file_snapwave", fname)
+            self.neumann_boundary_polygon_snapwave = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
         else:
             # Append to existing file
-            gdf = mpol2pol(gpd.read_file(fname))
-            self.neumann_boundary_polygon_snapwave = gpd.GeoDataFrame(
-                pd.concat(
-                    [self.neumann_boundary_polygon_snapwave, gdf], ignore_index=True
-                )
-            )
+            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
+            self.neumann_boundary_polygon_snapwave = gpd.GeoDataFrame(pd.concat([self.neumann_boundary_polygon_snapwave, gdf], ignore_index=True))
 
     def show_mask_polygons(self):
-        show_polygons = app.gui.getvar(
-            "modelmaker_sfincs_hmt", "show_mask_polygons_in_domain_tab"
-        )
+        show_polygons = app.gui.getvar("modelmaker_sfincs_hmt", "show_mask_polygons_in_domain_tab")
         if show_polygons:
             app.map.layer["modelmaker_sfincs_hmt"].layer["include_polygon"].show()
             app.map.layer["modelmaker_sfincs_hmt"].layer["exclude_polygon"].show()
@@ -799,77 +759,86 @@ class Toolbox(GenericToolbox):
 
     def write_refinement_polygon(self):
         if len(self.refinement_polygon) == 0:
-            print("No refinement polygons defined")
             return
-        # Drop the id column
-        gdf = self.refinement_polygon.drop(columns=["id"])
+        # Drop the id column (if it exists)
+        if "id" in self.refinement_polygon.columns:
+            gdf = self.refinement_polygon.drop(columns=["id"])
+        else:
+            gdf = self.refinement_polygon
         fname = app.gui.getvar("modelmaker_sfincs_hmt", "refinement_polygon_file")
-        gdf.to_file(fname, driver="GeoJSON")
+        gdf.to_file(fname, driver='GeoJSON')
 
     def write_include_polygon(self):
         if len(self.include_polygon) == 0:
             return
         gdf = gpd.GeoDataFrame(geometry=self.include_polygon["geometry"])
         fname = app.gui.getvar("modelmaker_sfincs_hmt", "include_polygon_file")
-        gdf.to_file(fname, driver="GeoJSON")
+        gdf.to_file(fname, driver='GeoJSON')
 
     def write_exclude_polygon(self):
         if len(self.exclude_polygon) == 0:
             return
         gdf = gpd.GeoDataFrame(geometry=self.exclude_polygon["geometry"])
         fname = app.gui.getvar("modelmaker_sfincs_hmt", "exclude_polygon_file")
-        gdf.to_file(fname, driver="GeoJSON")
+        gdf.to_file(fname, driver='GeoJSON')
 
     def write_open_boundary_polygon(self):
         if len(self.open_boundary_polygon) == 0:
             return
         gdf = gpd.GeoDataFrame(geometry=self.open_boundary_polygon["geometry"])
         fname = app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_polygon_file")
-        gdf.to_file(fname, driver="GeoJSON")
+        gdf.to_file(fname, driver='GeoJSON')
+
+    def write_downstream_boundary_polygon(self):
+        if len(self.downstream_boundary_polygon) == 0:
+            return
+        gdf = gpd.GeoDataFrame(geometry=self.downstream_boundary_polygon["geometry"])
+        fname = app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_polygon_file")
+        gdf.to_file(fname, driver='GeoJSON')
+
+    def write_neumann_boundary_polygon(self):
+        if len(self.neumann_boundary_polygon) == 0:
+            return
+        gdf = gpd.GeoDataFrame(geometry=self.neumann_boundary_polygon["geometry"])
+        fname = app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_polygon_file")
+        gdf.to_file(fname, driver='GeoJSON')    
 
     def write_outflow_boundary_polygon(self):
         if len(self.outflow_boundary_polygon) == 0:
             return
         gdf = gpd.GeoDataFrame(geometry=self.outflow_boundary_polygon["geometry"])
         fname = app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_polygon_file")
-        gdf.to_file(fname, driver="GeoJSON")
+        gdf.to_file(fname, driver='GeoJSON')
 
     def write_include_polygon_snapwave(self):
         if len(self.include_polygon_snapwave) == 0:
             return
         gdf = gpd.GeoDataFrame(geometry=self.include_polygon_snapwave["geometry"])
         fname = app.gui.getvar("modelmaker_sfincs_hmt", "include_polygon_file_snapwave")
-        gdf.to_file(fname, driver="GeoJSON")
+        gdf.to_file(fname, driver='GeoJSON')
 
     def write_exclude_polygon_snapwave(self):
         if len(self.exclude_polygon_snapwave) == 0:
             return
         gdf = gpd.GeoDataFrame(geometry=self.exclude_polygon_snapwave["geometry"])
         fname = app.gui.getvar("modelmaker_sfincs_hmt", "exclude_polygon_file_snapwave")
-        gdf.to_file(fname, driver="GeoJSON")
+        gdf.to_file(fname, driver='GeoJSON')
 
     def write_open_boundary_polygon_snapwave(self):
         if len(self.open_boundary_polygon_snapwave) == 0:
             return
         gdf = gpd.GeoDataFrame(geometry=self.open_boundary_polygon_snapwave["geometry"])
-        fname = app.gui.getvar(
-            "modelmaker_sfincs_hmt", "open_boundary_polygon_file_snapwave"
-        )
-        gdf.to_file(fname, driver="GeoJSON")
+        fname = app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_polygon_file_snapwave")
+        gdf.to_file(fname, driver='GeoJSON')
 
     def write_neumann_boundary_polygon_snapwave(self):
         if len(self.neumann_boundary_polygon_snapwave) == 0:
             return
-        gdf = gpd.GeoDataFrame(
-            geometry=self.neumann_boundary_polygon_snapwave["geometry"]
-        )
-        fname = app.gui.getvar(
-            "modelmaker_sfincs_hmt", "neumann_boundary_polygon_file_snapwave"
-        )
-        gdf.to_file(fname, driver="GeoJSON")
+        gdf = gpd.GeoDataFrame(geometry=self.neumann_boundary_polygon_snapwave["geometry"])
+        fname = app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_polygon_file_snapwave")
+        gdf.to_file(fname, driver='GeoJSON')
 
-    # PLOT
-
+    # Plot
     def plot_refinement_polygon(self):
         layer = app.map.layer["modelmaker_sfincs_hmt"].layer["quadtree_refinement"]
         layer.set_data(self.refinement_polygon)
@@ -889,6 +858,16 @@ class Toolbox(GenericToolbox):
         layer.clear()
         layer.add_feature(self.open_boundary_polygon)
 
+    def plot_downstream_boundary_polygon(self):
+        layer = app.map.layer["modelmaker_sfincs_hmt"].layer["downstream_boundary_polygon"]
+        layer.clear()
+        layer.add_feature(self.downstream_boundary_polygon)
+
+    def plot_neumann_boundary_polygon(self):
+        layer = app.map.layer["modelmaker_sfincs_hmt"].layer["neumann_boundary_polygon"]
+        layer.clear()
+        layer.add_feature(self.neumann_boundary_polygon)    
+
     def plot_outflow_boundary_polygon(self):
         layer = app.map.layer["modelmaker_sfincs_hmt"].layer["outflow_boundary_polygon"]
         layer.clear()
@@ -905,26 +884,18 @@ class Toolbox(GenericToolbox):
         layer.add_feature(self.exclude_polygon_snapwave)
 
     def plot_open_boundary_polygon_snapwave(self):
-        layer = app.map.layer["modelmaker_sfincs_hmt"].layer[
-            "open_boundary_polygon_snapwave"
-        ]
+        layer = app.map.layer["modelmaker_sfincs_hmt"].layer["open_boundary_polygon_snapwave"]
         layer.clear()
         layer.add_feature(self.open_boundary_polygon_snapwave)
 
     def plot_neumann_boundary_polygon_snapwave(self):
-        layer = app.map.layer["modelmaker_sfincs_hmt"].layer[
-            "neumann_boundary_polygon_snapwave"
-        ]
+        layer = app.map.layer["modelmaker_sfincs_hmt"].layer["neumann_boundary_polygon_snapwave"]
         layer.clear()
-        layer.add_feature(self.neumann_boundary_polygon_snapwave)
+        layer.add_feature(self.neumann_boundary_polygon_snapwave)    
 
     def read_setup_yaml(self, file_name):
 
-        # To be replaced by HydroMT yaml file
-
         group = "modelmaker_sfincs_hmt"
-
-        return
 
         # Clear layers
         self.clear_layers()
@@ -973,18 +944,18 @@ class Toolbox(GenericToolbox):
 
         # app.gui.setvar(group, "use_snapwave", False)
         # app.gui.setvar("sfincs_hmt", "snapwave", True)
-        # app.model["sfincs_hmt"].domain.input.variables.snapwave = False
+        # app.model["sfincs_hmt"].domain.input.variables.snapwave = False          
 
         # # Empty geodataframes
-        # self.include_polygon = gpd.GeoDataFrame()
-        # self.exclude_polygon = gpd.GeoDataFrame()
-        # self.open_boundary_polygon = gpd.GeoDataFrame()
-        # self.outflow_boundary_polygon = gpd.GeoDataFrame()
-        # self.include_polygon_snapwave = gpd.GeoDataFrame()
+        # self.include_polygon = gpd.GeoDataFrame()    
+        # self.exclude_polygon = gpd.GeoDataFrame()    
+        # self.open_boundary_polygon = gpd.GeoDataFrame()    
+        # self.outflow_boundary_polygon = gpd.GeoDataFrame()    
+        # self.include_polygon_snapwave = gpd.GeoDataFrame()    
         # self.exclude_polygon_snapwave = gpd.GeoDataFrame()
         # self.open_boundary_polygon_snapwave = gpd.GeoDataFrame()
         # self.neumann_boundary_polygon_snapwave = gpd.GeoDataFrame()
-        # self.quadtree_polygon = gpd.GeoDataFrame()
+        # self.quadtree_polygon = gpd.GeoDataFrame()    
 
         # Read in yaml file
         dct = yaml2dict(file_name)
@@ -1010,22 +981,18 @@ class Toolbox(GenericToolbox):
         y1 = y0 + dct["coordinates"]["dy"] * dct["coordinates"]["nmax"]
         dx = x1 - x0
         dy = y1 - y0
-        bounds = [x0 - 0.1 * dx, y0 - 0.1 * dy, x1 + 0.1 * dx, y1 + 0.1 * dy]
-        app.map.fit_bounds(
-            bounds[0],
-            bounds[1],
-            bounds[2],
-            bounds[3],
-            crs=app.model["sfincs_hmt"].domain.crs,
-        )
+        bounds = [x0 - 0.1 * dx,
+                  y0 - 0.1 * dy,
+                  x1 + 0.1 * dx,
+                  y1 + 0.1 * dy]
+        app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3],
+                           crs=app.model["sfincs_hmt"].domain.crs)
 
         # Quadtree refinement
         if "quadtree" in dct:
             if "polygon_file" in dct["quadtree"]:
-                app.gui.setvar(
-                    group, "refinement_polygon_file", dct["quadtree"]["polygon_file"]
-                )
-                self.read_refinement_polygon()
+                app.gui.setvar(group, "refinement_polygon_file", dct["quadtree"]["polygon_file"])
+                self.read_refinement_polygon(dct["quadtree"]["polygon_file"], False)
                 self.plot_refinement_polygon()
         # Mask
         app.gui.setvar(group, "use_mask_global", False)
@@ -1033,7 +1000,7 @@ class Toolbox(GenericToolbox):
             if "zmin" in dct["mask"]["global"]:
                 app.gui.setvar(group, "global_zmin", dct["mask"]["global"]["zmin"])
                 app.gui.setvar(group, "use_mask_global", True)
-            if "zmax" in dct["mask"]["global"]:
+            if "zmax" in dct["mask"]["global"]:    
                 app.gui.setvar(group, "global_zmax", dct["mask"]["global"]["zmax"])
                 app.gui.setvar(group, "use_mask_global", True)
         if "include" in dct["mask"]:
@@ -1045,7 +1012,7 @@ class Toolbox(GenericToolbox):
                 # Now read in polygons from geojson file (or other file)
                 self.read_include_polygon(dct["mask"]["include"]["polygon_file"], False)
                 self.plot_include_polygon()
-        # Now do the same for exclude polygons
+        # Now do the same for exclude polygons        
         if "exclude" in dct["mask"]:
             if "zmin" in dct["mask"]["exclude"]:
                 app.gui.setvar(group, "exclude_zmin", dct["mask"]["exclude"]["zmin"])
@@ -1054,139 +1021,95 @@ class Toolbox(GenericToolbox):
             if "polygon_file" in dct["mask"]["exclude"]:
                 # Now read in polygons from geojson file
                 self.read_exclude_polygon(dct["mask"]["exclude"]["polygon_file"], False)
-                self.plot_exclude_polygon()
+                self.plot_exclude_polygon()     
         # Now do the same for open boundary polygons
         if "open_boundary" in dct["mask"]:
             if "zmin" in dct["mask"]["open_boundary"]:
-                app.gui.setvar(
-                    group, "open_boundary_zmin", dct["mask"]["open_boundary"]["zmin"]
-                )
+                app.gui.setvar(group, "open_boundary_zmin", dct["mask"]["open_boundary"]["zmin"])
             if "zmax" in dct["mask"]["open_boundary"]:
-                app.gui.setvar(
-                    group, "open_boundary_zmax", dct["mask"]["open_boundary"]["zmax"]
-                )
+                app.gui.setvar(group, "open_boundary_zmax", dct["mask"]["open_boundary"]["zmax"])
             if "polygon_file" in dct["mask"]["open_boundary"]:
                 # Now read in polygons from geojson file
-                self.read_open_boundary_polygon(
-                    dct["mask"]["open_boundary"]["polygon_file"], False
-                )
+                self.read_open_boundary_polygon(dct["mask"]["open_boundary"]["polygon_file"], False)
                 self.plot_open_boundary_polygon()
+        # Now do the same for downstream boundary polygons
+        if "downstream_boundary" in dct["mask"]:
+            if "zmin" in dct["mask"]["downstream_boundary"]:
+                app.gui.setvar(group, "downstream_boundary_zmin", dct["mask"]["downstream_boundary"]["zmin"])
+            if "zmax" in dct["mask"]["downstream_boundary"]:
+                app.gui.setvar(group, "downstream_boundary_zmax", dct["mask"]["downstream_boundary"]["zmax"])
+            if "polygon_file" in dct["mask"]["downstream_boundary"]:
+                # Now read in polygons from geojson file
+                self.read_downstream_boundary_polygon(dct["mask"]["downstream_boundary"]["polygon_file"], False)
+                self.plot_downstream_boundary_polygon()
+        # Now do the same for neumann boundary polygons
+        if "neumann_boundary" in dct["mask"]:
+            if "zmin" in dct["mask"]["neumann_boundary"]:
+                app.gui.setvar(group, "neumann_boundary_zmin", dct["mask"]["neumann_boundary"]["zmin"])
+            if "zmax" in dct["mask"]["neumann_boundary"]:
+                app.gui.setvar(group, "neumann_boundary_zmax", dct["mask"]["neumann_boundary"]["zmax"])
+            if "polygon_file" in dct["mask"]["neumann_boundary"]:
+                # Now read in polygons from geojson file
+                self.read_neumann_boundary_polygon(dct["mask"]["neumann_boundary"]["polygon_file"], False)
+                self.plot_neumann_boundary_polygon()        
         # Now do the same for outflow boundary polygons
         if "outflow_boundary" in dct["mask"]:
             if "zmin" in dct["mask"]["outflow_boundary"]:
-                app.gui.setvar(
-                    group,
-                    "outflow_boundary_zmin",
-                    dct["mask"]["outflow_boundary"]["zmin"],
-                )
+                app.gui.setvar(group, "outflow_boundary_zmin", dct["mask"]["outflow_boundary"]["zmin"])
             if "zmax" in dct["mask"]["outflow_boundary"]:
-                app.gui.setvar(
-                    group,
-                    "outflow_boundary_zmax",
-                    dct["mask"]["outflow_boundary"]["zmax"],
-                )
+                app.gui.setvar(group, "outflow_boundary_zmax", dct["mask"]["outflow_boundary"]["zmax"])
             if "polygon_file" in dct["mask"]["outflow_boundary"]:
                 # Now read in polygons from geojson file
-                self.read_outflow_boundary_polygon(
-                    dct["mask"]["outflow_boundary"]["polygon_file"], False
-                )
+                self.read_outflow_boundary_polygon(dct["mask"]["outflow_boundary"]["polygon_file"], False)
                 self.plot_outflow_boundary_polygon()
 
         if "mask_snapwave" in dct:
             app.gui.setvar(group, "use_snapwave", True)
             # app.gui.setvar("sfincs_hmt", "snapwave", True)
-            # app.model["sfincs_hmt"].domain.input.variables.snapwave = True
+            # app.model["sfincs_hmt"].domain.input.variables.snapwave = True            
             if "global" in dct["mask_snapwave"]:
                 if "zmin" in dct["mask_snapwave"]["global"]:
-                    app.gui.setvar(
-                        group,
-                        "global_zmin_snapwave",
-                        dct["mask_snapwave"]["global"]["zmin"],
-                    )
+                    app.gui.setvar(group, "global_zmin_snapwave", dct["mask_snapwave"]["global"]["zmin"])
                     app.gui.setvar(group, "use_mask_snapwave_global", True)
-                if "zmax" in dct["mask_snapwave"]["global"]:
-                    app.gui.setvar(
-                        group,
-                        "global_zmax_snapwave",
-                        dct["mask_snapwave"]["global"]["zmax"],
-                    )
+                if "zmax" in dct["mask_snapwave"]["global"]:    
+                    app.gui.setvar(group, "global_zmax_snapwave", dct["mask_snapwave"]["global"]["zmax"])
                     app.gui.setvar(group, "use_mask_snapwave_global", True)
             if "include" in dct["mask_snapwave"]:
                 if "zmin" in dct["mask_snapwave"]["include"]:
-                    app.gui.setvar(
-                        group,
-                        "include_zmin_snapwave",
-                        dct["mask_snapwave"]["include"]["zmin"],
-                    )
+                    app.gui.setvar(group, "include_zmin_snapwave", dct["mask_snapwave"]["include"]["zmin"])
                 if "zmax" in dct["mask_snapwave"]["include"]:
-                    app.gui.setvar(
-                        group,
-                        "include_zmax_snapwave",
-                        dct["mask_snapwave"]["include"]["zmax"],
-                    )
+                    app.gui.setvar(group, "include_zmax_snapwave", dct["mask_snapwave"]["include"]["zmax"])
                 if "polygon_file" in dct["mask_snapwave"]["include"]:
                     # Now read in polygons from geojson file
-                    self.read_include_polygon_snapwave(
-                        dct["mask_snapwave"]["include"]["polygon_file"], False
-                    )
+                    self.read_include_polygon_snapwave(dct["mask_snapwave"]["include"]["polygon_file"], False)
                     self.plot_include_polygon_snapwave()
             if "exclude" in dct["mask_snapwave"]:
                 if "zmin" in dct["mask_snapwave"]["exclude"]:
-                    app.gui.setvar(
-                        group,
-                        "exclude_zmin_snapwave",
-                        dct["mask_snapwave"]["exclude"]["zmin"],
-                    )
+                    app.gui.setvar(group, "exclude_zmin_snapwave", dct["mask_snapwave"]["exclude"]["zmin"])
                 if "zmax" in dct["mask_snapwave"]["exclude"]:
-                    app.gui.setvar(
-                        group,
-                        "exclude_zmax_snapwave",
-                        dct["mask_snapwave"]["exclude"]["zmax"],
-                    )
+                    app.gui.setvar(group, "exclude_zmax_snapwave", dct["mask_snapwave"]["exclude"]["zmax"])
                 if "polygon_file" in dct["mask_snapwave"]["exclude"]:
                     # Now read in polygons from geojson file
-                    self.read_exclude_polygon_snapwave(
-                        dct["mask_snapwave"]["exclude"]["polygon_file"], False
-                    )
-                    self.plot_exclude_polygon_snapwave()
+                    self.read_exclude_polygon_snapwave(dct["mask_snapwave"]["exclude"]["polygon_file"], False)
+                    self.plot_exclude_polygon_snapwave()        
             if "open_boundary" in dct["mask_snapwave"]:
                 if "zmin" in dct["mask_snapwave"]["open_boundary"]:
-                    app.gui.setvar(
-                        group,
-                        "open_boundary_zmin_snapwave",
-                        dct["mask_snapwave"]["open_boundary"]["zmin"],
-                    )
+                    app.gui.setvar(group, "open_boundary_zmin_snapwave", dct["mask_snapwave"]["open_boundary"]["zmin"])
                 if "zmax" in dct["mask_snapwave"]["open_boundary"]:
-                    app.gui.setvar(
-                        group,
-                        "open_boundary_zmax_snapwave",
-                        dct["mask_snapwave"]["open_boundary"]["zmax"],
-                    )
+                    app.gui.setvar(group, "open_boundary_zmax_snapwave", dct["mask_snapwave"]["open_boundary"]["zmax"])
                 if "polygon_file" in dct["mask_snapwave"]["open_boundary"]:
                     # Now read in polygons from geojson file
-                    self.read_open_boundary_polygon_snapwave(
-                        dct["mask_snapwave"]["open_boundary"]["polygon_file"], False
-                    )
+                    self.read_open_boundary_polygon_snapwave(dct["mask_snapwave"]["open_boundary"]["polygon_file"], False)
                     self.plot_open_boundary_polygon_snapwave()
             if "neumann_boundary" in dct["mask_snapwave"]:
                 if "zmin" in dct["mask_snapwave"]["neumann_boundary"]:
-                    app.gui.setvar(
-                        group,
-                        "neumann_boundary_zmin_snapwave",
-                        dct["mask_snapwave"]["neumann_boundary"]["zmin"],
-                    )
+                    app.gui.setvar(group, "neumann_boundary_zmin_snapwave", dct["mask_snapwave"]["neumann_boundary"]["zmin"])
                 if "zmax" in dct["mask_snapwave"]["neumann_boundary"]:
-                    app.gui.setvar(
-                        group,
-                        "neumann_boundary_zmax_snapwave",
-                        dct["mask_snapwave"]["neumann_boundary"]["zmax"],
-                    )
+                    app.gui.setvar(group, "neumann_boundary_zmax_snapwave", dct["mask_snapwave"]["neumann_boundary"]["zmax"])
                 if "polygon_file" in dct["mask_snapwave"]["neumann_boundary"]:
                     # Now read in polygons from geojson file
-                    self.read_neumann_boundary_polygon_snapwave(
-                        dct["mask_snapwave"]["neumann_boundary"]["polygon_file"], False
-                    )
-                    self.plot_neumann_boundary_polygon_snapwave()
+                    self.read_neumann_boundary_polygon_snapwave(dct["mask_snapwave"]["neumann_boundary"]["polygon_file"], False)
+                    self.plot_neumann_boundary_polygon_snapwave()                
 
         # Bathymetry
         dataset_names = []
@@ -1194,32 +1117,21 @@ class Toolbox(GenericToolbox):
         for ddict in dct["bathymetry"]["dataset"]:
             name = ddict["name"]
             zmin = ddict["zmin"]
-            zmax = ddict["zmax"]
+            zmax = ddict["zmax"] 
             dataset = {"name": name, "zmin": zmin, "zmax": zmax}
-            app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets.append(
-                dataset
-            )
+            app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets.append(dataset)
             dataset_names.append(name)
-        app.gui.setvar(
-            "modelmaker_sfincs_hmt", "selected_bathymetry_dataset_names", dataset_names
-        )
+        app.gui.setvar("modelmaker_sfincs_hmt", "selected_bathymetry_dataset_names", dataset_names)
         app.gui.setvar("modelmaker_sfincs_hmt", "selected_bathymetry_dataset_index", 0)
-        app.gui.setvar(
-            "modelmaker_sfincs_hmt",
-            "nr_selected_bathymetry_datasets",
-            len(dataset_names),
-        )
+        app.gui.setvar("modelmaker_sfincs_hmt", "nr_selected_bathymetry_datasets", len(dataset_names))
 
         layer = app.map.layer["modelmaker_sfincs_hmt"].layer["grid_outline"]
         lenx = dct["coordinates"]["mmax"] * dct["coordinates"]["dx"]
         leny = dct["coordinates"]["nmax"] * dct["coordinates"]["dy"]
-        layer.add_rectangle(
-            dct["coordinates"]["x0"],
-            dct["coordinates"]["y0"],
-            lenx,
-            leny,
-            dct["coordinates"]["rotation"],
-        )
+        layer.add_rectangle(dct["coordinates"]["x0"],
+                            dct["coordinates"]["y0"],
+                            lenx, leny,
+                            dct["coordinates"]["rotation"])
 
         # Sub grid
         if "subgrid" in dct:
@@ -1228,10 +1140,6 @@ class Toolbox(GenericToolbox):
             app.gui.setvar("modelmaker_sfincs_hmt", "use_subgrid", False)
 
     def write_setup_yaml(self):
-
-        # To be replaced by HydroMT yaml file
-        return
-
         group = "modelmaker_sfincs_hmt"
         dct = {}
         # Coordinates
@@ -1246,10 +1154,8 @@ class Toolbox(GenericToolbox):
         dct["coordinates"]["crs"] = app.model["sfincs_hmt"].domain.crs.name
         # QuadTree
         dct["quadtree"] = {}
-        if len(app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon) > 0:
-            dct["quadtree"]["polygon_file"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "refinement_polygon_file"
-            )
+        if len(app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon)>0:
+            dct["quadtree"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "refinement_polygon_file")
         # Mask
         dct["mask"] = {}
         if app.gui.getvar(group, "use_mask_global"):
@@ -1257,137 +1163,84 @@ class Toolbox(GenericToolbox):
             dct["mask"]["global"]["zmax"] = app.gui.getvar(group, "global_zmax")
             dct["mask"]["global"]["zmin"] = app.gui.getvar(group, "global_zmin")
         dct["mask"]["include"] = {}
-        if len(app.toolbox["modelmaker_sfincs_hmt"].include_polygon) > 0:
-            dct["mask"]["include"]["zmax"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "include_zmax"
-            )
-            dct["mask"]["include"]["zmin"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "include_zmin"
-            )
-            dct["mask"]["include"]["polygon_file"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "include_polygon_file"
-            )
+        if len(app.toolbox["modelmaker_sfincs_hmt"].include_polygon)>0:
+            dct["mask"]["include"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "include_zmax")
+            dct["mask"]["include"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "include_zmin")
+            dct["mask"]["include"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "include_polygon_file")
         dct["mask"]["exclude"] = {}
-        if len(app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon) > 0:
-            dct["mask"]["exclude"]["zmax"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "exclude_zmax"
-            )
-            dct["mask"]["exclude"]["zmin"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "exclude_zmin"
-            )
-            dct["mask"]["exclude"]["polygon_file"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "exclude_polygon_file"
-            )
+        if len(app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon)>0:
+            dct["mask"]["exclude"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmax")
+            dct["mask"]["exclude"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmin")
+            dct["mask"]["exclude"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "exclude_polygon_file")
         dct["mask"]["open_boundary"] = {}
-        if len(app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon) > 0:
-            dct["mask"]["open_boundary"]["zmax"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "open_boundary_zmax"
-            )
-            dct["mask"]["open_boundary"]["zmin"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "open_boundary_zmin"
-            )
-            dct["mask"]["open_boundary"]["polygon_file"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "open_boundary_polygon_file"
-            )
+        if len(app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon)>0:
+            dct["mask"]["open_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmax")
+            dct["mask"]["open_boundary"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmin")
+            dct["mask"]["open_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_polygon_file")
+        dct["mask"]["downstream_boundary"] = {}
+        if len(app.toolbox["modelmaker_sfincs_hmt"].downstream_boundary_polygon)>0:
+            dct["mask"]["downstream_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_zmax")
+            dct["mask"]["downstream_boundary"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_zmin")
+            dct["mask"]["downstream_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_polygon_file")
+        dct["mask"]["neumann_boundary"] = {}
+        if len(app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon)>0:
+            dct["mask"]["neumann_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmax")
+            dct["mask"]["neumann_boundary"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmin")
+            dct["mask"]["neumann_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_polygon_file")    
         dct["mask"]["outflow_boundary"] = {}
-        if len(app.toolbox["modelmaker_sfincs_hmt"].outflow_boundary_polygon) > 0:
-            dct["mask"]["outflow_boundary"]["zmax"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "outflow_boundary_zmax"
-            )
-            dct["mask"]["outflow_boundary"]["zmin"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "outflow_boundary_zmin"
-            )
-            dct["mask"]["outflow_boundary"]["polygon_file"] = app.gui.getvar(
-                "modelmaker_sfincs_hmt", "outflow_boundary_polygon_file"
-            )
+        if len(app.toolbox["modelmaker_sfincs_hmt"].outflow_boundary_polygon)>0:
+            dct["mask"]["outflow_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_zmax")
+            dct["mask"]["outflow_boundary"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_zmin")
+            dct["mask"]["outflow_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_polygon_file")
         # SnapWave
         # Check if snapwave is enabled
-        if app.model["sfincs_hmt"].domain.input.variables.snapwave:
+        if app.model["sfincs_hmt"].domain.input.variables.snapwave:  
             dct["mask_snapwave"] = {}
             dct["mask_snapwave"]["global"] = {}
-            dct["mask_snapwave"]["global"]["zmax"] = app.gui.getvar(
-                group, "global_zmax_snapwave"
-            )
-            dct["mask_snapwave"]["global"]["zmin"] = app.gui.getvar(
-                group, "global_zmin_snapwave"
-            )
+            dct["mask_snapwave"]["global"]["zmax"] = app.gui.getvar(group, "global_zmax_snapwave")
+            dct["mask_snapwave"]["global"]["zmin"] = app.gui.getvar(group, "global_zmin_snapwave")
             dct["mask_snapwave"]["include"] = {}
-            if len(app.toolbox["modelmaker_sfincs_hmt"].include_polygon_snapwave) > 0:
-                dct["mask_snapwave"]["include"]["zmax"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "include_zmax_snapwave"
-                )
-                dct["mask_snapwave"]["include"]["zmin"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "include_zmin_snapwave"
-                )
-                dct["mask_snapwave"]["include"]["polygon_file"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "include_polygon_file_snapwave"
-                )
+            if len(app.toolbox["modelmaker_sfincs_hmt"].include_polygon_snapwave)>0:
+                dct["mask_snapwave"]["include"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "include_zmax_snapwave")
+                dct["mask_snapwave"]["include"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "include_zmin_snapwave")
+                dct["mask_snapwave"]["include"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "include_polygon_file_snapwave")
             dct["mask_snapwave"]["exclude"] = {}
-            if len(app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon_snapwave) > 0:
-                dct["mask_snapwave"]["exclude"]["zmax"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "exclude_zmax_snapwave"
-                )
-                dct["mask_snapwave"]["exclude"]["zmin"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "exclude_zmin_snapwave"
-                )
-                dct["mask_snapwave"]["exclude"]["polygon_file"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "exclude_polygon_file_snapwave"
-                )
+            if len(app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon_snapwave)>0:
+                dct["mask_snapwave"]["exclude"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmax_snapwave")
+                dct["mask_snapwave"]["exclude"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmin_snapwave")
+                dct["mask_snapwave"]["exclude"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "exclude_polygon_file_snapwave")
             dct["mask_snapwave"]["open_boundary"] = {}
-            if (
-                len(app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave)
-                > 0
-            ):
-                dct["mask_snapwave"]["open_boundary"]["zmax"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "open_boundary_zmax_snapwave"
-                )
-                dct["mask_snapwave"]["open_boundary"]["zmin"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "open_boundary_zmin_snapwave"
-                )
-                dct["mask_snapwave"]["open_boundary"]["polygon_file"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "open_boundary_polygon_file_snapwave"
-                )
+            if len(app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave)>0:
+                dct["mask_snapwave"]["open_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmax_snapwave")
+                dct["mask_snapwave"]["open_boundary"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmin_snapwave")
+                dct["mask_snapwave"]["open_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_polygon_file_snapwave")
             dct["mask_snapwave"]["neumann_boundary"] = {}
-            if (
-                len(
-                    app.toolbox[
-                        "modelmaker_sfincs_hmt"
-                    ].neumann_boundary_polygon_snapwave
-                )
-                > 0
-            ):
-                dct["mask_snapwave"]["neumann_boundary"]["zmax"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "neumann_boundary_zmax_snapwave"
-                )
-                dct["mask_snapwave"]["neumann_boundary"]["zmin"] = app.gui.getvar(
-                    "modelmaker_sfincs_hmt", "neumann_boundary_zmin_snapwave"
-                )
-                dct["mask_snapwave"]["neumann_boundary"]["polygon_file"] = (
-                    app.gui.getvar(
-                        "modelmaker_sfincs_hmt",
-                        "neumann_boundary_polygon_file_snapwave",
-                    )
-                )
+            if len(app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave)>0:
+                dct["mask_snapwave"]["neumann_boundary"]["zmax"] = app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmax_snapwave")
+                dct["mask_snapwave"]["neumann_boundary"]["zmin"] = app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmin_snapwave")
+                dct["mask_snapwave"]["neumann_boundary"]["polygon_file"] = app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_polygon_file_snapwave")
 
         # Bathymetry
         dct["bathymetry"] = {}
         dct["bathymetry"]["dataset"] = []
         for d in app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets:
             dataset = {}
-            dataset["name"] = d["name"]
+            dataset["name"]   = d["name"]
             dataset["source"] = "delftdashboard"
-            dataset["zmin"] = d["zmin"]
-            dataset["zmax"] = d["zmax"]
-            dct["bathymetry"]["dataset"].append(dataset)
+            dataset["zmin"]   = d["zmin"]
+            dataset["zmax"]   = d["zmax"]
+            dct["bathymetry"]["dataset"].append(dataset)    
 
         self.setup_dict = dct
 
         dict2yaml("model_setup.yml", dct)
 
-        # Write out polygons
+        # Write out polygons 
         app.toolbox["modelmaker_sfincs_hmt"].write_include_polygon()
         app.toolbox["modelmaker_sfincs_hmt"].write_exclude_polygon()
         app.toolbox["modelmaker_sfincs_hmt"].write_open_boundary_polygon()
+        app.toolbox["modelmaker_sfincs_hmt"].write_downstream_boundary_polygon()
+        app.toolbox["modelmaker_sfincs_hmt"].write_neumann_boundary_polygon()
         app.toolbox["modelmaker_sfincs_hmt"].write_outflow_boundary_polygon()
         app.toolbox["modelmaker_sfincs_hmt"].write_refinement_polygon()
         app.toolbox["modelmaker_sfincs_hmt"].write_include_polygon_snapwave()
@@ -1395,8 +1248,9 @@ class Toolbox(GenericToolbox):
         app.toolbox["modelmaker_sfincs_hmt"].write_open_boundary_polygon_snapwave()
         app.toolbox["modelmaker_sfincs_hmt"].write_neumann_boundary_polygon_snapwave()
 
+
 def gdf2list(gdf_in):
-    gdf_out = []
-    for feature in gdf_in.iterfeatures():
-        gdf_out.append(gpd.GeoDataFrame.from_features([feature]))
-    return gdf_out
+   gdf_out = []
+   for feature in gdf_in.iterfeatures():
+      gdf_out.append(gpd.GeoDataFrame.from_features([feature]))
+   return gdf_out

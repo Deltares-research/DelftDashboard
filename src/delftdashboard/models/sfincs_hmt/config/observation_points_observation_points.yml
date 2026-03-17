@@ -2,9 +2,9 @@ element:
 - style: listbox
   position:
     x: 10
-    y: 40
+    y: 35
     width: 300
-    height: 90
+    height: 95
   method: select_observation_point_from_list
   variable: active_observation_point
   select: index
@@ -13,14 +13,15 @@ element:
   tooltip: Select observation point
 - style: edit
   text: Name
+  text_position: left
   position:
-    x: 40
+    x: 50
     y: 10
-    width: 270
+    width: 260
     height: 20
-  method: edit_name
   variable: observation_point_name
-  tooltip: Edit name
+  method: edit_observation_point_name
+  tooltip: Edit observation point name
   dependency:
   - action: enable
     checkfor: all

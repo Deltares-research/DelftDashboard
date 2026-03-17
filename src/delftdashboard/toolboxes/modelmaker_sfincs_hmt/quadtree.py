@@ -31,6 +31,15 @@ def select(*args):
     app.gui.window.statusbar.show_message("Select refinement polygon(s) and set refinement levels.", 5000)
     update()
 
+def deselect(*args):
+    # Check if there are refinement polygons
+    if len(app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon) == 0:
+        return
+    if app.toolbox["modelmaker_sfincs_hmt"].refinement_polygons_changed:
+        ok = app.gui.window.dialog_yes_no("The refinement polygons have changed. Would you like to save the changes?")
+        if ok:
+            save_refinement_polygon()
+
 def draw_refinement_polygon(*args):
     app.map.layer["modelmaker_sfincs_hmt"].layer["quadtree_refinement"].crs = app.crs
     app.map.layer["modelmaker_sfincs_hmt"].layer["quadtree_refinement"].draw()
@@ -49,6 +58,9 @@ def delete_refinement_polygon(*args):
     if index > len(app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon) - 1:
         index = max(len(app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon) - 1, 0)
         app.gui.setvar("modelmaker_sfincs_hmt", "refinement_polygon_index", index)
+
+    app.toolbox["modelmaker_sfincs_hmt"].refinement_polygons_changed = True
+
     update()
 
 def load_refinement_polygon(*args):
@@ -60,20 +72,33 @@ def load_refinement_polygon(*args):
         append = app.gui.window.dialog_yes_no("Add to existing refinement polygons?", " ")    
     app.toolbox["modelmaker_sfincs_hmt"].read_refinement_polygon(full_name, append)
     app.toolbox["modelmaker_sfincs_hmt"].plot_refinement_polygon()
+    if append:
+        app.toolbox["modelmaker_sfincs_hmt"].refinement_polygons_changed = True
+    else:
+        # We want to save it as quadtree.geojson (just in case the original file
+        # has a different name, or does not specify the refinememnt levels)
+        save_refinement_polygon()
+        # app.toolbox["modelmaker_sfincs_hmt"].write_refinement_polygon()
+        # app.toolbox["modelmaker_sfincs_hmt"].refinement_polygons_changed = False
+
     update()
 
 def save_refinement_polygon(*args):
+    app.gui.window.dialog_fade_label("Saving refinement polygons to quadtree.geojson ...")
     app.toolbox["modelmaker_sfincs_hmt"].write_refinement_polygon()
+    app.toolbox["modelmaker_sfincs_hmt"].refinement_polygons_changed = False
 
 def select_refinement_polygon(*args):
     index = args[0]
     app.map.layer["modelmaker_sfincs_hmt"].layer["quadtree_refinement"].activate_feature(index)
 
 def select_refinement_level(*args):
-    level_index = args[0]
+    # level_index = args[0]
+    level_index = app.gui.getvar("modelmaker_sfincs_hmt", "refinement_polygon_level")
     # Get index of selected polygon 
     index = app.gui.getvar("modelmaker_sfincs_hmt", "refinement_polygon_index")
     app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon.at[index, "refinement_level"] = level_index + 1
+    app.toolbox["modelmaker_sfincs_hmt"].refinement_polygons_changed = True
     update()
 
 def edit_zmin_zmax(*args):
@@ -87,10 +112,12 @@ def refinement_polygon_created(gdf, index, feature_id):
     app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon = gdf
     nrp = len(app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon)
     app.gui.setvar("modelmaker_sfincs_hmt", "refinement_polygon_index", nrp - 1)
+    app.toolbox["modelmaker_sfincs_hmt"].refinement_polygons_changed = True
     update()
 
 def refinement_polygon_modified(gdf, index, id):
     app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon = gdf
+    app.toolbox["modelmaker_sfincs_hmt"].refinement_polygons_changed = True
 
 def refinement_polygon_selected(index):
     app.gui.setvar("modelmaker_sfincs_hmt", "refinement_polygon_index", index)
@@ -117,6 +144,13 @@ def update():
         pass
     app.gui.setvar("modelmaker_sfincs_hmt", "nr_refinement_polygons", nrp)
     app.gui.setvar("modelmaker_sfincs_hmt", "refinement_polygon_names", refnames)
+    # Now update the refinement_polygon_level
+    if nrp > 0:
+        ilev = app.toolbox["modelmaker_sfincs_hmt"].refinement_polygon.at[index, "refinement_level"]
+        app.gui.setvar("modelmaker_sfincs_hmt", "refinement_polygon_level", ilev - 1)
+    else:
+        app.gui.setvar("modelmaker_sfincs_hmt", "refinement_polygon_level", 0)
+    # And update the GUI
     app.gui.window.update()
 
 def build_quadtree_grid(*args):
@@ -127,7 +161,7 @@ def build_quadtree_grid(*args):
         if row["zmin"] > -20000.0 or row["zmax"] < 20000.0:
             zminzmax = True
     if zminzmax:
-        if len(app.toolbox["modelmaker_sfincs_hmt"].selected_bathymetry_datasets) == 0:
+        if app.gui.getvar("bathy_topo_selector", "nr_selected_bathymetry_datasets") == 0:    
             app.gui.window.dialog_warning("Please select at least one bathymetry dataset (see next tab).")
             return
     nmax = app.gui.getvar("modelmaker_sfincs_hmt", "nmax")

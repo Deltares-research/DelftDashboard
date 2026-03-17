@@ -11,3 +11,8 @@ from delftdashboard.operations import map
 def select(*args):
     # De-activate existing layers
     map.update()
+
+
+def set_model_variables(*args):
+    # All variables will be set
+    app.model["sfincs_hmt"].set_model_variables()

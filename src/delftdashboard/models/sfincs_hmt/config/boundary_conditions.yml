@@ -105,6 +105,16 @@ element:
       height: 20
     variable: boundary_dx  
     tooltip: Edit spacing between boundary point along the mesh
+  - style: radiobuttongroup
+    position:
+      x: 190
+      y: 60
+      width: 100
+      height: 50
+    variable: boundary_conditions_timeseries_or_astro
+    option_string: ["Time Series", "Astronomical"]
+    option_value: ["timeseries", "astro"]
+    method: select_timeseries_or_astro
   - style: pushbutton
     text: Generate From Tide Model
     position:
@@ -121,6 +131,9 @@ element:
       - variable: nr_boundary_points
         operator: gt
         value: 0
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: astro
   - style: popupmenu
     position:
       x: 310
@@ -143,6 +156,9 @@ element:
       - variable: nr_boundary_points
         operator: gt
         value: 0
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: astro
   - style: pushbutton
     text: Set Boundary Conditions
     position:
@@ -159,6 +175,9 @@ element:
       - variable: nr_boundary_points
         operator: gt
         value: 0
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
   - style: edit
     text: Time Step (s)
     text_position: right  
@@ -176,6 +195,9 @@ element:
       - variable: nr_boundary_points
         operator: gt
         value: 0
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
   - style: popupmenu
     position:
       x: 450
@@ -202,12 +224,15 @@ element:
       - variable: nr_boundary_points
         operator: gt
         value: 0
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
   - style: edit
     text: Offset (m)
     text_position: right  
     position:
-      x: 450
-      y: 80
+      x: 580
+      y: 105
       width: 50
       height: 20
     variable: boundary_conditions_timeseries_offset
@@ -219,12 +244,15 @@ element:
       - variable: nr_boundary_points
         operator: gt
         value: 0
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
   - style: edit
     text: Amplitude (m)
     text_position: right  
     position:
-      x: 450
-      y: 55
+      x: 580
+      y: 80
       width: 50
       height: 20
     variable: boundary_conditions_timeseries_amplitude
@@ -239,12 +267,15 @@ element:
       - variable: boundary_conditions_timeseries_shape
         operator: eq
         value: sine
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
   - style: edit
     text: Phase (deg)
     text_position: right  
     position:
-      x: 450
-      y: 30
+      x: 580
+      y: 55
       width: 50
       height: 20
     variable: boundary_conditions_timeseries_phase
@@ -259,12 +290,15 @@ element:
       - variable: boundary_conditions_timeseries_shape
         operator: eq
         value: sine
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
   - style: edit
     text: Period (s)
     text_position: right  
     position:
-      x: 450
-      y: 5
+      x: 580
+      y: 30
       width: 50
       height: 20
     variable: boundary_conditions_timeseries_period
@@ -279,12 +313,15 @@ element:
       - variable: boundary_conditions_timeseries_shape
         operator: eq
         value: sine
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
   - style: edit
     text: Peak (m)
     text_position: right  
     position:
-      x: 450
-      y: 55
+      x: 580
+      y: 80
       width: 50
       height: 20
     variable: boundary_conditions_timeseries_peak
@@ -299,12 +336,15 @@ element:
       - variable: boundary_conditions_timeseries_shape
         operator: eq
         value: gaussian
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
   - style: edit
     text: Peak Time (s)
     text_position: right  
     position:
-      x: 450
-      y: 30
+      x: 580
+      y: 55
       width: 50
       height: 20
     variable: boundary_conditions_timeseries_tpeak
@@ -319,12 +359,15 @@ element:
       - variable: boundary_conditions_timeseries_shape
         operator: eq
         value: gaussian
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
   - style: edit
     text: Duration (s)
     text_position: right  
     position:
-      x: 450
-      y: 5
+      x: 580
+      y: 30
       width: 50
       height: 20
     variable: boundary_conditions_timeseries_duration
@@ -339,3 +382,6 @@ element:
       - variable: boundary_conditions_timeseries_shape
         operator: eq
         value: gaussian
+      - variable: boundary_conditions_timeseries_or_astro
+        operator: eq
+        value: timeseries
