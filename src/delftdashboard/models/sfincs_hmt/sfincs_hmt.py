@@ -22,7 +22,7 @@ class Model(GenericModel):
         self.long_name = "SFINCS (HydroMT)"
 
     def initialize(self):
-        self.domain = SfincsModel(root=".", mode="w+")
+        self.domain = SfincsModel(root=".", mode="r+")
         # self.domain = SfincsModel(root=".", mode="r+")
         self.domain.config.set("epsg", app.crs.to_epsg())
         self.set_gui_variables()
@@ -32,6 +32,7 @@ class Model(GenericModel):
         self.boundaries_changed = False
         self.thin_dams_changed = False
         self.wave_boundaries_changed = False
+        self.wave_makers_changed = False
 
     def get_view_menu(self):
         model_view_menu = {}
@@ -304,7 +305,7 @@ class Model(GenericModel):
         # Mask
         app.map.layer["sfincs_hmt"].layer["mask"].set_data(app.model["sfincs_hmt"].domain.quadtree_mask)
         # Thin dams
-        app.map.layer["sfincs_hmt"].layer["thin_dams"].layer["polylines"].set_data(app.model["sfincs_hmt"].domain.thin_dams.gdf, 0)
+        app.map.layer["sfincs_hmt"].layer["thin_dams"].layer["polylines"].set_data(app.model["sfincs_hmt"].domain.thin_dams.gdf)
         # Observation points
         app.map.layer["sfincs_hmt"].layer["observation_points"].set_data(app.model["sfincs_hmt"].domain.observation_points.gdf, 0)
         # Cross sections
@@ -425,7 +426,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "rain", False)
 
         # Turning off weirs for now
-        app.gui.setvar(group, "enable_weirs", False)
+        app.gui.setvar(group, "enable_weirs", True)
 
     def set_model_variables(self, varid=None, value=None):
         # Copies gui variables to sfincs input variables

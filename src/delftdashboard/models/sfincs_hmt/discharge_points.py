@@ -122,7 +122,7 @@ def point_clicked(x, y):
     # Try to convert qstr to float
     try:
         q = float(qstr)
-    except:
+    except Exception as e:
         app.gui.window.dialog_info("Invalid discharge value !")
         return
     app.model["sfincs_hmt"].domain.discharge_points.add_point(x, y, name=name, value=q)

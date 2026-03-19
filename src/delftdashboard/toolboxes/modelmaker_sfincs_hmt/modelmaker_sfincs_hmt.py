@@ -484,29 +484,34 @@ class Toolbox(GenericToolbox):
             global_zmin = 10.0
             global_zmax = -10.0
 
-        mask.create(model="sfincs", 
-                    zmin=global_zmin,
-                    zmax=global_zmax,
-                    include_polygon=app.toolbox["modelmaker_sfincs_hmt"].include_polygon,
-                    include_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmin"),
-                    include_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmax"),
-                    exclude_polygon=app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon,
-                    exclude_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmin"),
-                    exclude_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmax"),
-                    open_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon,
-                    open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmin"),
-                    open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmax"),
-                    downstream_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].downstream_boundary_polygon,
-                    downstream_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_zmin"),
-                    downstream_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_zmax"),
-                    neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon,
-                    neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmin"),
-                    neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmax"),
-                    outflow_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].outflow_boundary_polygon,
-                    outflow_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_zmin"),
-                    outflow_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_zmax"),
-                    update_datashader_dataframe=True
-                   )
+        try:
+            mask.create(model="sfincs", 
+                        zmin=global_zmin,
+                        zmax=global_zmax,
+                        include_polygon=app.toolbox["modelmaker_sfincs_hmt"].include_polygon,
+                        include_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmin"),
+                        include_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmax"),
+                        exclude_polygon=app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon,
+                        exclude_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmin"),
+                        exclude_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmax"),
+                        open_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon,
+                        open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmin"),
+                        open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmax"),
+                        downstream_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].downstream_boundary_polygon,
+                        downstream_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_zmin"),
+                        downstream_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "downstream_boundary_zmax"),
+                        neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon,
+                        neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmin"),
+                        neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmax"),
+                        outflow_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].outflow_boundary_polygon,
+                        outflow_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_zmin"),
+                        outflow_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "outflow_boundary_zmax"),
+                        update_datashader_dataframe=True
+                    )
+        except Exception as e:
+            app.gui.window.dialog_warning(str(e))
+            dlg.close()
+            return
 
         app.map.layer["sfincs_hmt"].layer["mask"].set_data(mask)
 
@@ -518,46 +523,51 @@ class Toolbox(GenericToolbox):
         dlg.close()
 
     def update_mask_snapwave(self):
+
         grid = app.model["sfincs_hmt"].domain.quadtree_grid
         mask = app.model["sfincs_hmt"].domain.quadtree_snapwave_mask
         if np.all(np.isnan(grid.data["z"])):
             app.gui.window.dialog_warning("Please first generate a bathymetry !")
             return
-        dlg = app.gui.window.dialog_wait("Updating SnapWave mask ...")
-        if app.gui.getvar("modelmaker_sfincs_hmt", "use_mask_snapwave_global"):
-            global_zmin = app.gui.getvar("modelmaker_sfincs_hmt", "global_zmin_snapwave")
-            global_zmax = app.gui.getvar("modelmaker_sfincs_hmt", "global_zmax_snapwave")
-        else:
-            # Set zmax lower than zmin to avoid use of global mask
-            global_zmin = 10.0
-            global_zmax = -10.0
 
-        mask.build(
-                   zmin=global_zmin,
-                   zmax=global_zmax,
-                   include_polygon=app.toolbox["modelmaker_sfincs_hmt"].include_polygon_snapwave,
-                   include_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmin_snapwave"),
-                   include_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmax_snapwave"),
-                   exclude_polygon=app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon_snapwave,
-                   exclude_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmin_snapwave"),
-                   exclude_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmax_snapwave"),
-                   open_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave,
-                   open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmin_snapwave"),
-                   open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmax_snapwave"),
-                   neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave,
-                   neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmin_snapwave"),
-                   neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmax_snapwave"),
-                   update_datashader_dataframe=True
-                  )
+        try: 
 
-        # mask has a method to make an overlay
-        app.map.layer["sfincs_hmt"].layer["mask_snapwave"].set_data(mask)
-        # if not app.model["sfincs_hmt"].domain.input.variables.snapwave_mskfile:
-        #     app.model["sfincs_hmt"].domain.input.variables.snapwave_mskfile = "snapwave.msk"
-        grid.write()
-        # # GUI variables
-        # app.gui.setvar("sfincs_hmt", "snapwave_mskfile", app.model["sfincs_hmt"].domain.input.variables.snapwave_mskfile)
-        dlg.close()
+            dlg = app.gui.window.dialog_wait("Updating SnapWave mask ...")
+            if app.gui.getvar("modelmaker_sfincs_hmt", "use_mask_snapwave_global"):
+                global_zmin = app.gui.getvar("modelmaker_sfincs_hmt", "global_zmin_snapwave")
+                global_zmax = app.gui.getvar("modelmaker_sfincs_hmt", "global_zmax_snapwave")
+            else:
+                # Set zmax lower than zmin to avoid use of global mask
+                global_zmin = 10.0
+                global_zmax = -10.0
+
+            mask.build(
+                    zmin=global_zmin,
+                    zmax=global_zmax,
+                    include_polygon=app.toolbox["modelmaker_sfincs_hmt"].include_polygon_snapwave,
+                    include_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmin_snapwave"),
+                    include_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "include_zmax_snapwave"),
+                    exclude_polygon=app.toolbox["modelmaker_sfincs_hmt"].exclude_polygon_snapwave,
+                    exclude_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmin_snapwave"),
+                    exclude_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "exclude_zmax_snapwave"),
+                    open_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].open_boundary_polygon_snapwave,
+                    open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmin_snapwave"),
+                    open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "open_boundary_zmax_snapwave"),
+                    neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_hmt"].neumann_boundary_polygon_snapwave,
+                    neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmin_snapwave"),
+                    neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_hmt", "neumann_boundary_zmax_snapwave"),
+                    update_datashader_dataframe=True
+                    )
+
+            app.map.layer["sfincs_hmt"].layer["mask_snapwave"].set_data(mask)
+            grid.write()
+
+            dlg.close()
+
+        except Exception as e:
+            dlg.close()
+            app.gui.window.dialog_warning(str(e))
+            return
 
     def generate_subgrid(self):
         group = "modelmaker_sfincs_hmt"

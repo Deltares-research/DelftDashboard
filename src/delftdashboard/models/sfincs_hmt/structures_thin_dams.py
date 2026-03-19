@@ -4,6 +4,7 @@ Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
 """
+import geopandas as gpd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -40,6 +41,33 @@ def load(*args):
         app.gui.setvar("sfincs_hmt", "active_thin_dam", 0)
         update()
     app.model["sfincs_hmt"].thin_dams_changed = False
+
+def import_geojson(*args):
+
+    map.reset_cursor()
+
+    rsp = app.gui.window.dialog_open_file("Select file ...",
+                                          filter="*.geojson",
+                                          allow_directory_change=False)
+    if rsp[0]:
+        filename = rsp[0]
+        gdf = gpd.read_file(filename)
+        # Extract only LineStrings
+        gdf = gdf[gdf.geometry.type == "LineString"].copy()
+        # Check if there are any LineStrings
+        if len(gdf) == 0:
+            app.gui.window.dialog_warning("No LineString geometries found in the selected file.")
+            return
+        merge = False
+        if app.model["sfincs_hmt"].domain.thin_dams.nr_lines > 0:
+            ok = app.gui.window.dialog_yes_no("Do you want to merge these with the existing thin dams?")
+            if ok:
+                merge = True
+        app.model["sfincs_hmt"].domain.thin_dams.set(gdf, merge=merge)
+        app.map.layer["sfincs_hmt"].layer["thin_dams"].set_data(gdf)
+        app.gui.setvar("sfincs_hmt", "active_thin_dam", 0)
+        app.model["sfincs_hmt"].thin_dams_changed = True
+        update()
 
 def save(*args):
     map.reset_cursor()

@@ -101,7 +101,6 @@ def save(*args, **kwargs):
     app.model["sfincs_hmt"].domain.water_level.write_boundary_conditions_timeseries()
     app.model["sfincs_hmt"].boundaries_changed = False
 
-
 def add_boundary_point_on_map(*args):
     app.map.click_point(point_clicked)
 
@@ -227,7 +226,7 @@ def view_boundary_conditions(*args):
 def create_boundary_points(*args):
     
     # First check if there are already boundary points
-    if len(app.model["sfincs_hmt"].domain.water_level.gdf.index)>0:
+    if app.model["sfincs_hmt"].domain.water_level.nr_points > 0:
         ok = app.gui.window.dialog_ok_cancel("Existing boundary points will be overwritten! Continue?",                                
                                     title="Warning")
         if not ok:
