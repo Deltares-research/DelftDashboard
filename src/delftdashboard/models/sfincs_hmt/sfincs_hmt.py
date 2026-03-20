@@ -31,6 +31,8 @@ class Model(GenericModel):
         self.discharge_points_changed = False
         self.boundaries_changed = False
         self.thin_dams_changed = False
+        self.weirs_changed = False
+        self.drainage_structures_changed = False
         self.wave_boundaries_changed = False
         self.wave_makers_changed = False
 
@@ -113,6 +115,39 @@ class Model(GenericModel):
                             circle_radius=0,
                             line_color_inactive="lightgrey")
 
+        from .structures_weirs import weir_created
+        from .structures_weirs import weir_selected
+        from .structures_weirs import weir_modified
+        weir_layer = layer.add_layer("weirs") # Container layer for weirs and snapped weirs
+        weir_layer.add_layer("polylines",
+                            type="draw",
+                            shape="polyline",
+                            create=weir_created,
+                            modify=weir_modified,
+                            select=weir_selected,
+                            polyline_line_color="yellow",
+                            polyline_line_width=2.0,
+                            polyline_line_opacity=1.0)
+        weir_layer.add_layer("snapped",
+                            type="line",
+                            line_color="white",
+                            line_opacity=1.0,
+                            circle_radius=0,
+                            line_color_inactive="lightgrey")
+
+        from .structures_drainage_structures import drainage_structure_created
+        from .structures_drainage_structures import drainage_structure_selected
+        from .structures_drainage_structures import drainage_structure_modified
+        layer.add_layer("drainage_structures",
+                         type="draw",
+                         shape="polyline",
+                         create=drainage_structure_created,
+                         modify=drainage_structure_modified,
+                         select=drainage_structure_selected,
+                         polyline_line_color="yellow",
+                         polyline_line_width=2.0,
+                         polyline_line_opacity=1.0)
+
         from .observation_points_observation_points import select_observation_point_from_map
         layer.add_layer("observation_points",
                         type="circle_selector",                        
@@ -130,7 +165,7 @@ class Model(GenericModel):
         from .observation_points_cross_sections import cross_section_created
         from .observation_points_cross_sections import cross_section_selected
         from .observation_points_cross_sections import cross_section_modified
-        crs_layer = layer.add_layer("cross_sections") # Container layer for thin dams and snapped thin dams
+        crs_layer = layer.add_layer("cross_sections") # Container layer for cross sections and snapped cross sections
         crs_layer.add_layer("polylines",
                             type="draw",
                             shape="polyline",
@@ -147,8 +182,6 @@ class Model(GenericModel):
                             circle_radius=0,
                             line_color_inactive="lightgrey")
 
-            # Make the layer
-        # Create geodataframe with one point at (0,0), crs(4326)    
         layer.add_layer(
                 "obs_points",
                 type="marker",
@@ -173,15 +206,6 @@ class Model(GenericModel):
                         line_color_selected="white",
                         fill_color_selected="red")
 
-
-        # # Snapwave Boundary Enclosure
-        # from .waves_snapwave import boundary_enclosure_created
-        # from .waves_snapwave import boundary_enclosure_modified
-        # layer.add_layer("snapwave_boundary_enclosure", type="draw",
-        #                      shape="polygon",
-        #                      create=boundary_enclosure_created,
-        #                      modify=boundary_enclosure_modified,
-        #                      polygon_line_color="red")
         from .waves_boundary_conditions import select_boundary_point_from_map_snapwave
         layer.add_layer("boundary_points_snapwave",
                         type="circle_selector",
@@ -236,6 +260,8 @@ class Model(GenericModel):
             # Thin dams are made grey
             layer.layer["thin_dams"].layer["polylines"].deactivate()
             layer.layer["thin_dams"].layer["snapped"].hide()
+            # Drainage structures are made grey
+            layer.layer["drainage_structures"].deactivate()
             # # SnapWave boundary enclosure is made invisible
             # layer.layer["snapwave_boundary_enclosure"].hide()
             layer.layer["boundary_points_snapwave"].deactivate()
@@ -306,6 +332,10 @@ class Model(GenericModel):
         app.map.layer["sfincs_hmt"].layer["mask"].set_data(app.model["sfincs_hmt"].domain.quadtree_mask)
         # Thin dams
         app.map.layer["sfincs_hmt"].layer["thin_dams"].layer["polylines"].set_data(app.model["sfincs_hmt"].domain.thin_dams.gdf)
+        # Weirs
+        app.map.layer["sfincs_hmt"].layer["weirs"].layer["polylines"].set_data(app.model["sfincs_hmt"].domain.weirs.gdf)
+        # Drainage structures
+        app.map.layer["sfincs_hmt"].layer["drainage_structures"].set_data(app.model["sfincs_hmt"].domain.drainage_structures.gdf)
         # Observation points
         app.map.layer["sfincs_hmt"].layer["observation_points"].set_data(app.model["sfincs_hmt"].domain.observation_points.gdf, 0)
         # Cross sections
@@ -396,6 +426,32 @@ class Model(GenericModel):
         app.gui.setvar(group, "thin_dam_names", [])
         app.gui.setvar(group, "nr_thin_dams", 0)
         app.gui.setvar(group, "thin_dam_index", 0)
+
+        # Weirs
+        app.gui.setvar(group, "weir_names", [])
+        app.gui.setvar(group, "nr_weirs", 0)
+        app.gui.setvar(group, "weir_index", 0)
+        app.gui.setvar(group, "weir_elevation", 0.0)
+        app.gui.setvar(group, "weir_par1", 0.5)
+        app.gui.setvar(group, "weir_elevation", 0.0)
+        app.gui.setvar(group, "weir_enable_editing_elevation", False)
+        app.gui.setvar(group, "weir_enable_editing_par1", False)
+
+        # Drainage
+        app.gui.setvar(group, "drainage_structure_names", [])
+        app.gui.setvar(group, "nr_drainage_structures", 0)
+        app.gui.setvar(group, "drainage_structure_index", 0)
+        app.gui.setvar(group, "drainage_structure_alpha", 0.6)
+        app.gui.setvar(group, "drainage_structure_discharge", 1.0)
+        app.gui.setvar(group, "drainage_structure_width", 100.0)
+        app.gui.setvar(group, "drainage_structure_sill_elevation", 0.0)
+        app.gui.setvar(group, "drainage_structure_manning_n", 0.024)
+        app.gui.setvar(group, "drainage_structure_zmin", 0.0)
+        app.gui.setvar(group, "drainage_structure_zmax", 1.0)
+        app.gui.setvar(group, "drainage_structure_closing_time", 600.0)
+        app.gui.setvar(group, "drainage_structure_type", 1)
+        app.gui.setvar(group, "drainage_structure_types", [1, 2, 3, 4])
+        app.gui.setvar(group, "drainage_structure_type_names", ["Pump", "Culvert", "Check Valve", "Gate"])
 
         # SnapWave
         app.gui.setvar("modelmaker_sfincs_hmt", "use_snapwave", app.gui.getvar(group, "snapwave"))

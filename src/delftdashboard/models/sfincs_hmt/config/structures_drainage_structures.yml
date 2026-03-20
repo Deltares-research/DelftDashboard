@@ -1,0 +1,280 @@
+element:
+- style: listbox
+  position:
+    x: 10
+    y: 10
+    width: 80
+    height: 120
+  method: select_drainage_structure
+  variable: drainage_structure_index
+  select: index
+  option_string:
+    variable: drainage_structure_names
+- style: pushbutton
+  text: Draw Drainage
+  position:
+    x: 100
+    y: 110
+    width: 100
+    height: 20
+  method: draw_drainage_structure
+  tooltip: Draw drainage structure on map
+- style: pushbutton
+  text: Delete Drainage
+  position:
+    x: 100
+    y: 85
+    width: 100
+    height: 20
+  method: delete_drainage_structure
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_drainage_structures
+      operator: gt
+      value: 0
+  tooltip: Delete drainage structure from list
+- style: pushbutton
+  text: Load
+  position:
+    x: 100
+    y: 60
+    width: 100
+    height: 20
+  method: load
+  tooltip: Load drainage structures from file
+- style: pushbutton
+  text: Import (*.geojson)
+  position:
+    x: 100
+    y: 35
+    width: 100
+    height: 20
+  method: import_geojson
+  tooltip: Import drainage structures from geojsonfile
+  enable: false
+- style: pushbutton
+  text: Save
+  position:
+    x: 100
+    y: 10
+    width: 100
+    height: 20
+  method: save
+  tooltip: Save drainage_structures to file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_drainage_structures
+      operator: gt
+      value: 0
+- style: panel
+  text: Selected Drainage Structure
+  position:
+    x: 220
+    y: 10
+    width: 400
+    height: 120
+  element:  
+  - style: popupmenu
+    text: Type
+    position:
+      x: 50
+      y: 90
+      width: 100
+      height: 20
+    variable: drainage_structure_type
+    option_value:
+      variable: drainage_structure_types
+    option_string:
+      variable: drainage_structure_type_names
+    enable: false  
+  - style: edit
+    text: Discharge (m3/s)
+    position:
+      x: 100
+      y: 60
+      width: 50
+      height: 20
+    variable: drainage_structure_discharge
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 1
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: "Edit discharge for pump (m3/s)"
+  - style: edit
+    text: Alpha
+    position:
+      x: 100
+      y: 60
+      width: 50
+      height: 20
+    variable: drainage_structure_alpha
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 2
+      - variable: drainage_structure_type
+        operator: eq
+        value: 3
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: "Edit alpha coefficient: Q = alpha * H^1.5"
+  - style: edit
+    text: Width
+    position:
+      x: 100
+      y: 60
+      width: 50
+      height: 20
+    variable: drainage_structure_width
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit gate width (m)
+  - style: edit
+    text: Sill Elevation
+    position:
+      x: 100
+      y: 35
+      width: 50
+      height: 20
+    variable: drainage_structure_sill_elevation
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit gate sill elevation with respect to reference plane (m)
+  - style: edit
+    text: Manning's n
+    position:
+      x: 100
+      y: 10
+      width: 50
+      height: 20
+    variable: drainage_structure_manning_n
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit gate Manning's n
+  - style: edit
+    text: Min water level for open
+    position:
+      x: 300
+      y: 60
+      width: 50
+      height: 20
+    variable: drainage_structure_zmin
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit minimum water level for gate to open (metres with respect to reference plane)
+  - style: edit
+    text: Max water level for open
+    position:
+      x: 300
+      y: 35
+      width: 50
+      height: 20
+    variable: drainage_structure_zmax
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit maximum water level for gate to open (metres with respect to reference plane)
+  - style: edit
+    text: Closing time (s)
+    position:
+      x: 300
+      y: 10
+      width: 50
+      height: 20
+    variable: drainage_structure_closing_time
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit time it takes for gate to open or close (s)

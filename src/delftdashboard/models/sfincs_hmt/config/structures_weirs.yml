@@ -1,20 +1,119 @@
 element:
-- style: panel
+- style: listbox
   position:
     x: 10
     y: 10
-    width: -10
-    height: 110
-  element:
-  - style: pushselectfile
+    width: 80
+    height: 120
+  method: select_weir
+  variable: weir_index
+  select: index
+  option_string:
+    variable: weir_names
+- style: pushbutton
+  text: Draw Weir
+  position:
+    x: 100
+    y: 110
+    width: 100
+    height: 20
+  method: draw_weir
+  tooltip: Draw weir on map
+- style: pushbutton
+  text: Delete Weir
+  position:
+    x: 100
+    y: 85
+    width: 100
+    height: 20
+  method: delete_weir
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_weirs
+      operator: gt
+      value: 0
+  tooltip: Delete weir from list
+- style: pushbutton
+  text: Load
+  position:
+    x: 100
+    y: 60
+    width: 100
+    height: 20
+  method: load
+  tooltip: Load weirs from file
+- style: pushbutton
+  text: Import (*.geojson)
+  position:
+    x: 100
+    y: 35
+    width: 100
+    height: 20
+  method: import_geojson
+  tooltip: Import weirs from geojsonfile
+- style: pushbutton
+  text: Save
+  position:
+    x: 100
+    y: 10
+    width: 100
+    height: 20
+  method: save
+  tooltip: Save weirs to file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: nr_weirs
+      operator: gt
+      value: 0
+- style: panel
+  text: Selected Weir
+  position:
+    x: 220
+    y: 10
+    width: 400
+    height: 120
+  element:  
+  - style: edit
+    text: Elevation (m)
     position:
-      x: 10
-      y: 80
-      width: 130
+      x: 70
+      y: 85
+      width: 50
       height: 20
-    text: Thin Dam File
-    variable: thdfile
-    showfilename: True
-    extension: "*.thd"
-    selectiontext: Select thin dam file
-    tooltipstring: Select thin dam file
+    variable: weir_elevation
+    method: edit_weir_elevation
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_weirs
+        operator: gt
+        value: 0
+      - variable: weir_enable_editing_elevation
+        operator: eq
+        value: true
+    tooltip: "Edit elevation for weir (in metres with respect to the vertical datum of the model). This function is disabled if the weir elevation is variable."
+  - style: edit
+    text: Cd
+    position:
+      x: 70
+      y: 60
+      width: 50
+      height: 20
+    variable: weir_par1
+    method: edit_weir_par1
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_weirs
+        operator: gt
+        value: 0
+      - variable: weir_enable_editing_par1
+        operator: eq
+        value: true
+    tooltip: "Edit discharge coefficient Cd. This function is disabled if the coefficient is variable."
