@@ -22,7 +22,7 @@ class Model(GenericModel):
         self.long_name = "SFINCS (HydroMT)"
 
     def initialize(self):
-        self.domain = SfincsModel(root=".", mode="r+")
+        self.domain = SfincsModel(root=".", mode="w")
         # self.domain = SfincsModel(root=".", mode="r+")
         self.domain.config.set("epsg", app.crs.to_epsg())
         self.set_gui_variables()

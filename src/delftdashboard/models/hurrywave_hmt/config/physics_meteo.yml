@@ -1,0 +1,32 @@
+element:
+- style: popupmenu
+  position:
+    x: 60
+    y: 110
+    width: 100
+    height: 20
+  text: Wind Drag
+  variable: winddrag
+  method: set_model_variables
+  option_string:
+  - Zijlema (2012)
+  - Wu (1982)
+  option_value:
+  - zijlema
+  - wu
+- style: edit
+  position:
+    x: 60
+    y: 85
+    width: 100
+    height: 20
+  text: Cd Cap
+  variable: cdcap
+  method: set_model_variables
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: winddrag
+      operator: eq
+      value: wu

@@ -3,13 +3,14 @@ rem The delftdashboard_dev environment only needs to be created and used if you 
 
 rem CHANGE GITDIR to point to you local repos folder !!!
 set GITDIR=c:\work\checkouts\git
-set ENVNAME=delftdashboard_dev
+rem  set ENVNAME=delftdashboard_dev
 
-call mamba env remove -n delftdashboard_dev
-call mamba create -n delftdashboard_dev python=3.12
-call mamba activate delftdashboard_dev
+rem call mamba env remove -n delftdashboard_dev
+rem call mamba create -n delftdashboard_dev python=3.12
+rem call mamba activate delftdashboard_dev
 
-rem We first install delftdashboard, which also install some cht packages from PyPi. Then we override with editable packages.
+rem We first install delftdashboard, which also installs some cht packages directly from git server (no Pypi).
+rem Then we override with editable packages.
 
 pip install -e %GITDIR%\delftdashboard
 pip install -e %GITDIR%\guitares
@@ -28,6 +29,5 @@ pip install -e %GITDIR%\cht_tiling
 pip install -e %GITDIR%\cht_tsunami
 pip install -e %GITDIR%\cht_utils
 pip install -e %GITDIR%\cht_xbeach
-rem pip install -e %GITDIR%\hydromt
-rem pip install -e %GITDIR%\hydromt_sfincs
-
+pip install -e %GITDIR%\hydromt_sfincs
+pip install -e %GITDIR%\hydromt_hurrywave

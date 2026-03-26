@@ -12,6 +12,12 @@ import importlib
 from pyproj import CRS
 import requests
 
+# Pre-import pydantic before PySide6/Shiboken is loaded.
+# Shiboken hooks into inspect.getsource which interferes with pydantic's
+# lazy import mechanism and causes a circular import in pydantic._internal._validators.
+import pydantic
+import pydantic.fields
+
 from guitares.gui import GUI
 from guitares.colormap import read_color_maps
 from cht_bathymetry import BathymetryDatabase
