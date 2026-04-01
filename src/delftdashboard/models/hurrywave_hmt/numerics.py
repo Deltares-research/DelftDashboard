@@ -1,10 +1,18 @@
+"""GUI callbacks for the HurryWave Numerics tab."""
+
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+_MODEL = "hurrywave_hmt"
 
-def select(*args):
+
+def select(*args: Any) -> None:
+    """Activate the Numerics tab."""
     map.update()
 
 
-def set_model_variables(*args):
-    app.model["hurrywave_hmt"].set_model_variables()
+def set_model_variables(*args: Any) -> None:
+    """Copy current GUI variables back to the model config."""
+    app.model[_MODEL].set_model_variables()
