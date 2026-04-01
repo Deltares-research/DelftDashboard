@@ -101,34 +101,56 @@ class Toolbox(GenericToolbox):
         self.flood_map.set_topobathy_file(full_name)
 
     def generate_topobathy_geotiff(self):
-
+        """Generate a topobathy COG from the selected datasets."""
         if self.polygon.empty:
-            # If there is no polygon, use the bounding box of the model
-
-            if app.active_model.name == "sfincs_cht":
-                bounds = app.active_model.domain.grid.bounds()            
+            model = app.active_model
+            if model.name == "sfincs_cht":
+                bounds = model.domain.grid.bounds()
+            elif model.name == "sfincs_hmt":
+                exterior = model.domain.quadtree_grid.exterior
+                if len(exterior) == 0:
+                    app.gui.window.dialog_warning("No grid found!")
+                    return
+                bounds = exterior.total_bounds
+            elif model.name == "hurrywave_hmt":
+                exterior = model.domain.quadtree_grid.exterior
+                if len(exterior) == 0:
+                    app.gui.window.dialog_warning("No grid found!")
+                    return
+                bounds = exterior.total_bounds
             else:
-                # Get the bounding box of the model
-                print("Not supported")            
+                app.gui.window.dialog_warning(
+                    f"Model '{model.name}' not supported for topobathy generation."
+                )
                 return
         else:
-            # Use the bounding box of the polygon
             bounds = self.polygon.total_bounds
-                
+
         dx = app.gui.getvar("flood_map", "dx_geotiff")
-        full_name, path, name, ext, fltr = app.gui.window.dialog_save_file("Save topo/bathy geotiff file", filter="*.tif")
+        full_name, path, name, ext, fltr = app.gui.window.dialog_save_file(
+            "Save topo/bathy geotiff file", filter="*.tif"
+        )
         if not full_name:
             return
         filename = full_name
         wb = app.gui.window.dialog_wait("Generating topobathy geotiff ...")
-        make_topobathy_cog(filename,
-                           app.selected_bathymetry_datasets,
-                           bounds,
-                           app.map.crs,
-                           bathymetry_database=app.bathymetry_database,
-                           dx=dx)
-        self.topobathy_geotiff = filename
-        self.flood_map.set_topobathy_file(filename)
+        try:
+            make_topobathy_cog(
+                filename,
+                app.selected_bathymetry_datasets,
+                bounds,
+                app.map.crs,
+                topography_data_catalog=app.topography_data_catalog,
+                dx=dx,
+            )
+            self.topobathy_geotiff = filename
+            self.flood_map.set_topobathy_file(filename)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            wb.close()
+            app.gui.window.dialog_warning(f"Error generating topobathy:\n{e}")
+            return
         wb.close()
 
     def load_index_geotiff(self):
@@ -140,20 +162,37 @@ class Toolbox(GenericToolbox):
         self.flood_map.set_index_file(full_name)
 
     def generate_index_geotiff(self):
-        if app.active_model.name == "sfincs_cht":
-            full_name, path, name, ext, fltr = app.gui.window.dialog_save_file("Save index geotiff file", filter="*.tif")
-            if not full_name:
-                return
-            filename = full_name
-            wb = app.gui.window.dialog_wait("Generating index geotiff ...")
-            app.active_model.domain.grid.make_index_cog(filename,
-                                                        app.toolbox["flood_map"].topobathy_geotiff)
-            wb.close()
-            self.flood_map.set_index_file(filename)
-            self.index_geotiff = filename
+        """Generate an index COG mapping grid cells to topobathy pixels."""
+        model = app.active_model
+        if model.name == "sfincs_cht":
+            grid = model.domain.grid
+        elif model.name == "sfincs_hmt":
+            grid = model.domain.quadtree_grid
         else:
-            print("Not supported")
+            app.gui.window.dialog_warning(
+                f"Model '{model.name}' not supported for index generation."
+            )
             return
+
+        full_name, path, name, ext, fltr = app.gui.window.dialog_save_file(
+            "Save index geotiff file", filter="*.tif"
+        )
+        if not full_name:
+            return
+        wb = app.gui.window.dialog_wait("Generating index geotiff ...")
+        try:
+            grid.make_index_cog(
+                full_name, app.toolbox["flood_map"].topobathy_geotiff
+            )
+            self.flood_map.set_index_file(full_name)
+            self.index_geotiff = full_name
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            wb.close()
+            app.gui.window.dialog_warning(f"Error generating index:\n{e}")
+            return
+        wb.close()
 
     def load_map_output(self):
         # Load the map output

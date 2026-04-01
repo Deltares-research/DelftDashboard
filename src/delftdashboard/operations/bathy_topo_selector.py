@@ -7,7 +7,7 @@ from delftdashboard.app import app
 
 def select_bathymetry_source(*args):
     source = args[0]
-    dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source)
+    dataset_names, dataset_long_names, dataset_source_names = app.topography_data_catalog.dataset_names(source=source)
     group = "bathy_topo_selector"
     app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
     app.gui.setvar(group, "bathymetry_dataset_index", 0)
@@ -23,7 +23,7 @@ def use_dataset(*args):
     name  = names[index]
     if name not in app.gui.getvar(group, "selected_bathymetry_dataset_names"):
         # d = bathymetry_database.get_dataset(name)
-        dataset = {"name": name, "zmin": -99999.0, "zmax": 99999.0}
+        dataset = {"name": name, "elevation": name, "zmin": -99999.0, "zmax": 99999.0}
         app.selected_bathymetry_datasets.append(dataset)
         app.gui.setvar(group, "selected_bathymetry_dataset_index", len(app.selected_bathymetry_datasets) - 1)
         update()

@@ -5,6 +5,8 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 
+import traceback
+
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -396,75 +398,59 @@ class Toolbox(GenericToolbox):
     def generate_grid(self):
         group = "modelmaker_sfincs_hmt"
         dlg = app.gui.window.dialog_wait("Generating grid ...")
-        model = app.model["sfincs_hmt"].domain
-        epsg = app.crs.to_epsg()
-        # TODO: Following method does not exist. Is there an alternative?
-        # model.clear_spatial_attributes()
-        x0       = app.gui.getvar(group, "x0")
-        y0       = app.gui.getvar(group, "y0")
-        dx       = app.gui.getvar(group, "dx")
-        dy       = app.gui.getvar(group, "dy")
-        nmax     = app.gui.getvar(group, "nmax")
-        mmax     = app.gui.getvar(group, "mmax")
-        rotation = app.gui.getvar(group, "rotation")
-        model.config.set("qtrfile", "sfincs.nc")
-        # model.input.variables.qtrfile = "sfincs.nc"
-        app.gui.setvar("sfincs_hmt", "qtrfile", "sfincs.nc")
+        try:
+            model = app.model["sfincs_hmt"].domain
+            epsg = app.crs.to_epsg()
+            x0       = app.gui.getvar(group, "x0")
+            y0       = app.gui.getvar(group, "y0")
+            dx       = app.gui.getvar(group, "dx")
+            dy       = app.gui.getvar(group, "dy")
+            nmax     = app.gui.getvar(group, "nmax")
+            mmax     = app.gui.getvar(group, "mmax")
+            rotation = app.gui.getvar(group, "rotation")
+            model.config.set("qtrfile", "sfincs.nc")
+            app.gui.setvar("sfincs_hmt", "qtrfile", "sfincs.nc")
 
-        if len(self.refinement_polygon) == 0:
-            refpol = None
-        else:
-            # Make list of separate gdfs for each polygon
-            refpol = self.refinement_polygon
+            if len(self.refinement_polygon) == 0:
+                refpol = None
+            else:
+                refpol = self.refinement_polygon
 
-        # Build grid
+            model.quadtree_grid.create(
+                x0,
+                y0,
+                nmax,
+                mmax,
+                dx,
+                dy,
+                rotation,
+                epsg,
+                refinement_polygons=refpol,
+            )
 
-        # Build grid
-        model.quadtree_grid.create(
-            x0,
-            y0,
-            nmax,
-            mmax,
-            dx,
-            dy,
-            rotation,
-            epsg,
-            refinement_polygons=refpol,
-            # bathymetry_sets=app.toolbox[
-            #     "modelmaker_sfincs_hmt"
-            # ].selected_bathymetry_datasets,
-            bathymetry_database=app.bathymetry_database,
-        )
-
-        # Save grid 
-        model.quadtree_grid.write()
-
-        # If SnapWave also generate SnapWave mesh and save it. Why?!
-        # if app.gui.getvar(group, "use_snapwave"):
-        #     snapwave_quadtree2mesh(model.grid, file_name="snapwave.nc")
-
-        # Replot everything
-        app.model["sfincs_hmt"].plot()
-
+            model.quadtree_grid.write()
+            app.model["sfincs_hmt"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating grid:\n{e}")
+            return
         dlg.close()
 
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
-
-        # app.model["sfincs_hmt"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
-        #                                                    bathymetry_database=app.bathymetry_database,
-        #                                                    zmin=app.gui.getvar("modelmaker_sfincs_hmt", "zmin"),
-        #                                                    zmax=app.gui.getvar("modelmaker_sfincs_hmt", "zmax"))
-
-        app.model["sfincs_hmt"].domain.quadtree_elevation.create(app.selected_bathymetry_datasets,
-                                                                 bathymetry_database=app.bathymetry_database,
-                                                                 zmin=app.gui.getvar("modelmaker_sfincs_hmt", "zmin"),
-                                                                 zmax=app.gui.getvar("modelmaker_sfincs_hmt", "zmax"))
-
-        app.model["sfincs_hmt"].domain.quadtree_grid.write()
-        # # If SnapWave also generate SnapWave mesh and save it
-        # if app.gui.getvar("modelmaker_sfincs_hmt", "use_snapwave"):
-        #     snapwave_quadtree2mesh(app.model["sfincs_hmt"].domain.grid, file_name="snapwave.nc")
+        try:
+            app.model["sfincs_hmt"].domain.quadtree_elevation.create(
+                app.selected_bathymetry_datasets,
+                zmin=app.gui.getvar("modelmaker_sfincs_hmt", "zmin"),
+                zmax=app.gui.getvar("modelmaker_sfincs_hmt", "zmax"),
+            )
+            app.model["sfincs_hmt"].domain.quadtree_grid.write()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating bathymetry:\n{e}")
+            return
         dlg.close()
 
     def update_mask(self):
@@ -509,8 +495,9 @@ class Toolbox(GenericToolbox):
                         update_datashader_dataframe=True
                     )
         except Exception as e:
-            app.gui.window.dialog_warning(str(e))
+            traceback.print_exc()
             dlg.close()
+            app.gui.window.dialog_warning(f"Error updating mask:\n{e}")
             return
 
         app.map.layer["sfincs_hmt"].layer["mask"].set_data(mask)
@@ -565,6 +552,7 @@ class Toolbox(GenericToolbox):
             dlg.close()
 
         except Exception as e:
+            traceback.print_exc()
             dlg.close()
             app.gui.window.dialog_warning(str(e))
             return
@@ -592,7 +580,6 @@ class Toolbox(GenericToolbox):
 
             app.model["sfincs_hmt"].domain.quadtree_subgrid.create(bathymetry_sets,
                                                         roughness_sets,
-                                                        bathymetry_database=app.bathymetry_database,
                                                         manning_land=manning_land,
                                                         manning_water=manning_water,
                                                         manning_level=manning_level,
@@ -610,6 +597,7 @@ class Toolbox(GenericToolbox):
             p.close()
 
         except Exception as e:
+            traceback.print_exc()
             p.close()
             app.gui.window.dialog_critical(f"Error generating sub-grid tables: {str(e)}")
             return
@@ -620,10 +608,15 @@ class Toolbox(GenericToolbox):
 
     def cut_inactive_cells(self):
         dlg = app.gui.window.dialog_wait("Cutting Inactive Cells ...")
-        app.model["sfincs_hmt"].domain.quadtree_grid.cut_inactive_cells()
-        app.model["sfincs_hmt"].domain.quadtree_grid.write()
-        # Replot everything
-        app.model["sfincs_hmt"].plot()
+        try:
+            app.model["sfincs_hmt"].domain.quadtree_grid.cut_inactive_cells()
+            app.model["sfincs_hmt"].domain.quadtree_grid.write()
+            app.model["sfincs_hmt"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error cutting inactive cells:\n{e}")
+            return
         dlg.close()
 
     def build_model(self):

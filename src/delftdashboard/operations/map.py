@@ -6,9 +6,10 @@ Created on Tue Jul  5 13:40:07 2022
 """
 import numpy as np
 import xarray as xr
+import geopandas as gpd
 import traceback
 from pyproj import CRS, Transformer
-# import matplotlib as mpl
+from shapely.geometry import box
 
 from delftdashboard.app import app
 
@@ -152,52 +153,29 @@ def update_background_topography_data():
             yl = [y0, y1]
 
             dxy = (yl[1] - yl[0]) / npix
-            xv = np.arange(xl[0], xl[1] + dxy, dxy)
-            yv = np.arange(yl[0], yl[1], dxy)
-            background_topography_dataset = app.gui.getvar("view_settings", "topography_dataset")
-            dataset_list = [{"name": background_topography_dataset, "zmin": -99999.9, "zmax": 99999.9}]
+            dataset_name = app.gui.getvar("view_settings", "topography_dataset")
 
             try:
-                # Add wait box
-                z = app.bathymetry_database.get_bathymetry_on_grid(xv, yv, CRS(3857), dataset_list,
-                                                                   method=interp_method,
-                                                                   waitbox=app.gui.window.dialog_wait)
+                geom = gpd.GeoDataFrame(
+                    geometry=[box(xl[0], yl[0], xl[1], yl[1])], crs=3857
+                )
+                da = app.topography_data_catalog.get_rasterdataset(
+                    dataset_name, geom=geom, zoom=(dxy, "metre")
+                )
 
-                app.map.layer["main"].layer["background_topography"].opacity = opacity
+                topo_layer = app.map.layer["main"].layer["background_topography"]
+                topo_layer.opacity = opacity
+                topo_layer.color_scale_auto = autoscaling
+                topo_layer.color_scale_symmetric = True
+                topo_layer.color_scale_symmetric_side = "min"
+                topo_layer.color_scale_cmin = zmin
+                topo_layer.color_scale_cmax = zmax
+                topo_layer.hillshading = hillshading
+                topo_layer.color_map = colormap
 
-                app.map.layer["main"].layer["background_topography"].color_scale_auto = autoscaling
-                app.map.layer["main"].layer["background_topography"].color_scale_symmetric = True
-                app.map.layer["main"].layer["background_topography"].color_scale_symmetric_side = "min"
-                app.map.layer["main"].layer["background_topography"].color_scale_cmin = zmin
-                app.map.layer["main"].layer["background_topography"].color_scale_cmax = zmax
-                app.map.layer["main"].layer["background_topography"].hillshading = hillshading
-                app.map.layer["main"].layer["background_topography"].color_map = colormap
-
-                # color_values = []
-                # color_values.append(
-                #     {"color": "lightgreen", "lower_value": -1000.0, "upper_value": -500.0}
-                # )
-                # color_values.append(
-                #     {"color": "yellow", "lower_value": -500.0, "upper_value": 0.0}
-                # )
-                # color_values.append(
-                #     {"color": "#FFA500", "lower_value": 0.0, "upper_value": 500.0}
-                # )
-                # color_values.append({"color": "red", "lower_value": 500.0, "text": "VERY HIGH!"})
-                # app.map.layer["main"].layer["background_topography"].color_values = color_values
-
-                # data["x"] = xv
-                # data["y"] = yv
-                # data["z"] = z
-                # data["crs"] = CRS(3857)
-
-                # Now make an xarray DataArray with the data
-                da = xr.DataArray(z, dims=["y", "x"], coords={"y": yv, "x": xv})
-                da = da.rio.write_crs("EPSG:3857")
                 app.background_topography = da
-                # app.background_topography.attrs["crs"] = "EPSG:3857"
 
-            except:
+            except Exception:
                 print("Error loading background topo ...")
                 traceback.print_exc()
 

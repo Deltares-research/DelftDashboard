@@ -1,89 +1,52 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for generating topobathy tiles."""
 
-@author: ormondt
-"""
-# import geopandas as gpd
 import os
-from delftdashboard.app import app
-from delftdashboard.operations import map
-# from cht_tiling.topobathy import make_topobathy_tiles
+import traceback
+
 from cht_tiling import TiledWebMap
 
-# Callbacks
+from delftdashboard.app import app
+from delftdashboard.operations import map
+
+
 def select(*args):
-    # De-activate() existing layers
+    """Activate the tiling tab."""
     map.update()
 
+
 def generate_topobathy_tiles(*args):
-    # Check what sort of model this is
+    """Generate topobathy tiles for the active model."""
     model = app.active_model
     index_path = "./tiling/indices"
     path = "./tiling/topobathy"
 
-    # First check of index tiles exist
     if not os.path.exists(index_path):
         app.gui.window.dialog_message("Please generate index tiles first !")
         return
 
-    if model.name == "sfincs_cht":
-    
-        dlg = app.gui.window.dialog_wait("Generating topo/bathy tiles ...")
-
-        dem_list = app.selected_bathymetry_datasets
-
-        # # Loop through dem_list (now only using twm)
-        # for dem in dem_list:
-        #     dem["twm"] = app.bathymetry_database.get_dataset(dem["name"]).data
-
-        # data_list = []
-
-        # # Getting tiles directly from tiled web map
-        # data_path = r"c:\work\delftdashboard\data\bathymetry\ph_dtm_leyte_samar"
-        # twm_data = TiledWebMap(data_path, "topobathy", parameter="elevation")
-        # data_list.append({"twm": twm_data, "zmin": 0.1})
-
-        # Create topo bathy tiles
-        # twmb = TiledWebMap(path, "topobathy", parameter="elevation")
-        # twmb.generate_topobathy_tiles(dem_list,
-        #                               bathymetry_database=app.bathymetry_database,
-        #                               index_path=index_path,
-        #                               write_metadata=False,
-        #                               parallel=False
-        #                              )
-        twmb = TiledWebMap(path,
-                           type="data",
-                           parameter="elevation",
-                           data=dem_list,
-                           bathymetry_database=app.bathymetry_database,
-                           index_path=index_path)
-        twmb.make()
-
-        # make_topobathy_tiles(path,
-        #                     dem_list=dem_list,
-        #                     bathymetry_database=app.bathymetry_database,
-        #                     index_path=index_path,
-        #                     zoom_range=zoom_range,
-        #                     quiet=False,
-        #                     make_webviewer=True,
-        #                     write_metadata=False,    
-        #                     make_availability_file=False,
-        #                     make_lower_levels=True,
-        #                     make_highest_level=True,
-        #                     skip_existing=False,
-        #                     interpolation_method="linear",
-        #                     encoder="terrarium",
-        #                     compress_level=6,
-        # )
-
-        dlg.close()
-
-    elif model.name == "hurrywave":
-        app.gui.window.dialog_message(f"Tiling not needed for {model.name} !")
-
-    else:        
+    if model.name not in ("sfincs_cht", "sfincs_hmt"):
         app.gui.window.dialog_message(f"Tiling not supported for {model.name}")
+        return
+
+    dlg = app.gui.window.dialog_wait("Generating topo/bathy tiles ...")
+    try:
+        dem_list = app.selected_bathymetry_datasets
+        twmb = TiledWebMap(
+            path,
+            type="data",
+            parameter="elevation",
+            data=dem_list,
+            data_catalog=app.topography_data_catalog.catalog,
+            index_path=index_path,
+        )
+        twmb.make()
+    except Exception as e:
+        traceback.print_exc()
+        dlg.close()
+        app.gui.window.dialog_warning(f"Error generating topobathy tiles:\n{e}")
+        return
+    dlg.close()
+
 
 def edit_variables(*args):
-    pass
+    """Placeholder for variable editing."""

@@ -5,6 +5,8 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 
+import traceback
+
 import numpy as np
 import geopandas as gpd
 from pyproj import CRS
@@ -113,10 +115,10 @@ class Toolbox(GenericToolbox):
 
 
         # Bathymetry
-        source_names, sources = app.bathymetry_database.sources()
+        source_names, sources = app.topography_data_catalog.sources()
         app.gui.setvar(group, "bathymetry_source_names", source_names)
         app.gui.setvar(group, "active_bathymetry_source", source_names[0])
-        dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source_names[0])
+        dataset_names, dataset_long_names, dataset_source_names = app.topography_data_catalog.dataset_names(source=source_names[0])
         app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
         app.gui.setvar(group, "bathymetry_dataset_index", 0)
         app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
@@ -245,177 +247,238 @@ class Toolbox(GenericToolbox):
     def generate_grid(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Generating grid ...")
-        # self.clear_layers()
-        model = app.model["delft3dfm"].domain
-        model.clear_spatial_attributes()    
-        x0       = app.gui.getvar(group, "x0")
-        y0       = app.gui.getvar(group, "y0")
-        dx       = app.gui.getvar(group, "dx")
-        dy       = app.gui.getvar(group, "dy")
-        nmax     = app.gui.getvar(group, "nmax")
-        mmax     = app.gui.getvar(group, "mmax")
-        model.input.geometry.netfile.filepath = "flow_net.nc"
-        app.gui.setvar("delft3dfm", "netfile", model.input.geometry.netfile.filepath)
+        try:
+            # self.clear_layers()
+            model = app.model["delft3dfm"].domain
+            model.clear_spatial_attributes()
+            x0       = app.gui.getvar(group, "x0")
+            y0       = app.gui.getvar(group, "y0")
+            dx       = app.gui.getvar(group, "dx")
+            dy       = app.gui.getvar(group, "dy")
+            nmax     = app.gui.getvar(group, "nmax")
+            mmax     = app.gui.getvar(group, "mmax")
+            model.input.geometry.netfile.filepath = "flow_net.nc"
+            app.gui.setvar("delft3dfm", "netfile", model.input.geometry.netfile.filepath)
 
-        # if len(self.refinement_polygon) == 0:
-        #     refpol = None
-        # else:
-        #     # Make list of separate gdfs for each polygon
-        #     refpol = self.refinement_polygon
+            # if len(self.refinement_polygon) == 0:
+            #     refpol = None
+            # else:
+            #     # Make list of separate gdfs for each polygon
+            #     refpol = self.refinement_polygon
 
-        # Build grid 
-        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
-        model.grid.build(x0, y0, nmax, mmax, dx, dy, bathymetry_list=bathymetry_list, bathymetry_database=app.bathymetry_database)
-        # Save grid 
-        model.grid.write()
+            # Build grid
+            bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+            model.grid.build(x0, y0, nmax, mmax, dx, dy, bathymetry_list=bathymetry_list, data_catalog=app.topography_data_catalog.catalog)
+            # Save grid
+            model.grid.write()
 
-        # Replot everything
-        app.model["delft3dfm"].plot()
-
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating grid:\n{e}")
+            return
         dlg.close()
 
     def generate_depth_refinement(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Generating refinement ...")
-        model = app.model["delft3dfm"].domain
-        
-        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+        try:
+            model = app.model["delft3dfm"].domain
 
-        if bathymetry_list:
-            model.grid.refine_depth(bathymetry_list, bathymetry_database=app.bathymetry_database)
-            
-            # Interpolate bathymetry onto the grid (Update: now done only for connect nodes)
-            # model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
-        
-            # Save grid 
-            model.grid.write()
+            bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
 
-            # Replot everything
-            app.model["delft3dfm"].plot()
-        else:
-            print("No bathymetry selected")
+            if bathymetry_list:
+                model.grid.refine_depth(bathymetry_list, data_catalog=app.topography_data_catalog.catalog)
 
+                # Interpolate bathymetry onto the grid (Update: now done only for connect nodes)
+                # model.grid.set_bathymetry(bathymetry_list, data_catalog=app.topography_data_catalog.catalog)
+
+                # Save grid
+                model.grid.write()
+
+                # Replot everything
+                app.model["delft3dfm"].plot()
+            else:
+                print("No bathymetry selected")
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating depth refinement:\n{e}")
+            return
         dlg.close()
 
     def generate_polygon_depth_refinement(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Generating refinement ...")
-        model = app.model["delft3dfm"].domain
-        
-        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+        try:
+            model = app.model["delft3dfm"].domain
 
-        if bathymetry_list:
-            model.grid.refine_polygon_depth(bathymetry_list, bathymetry_database=app.bathymetry_database, gdf = self.refinement_polygon)
-            
-            # Interpolate bathymetry onto the grid (Update: now done only for connect nodes)
-            # model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
-        
-            # Save grid 
-            model.grid.write()
+            bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
 
-            # Replot everything
-            app.model["delft3dfm"].plot()
-        else:
-            print("No bathymetry selected")
+            if bathymetry_list:
+                model.grid.refine_polygon_depth(bathymetry_list, data_catalog=app.topography_data_catalog.catalog, gdf = self.refinement_polygon)
 
+                # Interpolate bathymetry onto the grid (Update: now done only for connect nodes)
+                # model.grid.set_bathymetry(bathymetry_list, data_catalog=app.topography_data_catalog.catalog)
+
+                # Save grid
+                model.grid.write()
+
+                # Replot everything
+                app.model["delft3dfm"].plot()
+            else:
+                print("No bathymetry selected")
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating polygon depth refinement:\n{e}")
+            return
         dlg.close()
 
     def generate_polygon_refinement(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Generating refinement ...")
-        model = app.model["delft3dfm"].domain
-        
-        model.grid.refine_polygon(gdf = self.refinement_polygon)
-        
-        # Interpolate bathymetry onto the grid (Update: now done only for connect nodes)
-        # bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
-        # if bathymetry_list:
-        #     model.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
-      
-        # Save grid 
-        model.grid.write()
+        try:
+            model = app.model["delft3dfm"].domain
 
-        # Replot everything
-        app.model["delft3dfm"].plot()
+            model.grid.refine_polygon(gdf = self.refinement_polygon)
 
+            # Interpolate bathymetry onto the grid (Update: now done only for connect nodes)
+            # bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+            # if bathymetry_list:
+            #     model.grid.set_bathymetry(bathymetry_list, data_catalog=app.topography_data_catalog.catalog)
+
+            # Save grid
+            model.grid.write()
+
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating polygon refinement:\n{e}")
+            return
         dlg.close()
 
     def connect_nodes(self):
         group = "modelmaker_delft3dfm"
         dlg = app.gui.window.dialog_wait("Connecting nodes ...")
-        model = app.model["delft3dfm"].domain
+        try:
+            model = app.model["delft3dfm"].domain
 
-        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+            bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
 
-        if bathymetry_list:
-            model.grid.connect_nodes(bathymetry_list, bathymetry_database=app.bathymetry_database)
-            app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
+            if bathymetry_list:
+                model.grid.connect_nodes(bathymetry_list, data_catalog=app.topography_data_catalog.catalog)
+                app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list, data_catalog=app.topography_data_catalog.catalog)
 
-            # Save grid 
-            model.grid.write()
+                # Save grid
+                model.grid.write()
 
-            # Replot everything
-            app.model["delft3dfm"].plot()
-        else:
-            print("No bathymetry selected")
-
+                # Replot everything
+                app.model["delft3dfm"].plot()
+            else:
+                print("No bathymetry selected")
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error connecting nodes:\n{e}")
+            return
         dlg.close()
 
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
-        bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
-        app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list, bathymetry_database=app.bathymetry_database)
-        app.model["delft3dfm"].domain.grid.write()
+        try:
+            bathymetry_list = app.toolbox["modelmaker_delft3dfm"].selected_bathymetry_datasets
+            app.model["delft3dfm"].domain.grid.set_bathymetry(bathymetry_list, data_catalog=app.topography_data_catalog.catalog)
+            app.model["delft3dfm"].domain.grid.write()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating bathymetry:\n{e}")
+            return
         dlg.close()
 
     def generate_bnd_coastline(self):
         dlg = app.gui.window.dialog_wait("Creating open boundary based on coastline ...")
-        res = app.gui.getvar("modelmaker_delft3dfm", "boundary_dx")
-        if app.crs.is_geographic:
-            res = res / 111111.0
-        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withcoastlines = True, resolution = res)
-        app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
-        # app.model["delft3dfm"].domain.grid.write()
-        # Replot everything
-        app.model["delft3dfm"].plot()
+        try:
+            res = app.gui.getvar("modelmaker_delft3dfm", "boundary_dx")
+            if app.crs.is_geographic:
+                res = res / 111111.0
+            app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withcoastlines = True, resolution = res)
+            app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
+            # app.model["delft3dfm"].domain.grid.write()
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error creating boundary from coastline:\n{e}")
+            return
         dlg.close()
 
     def generate_bnd_polygon(self):
         dlg = app.gui.window.dialog_wait("Creating open boundary based on polygon ...")
-        gdf = self.open_boundary_polygon
-        res = app.gui.getvar("modelmaker_delft3dfm", "boundary_dx")
-        if app.crs.is_geographic:
-            res = res / 111111.0
-        app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withpolygon = gdf, resolution = res)
-        app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
-        # app.model["delft3dfm"].domain.grid.write()
-        # Replot everything
-        app.model["delft3dfm"].plot()
+        try:
+            gdf = self.open_boundary_polygon
+            res = app.gui.getvar("modelmaker_delft3dfm", "boundary_dx")
+            if app.crs.is_geographic:
+                res = res / 111111.0
+            app.model["delft3dfm"].domain.boundary_conditions.generate_bnd(bnd_withpolygon = gdf, resolution = res)
+            app.model["delft3dfm"].domain.boundary_conditions.write_bnd()
+            # app.model["delft3dfm"].domain.grid.write()
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error creating boundary from polygon:\n{e}")
+            return
         dlg.close()
 
     def load_bnd(self, fname):
         dlg = app.gui.window.dialog_wait("Loading boundary ...")
-        app.model["delft3dfm"].domain.boundary_conditions.load_bnd(file_name = fname)
-        # app.model["delft3dfm"].domain.grid.write()
-        # Replot everything
-        app.model["delft3dfm"].plot()
+        try:
+            app.model["delft3dfm"].domain.boundary_conditions.load_bnd(file_name = fname)
+            # app.model["delft3dfm"].domain.grid.write()
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error loading boundary:\n{e}")
+            return
         dlg.close()
 
     def cut_polygon(self):
         dlg = app.gui.window.dialog_wait("Cutting Cells based on polygon ...")
-        gdf = self.exclude_polygon
-        app.model["delft3dfm"].domain.grid.delete_cells(delete_withpolygon = gdf)
-        app.model["delft3dfm"].domain.grid.write()
-        # Replot everything
-        app.model["delft3dfm"].plot()
+        try:
+            gdf = self.exclude_polygon
+            app.model["delft3dfm"].domain.grid.delete_cells(delete_withpolygon = gdf)
+            app.model["delft3dfm"].domain.grid.write()
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error cutting cells with polygon:\n{e}")
+            return
         dlg.close()
 
     def cut_coastline(self):
         dlg = app.gui.window.dialog_wait("Cutting Cells based on coastline ...")
-        app.model["delft3dfm"].domain.grid.delete_cells(delete_withcoastlines=True)
-        app.model["delft3dfm"].domain.grid.write()
-        # Replot everything
-        app.model["delft3dfm"].plot()
+        try:
+            app.model["delft3dfm"].domain.grid.delete_cells(delete_withcoastlines=True)
+            app.model["delft3dfm"].domain.grid.write()
+            # Replot everything
+            app.model["delft3dfm"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error cutting cells with coastline:\n{e}")
+            return
         dlg.close()
 
     def build_model(self):

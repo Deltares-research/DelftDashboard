@@ -20,8 +20,8 @@ import pydantic.fields
 
 from guitares.gui import GUI
 from guitares.colormap import read_color_maps
-from cht_bathymetry import BathymetryDatabase
 from cht_meteo import MeteoDatabase
+from delftdashboard.operations.topography import TopographyDataCatalog
 from cht_tide import TideModelDatabase
 from .gui import build_gui_config
 
@@ -147,41 +147,11 @@ def initialize():
         app.online = False
 
 
-    # Bathymetry database (initialize local database)
-    if "bathymetry_database_path" not in app.config:
-        app.config["bathymetry_database_path"] = os.path.join(app.config["data_path"], "bathymetry")
-    s3_bucket = app.config["s3_bucket"]
-    s3_key = f"data/bathymetry"
-    app.bathymetry_database = BathymetryDatabase(path=app.config["bathymetry_database_path"],
-                                                 s3_bucket=s3_bucket,
-                                                 s3_key=s3_key,
-                                                 check_online=app.online)
-
-    # Selected bathy/topo datasets
-    # Using a list of dictionaries to store the datasets, e.g.:
-    # app.selected_bathymetry_datasets = [{"name": "dataset1", "zmin": -10.0, "zmax": 10.0},
-    app.selected_bathymetry_datasets = []
-    source_names, sources = app.bathymetry_database.sources()
-    dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source_names[0])
-    group = "bathy_topo_selector"
-    app.gui.setvar(group, "names", [])
-    app.gui.setvar(group, "zmin", [])
-    app.gui.setvar(group, "bathymetry_source_names", source_names)
-    app.gui.setvar(group, "active_bathymetry_source", source_names[0])
-    app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
-    app.gui.setvar(group, "bathymetry_dataset_index", 0)
-    app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
-    app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
-    app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
-    app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
-    app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
+    # Topography/bathymetry data catalog
+    initialize_topography()
 
     # Define some other variables
     app.crs = CRS(4326)
-    if "default_bathymetry_dataset" in app.config:
-        app.background_topography = app.config["default_bathymetry_dataset"]
-    else:
-        app.background_topography  = app.bathymetry_database.dataset_names()[0][0]
 
     # Meteo database
     if "meteo_database_path" not in app.config:
@@ -265,6 +235,50 @@ def initialize():
 
     # Now build up GUI config
     build_gui_config()
+
+def initialize_topography():
+    """Load the topography/bathymetry data catalog and set up GUI variables."""
+    if "bathymetry_database_path" not in app.config:
+        app.config["bathymetry_database_path"] = os.path.join(
+            app.config["data_path"], "bathymetry"
+        )
+    path = app.config["bathymetry_database_path"]
+
+    app.topography_data_catalog = TopographyDataCatalog(path)
+    # Backward-compatible alias for toolboxes that still use cht_bathymetry
+    app.bathymetry_database = app.topography_data_catalog
+
+    # Selected datasets (list of dicts: {"name": ..., "zmin": ..., "zmax": ...})
+    app.selected_bathymetry_datasets = []
+
+    # Populate GUI variables for the bathy/topo selector
+    source_names, _ = app.topography_data_catalog.sources()
+    dataset_names, _, _ = app.topography_data_catalog.dataset_names(
+        source=source_names[0]
+    )
+    group = "bathy_topo_selector"
+    app.gui.setvar(group, "names", [])
+    app.gui.setvar(group, "zmin", [])
+    app.gui.setvar(group, "bathymetry_source_names", source_names)
+    app.gui.setvar(group, "active_bathymetry_source", source_names[0])
+    app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
+    app.gui.setvar(group, "bathymetry_dataset_index", 0)
+    app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
+    app.gui.setvar(group, "selected_bathymetry_dataset_index", 0)
+    app.gui.setvar(group, "selected_bathymetry_dataset_zmin", -99999.0)
+    app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
+    app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
+
+    # Default background topography
+    if "default_bathymetry_dataset" in app.config:
+        app.background_topography = app.config["default_bathymetry_dataset"]
+    else:
+        all_names, _, _ = app.topography_data_catalog.dataset_names()
+        if "gebco_2024" in all_names:
+            app.background_topography = "gebco_2024"
+        else:
+            app.background_topography = all_names[0] if all_names else None
+
 
 def initialize_toolboxes():
 

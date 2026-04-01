@@ -23,6 +23,8 @@ class Model(GenericModel):
 
     def initialize(self):
         self.domain = SfincsModel(root=".", mode="w")
+        if hasattr(app, "topography_data_catalog"):
+            app.topography_data_catalog.add_to_model_catalog(self.domain.data_catalog)
         self.domain.config.set("epsg", app.crs.to_epsg())
         # Set to "r+" to allow explicit reads without auto-reading on init
         self.domain.root.mode = "r+"

@@ -126,31 +126,31 @@ def build_gui_config():
     app.gui.config["menu"].append(menu)
 
     # Topography
-    source_names, sources = app.bathymetry_database.sources()
+    source_names, _ = app.topography_data_catalog.sources()
     menu = {}
     menu["text"] = "Topography"
     menu["id"] = "topography"
     menu["module"] = "delftdashboard.menu.topography"
     menu["menu"] = []
-    for source in sources:
+    for source_name in source_names:
+        names, long_names, _ = app.topography_data_catalog.dataset_names(source=source_name)
         source_menu = {}
-        source_menu["text"] = source.name
-        source_menu["id"] = "topography." + source.name
+        source_menu["text"] = source_name
+        source_menu["id"] = f"topography.{source_name}"
         source_menu["menu"] = []
-        for dataset in source.dataset:
+        for name, long_name in zip(names, long_names):
             dependency = [{"action": "check",
                            "checkfor": "all",
                            "check": [{"variable": "topography_dataset",
                                       "operator": "eq",
-                                      "value": dataset.name}]
+                                      "value": name}]
                            }]
-                
-            source_menu["menu"].append({"id": "topography." + dataset.name,
+            source_menu["menu"].append({"id": f"topography.{name}",
                                         "variable_group": "view_settings",
-                                        "text": dataset.long_name,
+                                        "text": long_name,
                                         "separator": False,
                                         "checkable": True,
-                                        "option": dataset.name,
+                                        "option": name,
                                         "method": "select_dataset",
                                         "dependency": dependency})
         menu["menu"].append(source_menu)

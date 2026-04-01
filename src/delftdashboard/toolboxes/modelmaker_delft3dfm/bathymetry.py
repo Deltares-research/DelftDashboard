@@ -15,7 +15,7 @@ def select(*args):
 
 def select_bathymetry_source(*args):
     source = args[0]
-    dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source)
+    dataset_names, dataset_long_names, dataset_source_names = app.topography_data_catalog.dataset_names(source=source)
     app.gui.setvar("modelmaker_delft3dfm", "bathymetry_dataset_names", dataset_names)
     app.gui.setvar("modelmaker_delft3dfm", "bathymetry_dataset_index", 0)
 

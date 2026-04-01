@@ -34,6 +34,8 @@ class Model(GenericModel):
         """
         self.clear_layers()
         self.domain = HurrywaveModel(root=".", mode="w")
+        if hasattr(app, "topography_data_catalog"):
+            app.topography_data_catalog.add_to_model_catalog(self.domain.data_catalog)
         self.domain.config.set("crs_epsg", app.crs.to_epsg(), skip_validation=True)
         self.set_gui_variables()
         # Switch to r+ so explicit reads work without auto-reading on init
