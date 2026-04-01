@@ -54,6 +54,7 @@ element:
     option_string: ["Time Series", "2D Spectra"]
     option_value: ["timeseries", "spectra"]
     method: select_boundary_forcing
+    tooltip: Choose between parametric time series or 2D spectral boundary forcing
   - style: pushbutton
     text: Create Points
     position:

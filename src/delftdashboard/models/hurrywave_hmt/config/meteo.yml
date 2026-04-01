@@ -16,6 +16,7 @@ element:
     text: File Type
     variable: wind_type
     method: edit
+    tooltipstring: Type of meteorological forcing input
     option_string:
     - Uniform
     - Spider web

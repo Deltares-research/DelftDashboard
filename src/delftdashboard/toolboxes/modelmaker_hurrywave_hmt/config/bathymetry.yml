@@ -15,6 +15,7 @@ element:
   option_string:
     variable: bathymetry_dataset_names
     variable_group: bathy_topo_selector
+  tooltip: Select a bathymetry dataset from this source
 - style: popupmenu
   position:
     x: 10
@@ -32,6 +33,7 @@ element:
   option_value:
     variable: bathymetry_source_names
     variable_group: bathy_topo_selector
+  tooltip: Select the bathymetry data source
 - style: pushbutton
   position:
     x: 220
@@ -41,6 +43,7 @@ element:
   text: "Use Dataset ->"
   method: use_dataset
   module: delftdashboard.operations.bathy_topo_selector
+  tooltip: Add selected dataset to the list of datasets to use
 - style: pushbutton
   position:
     x: 220
@@ -51,6 +54,7 @@ element:
   method: info
   module: delftdashboard.operations.bathy_topo_selector
   enable: False
+  tooltip: Show information about the selected dataset
 - style: listbox
   position:
     x: 310
@@ -67,6 +71,7 @@ element:
   option_string:
     variable: selected_bathymetry_dataset_names
     variable_group: bathy_topo_selector
+  tooltip: Datasets used for bathymetry generation (higher priority at top)
 - style: edit
   position:
     x: 340
@@ -116,6 +121,7 @@ element:
   text: "Remove"
   method: remove_selected_bathymetry_dataset
   module: delftdashboard.operations.bathy_topo_selector
+  tooltip: Remove selected dataset from the list
   dependency:
   - action: enable
     checkfor: all
@@ -133,6 +139,7 @@ element:
   text: "Move Up"
   method: move_up_selected_bathymetry_dataset
   module: delftdashboard.operations.bathy_topo_selector
+  tooltip: Move selected dataset up (higher priority)
   dependency:
   - action: enable
     checkfor: all
@@ -150,6 +157,7 @@ element:
   text: "Move Down"
   method: move_down_selected_bathymetry_dataset
   module: delftdashboard.operations.bathy_topo_selector
+  tooltip: Move selected dataset down (lower priority)
   dependency:
   - action: enable
     checkfor: all

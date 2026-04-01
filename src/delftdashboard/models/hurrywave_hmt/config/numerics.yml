@@ -46,7 +46,7 @@ element:
     text: Directional Bins
     variable: ntheta
     method: set_model_variables
-    tooltipstring: Edit number of frequency bins
+    tooltipstring: Edit number of directional bins
 - style: panel
   title: Limiters
   position:
@@ -74,4 +74,4 @@ element:
     text: Dmx2 (-)
     variable: dmx2
     method: set_model_variables
-    tooltipstring: Edit DMX1
+    tooltipstring: Edit DMX2

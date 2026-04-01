@@ -23,8 +23,9 @@ class Model(GenericModel):
 
     def initialize(self):
         self.domain = SfincsModel(root=".", mode="w")
-        # self.domain = SfincsModel(root=".", mode="r+")
         self.domain.config.set("epsg", app.crs.to_epsg())
+        # Set to "r+" to allow explicit reads without auto-reading on init
+        self.domain.root.mode = "r+"
         self.set_gui_variables()
         self.observation_points_changed = False
         self.cross_sections_changed = False

@@ -7,9 +7,10 @@ element:
     width: 110
     height: 20
   method: create_boundary_points
+  tooltip: Create equally spaced boundary points along the open boundary
 - style: edit
   text: Distance (m)
-  text_position: right  
+  text_position: right
   position:
     x: 130
     y: 100
@@ -17,4 +18,5 @@ element:
     height: 20
   variable: boundary_dx
   variable_group: hurrywave_hmt
+  tooltip: Spacing between boundary points in metres
 

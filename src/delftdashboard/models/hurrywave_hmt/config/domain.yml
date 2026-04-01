@@ -16,6 +16,7 @@ element:
     text: X0
     variable: x0
     enable: False
+    tooltipstring: X-coordinate of the grid origin
   - style: edit
     position:
       x: 160
@@ -25,6 +26,7 @@ element:
     text: Y0
     variable: y0
     enable: False
+    tooltipstring: Y-coordinate of the grid origin
   - style: edit
     position:
       x: 60
@@ -34,6 +36,7 @@ element:
     text: MMax
     variable: mmax
     enable: False
+    tooltipstring: Number of grid cells in the x-direction
   - style: edit
     position:
       x: 160
@@ -43,6 +46,7 @@ element:
     text: NMax
     variable: nmax
     enable: False
+    tooltipstring: Number of grid cells in the y-direction
   - style: edit
     position:
       x: 60
@@ -52,6 +56,7 @@ element:
     text: dX
     variable: dx
     enable: False
+    tooltipstring: Grid cell size in the x-direction
   - style: edit
     position:
       x: 160
@@ -61,6 +66,7 @@ element:
     text: dY
     variable: dy
     enable: False
+    tooltipstring: Grid cell size in the y-direction
   - style: edit
     position:
       x: 60
@@ -70,3 +76,4 @@ element:
     text: Rotation
     variable: rotation
     enable: False
+    tooltipstring: Grid rotation angle in degrees

@@ -18,6 +18,7 @@ element:
     select: index
     option_string:
       variable: boundary_polygon_names
+    tooltip: Select open boundary polygon
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -26,6 +27,7 @@ element:
       width: 80
       height: 20
     method: draw_boundary_polygon
+    tooltip: Draw a polygon to mark open boundary cells
   - style: pushbutton
     text: Delete Polygon
     position:
@@ -34,6 +36,7 @@ element:
       width: 80
       height: 20
     method: delete_boundary_polygon
+    tooltip: Delete selected boundary polygon
     dependency:
     - action: enable
       checkfor: all
@@ -49,6 +52,7 @@ element:
       width: 80
       height: 20
     method: load_boundary_polygon
+    tooltip: Load boundary polygon from file
   - style: pushbutton
     text: Save Polygon
     position:
@@ -57,6 +61,7 @@ element:
       width: 80
       height: 20
     method: save_boundary_polygon
+    tooltip: Save boundary polygon to file
     dependency:
     - action: enable
       checkfor: all
@@ -72,6 +77,7 @@ element:
       height: 20
     text: Zmax
     variable: boundary_zmax
+    tooltip: Maximum elevation for boundary cells
   - style: edit
     position:
       x: 215
@@ -80,6 +86,7 @@ element:
       height: 20
     text: Zmin
     variable: boundary_zmin
+    tooltip: Minimum elevation for boundary cells
 - style: pushbutton
   text: Update Mask
   position:
@@ -88,6 +95,7 @@ element:
     width: 80
     height: 20
   method: update_mask
+  tooltip: Recompute the mask based on current settings
 - style: pushbutton
   text: Cut Inactive Cells
   position:
@@ -96,4 +104,4 @@ element:
     width: 80
     height: 20
   method: cut_inactive_cells
-
+  tooltip: Remove inactive cells from the grid to reduce model size

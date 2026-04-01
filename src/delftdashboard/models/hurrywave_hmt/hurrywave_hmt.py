@@ -14,9 +14,21 @@ class Model(GenericModel):
         self.long_name = "HurryWave (HydroMT)"
 
     def initialize(self):
+        """initialize is called when creating a new model. It sets up an empty model with default values.
+           This happens when:
+             1) the user clicks "New model" in the menu. 
+             2) the user changes the coordinate reference system (CRS) in the menu, which triggers a new model initialization with the new CRS.
+        """
+        # Clear existing map layers
+        self.clear_layers()
+        # Initialize an empty model with default values
         self.domain = HurrywaveModel(root=".", mode="w")
+        # Set the CRS to the current app CRS
         self.domain.config.set("crs_epsg", app.crs.to_epsg(), skip_validation=True)
+        # Set all GUI variables to the default values from the model
         self.set_gui_variables()
+        # Set to "r+" to allow explicit reads without auto-reading on init
+        self.domain.root.mode = "r+" 
 
     def add_layers(self):
         layer = app.map.add_layer("hurrywave_hmt")
@@ -95,13 +107,23 @@ class Model(GenericModel):
             path = os.path.dirname(filename)
             if not path:
                 path = os.getcwd()
+            # Change working directory to the model path
             os.chdir(path)
+            # Clear map layers
+            self.clear_layers()
+            # Load model and set GUI variables
             self.domain = HurrywaveModel(root=path, mode="r+")
+            # Read the entire model
             self.domain.read()
+            # Set all GUI variables to the values from the model
             self.set_gui_variables()
+            # Change map CRS to model CRS
             map.set_crs(self.domain.crs)
+            # Plot all model layers
             self.plot()
+            # Close the load dialog
             dlg.close()
+            # Update the GUI
             app.gui.window.update()
 
             # Zoom to model extent

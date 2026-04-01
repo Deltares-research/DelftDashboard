@@ -15,6 +15,7 @@ element:
       height: 20
     text: Zmax
     variable: global_zmax
+    tooltip: Maximum elevation for active cells
   - style: edit
     position:
       x: 35
@@ -23,6 +24,7 @@ element:
       height: 20
     text: Zmin
     variable: global_zmin
+    tooltip: Minimum elevation for active cells
 - style: panel
   title: Include Polygons
   position:
@@ -42,6 +44,7 @@ element:
     select: index
     option_string:
       variable: include_polygon_names
+    tooltip: Select include polygon
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -50,6 +53,7 @@ element:
       width: 80
       height: 20
     method: draw_include_polygon
+    tooltip: Draw a polygon to force cells active
   - style: pushbutton
     text: Delete Polygon
     position:
@@ -58,6 +62,7 @@ element:
       width: 80
       height: 20
     method: delete_include_polygon
+    tooltip: Delete selected include polygon
     dependency:
     - action: enable
       checkfor: all
@@ -73,6 +78,7 @@ element:
       width: 80
       height: 20
     method: load_include_polygon
+    tooltip: Load include polygon from file
   - style: pushbutton
     text: Save Polygon
     position:
@@ -81,6 +87,7 @@ element:
       width: 80
       height: 20
     method: save_include_polygon
+    tooltip: Save include polygon to file
     dependency:
     - action: enable
       checkfor: all
@@ -96,6 +103,7 @@ element:
       height: 20
     text: Zmax
     variable: include_zmax
+    tooltip: Maximum elevation for included cells
   - style: edit
     position:
       x: 215
@@ -104,6 +112,7 @@ element:
       height: 20
     text: Zmin
     variable: include_zmin
+    tooltip: Minimum elevation for included cells
 - style: panel
   title: Exclude Polygons
   position:
@@ -123,6 +132,7 @@ element:
     select: index
     option_string:
       variable: exclude_polygon_names
+    tooltip: Select exclude polygon
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -131,6 +141,7 @@ element:
       width: 80
       height: 20
     method: draw_exclude_polygon
+    tooltip: Draw a polygon to force cells inactive
   - style: pushbutton
     text: Delete Polygon
     position:
@@ -139,6 +150,7 @@ element:
       width: 80
       height: 20
     method: delete_exclude_polygon
+    tooltip: Delete selected exclude polygon
     dependency:
     - action: enable
       checkfor: all
@@ -154,6 +166,7 @@ element:
       width: 80
       height: 20
     method: load_exclude_polygon
+    tooltip: Load exclude polygon from file
   - style: pushbutton
     text: Save Polygon
     position:
@@ -162,6 +175,7 @@ element:
       width: 80
       height: 20
     method: save_exclude_polygon
+    tooltip: Save exclude polygon to file
     dependency:
     - action: enable
       checkfor: all
@@ -177,6 +191,7 @@ element:
       height: 20
     text: Zmax
     variable: exclude_zmax
+    tooltip: Maximum elevation for excluded cells
   - style: edit
     position:
       x: 215
@@ -185,6 +200,7 @@ element:
       height: 20
     text: Zmin
     variable: exclude_zmin
+    tooltip: Minimum elevation for excluded cells
 - style: pushbutton
   text: Update Mask
   position:
@@ -193,6 +209,7 @@ element:
     width: 80
     height: 20
   method: update_mask
+  tooltip: Recompute the mask based on current settings
 - style: pushbutton
   text: Cut Inactive Cells
   position:
@@ -201,4 +218,4 @@ element:
     width: 80
     height: 20
   method: cut_inactive_cells
-
+  tooltip: Remove inactive cells from the grid to reduce model size

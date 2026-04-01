@@ -728,7 +728,7 @@ QCheckBox::indicator:disabled
 
 
 /*-----QRadioButton-----*/
-QRadioButton 
+QRadioButton
 {
 	color: #fff;
 	background-color: transparent;
@@ -736,21 +736,31 @@ QRadioButton
 }
 
 
-QRadioButton::indicator::unchecked:hover 
+QRadioButton::indicator
+{
+	width: 11px;
+	height: 11px;
+	border-radius: 6px;
+	border: 1px solid #ffffff;
+	background-color: transparent;
+}
+
+
+QRadioButton::indicator::unchecked:hover
 {
 	background-color: #d3d3d3;
-	border: 2px solid #002b2b;
+	border: 1px solid #ffffff;
 	border-radius: 6px;
 }
 
 
-QRadioButton::indicator::checked 
+QRadioButton::indicator::checked
 {
 	border: 2px solid #52beff;
 	border-radius: 6px;
-	background-color: #002b2b;  
-	width: 9px; 
-	height: 9px; 
+	background-color: #52beff;
+	width: 9px;
+	height: 9px;
 
 }
 

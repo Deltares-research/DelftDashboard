@@ -16,6 +16,7 @@ element:
     text: Reference Time
     variable: tref
     method: set_model_variables
+    tooltipstring: Reference date/time for the simulation
   - style: datetimeedit
     position:
       x: 80
@@ -25,6 +26,7 @@ element:
     text: Start Time
     variable: tstart
     method: set_model_variables
+    tooltipstring: Start date/time of the simulation
   - style: datetimeedit
     position:
       x: 80
@@ -34,6 +36,7 @@ element:
     text: Stop Time
     variable: tstop
     method: set_model_variables
+    tooltipstring: End date/time of the simulation
   - style: edit
     position:
       x: 80
@@ -43,3 +46,4 @@ element:
     text: Spin-up Time (s)
     variable: tspinup
     method: set_model_variables
+    tooltipstring: Duration of the spin-up period in seconds

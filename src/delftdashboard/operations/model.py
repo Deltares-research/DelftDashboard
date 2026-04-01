@@ -4,7 +4,7 @@ Created on Tue Jul  5 13:40:07 2022
 
 @author: ormondt
 """
-import os
+
 from delftdashboard.app import app
 from delftdashboard.operations.toolbox import select_toolbox
 
@@ -15,20 +15,24 @@ class GenericModel:
         self.exe_path  = None
 
     def open(self):
+        # Method is overridden by inheriting classes.
         pass
 
     def add_layers(self):
+        # Method is overridden by inheriting classes.
         pass
 
-    def delete_layers(self):
-        # Should not use this method, use clear_layers instead
-        if self.name in app.map.layer:
-            app.map.layer[self.name].delete()
+    # def delete_layers(self):
+    #     # Should not use this method! Use clear_layers instead!
+    #     if self.name in app.map.layer:
+    #         app.map.layer[self.name].delete()
 
     def clear_layers(self):
-        # Clear data and remove from map
-        if self.name in app.map.layer:
-            app.map.layer[self.name].clear()
+        """Clears model layers on map, but keep the layer objects for later use."""
+        # First check if app actually has a map and layer, because this method is also called during initialization before the map and layers are created.
+        if hasattr(app, "map") and hasattr(app.map, "layer"):
+            if self.name in app.map.layer:
+                app.map.layer[self.name].clear()
 
     def select(self):
 
@@ -104,12 +108,15 @@ class GenericModel:
         app.gui.window.update()
 
     def get_view_menu(self):
+        # Method is overridden by inheriting classes.
         return {}
 
     def set_view_menu(self):
+        # Method is overridden by inheriting classes.
         pass
 
     def set_crs(self):        
+        # Method is overridden by inheriting classes.
         pass
 
 def select_model(model_name):

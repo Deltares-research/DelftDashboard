@@ -8,6 +8,7 @@ element:
   text: Wind Drag
   variable: winddrag
   method: set_model_variables
+  tooltipstring: Wind drag coefficient formulation
   option_string:
   - Zijlema (2012)
   - Wu (1982)
@@ -23,6 +24,7 @@ element:
   text: Cd Cap
   variable: cdcap
   method: set_model_variables
+  tooltipstring: Maximum wind drag coefficient (Wu formulation only)
   dependency:
   - action: visible
     checkfor: all
