@@ -21,6 +21,7 @@ element:
       variable: dataset_long_names
     option_value:
       variable: dataset_names
+    tooltip: Select the watershed dataset
   - style: listbox
     text: Level
     textposition: above
@@ -36,6 +37,7 @@ element:
       variable: level_long_names
     option_value:
       variable: level_names
+    tooltip: Select the watershed level
   - style: pushbutton
     position:
       x: 430
@@ -44,6 +46,7 @@ element:
       height: 20
     method: update
     text: Update
+    tooltip: Update the watershed boundaries on the map
   - style: pushbutton
     position:
       x: 430
@@ -52,6 +55,7 @@ element:
       height: 20
     method: save
     text: Save
+    tooltip: Save selected watersheds to file
     dependency:
     - action: enable
       checkfor: all
@@ -68,4 +72,5 @@ element:
     variable: buffer  
     method: edit_buffer
     text: Buffer (m)
+    tooltip: Edit buffer distance around selected watersheds in metres
 

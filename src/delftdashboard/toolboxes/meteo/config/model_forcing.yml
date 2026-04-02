@@ -14,6 +14,7 @@ element:
     variable: dataset_long_names
   option_value:
     variable: dataset_names
+  tooltip: Select the meteo dataset for model forcing
 - style: datetimeedit
   position:
     x: 380

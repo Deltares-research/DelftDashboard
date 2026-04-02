@@ -7,3 +7,4 @@ element:
     width: 120
     height: 20
   method: draw_layout
+  tooltip: Draw roughness layout on the map

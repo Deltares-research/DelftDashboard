@@ -1,32 +1,39 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""Flood map toolbox for DelftDashboard.
 
-@author: ormondt
+Provides the main Toolbox class for generating and visualizing flood maps
+from model output, including topobathy and index GeoTIFF management.
 """
+
 import os
+
 import geopandas as gpd
 import xarray as xr
+from cht_tiling import FloodMap
 
-# import datetime
 from delftdashboard.app import app
 from delftdashboard.operations.toolbox import GenericToolbox
 
-# from cht_sfincs import SFINCS
-from cht_tiling import FloodMap
 from .utils import make_topobathy_cog
 
+
 class Toolbox(GenericToolbox):
-    def __init__(self, name):
+    """Toolbox for flood map generation and visualization."""
+
+    def __init__(self, name: str) -> None:
+        """Initialize the flood map toolbox.
+
+        Parameters
+        ----------
+        name : str
+            Name identifier for the toolbox.
+        """
         super().__init__()
 
         self.name = name
         self.long_name = "Flood Map"
 
-    def initialize(self):
-
-        # Set variables
-
+    def initialize(self) -> None:
+        """Set up default GUI variables and flood map state."""
         group = "flood_map"
 
         app.gui.setvar(group, "dx_geotiff", 10.0)
@@ -43,14 +50,13 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "cmin", 0.0)
         app.gui.setvar(group, "cmax", 2.0)
         app.gui.setvar(group, "colormaps", app.gui.getvar("view_settings", "colormaps"))
-        
 
         self.flood_map = FloodMap()
         # Set some default values
         self.flood_map.cmap = app.gui.getvar(group, "cmap")
         self.flood_map.cmin = app.gui.getvar(group, "cmin")
         self.flood_map.cmax = app.gui.getvar(group, "cmax")
-        self.flood_map.color_values = "default" # Using green, yellow, orange, red
+        self.flood_map.color_values = "default"  # Using green, yellow, orange, red
         self.flood_map.discrete_colors = True
 
         # Exclude polygons SnapWave
@@ -61,7 +67,14 @@ class Toolbox(GenericToolbox):
         self.nr_of_instantaneous_times = 0
         self.nr_of_maximum_times = 0
 
-    def set_layer_mode(self, mode):
+    def set_layer_mode(self, mode: str) -> None:
+        """Control visibility of flood map layers.
+
+        Parameters
+        ----------
+        mode : str
+            One of ``"active"``, ``"inactive"``, or ``"invisible"``.
+        """
         if mode == "active":
             # Make container layer visible
             app.map.layer["flood_map"].show()
@@ -76,31 +89,39 @@ class Toolbox(GenericToolbox):
             # Make all layers invisible
             app.map.layer[self.name].hide()
 
-    def add_layers(self):
-        # Add Mapbox layers
+    def add_layers(self) -> None:
+        """Register map layers for the flood map toolbox."""
         layer = app.map.add_layer(self.name)
-        layer.add_layer("flood_map",
-                        type="raster_image",
-                        opacity=0.7,
-                        legend_position="bottom-right")
+        layer.add_layer(
+            "flood_map",
+            type="raster_image",
+            opacity=0.7,
+            legend_position="bottom-right",
+        )
         # Open boundary
         from .topobathy import polygon_created
-        layer.add_layer("polygon", type="draw",
-                             shape="polygon",
-                             create=polygon_created,
-                             polygon_line_color="deepskyblue",
-                             polygon_fill_color="deepskyblue",
-                             polygon_fill_opacity=0.1)
 
-    def load_topobathy_geotiff(self):
-        """Select topo/bathy geotiff file"""
-        full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select topo/bathy geotiff file", filter="*.tif")
+        layer.add_layer(
+            "polygon",
+            type="draw",
+            shape="polygon",
+            create=polygon_created,
+            polygon_line_color="deepskyblue",
+            polygon_fill_color="deepskyblue",
+            polygon_fill_opacity=0.1,
+        )
+
+    def load_topobathy_geotiff(self) -> None:
+        """Select and load a topo/bathy GeoTIFF file via dialog."""
+        full_name, path, name, ext, fltr = app.gui.window.dialog_open_file(
+            "Select topo/bathy geotiff file", filter="*.tif"
+        )
         if not full_name:
             return
         self.topobathy_geotiff = full_name
         self.flood_map.set_topobathy_file(full_name)
 
-    def generate_topobathy_geotiff(self):
+    def generate_topobathy_geotiff(self) -> None:
         """Generate a topobathy COG from the selected datasets."""
         if self.polygon.empty:
             model = app.active_model
@@ -147,21 +168,24 @@ class Toolbox(GenericToolbox):
             self.flood_map.set_topobathy_file(filename)
         except Exception as e:
             import traceback
+
             traceback.print_exc()
             wb.close()
             app.gui.window.dialog_warning(f"Error generating topobathy:\n{e}")
             return
         wb.close()
 
-    def load_index_geotiff(self):
-        """Select index geotiff file"""
-        full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select index geotiff file", filter="*.tif")
+    def load_index_geotiff(self) -> None:
+        """Select and load an index GeoTIFF file via dialog."""
+        full_name, path, name, ext, fltr = app.gui.window.dialog_open_file(
+            "Select index geotiff file", filter="*.tif"
+        )
         if not full_name:
             return
         self.index_geotiff = full_name
         self.flood_map.set_index_file(full_name)
 
-    def generate_index_geotiff(self):
+    def generate_index_geotiff(self) -> None:
         """Generate an index COG mapping grid cells to topobathy pixels."""
         model = app.active_model
         if model.name == "sfincs_cht":
@@ -181,21 +205,20 @@ class Toolbox(GenericToolbox):
             return
         wb = app.gui.window.dialog_wait("Generating index geotiff ...")
         try:
-            grid.make_index_cog(
-                full_name, app.toolbox["flood_map"].topobathy_geotiff
-            )
+            grid.make_index_cog(full_name, app.toolbox["flood_map"].topobathy_geotiff)
             self.flood_map.set_index_file(full_name)
             self.index_geotiff = full_name
         except Exception as e:
             import traceback
+
             traceback.print_exc()
             wb.close()
             app.gui.window.dialog_warning(f"Error generating index:\n{e}")
             return
         wb.close()
 
-    def load_map_output(self):
-        # Load the map output
+    def load_map_output(self) -> None:
+        """Load model map output from a NetCDF file."""
         file_name = app.gui.window.dialog_open_file("Open map output file", "*.nc")
         # Use full path
         if file_name[0]:
@@ -204,49 +227,36 @@ class Toolbox(GenericToolbox):
 
             self.dsa = xr.open_dataset(self.map_file_name)
 
-            # Read the output file lazily
-
-            # Get the time strings
-            
             # Instantaneous
             times = self.dsa.time.values
-            dt_list = times.astype('datetime64[s]').astype(object)
-            self.instantaneous_time_strings = [dt.strftime("%Y-%m-%d %H:%M:%S") for dt in dt_list]
+            dt_list = times.astype("datetime64[s]").astype(object)
+            self.instantaneous_time_strings = [
+                dt.strftime("%Y-%m-%d %H:%M:%S") for dt in dt_list
+            ]
             self.nr_of_instantaneous_times = len(self.instantaneous_time_strings)
 
             # Maximum
             max_times = self.dsa.timemax.values
-            dt_list = max_times.astype('datetime64[s]').astype(object)
-            self.maximum_time_strings = [dt.strftime("%Y-%m-%d %H:%M:%S") for dt in dt_list]
+            dt_list = max_times.astype("datetime64[s]").astype(object)
+            self.maximum_time_strings = [
+                dt.strftime("%Y-%m-%d %H:%M:%S") for dt in dt_list
+            ]
             self.nr_of_maximum_times = len(self.maximum_time_strings)
 
             app.gui.setvar("flood_map", "time_index", 0)
-        # return
-        # Read file
 
-        # Create XR DataArray
-
-        # Set data
-        # app.map.layer[self.name].layer["flood_map_from_tiles"].index_path = os.path.join(pth, "tiles", "indices")
-        # app.map.layer[self.name].layer["flood_map_from_tiles"].topobathy_path = os.path.join(pth, "tiles", "topobathy")
-        # app.map.layer[self.name].layer["flood_map_from_tiles"].set_data(da)
-
-        # zs = da.values[:]
-        # self.flood_map.set_water_level(zs)
-        # app.map.layer[self.name].layer["flood_map"].set_data(self.flood_map)
-
-    def update_flood_map(self):
-
-        instantaneous_or_maximum = app.gui.getvar("flood_map", "instantaneous_or_maximum")
+    def update_flood_map(self) -> None:
+        """Update the flood map layer with the current time step data."""
+        instantaneous_or_maximum = app.gui.getvar(
+            "flood_map", "instantaneous_or_maximum"
+        )
 
         if instantaneous_or_maximum == "instantaneous":
             if self.nr_of_instantaneous_times == 0:
-                # Clear flood map layer
                 app.map.layer["flood_map"].layer["flood_map"].clear()
                 return
         else:
             if self.nr_of_maximum_times == 0:
-                # Clear flood map layer
                 app.map.layer["flood_map"].layer["flood_map"].clear()
                 return
 
@@ -256,13 +266,13 @@ class Toolbox(GenericToolbox):
             zs = self.dsa.zs.isel(time=itime).values[:]
         else:
             zs = self.dsa.zsmax.isel(timemax=itime).values[:]
-        
+
         self.flood_map.set_water_level(zs)
 
         app.map.layer[self.name].layer["flood_map"].set_data(self.flood_map)
 
-    def load_his_output(self):
-        # Load the map output
+    def load_his_output(self) -> None:
+        """Load history output from a NetCDF file."""
         file_name = app.gui.window.dialog_open_file("Open map output file", "*.nc")
         if file_name[0]:
             self.tc.read_track(file_name[0])
@@ -272,8 +282,8 @@ class Toolbox(GenericToolbox):
             app.gui.setvar("tropical_cyclone", "track_loaded", True)
             self.plot_track()
 
-    def export_flood_map(self):
-        # Export flood map
+    def export_flood_map(self) -> None:
+        """Export the flood map to a GeoTIFF file."""
         file_name = app.gui.window.dialog_save_file("Export flood map", "*.tif")
         if file_name[0]:
             wb = app.gui.window.dialog_wait("Exporting flood map ...")

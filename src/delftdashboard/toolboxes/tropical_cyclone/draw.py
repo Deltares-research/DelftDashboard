@@ -1,27 +1,19 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the tropical cyclone draw tab.
 
-@author: ormondt
+Handle track drawing and visualization on the map.
 """
-# import math
-# import numpy as np
-import geopandas as gpd
-# import shapely
-# import json
-# import os
+
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
 
-# Callbacks
-
-def select(*args):
-    # De-activate() existing layers
+def select(*args: Any) -> None:
+    """Activate the draw tab and show the cyclone track layer."""
     map.update()
-    # Tab selected
-    # Show track
     app.map.layer["tropical_cyclone"].layer["cyclone_track"].show()
 
-def draw_track(*args):
-    pass
+
+def draw_track(*args: Any) -> None:
+    """Draw a tropical cyclone track on the map (placeholder)."""

@@ -16,6 +16,7 @@ element:
     text: Reference Time
     variable: tref
     method: set_model_variables
+    tooltip: Set the reference date and time for the simulation
   - style: datetimeedit
     position:
       x: 80
@@ -25,6 +26,7 @@ element:
     text: Start Time
     variable: tstart
     method: set_model_variables
+    tooltip: Set the simulation start date and time
   - style: datetimeedit
     position:
       x: 80
@@ -34,3 +36,4 @@ element:
     text: Stop Time
     variable: tstop
     method: set_model_variables
+    tooltip: Set the simulation stop date and time

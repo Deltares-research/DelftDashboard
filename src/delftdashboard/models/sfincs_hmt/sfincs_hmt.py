@@ -1,27 +1,41 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""SFINCS (HydroMT) model plugin for DelftDashboard.
 
-@author: ormondt
+Provides the ``Model`` class that wraps a HydroMT-SFINCS domain,
+registers map layers, and synchronizes GUI state with the model
+configuration for the SFINCS coastal flooding model.
 """
-# import datetime
+
 import os
-
-from delftdashboard.operations.model import GenericModel
-from delftdashboard.operations import map
-from delftdashboard.app import app
+from typing import Any, Optional
 
 from hydromt_sfincs import SfincsModel
 
+from delftdashboard.app import app
+from delftdashboard.operations import map
+from delftdashboard.operations.model import GenericModel
+
+_MODEL = "sfincs_hmt"
+_GROUP = "sfincs_hmt"
+
 
 class Model(GenericModel):
-    def __init__(self, name):
+    """DelftDashboard model wrapper for SFINCS via HydroMT-SFINCS."""
+
+    def __init__(self, name: str) -> None:
+        """Initialize the SFINCS model plugin.
+
+        Parameters
+        ----------
+        name : str
+            Identifier for this model instance (typically ``"sfincs_hmt"``).
+        """
         super().__init__()
 
         self.name = name
         self.long_name = "SFINCS (HydroMT)"
 
-    def initialize(self):
+    def initialize(self) -> None:
+        """Create a fresh SfincsModel domain and set default GUI variables."""
         self.domain = SfincsModel(root=".", mode="w")
         if hasattr(app, "topography_data_catalog"):
             app.topography_data_catalog.add_to_model_catalog(self.domain.data_catalog)
@@ -39,241 +53,307 @@ class Model(GenericModel):
         self.wave_boundaries_changed = False
         self.wave_makers_changed = False
 
-    def get_view_menu(self):
+    def get_view_menu(self) -> dict:
+        """Build the View menu entries for this model.
+
+        Returns
+        -------
+        dict
+            Menu definition dict with text, sub-items, and callbacks.
+        """
         model_view_menu = {}
         model_view_menu["text"] = self.long_name
         model_view_menu["menu"] = []
-        model_view_menu["menu"].append({"variable_group": self.name,
-                                        "id": f"view.{self.name}.grid",
-                                        "text": "Grid",
-                                        "variable": "view_grid",
-                                        "separator": True,
-                                        "checkable": True,
-                                        "method": self.set_view_menu,
-                                        "option": "grid",
-                                        "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "view_grid", "operator": "eq", "value": True}]}]})
+        model_view_menu["menu"].append(
+            {
+                "variable_group": self.name,
+                "id": f"view.{self.name}.grid",
+                "text": "Grid",
+                "variable": "view_grid",
+                "separator": True,
+                "checkable": True,
+                "method": self.set_view_menu,
+                "option": "grid",
+                "dependency": [
+                    {
+                        "action": "check",
+                        "checkfor": "all",
+                        "check": [
+                            {"variable": "view_grid", "operator": "eq", "value": True}
+                        ],
+                    }
+                ],
+            }
+        )
         return model_view_menu
 
-    def set_view_menu(self, option, checked):
+    def set_view_menu(self, option: str, checked: bool) -> None:
+        """Handle View menu toggling for model layers.
+
+        Parameters
+        ----------
+        option : str
+            The menu option toggled (e.g. ``"grid"``).
+        checked : bool
+            Whether the option is now checked.
+        """
         if option == "grid":
             print(f"Checked: {checked}")
             if app.gui.getvar(self.name, "view_grid"):
-                app.map.layer["sfincs_hmt"].layer["grid"].show()
+                app.map.layer[_MODEL].layer["grid"].show()
                 print("Grid is made visible")
             else:
-                app.map.layer["sfincs_hmt"].layer["grid"].hide()
+                app.map.layer[_MODEL].layer["grid"].hide()
                 print("Grid is made invisible")
 
-    def add_layers(self):
-        layer = app.map.add_layer("sfincs_hmt")
+    def add_layers(self) -> None:
+        """Register all map layers for the SFINCS model."""
+        layer = app.map.add_layer(_MODEL)
 
         layer.add_layer("grid", type="raster_image")
 
-        layer.add_layer("grid_exterior",
-                        type="line",
-                        circle_radius=0,
-                        line_color="yellow")
+        layer.add_layer(
+            "grid_exterior", type="line", circle_radius=0, line_color="yellow"
+        )
 
-        layer.add_layer("mask",
-                        type="raster_image")
-        
-        layer.add_layer("mask_snapwave",
-                        type="raster_image")
+        layer.add_layer("mask", type="raster_image")
+
+        layer.add_layer("mask_snapwave", type="raster_image")
 
         from .boundary_conditions import select_boundary_point_from_map
-        layer.add_layer("boundary_points",
-                        type="circle_selector",
-                        select=select_boundary_point_from_map,
-                        hover_property="name",
-                        line_color="white",
-                        line_opacity=1.0,
-                        fill_color="blue",
-                        fill_opacity=1.0,
-                        circle_radius=4,
-                        circle_radius_selected=5,
-                        line_color_selected="white",
-                        fill_color_selected="red",
-                        circle_radius_inactive=4,
-                        line_color_inactive="white",
-                        fill_color_inactive="lightgrey"
-                       )
-
-        from .structures_thin_dams import thin_dam_created
-        from .structures_thin_dams import thin_dam_selected
-        from .structures_thin_dams import thin_dam_modified
-        thd_layer = layer.add_layer("thin_dams") # Container layer for thin dams and snapped thin dams
-        thd_layer.add_layer("polylines",
-                            type="draw",
-                            shape="polyline",
-                            create=thin_dam_created,
-                            modify=thin_dam_modified,
-                            select=thin_dam_selected,
-                            polyline_line_color="yellow",
-                            polyline_line_width=2.0,
-                            polyline_line_opacity=1.0)
-        thd_layer.add_layer("snapped",
-                            type="line",
-                            line_color="white",
-                            line_opacity=1.0,
-                            circle_radius=0,
-                            line_color_inactive="lightgrey")
-
-        from .structures_weirs import weir_created
-        from .structures_weirs import weir_selected
-        from .structures_weirs import weir_modified
-        weir_layer = layer.add_layer("weirs") # Container layer for weirs and snapped weirs
-        weir_layer.add_layer("polylines",
-                            type="draw",
-                            shape="polyline",
-                            create=weir_created,
-                            modify=weir_modified,
-                            select=weir_selected,
-                            polyline_line_color="yellow",
-                            polyline_line_width=2.0,
-                            polyline_line_opacity=1.0)
-        weir_layer.add_layer("snapped",
-                            type="line",
-                            line_color="white",
-                            line_opacity=1.0,
-                            circle_radius=0,
-                            line_color_inactive="lightgrey")
-
-        from .structures_drainage_structures import drainage_structure_created
-        from .structures_drainage_structures import drainage_structure_selected
-        from .structures_drainage_structures import drainage_structure_modified
-        layer.add_layer("drainage_structures",
-                         type="draw",
-                         shape="polyline",
-                         create=drainage_structure_created,
-                         modify=drainage_structure_modified,
-                         select=drainage_structure_selected,
-                         polyline_line_color="yellow",
-                         polyline_line_width=2.0,
-                         polyline_line_opacity=1.0)
-
-        from .observation_points_observation_points import select_observation_point_from_map
-        layer.add_layer("observation_points",
-                        type="circle_selector",                        
-                        select=select_observation_point_from_map,
-                        hover_property="name",
-                        line_color="white",
-                        line_opacity=1.0,
-                        fill_color="blue",
-                        fill_opacity=1.0,
-                        circle_radius=3,
-                        circle_radius_selected=4,
-                        line_color_selected="white",
-                        fill_color_selected="red")
-
-        from .observation_points_cross_sections import cross_section_created
-        from .observation_points_cross_sections import cross_section_selected
-        from .observation_points_cross_sections import cross_section_modified
-        crs_layer = layer.add_layer("cross_sections") # Container layer for cross sections and snapped cross sections
-        crs_layer.add_layer("polylines",
-                            type="draw",
-                            shape="polyline",
-                            create=cross_section_created,
-                            modify=cross_section_modified,
-                            select=cross_section_selected,
-                            polyline_line_color="yellow",
-                            polyline_line_width=2.0,
-                            polyline_line_opacity=1.0)
-        crs_layer.add_layer("snapped",
-                            type="line",
-                            line_color="white",
-                            line_opacity=1.0,
-                            circle_radius=0,
-                            line_color_inactive="lightgrey")
 
         layer.add_layer(
-                "obs_points",
-                type="marker",
-                hover_property="description",
-                click_property="url",
-                icon_size=0.5,
-                click_popup_width=600,
-                click_popup_height=220,
-            )
+            "boundary_points",
+            type="circle_selector",
+            select=select_boundary_point_from_map,
+            hover_property="name",
+            line_color="white",
+            line_opacity=1.0,
+            fill_color="blue",
+            fill_opacity=1.0,
+            circle_radius=4,
+            circle_radius_selected=5,
+            line_color_selected="white",
+            fill_color_selected="red",
+            circle_radius_inactive=4,
+            line_color_inactive="white",
+            fill_color_inactive="lightgrey",
+        )
+
+        from .structures_thin_dams import (
+            thin_dam_created,
+            thin_dam_modified,
+            thin_dam_selected,
+        )
+
+        thd_layer = layer.add_layer(
+            "thin_dams"
+        )  # Container layer for thin dams and snapped thin dams
+        thd_layer.add_layer(
+            "polylines",
+            type="draw",
+            shape="polyline",
+            create=thin_dam_created,
+            modify=thin_dam_modified,
+            select=thin_dam_selected,
+            polyline_line_color="yellow",
+            polyline_line_width=2.0,
+            polyline_line_opacity=1.0,
+        )
+        thd_layer.add_layer(
+            "snapped",
+            type="line",
+            line_color="white",
+            line_opacity=1.0,
+            circle_radius=0,
+            line_color_inactive="lightgrey",
+        )
+
+        from .structures_weirs import weir_created, weir_modified, weir_selected
+
+        weir_layer = layer.add_layer(
+            "weirs"
+        )  # Container layer for weirs and snapped weirs
+        weir_layer.add_layer(
+            "polylines",
+            type="draw",
+            shape="polyline",
+            create=weir_created,
+            modify=weir_modified,
+            select=weir_selected,
+            polyline_line_color="yellow",
+            polyline_line_width=2.0,
+            polyline_line_opacity=1.0,
+        )
+        weir_layer.add_layer(
+            "snapped",
+            type="line",
+            line_color="white",
+            line_opacity=1.0,
+            circle_radius=0,
+            line_color_inactive="lightgrey",
+        )
+
+        from .structures_drainage_structures import (
+            drainage_structure_created,
+            drainage_structure_modified,
+            drainage_structure_selected,
+        )
+
+        layer.add_layer(
+            "drainage_structures",
+            type="draw",
+            shape="polyline",
+            create=drainage_structure_created,
+            modify=drainage_structure_modified,
+            select=drainage_structure_selected,
+            polyline_line_color="yellow",
+            polyline_line_width=2.0,
+            polyline_line_opacity=1.0,
+        )
+
+        from .observation_points_observation_points import (
+            select_observation_point_from_map,
+        )
+
+        layer.add_layer(
+            "observation_points",
+            type="circle_selector",
+            select=select_observation_point_from_map,
+            hover_property="name",
+            line_color="white",
+            line_opacity=1.0,
+            fill_color="blue",
+            fill_opacity=1.0,
+            circle_radius=3,
+            circle_radius_selected=4,
+            line_color_selected="white",
+            fill_color_selected="red",
+        )
+
+        from .observation_points_cross_sections import (
+            cross_section_created,
+            cross_section_modified,
+            cross_section_selected,
+        )
+
+        crs_layer = layer.add_layer(
+            "cross_sections"
+        )  # Container layer for cross sections and snapped cross sections
+        crs_layer.add_layer(
+            "polylines",
+            type="draw",
+            shape="polyline",
+            create=cross_section_created,
+            modify=cross_section_modified,
+            select=cross_section_selected,
+            polyline_line_color="yellow",
+            polyline_line_width=2.0,
+            polyline_line_opacity=1.0,
+        )
+        crs_layer.add_layer(
+            "snapped",
+            type="line",
+            line_color="white",
+            line_opacity=1.0,
+            circle_radius=0,
+            line_color_inactive="lightgrey",
+        )
+
+        layer.add_layer(
+            "obs_points",
+            type="marker",
+            hover_property="description",
+            click_property="url",
+            icon_size=0.5,
+            click_popup_width=600,
+            click_popup_height=220,
+        )
 
         from .discharge_points import select_discharge_point_from_map
-        layer.add_layer("discharge_points",
-                        type="circle_selector",                        
-                        select=select_discharge_point_from_map,
-                        hover_property="name",
-                        line_color="white",
-                        line_opacity=1.0,
-                        fill_color="blue",
-                        fill_opacity=1.0,
-                        circle_radius=3,
-                        circle_radius_selected=4,
-                        line_color_selected="white",
-                        fill_color_selected="red")
+
+        layer.add_layer(
+            "discharge_points",
+            type="circle_selector",
+            select=select_discharge_point_from_map,
+            hover_property="name",
+            line_color="white",
+            line_opacity=1.0,
+            fill_color="blue",
+            fill_opacity=1.0,
+            circle_radius=3,
+            circle_radius_selected=4,
+            line_color_selected="white",
+            fill_color_selected="red",
+        )
 
         from .waves_boundary_conditions import select_boundary_point_from_map_snapwave
-        layer.add_layer("boundary_points_snapwave",
-                        type="circle_selector",
-                        select=select_boundary_point_from_map_snapwave,
-                        hover_property="name",
-                        line_color="white",
-                        line_opacity=1.0,
-                        fill_color="blue",
-                        fill_opacity=1.0,
-                        circle_radius=4,
-                        circle_radius_selected=5,
-                        line_color_selected="white",
-                        fill_color_selected="red",
-                        circle_radius_inactive=4,
-                        line_color_inactive="white",
-                        fill_color_inactive="lightgrey"
-                       )
+
+        layer.add_layer(
+            "boundary_points_snapwave",
+            type="circle_selector",
+            select=select_boundary_point_from_map_snapwave,
+            hover_property="name",
+            line_color="white",
+            line_opacity=1.0,
+            fill_color="blue",
+            fill_opacity=1.0,
+            circle_radius=4,
+            circle_radius_selected=5,
+            line_color_selected="white",
+            fill_color_selected="red",
+            circle_radius_inactive=4,
+            line_color_inactive="white",
+            fill_color_inactive="lightgrey",
+        )
 
         # Wave makers
-        from .waves_wave_makers import wave_maker_created
-        from .waves_wave_makers import wave_maker_modified
-        from .waves_wave_makers import wave_maker_selected
-        layer.add_layer("wave_makers", type="draw",
-                             shape="polyline",
-                             create=wave_maker_created,
-                             modify=wave_maker_modified,
-                             select=wave_maker_selected,
-                             add=wave_maker_modified,
-                             polygon_line_color="red")
-        
-    def set_layer_mode(self, mode):
-        layer = app.map.layer["sfincs_hmt"]
+        from .waves_wave_makers import (
+            wave_maker_created,
+            wave_maker_modified,
+            wave_maker_selected,
+        )
+
+        layer.add_layer(
+            "wave_makers",
+            type="draw",
+            shape="polyline",
+            create=wave_maker_created,
+            modify=wave_maker_modified,
+            select=wave_maker_selected,
+            add=wave_maker_modified,
+            polygon_line_color="red",
+        )
+
+    def set_layer_mode(self, mode: str) -> None:
+        """Set the visibility/activation mode for all model layers.
+
+        Parameters
+        ----------
+        mode : str
+            Either ``"inactive"`` (grey out) or ``"invisible"`` (hide all).
+        """
+        layer = app.map.layer[_MODEL]
         if mode == "inactive":
-            # # Make the sfincs_hmt layer visible
-            # layer.show()
-            # Grid is made visible
             layer.layer["grid"].deactivate()
-            # Grid exterior is made visible
             layer.layer["grid_exterior"].deactivate()
-            # Mask is made invisible
             layer.layer["mask"].hide()
             layer.layer["mask_snapwave"].hide()
-            # Boundary points are made grey
             layer.layer["boundary_points"].deactivate()
-            # Observation points are made grey
             layer.layer["observation_points"].deactivate()
-            # Cross sections are made grey
             layer.layer["cross_sections"].layer["polylines"].deactivate()
             layer.layer["cross_sections"].layer["snapped"].hide()
-            # Discharge points are made grey
             layer.layer["discharge_points"].deactivate()
-            # Thin dams are made grey
             layer.layer["thin_dams"].layer["polylines"].deactivate()
             layer.layer["thin_dams"].layer["snapped"].hide()
-            # Drainage structures are made grey
             layer.layer["drainage_structures"].deactivate()
-            # # SnapWave boundary enclosure is made invisible
-            # layer.layer["snapwave_boundary_enclosure"].hide()
             layer.layer["boundary_points_snapwave"].deactivate()
-            # Wave makers are made invisible
             layer.layer["wave_makers"].hide()
         elif mode == "invisible":
-           layer.hide()
+            layer.hide()
 
-    def set_crs(self):
+    def set_crs(self) -> None:
+        """Update the model CRS to match the application CRS and re-plot."""
         crs = app.crs
         old_crs = self.domain.crs
         if old_crs != crs:
@@ -281,11 +361,19 @@ class Model(GenericModel):
             self.domain.clear_spatial_attributes()
             self.plot()
 
-    def open(self, filename=None):
-        # Open input file, and change working directory
+    def open(self, filename: Optional[str] = None) -> None:
+        """Open an existing SFINCS model from an input file.
+
+        Parameters
+        ----------
+        filename : str or None
+            Path to ``sfincs.inp``. If ``None``, a file dialog is shown.
+        """
         if filename is None:
             # Open file dialog to select input file
-            filename = app.gui.window.dialog_open_file("Open file", filter="SFINCS input file (sfincs.inp)")
+            filename = app.gui.window.dialog_open_file(
+                "Open file", filter="SFINCS input file (sfincs.inp)"
+            )
             filename = filename[0]
 
         if filename:
@@ -306,7 +394,9 @@ class Model(GenericModel):
 
             # Zoom to model extent (cht_sfincs has a nice function for this...)
             buffer = 0.1
-            crds = self.domain.quadtree_grid.exterior.to_crs(crs=4326).total_bounds.tolist()
+            crds = self.domain.quadtree_grid.exterior.to_crs(
+                crs=4326
+            ).total_bounds.tolist()
             dx = crds[2] - crds[0]
             dy = crds[3] - crds[1]
             crds[0] = crds[0] - buffer * dx
@@ -315,58 +405,77 @@ class Model(GenericModel):
             crds[3] = crds[3] + buffer * dy
             app.map.fit_bounds(crds[0], crds[1], crds[2], crds[3])
 
-    def save(self):        
-        # Write sfincs.inp
+    def save(self) -> None:
+        """Write the SFINCS configuration to disk."""
         self.check_times()
-        # self.domain.path = os.getcwd()
-        # self.domain.input.variables.epsg = app.crs.to_epsg()
-        # self.domain.exe_path = app.config["sfincs_exe_path"]
-        # self.domain.write_batch_file()
-        app.model["sfincs_hmt"].domain.config.write()
+        app.model[_MODEL].domain.config.write()
 
-    def plot(self):
-        # Plot everything
-        # app.map.add_layer("sfincs_hmt").clear()
+    def plot(self) -> None:
+        """Plot all model features on the map."""
         # Grid
-        app.map.layer["sfincs_hmt"].layer["grid"].set_data(app.model["sfincs_hmt"].domain.quadtree_grid)
+        app.map.layer[_MODEL].layer["grid"].set_data(
+            app.model[_MODEL].domain.quadtree_grid
+        )
         # Grid exterior
-        app.map.layer["sfincs_hmt"].layer["grid_exterior"].set_data(app.model["sfincs_hmt"].domain.quadtree_grid.exterior)
+        app.map.layer[_MODEL].layer["grid_exterior"].set_data(
+            app.model[_MODEL].domain.quadtree_grid.exterior
+        )
         # Mask
-        app.map.layer["sfincs_hmt"].layer["mask"].set_data(app.model["sfincs_hmt"].domain.quadtree_mask)
+        app.map.layer[_MODEL].layer["mask"].set_data(
+            app.model[_MODEL].domain.quadtree_mask
+        )
         # Thin dams
-        app.map.layer["sfincs_hmt"].layer["thin_dams"].layer["polylines"].set_data(app.model["sfincs_hmt"].domain.thin_dams.gdf)
+        app.map.layer[_MODEL].layer["thin_dams"].layer["polylines"].set_data(
+            app.model[_MODEL].domain.thin_dams.gdf
+        )
         # Weirs
-        app.map.layer["sfincs_hmt"].layer["weirs"].layer["polylines"].set_data(app.model["sfincs_hmt"].domain.weirs.gdf)
+        app.map.layer[_MODEL].layer["weirs"].layer["polylines"].set_data(
+            app.model[_MODEL].domain.weirs.gdf
+        )
         # Drainage structures
-        app.map.layer["sfincs_hmt"].layer["drainage_structures"].set_data(app.model["sfincs_hmt"].domain.drainage_structures.gdf)
+        app.map.layer[_MODEL].layer["drainage_structures"].set_data(
+            app.model[_MODEL].domain.drainage_structures.gdf
+        )
         # Observation points
-        app.map.layer["sfincs_hmt"].layer["observation_points"].set_data(app.model["sfincs_hmt"].domain.observation_points.gdf, 0)
+        app.map.layer[_MODEL].layer["observation_points"].set_data(
+            app.model[_MODEL].domain.observation_points.gdf, 0
+        )
         # Cross sections
-        app.map.layer["sfincs_hmt"].layer["cross_sections"].layer["polylines"].set_data(app.model["sfincs_hmt"].domain.cross_sections.gdf)
+        app.map.layer[_MODEL].layer["cross_sections"].layer["polylines"].set_data(
+            app.model[_MODEL].domain.cross_sections.gdf
+        )
         # Boundary points
-        app.map.layer["sfincs_hmt"].layer["boundary_points"].set_data(app.model["sfincs_hmt"].domain.water_level.gdf, 0)
+        app.map.layer[_MODEL].layer["boundary_points"].set_data(
+            app.model[_MODEL].domain.water_level.gdf, 0
+        )
         # Discharge points
-        app.map.layer["sfincs_hmt"].layer["discharge_points"].set_data(app.model["sfincs_hmt"].domain.discharge_points.gdf, 0)
+        app.map.layer[_MODEL].layer["discharge_points"].set_data(
+            app.model[_MODEL].domain.discharge_points.gdf, 0
+        )
         # Mask SnapWave
-        app.map.layer["sfincs_hmt"].layer["mask_snapwave"].set_data(app.model["sfincs_hmt"].domain.quadtree_snapwave_mask)
+        app.map.layer[_MODEL].layer["mask_snapwave"].set_data(
+            app.model[_MODEL].domain.quadtree_snapwave_mask
+        )
         # SnapWave Boundary points
-        app.map.layer["sfincs_hmt"].layer["boundary_points_snapwave"].set_data(app.model["sfincs_hmt"].domain.snapwave_boundary_conditions.gdf, 0)
+        app.map.layer[_MODEL].layer["boundary_points_snapwave"].set_data(
+            app.model[_MODEL].domain.snapwave_boundary_conditions.gdf, 0
+        )
         # Wave makers
-        app.map.layer["sfincs_hmt"].layer["wave_makers"].set_data(app.model["sfincs_hmt"].domain.wave_makers.data)
+        app.map.layer[_MODEL].layer["wave_makers"].set_data(
+            app.model[_MODEL].domain.wave_makers.data
+        )
 
-    def set_gui_variables(self):
-        """Called after reading the input file to set the GUI variables"""
+    def set_gui_variables(self) -> None:
+        """Populate GUI variables from the current model configuration."""
+        group = _GROUP
 
-        group = "sfincs_hmt"
-
-        # Copy sfincs input variables to gui variables
         # Copy sfincs input variables to gui variables
         for key, value in self.domain.config.data.model_dump(
             exclude_unset=False
         ).items():
             app.gui.setvar(group, key, value)
 
-        # View  
+        # View
         app.gui.setvar(group, "view_grid", True)
 
         # Now set some extra variables needed for SFINCS GUI
@@ -406,9 +515,13 @@ class Model(GenericModel):
         app.gui.setvar(group, "boundary_conditions_timeseries_peak", 1.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
-        app.gui.setvar(group, "boundary_conditions_tide_model", app.gui.getvar("tide_models", "names")[0])
-                 
-        # Observation points 
+        app.gui.setvar(
+            group,
+            "boundary_conditions_tide_model",
+            app.gui.getvar("tide_models", "names")[0],
+        )
+
+        # Observation points
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
@@ -420,7 +533,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "active_cross_section", 0)
         app.gui.setvar(group, "cross_section_name", "")
 
-        # Discharge points 
+        # Discharge points
         app.gui.setvar(group, "discharge_point_names", [])
         app.gui.setvar(group, "nr_discharge_points", 0)
         app.gui.setvar(group, "active_discharge_point", 0)
@@ -454,28 +567,32 @@ class Model(GenericModel):
         app.gui.setvar(group, "drainage_structure_closing_time", 600.0)
         app.gui.setvar(group, "drainage_structure_type", 1)
         app.gui.setvar(group, "drainage_structure_types", [1, 2, 3, 4])
-        app.gui.setvar(group, "drainage_structure_type_names", ["Pump", "Culvert", "Check Valve", "Gate"])
+        app.gui.setvar(
+            group,
+            "drainage_structure_type_names",
+            ["Pump", "Culvert", "Check Valve", "Gate"],
+        )
 
         # SnapWave
-        app.gui.setvar("modelmaker_sfincs_hmt", "use_snapwave", app.gui.getvar(group, "snapwave"))
+        app.gui.setvar(
+            "modelmaker_sfincs_hmt", "use_snapwave", app.gui.getvar(group, "snapwave")
+        )
         app.gui.setvar(group, "boundary_point_names_snapwave", [])
         app.gui.setvar(group, "nr_boundary_points_snapwave", 0)
         app.gui.setvar(group, "active_boundary_point_snapwave", 0)
         app.gui.setvar(group, "boundary_dx_snapwave", 10000.0)
-        app.gui.setvar(group, "boundary_conditions_timeseries_shape_snapwave", "constant")
-        app.gui.setvar(group, "boundary_conditions_timeseries_time_step_snapwave", 600.0)
-        # app.gui.setvar(group, "boundary_conditions_timeseries_offset", 0.0)
+        app.gui.setvar(
+            group, "boundary_conditions_timeseries_shape_snapwave", "constant"
+        )
+        app.gui.setvar(
+            group, "boundary_conditions_timeseries_time_step_snapwave", 600.0
+        )
         app.gui.setvar(group, "boundary_conditions_timeseries_hm0_snapwave", 1.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_tp_snapwave", 8.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_wd_snapwave", 0.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_ds_snapwave", 20.0)
-        # app.gui.setvar(group, "boundary_conditions_timeseries_phase", 0.0)
-        # app.gui.setvar(group, "boundary_conditions_timeseries_period", 43200.0)
-        # app.gui.setvar(group, "boundary_conditions_timeseries_peak", 1.0)
-        # app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
-        # app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
 
-        # Wave makers  
+        # Wave makers
         app.gui.setvar(group, "wave_maker_names", [])
         app.gui.setvar(group, "nr_wave_makers", 0)
         app.gui.setvar(group, "active_wave_maker", 0)
@@ -487,10 +604,19 @@ class Model(GenericModel):
         # Turning off weirs for now
         app.gui.setvar(group, "enable_weirs", True)
 
-    def set_model_variables(self, varid=None, value=None):
-        # Copies gui variables to sfincs input variables
+    def set_model_variables(
+        self, varid: Optional[str] = None, value: Any = None
+    ) -> None:
+        """Copy GUI variables back to the SFINCS model configuration.
 
-        group = "sfincs_hmt"
+        Parameters
+        ----------
+        varid : str or None
+            Specific variable identifier to update (unused, all are copied).
+        value : Any
+            Value to set (unused, read from GUI).
+        """
+        group = _GROUP
         for key, value in self.domain.config.data.model_dump(
             exclude_unset=False
         ).items():
@@ -513,42 +639,40 @@ class Model(GenericModel):
         cdval.append(app.gui.getvar(group, "cd_3"))
         self.domain.config.set("cdval", cdval)
 
-        # group = "sfincs_hmt"
-        # for var_name in vars(self.domain.input.variables):
-        #     setattr(self.domain.input.variables, var_name, app.gui.getvar(group, var_name))
-        # if self.domain.input.variables.snapwave:
-        #     app.gui.setvar("modelmaker_sfincs_hmt", "use_snapwave", True)
-        # else:
-        #     app.gui.setvar("modelmaker_sfincs_hmt", "use_snapwave", False)
-        # # Wind drag    
-        # self.domain.input.variables.cdwnd[0] = app.gui.getvar(group, "wind_speed_1")
-        # self.domain.input.variables.cdwnd[1] = app.gui.getvar(group, "wind_speed_2")
-        # self.domain.input.variables.cdwnd[2] = app.gui.getvar(group, "wind_speed_3")
-        # self.domain.input.variables.cdval[0] = app.gui.getvar(group, "cd_1")
-        # self.domain.input.variables.cdval[1] = app.gui.getvar(group, "cd_2")
-        # self.domain.input.variables.cdval[2] = app.gui.getvar(group, "cd_3")
+    def set_input_variable(self, gui_variable: str, value: Any) -> None:
+        """Set a single input variable (currently a no-op placeholder).
 
-    # def initialize_domain(self):
-    #     self.domain = SFINCS(crs=app.crs)
-    #     # Also add some other attributes needed for the GUI
-    #     self.observation_points_changed = False
-    #     self.discharge_points_changed = False
-    #     self.boundaries_changed = False
-    #     self.thin_dams_changed = False
-
-    def set_input_variable(self, gui_variable, value):
+        Parameters
+        ----------
+        gui_variable : str
+            The GUI variable name.
+        value : Any
+            The value to set.
+        """
         pass
 
-    def add_stations(self, gdf_stations_to_add, naming_option="id"):
-        self.domain.observation_points.add_points(gdf_stations_to_add, name=naming_option)
+    def add_stations(self, gdf_stations_to_add: Any, naming_option: str = "id") -> None:
+        """Add observation stations from a GeoDataFrame.
+
+        Parameters
+        ----------
+        gdf_stations_to_add : GeoDataFrame
+            Station locations to add.
+        naming_option : str
+            Column to use for station names (default ``"id"``).
+        """
+        self.domain.observation_points.add_points(
+            gdf_stations_to_add, name=naming_option
+        )
         gdf = self.domain.observation_points.gdf
-        app.map.layer["sfincs_hmt"].layer["observation_points"].set_data(gdf, 0)
+        app.map.layer[_MODEL].layer["observation_points"].set_data(gdf, 0)
         if not self.domain.input.variables.obsfile:
             self.domain.input.variables.obsfile = "sfincs.obs"
-            app.gui.setvar("sfincs_hmt", "obsfile", self.domain.input.variables.obsfile)
+            app.gui.setvar(_GROUP, "obsfile", self.domain.input.variables.obsfile)
         self.domain.observation_points.write()
 
-    def check_times(self):
+    def check_times(self) -> None:
+        """Validate that forcing covers the full simulation period (not yet implemented)."""
         # This does not yet exist for HydroMT-SFINCS
         return
         ok, message_list = self.domain.check_times()
@@ -557,4 +681,3 @@ class Model(GenericModel):
             for message in message_list:
                 messages = messages + message + "\n"
             app.gui.window.dialog_warning(messages, "Warning")
-

@@ -15,6 +15,7 @@ element:
   option_string:
     variable: bathymetry_dataset_names
     variable_group: bathy_topo_selector
+  tooltip: Select a dataset to add to the selected datasets list
 - style: popupmenu
   position:
     x: 10
@@ -32,6 +33,7 @@ element:
   option_value:
     variable: bathymetry_source_names
     variable_group: bathy_topo_selector
+  tooltip: Select the source of bathymetry/topography datasets
 - style: pushbutton
   position:
     x: 170
@@ -41,6 +43,7 @@ element:
   text: "Use Dataset ->"
   method: use_dataset
   module: delftdashboard.operations.bathy_topo_selector
+  tooltip: Add the selected dataset to the selected datasets list
 - style: pushbutton
   position:
     x: 170
@@ -51,6 +54,7 @@ element:
   method: info
   module: delftdashboard.operations.bathy_topo_selector
   enable: False
+  tooltip: Show information about the selected dataset
 - style: listbox
   position:
     x: 260
@@ -67,6 +71,7 @@ element:
   option_string:
     variable: selected_bathymetry_dataset_names
     variable_group: bathy_topo_selector
+  tooltip: Select a dataset from the selected datasets list
 - style: edit
   position:
     x: 280
@@ -116,6 +121,7 @@ element:
   text: "Remove"
   method: remove_selected_bathymetry_dataset
   module: delftdashboard.operations.bathy_topo_selector
+  tooltip: Remove the dataset from the selected datasets list
   dependency:
   - action: enable
     checkfor: all
@@ -133,6 +139,7 @@ element:
   text: "Move Up"
   method: move_up_selected_bathymetry_dataset
   module: delftdashboard.operations.bathy_topo_selector
+  tooltip: Move the dataset one position up in the selected datasets list
   dependency:
   - action: enable
     checkfor: all
@@ -150,6 +157,7 @@ element:
   text: "Move Down"
   method: move_down_selected_bathymetry_dataset
   module: delftdashboard.operations.bathy_topo_selector
+  tooltip: Move the dataset one position down in the selected datasets list
   dependency:
   - action: enable
     checkfor: all
@@ -167,6 +175,7 @@ element:
     height: 20
   method: load_polygon
   module: delftdashboard.operations.bathy_topo_selector
+  tooltip: Load a polygon to limit the area used for this dataset
   dependency:
   - action: enable
     checkfor: all

@@ -1,17 +1,23 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the SFINCS HydroMT Timeframe tab.
 
-@author: ormondt
+Handles tab selection, model variable synchronization, and time
+consistency checks for simulation start/stop times and output intervals.
 """
+
+from typing import Any
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-def select(*args):
-    # De-activate existing layers
+_MODEL = "sfincs_hmt"
 
 
+def select(*args: Any) -> None:
+    """Activate the Timeframe tab and update map layers.
+
+    Also deactivates existing map layers and sets up the commented-out
+    observation-point demo layer.
+    """
     # from geopandas import GeoDataFrame
     # from shapely.geometry import Point
     # gdf = GeoDataFrame(geometry=[Point(0, 0)], crs=4326)
@@ -26,9 +32,9 @@ def select(*args):
     map.update()
 
 
-def set_model_variables(*args):
-    # All variables will be set
-    app.model["sfincs_hmt"].set_model_variables()
+def set_model_variables(*args: Any) -> None:
+    """Copy current GUI variables back to the model config and check times."""
+    app.model[_MODEL].set_model_variables()
 
     # Now check that the boundary and other forcing fully covers the simulation time
-    app.model["sfincs_hmt"].check_times()
+    app.model[_MODEL].check_times()

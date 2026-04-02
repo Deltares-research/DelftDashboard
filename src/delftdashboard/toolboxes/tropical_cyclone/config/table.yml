@@ -8,3 +8,4 @@ element:
     height: 20
   method: edit_table
   enable: false
+  tooltip: Edit tropical cyclone track data in a table

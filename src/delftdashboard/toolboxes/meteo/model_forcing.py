@@ -1,26 +1,29 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the meteo model forcing tab."""
 
-@author: ormondt
-"""
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-# Callbacks
-def select(*args):
-    # De-activate() existing layers
+
+def select(*args: Any) -> None:
+    """Activate the model forcing tab and update the map."""
     map.update()
-    # Tab selected
     app.toolbox["meteo"].set_layer_mode("active")
 
-def select_dataset(*args):
+
+def select_dataset(*args: Any) -> None:
+    """Handle dataset selection change."""
     pass
 
-def edit_time(*args):
+
+def edit_time(*args: Any) -> None:
+    """Handle time range editing."""
     pass
 
-def generate_model_forcing_files(*args):
+
+def generate_model_forcing_files(*args: Any) -> None:
+    """Collect meteo data and write Delft3D forcing files."""
     dataset_name = app.gui.getvar("meteo", "selected_dataset")
     tstart = app.gui.getvar("meteo", "tstart")
     tend = app.gui.getvar("meteo", "tstop")
@@ -33,4 +36,3 @@ def generate_model_forcing_files(*args):
     wb = app.gui.window.dialog_wait("Writing forcing files ...")
     dataset.to_delft3d("sfincs")
     wb.close()
- 

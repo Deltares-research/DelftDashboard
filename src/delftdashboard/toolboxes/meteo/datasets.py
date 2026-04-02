@@ -1,28 +1,32 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the meteo datasets tab."""
 
-@author: ormondt
-"""
-import geopandas as gpd
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-# Callbacks
-def select(*args):
-    # De-activate() existing layers
+
+def select(*args: Any) -> None:
+    """Activate the datasets tab and update the map."""
     map.update()
-    # Tab selected
     app.toolbox["meteo"].set_layer_mode("active")
 
-def select_dataset(*args):
+
+def select_dataset(*args: Any) -> None:
+    """Handle dataset selection change."""
     pass
 
-def add_dataset(*args):
+
+def add_dataset(*args: Any) -> None:
+    """Handle adding a new dataset."""
     pass
 
-def select_source(*args):
+
+def select_source(*args: Any) -> None:
+    """Handle source selection change."""
     pass
 
-def edit_bbox(*args):
+
+def edit_bbox(*args: Any) -> None:
+    """Handle bounding-box edit interaction."""
     pass

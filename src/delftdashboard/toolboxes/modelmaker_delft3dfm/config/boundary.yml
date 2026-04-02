@@ -18,6 +18,7 @@ element:
     select: index
     option_string:
       variable: open_boundary_polygon_names
+    tooltip: Select open boundary polygon from list
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -26,6 +27,7 @@ element:
       width: 80
       height: 20
     method: draw_open_boundary_polygon
+    tooltip: Draw open boundary polygon on the map
   - style: pushbutton
     text: Delete Polygon
     position:
@@ -34,6 +36,7 @@ element:
       width: 80
       height: 20
     method: delete_open_boundary_polygon
+    tooltip: Delete selected open boundary polygon
     dependency:
     - action: enable
       checkfor: all
@@ -49,6 +52,7 @@ element:
       width: 80
       height: 20
     method: load_open_boundary_polygon
+    tooltip: Load open boundary polygon from file
   - style: pushbutton
     text: Save Polygon
     position:
@@ -57,6 +61,7 @@ element:
       width: 80
       height: 20
     method: save_open_boundary_polygon
+    tooltip: Save open boundary polygon to file
     dependency:
     - action: enable
       checkfor: all

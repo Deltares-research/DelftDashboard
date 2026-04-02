@@ -41,9 +41,7 @@ class TopographyDataCatalog:
             self.catalog.from_yml(master, root=path)
         else:
             # Fall back to individual catalogs in sub-folders
-            for yml in sorted(
-                glob.glob(os.path.join(path, "*", "data_catalog.yml"))
-            ):
+            for yml in sorted(glob.glob(os.path.join(path, "*", "data_catalog.yml"))):
                 self.catalog.from_yml(yml, root=os.path.dirname(yml))
 
     def sources(self) -> Tuple[List[str], List[str]]:

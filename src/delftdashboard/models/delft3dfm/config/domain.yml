@@ -16,6 +16,7 @@ element:
     text: lon_min
     variable: setup.lon_min
     enable: False
+    tooltip: Minimum longitude of the domain
   - style: edit
     position:
       x: 160
@@ -25,6 +26,7 @@ element:
     text: lat_min
     variable: setup.lat_min
     enable: False
+    tooltip: Minimum latitude of the domain
   - style: edit
     position:
       x: 60
@@ -34,6 +36,7 @@ element:
     text: lon_max
     variable: setup.lon_max
     enable: False
+    tooltip: Maximum longitude of the domain
   - style: edit
     position:
       x: 160
@@ -43,6 +46,7 @@ element:
     text: lat_max
     variable: setup.lat_max
     enable: False
+    tooltip: Maximum latitude of the domain
   - style: edit
     position:
       x: 60
@@ -52,6 +56,7 @@ element:
     text: dX
     variable: setup.dx
     enable: False
+    tooltip: Grid cell size in X-direction
   - style: edit
     position:
       x: 160
@@ -61,6 +66,7 @@ element:
     text: dY
     variable: setup.dy
     enable: False
+    tooltip: Grid cell size in Y-direction
   - style: edit
     position:
       x: 60
@@ -70,3 +76,4 @@ element:
     text: Rotation
     variable: rotation
     enable: False
+    tooltip: Grid rotation angle in degrees

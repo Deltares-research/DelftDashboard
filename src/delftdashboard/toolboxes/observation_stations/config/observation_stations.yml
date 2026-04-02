@@ -19,6 +19,7 @@ element:
     select: index
     option_string:
       variable: station_names
+    tooltip: Select an observation station from the list
   - style: pushbutton
     position:
       x: 320
@@ -27,6 +28,7 @@ element:
       height: 20
     text: Add to Model
     method: add_stations_to_model
+    tooltip: Add selected stations as observation points to the active model
   - style: radiobuttongroup
     position:
       x: 320
@@ -36,3 +38,4 @@ element:
     option_string: ["Name", "ID"]
     option_value: ["name", "id"]
     method: select_naming_option
+    tooltip: Select whether to use station name or ID for labelling

@@ -10,6 +10,7 @@ element:
   select: index
   option_string:
     variable: drainage_structure_names
+  tooltip: Select drainage structure from the list
 - style: pushbutton
   text: Draw Drainage
   position:
@@ -90,7 +91,8 @@ element:
       variable: drainage_structure_types
     option_string:
       variable: drainage_structure_type_names
-    enable: false  
+    enable: false
+    tooltip: Type of drainage structure
   - style: edit
     text: Discharge (m3/s)
     position:

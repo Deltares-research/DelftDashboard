@@ -12,6 +12,7 @@ element:
   select: index
   option_string:
     variable: bathymetry_dataset_names
+  tooltip: Select a dataset to add to the selected datasets list
 - style: popupmenu
   position:
     x: 10
@@ -25,6 +26,7 @@ element:
     variable: bathymetry_source_names
   option_value:
     variable: bathymetry_source_names
+  tooltip: Select the source of bathymetry/topography datasets
 - style: pushbutton
   position:
     x: 220
@@ -33,6 +35,7 @@ element:
     height: 20
   text: "Use Dataset ->"
   method: use_dataset
+  tooltip: Add the selected dataset to the selected datasets list
 - style: pushbutton
   position:
     x: 220
@@ -42,6 +45,7 @@ element:
   text: "Info"
   method: info
   enable: False
+  tooltip: Show information about the selected dataset
 - style: listbox
   position:
     x: 310
@@ -55,6 +59,7 @@ element:
   select: index
   option_string:
     variable: selected_bathymetry_dataset_names
+  tooltip: Select a dataset from the selected datasets list
 - style: pushbutton
   position:
     x: 520
@@ -63,6 +68,7 @@ element:
     height: 20
   text: "Remove"
   method: remove_selected_bathymetry_dataset
+  tooltip: Remove the dataset from the selected datasets list
   dependency:
   - action: enable
     checkfor: all
@@ -78,6 +84,7 @@ element:
     height: 20
   text: "Move Up"
   method: move_up_selected_bathymetry_dataset
+  tooltip: Move the dataset one position up in the selected datasets list
   dependency:
   - action: enable
     checkfor: all
@@ -93,6 +100,7 @@ element:
     height: 20
   text: "Move Down"
   method: move_down_selected_bathymetry_dataset
+  tooltip: Move the dataset one position down in the selected datasets list
   dependency:
   - action: enable
     checkfor: all
@@ -109,6 +117,7 @@ element:
   text: "Zmax"
   method: edit_zmax_bathymetry_dataset
   variable: selected_bathymetry_dataset_zmax
+  tooltip: Maximum elevation for this dataset
   dependency:
   - action: enable
     checkfor: all
@@ -125,6 +134,7 @@ element:
   text: "Zmin"
   method: edit_zmin_bathymetry_dataset
   variable: selected_bathymetry_dataset_zmin
+  tooltip: Minimum elevation for this dataset
   dependency:
   - action: enable
     checkfor: all
@@ -140,6 +150,7 @@ element:
     height: 20
   text: "Generate Bathymetry"
   method: generate_bathymetry
+  tooltip: Generate model bathymetry from the selected datasets
   dependency:
   - action: enable
     checkfor: all

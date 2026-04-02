@@ -1,19 +1,30 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jul  5 13:40:07 2022
+"""Generic toolbox base class and toolbox selection logic.
 
-@author: ormondt
+Provides ``GenericToolbox``, the base class for all DelftDashboard toolboxes,
+and the ``select_toolbox`` helper used by the menu system.
 """
+
+from typing import Optional
 
 from delftdashboard.app import app
-import inspect
+
 
 class GenericToolbox:
-    def __init__(self):
-        self.callback_module_name = None
+    """Base class for all DelftDashboard toolboxes.
 
-    def select(self):
+    Subclasses override ``add_layers`` and ``set_crs`` to provide
+    model-specific map layers and coordinate-system handling.
+    """
 
+    def __init__(self) -> None:
+        self.callback_module_name: Optional[str] = None
+
+    def select(self) -> None:
+        """Activate this toolbox in the GUI and make its layers visible.
+
+        Update the tab panel to show this toolbox's elements and ensure the
+        correct callback module is wired up.
+        """
         app.active_toolbox = self
         app.gui.setvar("menu", "active_toolbox_name", app.active_toolbox.name)
 
@@ -39,32 +50,44 @@ class GenericToolbox:
 
         # Make toolbox layer visible
         if self.name in app.map.layer:
-            app.map.layer[self.name].show()    
+            app.map.layer[self.name].show()
 
         app.gui.window.update()
-        # app.gui.window.resize()
 
-    def add_layers(self):
-        pass
+    def add_layers(self) -> None:
+        """Register map layers for this toolbox.
 
-    def delete_layers(self):
-        # Should not use this method, use clear_layers instead
+        Override in subclasses to add toolbox-specific layers.
+        """
+
+    def delete_layers(self) -> None:
+        """Delete map layers for this toolbox.
+
+        .. deprecated::
+            Use ``clear_layers`` instead.
+        """
         if self.name in app.map.layer:
             app.map.layer[self.name].delete()
 
-    def clear_layers(self):
-        # Clear data and remove from map
+    def clear_layers(self) -> None:
+        """Clear data from map layers without deleting the layer objects."""
         if self.name in app.map.layer:
-            app.map.layer[self.name].clear()        
+            app.map.layer[self.name].clear()
 
-    def set_crs(self):
-        pass
+    def set_crs(self) -> None:
+        """Update the coordinate reference system for this toolbox.
 
-def select_toolbox(toolbox_name):
-    # Called from menu, or from model->select
+        Override in subclasses to handle CRS changes.
+        """
+
+
+def select_toolbox(toolbox_name: str) -> None:
+    """Activate the named toolbox.
+
+    Parameters
+    ----------
+    toolbox_name : str
+        Key into ``app.toolbox`` identifying the toolbox to select.
+    """
     app.active_toolbox = app.toolbox[toolbox_name]
     app.active_toolbox.select()
-    # # And go to this tab
-    # app.gui.window.elements[0].widget.select_tab(0)
-    # app.gui.window.update()
-

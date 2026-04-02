@@ -115,6 +115,7 @@ element:
     option_string: ["Time Series", "Astronomical"]
     option_value: ["timeseries", "astro"]
     method: select_timeseries_or_astro
+    tooltip: Select time series or astronomical boundary conditions
   - style: pushbutton
     text: Generate From Tide Model
     position:

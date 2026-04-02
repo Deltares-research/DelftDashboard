@@ -85,7 +85,9 @@ def make_topobathy_cog(
             xx, yy, dx, crs, bathymetry_sets
         )
     else:
-        raise ValueError("Either topography_data_catalog or bathymetry_database required.")
+        raise ValueError(
+            "Either topography_data_catalog or bathymetry_database required."
+        )
 
     zz = np.where(np.isfinite(zz), zz, -999.0).astype(np.float32)
 

@@ -1,19 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the flood map compare tab."""
 
-@author: ormondt
-"""
-import geopandas as gpd
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-# Callbacks
-def select(*args):
-    # De-activate() existing layers
+
+def select(*args: Any) -> None:
+    """Activate the compare tab and update map layers."""
     map.update()
-    # Tab selected
     app.toolbox["flood_map"].set_layer_mode("active")
 
-def edit_table(*args):
-    pass
+
+def edit_table(*args: Any) -> None:
+    """Handle table edit events (placeholder)."""

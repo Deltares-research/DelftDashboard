@@ -8,6 +8,7 @@ element:
   text: Air Density (kg/m3)
   variable: rhoa
   method: set_model_variables
+  tooltip: Edit air density used in wind drag computation
 - style: edit
   position:
     x: 110
@@ -17,3 +18,4 @@ element:
   text: Water Density (kg/m3)
   variable: rhow
   method: set_model_variables
+  tooltip: Edit water density

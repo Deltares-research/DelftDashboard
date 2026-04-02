@@ -123,6 +123,7 @@ element:
     select: index
     option_string:
       variable: exclude_polygon_names
+    tooltip: Select exclude polygon from list
   - style: pushbutton
     text: Draw Polygon
     position:
@@ -131,6 +132,7 @@ element:
       width: 80
       height: 20
     method: draw_exclude_polygon
+    tooltip: Draw exclude polygon on the map
   - style: pushbutton
     text: Delete Polygon
     position:
@@ -139,6 +141,7 @@ element:
       width: 80
       height: 20
     method: delete_exclude_polygon
+    tooltip: Delete selected exclude polygon
     dependency:
     - action: enable
       checkfor: all
@@ -154,6 +157,7 @@ element:
       width: 80
       height: 20
     method: load_exclude_polygon
+    tooltip: Load exclude polygon from file
   - style: pushbutton
     text: Save Polygon
     position:
@@ -162,6 +166,7 @@ element:
       width: 80
       height: 20
     method: save_exclude_polygon
+    tooltip: Save exclude polygon to file
     dependency:
     - action: enable
       checkfor: all

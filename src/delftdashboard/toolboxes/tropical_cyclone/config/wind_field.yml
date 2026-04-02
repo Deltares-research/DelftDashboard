@@ -145,7 +145,8 @@ element:
     height: 20
   text: Reference Time
   variable: tref
-  method: edit_variables  
+  method: edit_variables
+  tooltip: Set the reference date and time for the spiderweb file
 - style: pushbutton
   text: Load Configuration
   position:
@@ -154,6 +155,7 @@ element:
     width: 100
     height: 20
   method: load_config
+  tooltip: Load spiderweb configuration from file
 - style: pushbutton
   text: Save Configuration
   position:
@@ -162,6 +164,7 @@ element:
     width: 100
     height: 20
   method: save_config
+  tooltip: Save spiderweb configuration to file
 - style: pushbutton
   text: Build Spiderweb
   position:
@@ -170,6 +173,7 @@ element:
     width: 100
     height: 20
   method: build_spiderweb
+  tooltip: Build the spiderweb wind field file
   dependency:
   - action: enable
     checkfor: all

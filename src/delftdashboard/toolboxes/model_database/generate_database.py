@@ -1,19 +1,24 @@
+"""GUI callbacks for the model database generate/view tab.
+
+Handle collection selection, domain visualization, map updates,
+and model activation from the database.
+"""
+
+import os
+from typing import Any, Dict
+
+import geopandas as gpd
+import pandas as pd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
-import os 
-import geopandas as gpd
-import pandas as pd
-from typing import Dict, Any
-import shutil
 
 # from delftdashboard.operations.model import select_model
 
-def select(*args):
-    """
-    Select the model_database tab and update the map.
-    """
-    map.update() # This hides all toolbox and model layers
+
+def select(*args: Any) -> None:
+    """Activate the generate tab and show model boundaries on the map."""
+    map.update()  # This hides all toolbox and model layers
     app.map.layer["model_database"].show()
     if app.gui.getvar("model_database", "show_sfincs"):
         app.map.layer["model_database"].layer["boundaries_sfincs"].show()
@@ -24,16 +29,17 @@ def select(*args):
     else:
         app.map.layer["model_database"].layer["boundaries_hurrywave"].hide()
 
-def select_collection(*args):
-    pass
 
-def use_collection(*args):
-    """Show models in the selected collection"""
+def select_collection(*args: Any) -> None:
+    """Handle collection selection events (placeholder)."""
 
+
+def use_collection(*args: Any) -> None:
+    """Add the selected collection to the active list and update the map."""
     group = "model_database"
 
     # Collection to be added
-    collection_name  = app.gui.getvar(group, "active_available_collection_name")
+    collection_name = app.gui.getvar(group, "active_available_collection_name")
     selected_collections = app.gui.getvar(group, "selected_collection_names")
 
     if collection_name in selected_collections:
@@ -47,9 +53,8 @@ def use_collection(*args):
     update_domains()
 
 
-def remove_collection(*args):
-    """Remove the selected collection from the list of selected collections."""
-
+def remove_collection(*args: Any) -> None:
+    """Remove the selected collection from the active list."""
     group = "model_database"
 
     # Names of selected collections
@@ -74,19 +79,19 @@ def remove_collection(*args):
     update_domains()
 
 
-def select_selected_collections(*args):
-    # No need to do anything here
-    pass
+def select_selected_collections(*args: Any) -> None:
+    """Handle selected-collections list click events (placeholder)."""
 
 
-def update_domains(*args):
-    """Update the list of selected domains."""
-
+def update_domains(*args: Any) -> None:
+    """Update the domain list from all selected collections."""
     group = "model_database"
     domain_names_all = []
     # Loop through all selected collections and make list of all domain names to be shown
     for collection_name in app.gui.getvar(group, "selected_collection_names"):
-        domain_names_in_collection, _, _ = app.model_database.model_names(collection=collection_name)
+        domain_names_in_collection, _, _ = app.model_database.model_names(
+            collection=collection_name
+        )
         for domain_name_i in domain_names_in_collection:
             domain_names_all.append(domain_name_i)
     # Set the list of all domain names for the listbox
@@ -99,18 +104,17 @@ def update_domains(*args):
     update_map()
 
 
-def toggle_sfincs(*args):
-    """Toggle visibility of SFINCS models on the map."""
-
+def toggle_sfincs(*args: Any) -> None:
+    """Toggle visibility of SFINCS model boundaries on the map."""
     viz = app.gui.getvar("model_database", "show_sfincs")
     if viz:
         app.map.layer["model_database"].layer["boundaries_sfincs"].show()
     else:
         app.map.layer["model_database"].layer["boundaries_sfincs"].hide()
 
-def toggle_hurrywave(*args):
-    """Toggle visibility of HurryWave models on the map."""
 
+def toggle_hurrywave(*args: Any) -> None:
+    """Toggle visibility of HurryWave model boundaries on the map."""
     viz = app.gui.getvar("model_database", "show_hurrywave")
     if viz:
         app.map.layer["model_database"].layer["boundaries_hurrywave"].show()
@@ -118,33 +122,34 @@ def toggle_hurrywave(*args):
         app.map.layer["model_database"].layer["boundaries_hurrywave"].hide()
 
 
-def select_domain_from_list(*args):
-    """The polygon in the map should be selected based on the selected domain in the listbox."""
-
+def select_domain_from_list(*args: Any) -> None:
+    """Highlight the map polygon corresponding to the selected domain in the list."""
     # Activate the polygon on the map
     group = "model_database"
     name = app.gui.getvar(group, "active_domain_name")
     model = app.model_database.get_model(name=name)
 
     if model.type == "sfincs":
-        app.map.layer["model_database"].layer["boundaries_sfincs"].select_by_property("name", name)
+        app.map.layer["model_database"].layer["boundaries_sfincs"].select_by_property(
+            "name", name
+        )
     elif model.type == "hurrywave":
-        app.map.layer["model_database"].layer["boundaries_hurrywave"].select_by_property("name", name)
+        app.map.layer["model_database"].layer[
+            "boundaries_hurrywave"
+        ].select_by_property("name", name)
 
     return
 
 
 def activate_domain(self) -> None:
-    """
-    Select model to make model.toml.
-    This should copy the model input from the model database to the active model folder! And then load the model. Maybe check if there is already a model in the active model folder?
-    The copying should be done by a method in the model database class?
-    """
+    """Copy the selected domain input files and activate the model."""
     group = "model_database"
 
     # Check if the current working directory is an empty folder
     if os.listdir(os.getcwd()):
-        ok = app.gui.window.dialog_yes_no("The current working directory is not empty. This may overwrite existing files! It is strongly recommended to select an empty working directory. Do you want to continue?")
+        ok = app.gui.window.dialog_yes_no(
+            "The current working directory is not empty. This may overwrite existing files! It is strongly recommended to select an empty working directory. Do you want to continue?"
+        )
         if not ok:
             return
 
@@ -153,7 +158,7 @@ def activate_domain(self) -> None:
     domain = app.model_database.get_model(name=domain_name)
     app.model_database.copy_model_input_files(domain_name, os.getcwd())
 
-    # Now check what sort of model we are dealing with    
+    # Now check what sort of model we are dealing with
     if domain.type == "sfincs":
         app.active_model = app.model["sfincs_cht"]
         app.active_model.select()
@@ -163,17 +168,13 @@ def activate_domain(self) -> None:
         app.active_model.select()
         app.active_model.open(filename="hurrywave.inp")
 
-    
 
 def update_map(*args) -> None:
     update_boundaries_on_map()
 
 
-def update_boundaries_on_map(*args) -> None:
-    """
-    Update the boundaries of the models on the map.
-    """
-
+def update_boundaries_on_map(*args: Any) -> None:
+    """Load and display model domain boundaries for all selected collections."""
     # Make list of all the domains
     all_model_names = app.gui.getvar("model_database", "domain_names")
 
@@ -187,13 +188,12 @@ def update_boundaries_on_map(*args) -> None:
     hurrywave_models = []
 
     for model_name in all_model_names:
-
         model = app.model_database.get_model(name=model_name)
 
         if model.type == "sfincs":
             sfincs_models.append(model)
         elif model.type == "hurrywave":
-            hurrywave_models.append(model)    
+            hurrywave_models.append(model)
 
     # Waitbox
 
@@ -227,24 +227,29 @@ def update_boundaries_on_map(*args) -> None:
         app.map.layer["model_database"].layer["boundaries_hurrywave"].clear()
     else:
         gdf_hurrywave.reset_index(drop=True, inplace=True)
-        app.map.layer["model_database"].layer["boundaries_hurrywave"].set_data(gdf_hurrywave)
+        app.map.layer["model_database"].layer["boundaries_hurrywave"].set_data(
+            gdf_hurrywave
+        )
         if app.gui.getvar("model_database", "show_hurrywave"):
             app.map.layer["model_database"].layer["boundaries_hurrywave"].show()
-        else:        
+        else:
             app.map.layer["model_database"].layer["boundaries_hurrywave"].hide()
 
     wb.close()
 
 
 def select_model_from_map(feature: Dict[str, Any], layer: Any) -> None:
-    """
-    Select models from the map.
+    """Set the active domain name from a map click.
 
-    Parameters:
-    features (List[Dict[str, Any]]): List of selected features.
-    layer (Any): The layer from which the features were selected.
+    Parameters
+    ----------
+    feature : Dict[str, Any]
+        The clicked feature with properties.
+    layer : Any
+        Map layer that triggered the selection.
     """
-
-    app.gui.setvar("model_database", "active_domain_name", feature["properties"]["name"])  
+    app.gui.setvar(
+        "model_database", "active_domain_name", feature["properties"]["name"]
+    )
 
     app.gui.window.update()

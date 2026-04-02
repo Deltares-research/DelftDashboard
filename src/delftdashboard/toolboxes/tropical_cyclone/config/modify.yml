@@ -8,4 +8,5 @@ element:
     height: 20
   method: modify
   enable: false
+  tooltip: Modify the tropical cyclone track
   

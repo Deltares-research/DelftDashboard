@@ -1,57 +1,63 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the tropical cyclone import tab.
 
-@author: ormondt
+Handle track dataset selection, loading, saving, and deletion.
 """
-import os
-# import math
-# import numpy as np
-import geopandas as gpd
-# import shapely
-# import json
-# import os
-from delftdashboard.app import app
-from delftdashboard.operations import map
+
+from typing import Any
 
 from cht_cyclones import track_selector
 
-# Callbacks
+from delftdashboard.app import app
+from delftdashboard.operations import map
 
-def select(*args):
-    # De-activate() existing layers
+
+def select(*args: Any) -> None:
+    """Activate the import tab and show cyclone layers."""
     map.update()
-    # Tab selected
-    # Show track
     app.toolbox["tropical_cyclone"].set_layer_mode("active")
 
-def select_dataset(*args):
-    pass
 
-def select_track(*args):
+def select_dataset(*args: Any) -> None:
+    """Handle dataset selection events (placeholder)."""
 
-    # For now, only read in dataset "IBTrACS_NA_v04r00"
+
+def select_track(*args: Any) -> None:
+    """Open the track selector dialog and load the chosen cyclone track."""
     dataset_name = app.gui.getvar("tropical_cyclone", "selected_track_dataset")
-    dataset = app.toolbox["tropical_cyclone"].cyclone_track_database.get_dataset(dataset_name)
+    dataset = app.toolbox["tropical_cyclone"].cyclone_track_database.get_dataset(
+        dataset_name
+    )
 
-    # Get the center of the map
     center = app.map.map_center
 
-    # Open track selector
-    tc, okay = track_selector(dataset,
-        app, lon=center[0], lat=center[1], distance=300.0, year_min=2000, year_max=2025
+    tc, okay = track_selector(
+        dataset,
+        app,
+        lon=center[0],
+        lat=center[1],
+        distance=300.0,
+        year_min=2000,
+        year_max=2025,
     )
 
     if okay:
         app.toolbox["tropical_cyclone"].tc = tc
-        app.toolbox["tropical_cyclone"].tc.name = app.toolbox["tropical_cyclone"].tc.name.lower()
+        app.toolbox["tropical_cyclone"].tc.name = app.toolbox[
+            "tropical_cyclone"
+        ].tc.name.lower()
         app.toolbox["tropical_cyclone"].track_added()
 
-def load_track(*args):
+
+def load_track(*args: Any) -> None:
+    """Load a cyclone track from file."""
     app.toolbox["tropical_cyclone"].load_track()
 
-def save_track(*args):
+
+def save_track(*args: Any) -> None:
+    """Save the current cyclone track to file."""
     app.toolbox["tropical_cyclone"].save_track()
 
-def delete_track(*args):
+
+def delete_track(*args: Any) -> None:
+    """Delete the current cyclone track."""
     app.toolbox["tropical_cyclone"].delete_track()

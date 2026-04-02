@@ -8,3 +8,4 @@ element:
     height: 20
   method: draw_track
   enable: false
+  tooltip: Draw a tropical cyclone track on the map

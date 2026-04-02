@@ -1,20 +1,31 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Apr 25 10:58:08 2021
+"""Base class for watershed datasets.
 
-@author: Maarten van Ormondt
+Provide the WatershedsDataset base class with metadata reading,
+file checking, and S3 download support.
 """
 
 import os
 
+import boto3
 import geopandas as gpd
 import toml
-import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
 
+
 class WatershedsDataset:
-    def __init__(self, name, path):
+    """Base class for a single watershed dataset."""
+
+    def __init__(self, name: str, path: str) -> None:
+        """Initialize the dataset and read its metadata.
+
+        Parameters
+        ----------
+        name : str
+            Short name of the dataset.
+        path : str
+            Local directory path for the dataset.
+        """
         self.name = name
         self.long_name = name
         self.path = path
@@ -29,7 +40,8 @@ class WatershedsDataset:
         self.prefix = ""
         self.read_metadata()
 
-    def read_metadata(self):
+    def read_metadata(self) -> None:
+        """Read dataset metadata from the local metadata.tml file."""
         if not os.path.exists(os.path.join(self.path, "metadata.tml")):
             print(
                 "Warning! Watersheds metadata file not found: "
@@ -50,21 +62,50 @@ class WatershedsDataset:
         if "s3_key" in metadata:
             self.s3_key = metadata["s3_key"]
         if "s3_region" in metadata:
-            self.s3_region = metadata["s3_region"]    
+            self.s3_region = metadata["s3_region"]
 
-    def get_watersheds_in_bbox(self, xmin, ymin, xmax, ymax, level):
-        # Method overruled in inherited classes
+    def get_watersheds_in_bbox(
+        self, xmin: float, ymin: float, xmax: float, ymax: float, level: str
+    ) -> gpd.GeoDataFrame:
+        """Return watersheds within the given bounding box.
+
+        Parameters
+        ----------
+        xmin : float
+            Minimum longitude.
+        ymin : float
+            Minimum latitude.
+        xmax : float
+            Maximum longitude.
+        ymax : float
+            Maximum latitude.
+        level : str
+            Watershed level identifier.
+
+        Returns
+        -------
+        gpd.GeoDataFrame
+            Watersheds intersecting the bounding box.
+        """
         return gpd.GeoDataFrame()
 
-    def check_files(self):
+    def check_files(self) -> bool:
+        """Check whether all required dataset files exist locally.
+
+        Returns
+        -------
+        bool
+            True if all files are present.
+        """
         okay = True
         for file in self.files:
             if not os.path.exists(os.path.join(self.path, file)):
                 okay = False
                 break
-        return okay    
+        return okay
 
-    def download(self):
+    def download(self) -> None:
+        """Download missing dataset files from S3."""
         if self.s3_bucket is None:
             return
         # Check if download is needed

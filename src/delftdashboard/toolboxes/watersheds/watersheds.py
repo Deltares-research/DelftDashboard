@@ -1,58 +1,48 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
-
-This module defines the Toolbox class for handling watersheds in Delft Dashboard.
-It provides methods to initialize the toolbox, select datasets, and update boundaries on the map.
-
-Classes:
-    Toolbox: A class for handling watersheds in Delft Dashboard.
-
-Usage:
-    from delftdashboard.toolboxes.watersheds import Toolbox
-"""
+"""Watersheds toolbox for selecting and exporting watershed boundaries."""
 
 import os
+from typing import Any, Dict, List
+
 import geopandas as gpd
-import fiona
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
-from shapely.ops import transform
-import pyproj
-from typing import List, Dict, Any, Union
 
-from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.app import app
 from delftdashboard.operations import map
+from delftdashboard.operations.toolbox import GenericToolbox
 
-# For now, we do need make a separate cht package for the watersheds. Rather, we keep it in Delft Dashboard.
 from .cht_watersheds import WatershedsDatabase
 
-class Toolbox(GenericToolbox):
-    def __init__(self, name: str):
-        """
-        Initialize the Toolbox class.
 
-        Parameters:
-        name (str): The name of the toolbox.
-        """
+class Toolbox(GenericToolbox):
+    """Toolbox for browsing, selecting, and exporting watershed boundaries.
+
+    Parameters
+    ----------
+    name : str
+        Short name used to register the toolbox in the application.
+    """
+
+    def __init__(self, name: str) -> None:
         super().__init__()
         self.name: str = name
         self.long_name: str = "Watersheds"
         self.gdf: gpd.GeoDataFrame = gpd.GeoDataFrame()
 
     def initialize(self) -> None:
-        """
-        Initialize the watersheds toolbox.
-        """
+        """Set up the watershed database, load datasets, and configure GUI variables."""
         if "watersheds_database_path" not in app.config:
-            app.config["watersheds_database_path"] = os.path.join(app.config["data_path"], "watersheds")
+            app.config["watersheds_database_path"] = os.path.join(
+                app.config["data_path"], "watersheds"
+            )
         s3_bucket = app.config["s3_bucket"]
-        s3_key = f"data/watersheds"
-        app.watersheds_database = WatershedsDatabase(path=app.config["watersheds_database_path"],
-                                                     s3_bucket=s3_bucket,
-                                                     s3_key=s3_key,
-                                                     check_online=app.online)
+        s3_key = "data/watersheds"
+        app.watersheds_database = WatershedsDatabase(
+            path=app.config["watersheds_database_path"],
+            s3_bucket=s3_bucket,
+            s3_key=s3_key,
+            check_online=app.online,
+        )
 
         short_names, long_names = app.watersheds_database.dataset_names()
 
@@ -66,24 +56,35 @@ class Toolbox(GenericToolbox):
             app.gui.setvar(group, "dataset", short_names[0])
             app.gui.setvar(group, "buffer", 100.0)
             app.gui.setvar(group, "nr_selected_watersheds", 0)
-            app.gui.setvar(group, "level_names", app.watersheds_database.dataset[short_names[0]].level_names)
-            app.gui.setvar(group, "level_long_names", app.watersheds_database.dataset[short_names[0]].level_long_names)
-            app.gui.setvar(group, "level", app.watersheds_database.dataset[short_names[0]].level_names[0])
+            app.gui.setvar(
+                group,
+                "level_names",
+                app.watersheds_database.dataset[short_names[0]].level_names,
+            )
+            app.gui.setvar(
+                group,
+                "level_long_names",
+                app.watersheds_database.dataset[short_names[0]].level_long_names,
+            )
+            app.gui.setvar(
+                group,
+                "level",
+                app.watersheds_database.dataset[short_names[0]].level_names[0],
+            )
 
     def select_tab(self) -> None:
-        """
-        Select the watersheds tab and update the map.
-        """
+        """Activate the watersheds tab and show boundary layers."""
         map.update()
         app.map.layer["watersheds"].show()
         app.map.layer["watersheds"].layer["boundaries"].activate()
 
     def set_layer_mode(self, mode: str) -> None:
-        """
-        Set the layer mode for the watersheds.
+        """Control visibility of watershed map layers.
 
-        Parameters:
-        mode (str): The mode to set the layer to ("inactive" or "invisible").
+        Parameters
+        ----------
+        mode : str
+            One of "inactive" or "invisible".
         """
         if mode == "inactive":
             # Make all layers invisible
@@ -93,34 +94,37 @@ class Toolbox(GenericToolbox):
             app.map.layer["watersheds"].hide()
 
     def add_layers(self) -> None:
-        """
-        Add layers to the map for the watersheds.
-        """
+        """Register polygon selector layers on the map for watershed boundaries."""
         layer = app.map.add_layer("watersheds")
-        layer.add_layer("boundaries",
-                         type="polygon_selector",
-                         hover_property="name",
-                         line_color="white",
-                         line_opacity=0.5,
-                         line_color_selected="dodgerblue",
-                         line_opacity_selected=1.0,
-                         fill_color="dodgerblue",
-                         fill_opacity=0.0,
-                         fill_color_selected="dodgerblue",
-                         fill_opacity_selected=0.6,
-                         fill_color_hover="green",
-                         fill_opacity_hover=0.35,
-                         selection_type="multiple",
-                         select=self.select_watershed_from_map
-                        )
+        layer.add_layer(
+            "boundaries",
+            type="polygon_selector",
+            hover_property="name",
+            line_color="white",
+            line_opacity=0.5,
+            line_color_selected="dodgerblue",
+            line_opacity_selected=1.0,
+            fill_color="dodgerblue",
+            fill_opacity=0.0,
+            fill_color_selected="dodgerblue",
+            fill_opacity_selected=0.6,
+            fill_color_hover="green",
+            fill_opacity_hover=0.35,
+            selection_type="multiple",
+            select=self.select_watershed_from_map,
+        )
 
-    def select_watershed_from_map(self, features: List[Dict[str, Any]], layer: Any) -> None:
-        """
-        Select watersheds from the map.
+    def select_watershed_from_map(
+        self, features: List[Dict[str, Any]], layer: Any
+    ) -> None:
+        """Store selected watershed features from the map.
 
-        Parameters:
-        features (List[Dict[str, Any]]): List of selected features.
-        layer (Any): The layer from which the features were selected.
+        Parameters
+        ----------
+        features : List[Dict[str, Any]]
+            List of selected features with properties.
+        layer : Any
+            Map layer that triggered the selection.
         """
         indices = []
         ids = []
@@ -128,14 +132,12 @@ class Toolbox(GenericToolbox):
             indices.append(feature["properties"]["index"])
             ids.append(feature["properties"]["id"])
         app.gui.setvar("watersheds", "selected_indices", indices)
-        app.gui.setvar("watersheds", "selected_ids", ids)    
+        app.gui.setvar("watersheds", "selected_ids", ids)
         app.gui.setvar("watersheds", "nr_selected_watersheds", len(indices))
         app.gui.window.update()
 
     def update_boundaries_on_map(self) -> None:
-        """
-        Update the boundaries of the watersheds on the map.
-        """
+        """Load and display watershed boundaries for the current map extent."""
         dataset_name = app.gui.getvar("watersheds", "dataset")
         dataset = app.watersheds_database.dataset[dataset_name]
         extent = app.map.map_extent
@@ -147,8 +149,10 @@ class Toolbox(GenericToolbox):
 
         # First check if dataset files need to be downloaded
         if not dataset.check_files():
-            rsp = app.gui.window.dialog_yes_no(f"Dataset {dataset_name} is not locally available. Do you want to try to download it? This may take several minutes.",
-                                               "Download dataset?")
+            rsp = app.gui.window.dialog_yes_no(
+                f"Dataset {dataset_name} is not locally available. Do you want to try to download it? This may take several minutes.",
+                "Download dataset?",
+            )
             if rsp:
                 wb = app.gui.window.dialog_wait("Downloading watersheds ...")
                 dataset.download()
@@ -162,9 +166,7 @@ class Toolbox(GenericToolbox):
         wb.close()
 
     def select_dataset(self) -> None:
-        """
-        Select a dataset for the watersheds.
-        """
+        """Update available levels when the user selects a different dataset."""
         dataset_name = app.gui.getvar("watersheds", "dataset")
         dataset = app.watersheds_database.dataset[dataset_name]
         app.gui.setvar("watersheds", "level_names", dataset.level_names)
@@ -174,22 +176,18 @@ class Toolbox(GenericToolbox):
         app.gui.window.update()
 
     def select_level(self) -> None:
-        """
-        Select a level for the watersheds.
-        """
+        """Handle watershed level selection events (placeholder)."""
         pass
 
     def save(self) -> None:
-        """
-        Save the selected watersheds to a file.
-        """
+        """Export the selected watersheds to a GeoJSON file."""
         if len(self.gdf) == 0:
             return
 
         dataset_name = app.gui.getvar("watersheds", "dataset")
 
         if app.map.crs.to_epsg() != 4326:
-            crs_string = "_epsg" + str(app.map.crs.to_epsg())
+            crs_string = f"_epsg{app.map.crs.to_epsg()}"
         else:
             crs_string = ""
 
@@ -218,10 +216,12 @@ class Toolbox(GenericToolbox):
         else:
             filename = f"{dataset_name}_{ids[0]}{crs_string}.geojson"
 
-        rsp = app.gui.window.dialog_save_file("Save watersheds as ...",
-                                              file_name=filename,
-                                              filter="*.geojson",
-                                              allow_directory_change=False)
+        rsp = app.gui.window.dialog_save_file(
+            "Save watersheds as ...",
+            file_name=filename,
+            filter="*.geojson",
+            allow_directory_change=False,
+        )
         if rsp[0]:
             filename = rsp[2]
         else:
@@ -236,7 +236,7 @@ class Toolbox(GenericToolbox):
             # Write text file with watershed names
             with open(filename_txt, "w") as f:
                 for index, name in enumerate(names):
-                    f.write(ids[index] + " " + name + '\n')
+                    f.write(ids[index] + " " + name + "\n")
 
         # Apply buffer
         self.dbuf = app.gui.getvar("watersheds", "buffer") / 100000.0
@@ -250,25 +250,35 @@ class Toolbox(GenericToolbox):
         gdf.to_file(filename, driver="GeoJSON")
 
     def edit_buffer(self) -> None:
-        """
-        Edit the buffer for the watersheds.
-        """
+        """Handle buffer distance edit events (placeholder)."""
         pass
 
-def select(*args) -> None:
+
+def select(*args: Any) -> None:
+    """Activate the watersheds tab."""
     app.toolbox["watersheds"].select_tab()
 
-def select_dataset(*args) -> None:
+
+def select_dataset(*args: Any) -> None:
+    """Handle dataset selection change."""
     app.toolbox["watersheds"].select_dataset()
 
-def select_level(*args) -> None:
+
+def select_level(*args: Any) -> None:
+    """Handle level selection change."""
     app.toolbox["watersheds"].select_level()
 
-def update(*args) -> None:
+
+def update(*args: Any) -> None:
+    """Update watershed boundaries on the map."""
     app.toolbox["watersheds"].update_boundaries_on_map()
 
-def save(*args) -> None:
+
+def save(*args: Any) -> None:
+    """Save selected watersheds to file."""
     app.toolbox["watersheds"].save()
 
-def edit_buffer(*args) -> None:
+
+def edit_buffer(*args: Any) -> None:
+    """Handle buffer distance edit."""
     app.toolbox["watersheds"].edit_buffer()

@@ -1,178 +1,188 @@
-# -*- coding: utf-8 -*-
+"""Delft3D-FM model plugin for DelftDashboard.
+
+Provides the ``Model`` class that wraps a cht_delft3dfm domain, registers
+map layers, and synchronizes GUI state with the model configuration.
 """
-Created on Mon May 10 12:18:09 2021
 
-@author: ormondt
-"""
-import os
-#from PyQt5.QtWidgets import QFileDialog
-from pathlib import Path
-
-from delftdashboard.operations.model import GenericModel
-from delftdashboard.operations import map
-from delftdashboard.app import app
-
-# from cht_delft3dfm.delft3dfm import Delft3DFM
-from cht_delft3dfm import Delft3DFM
-import datetime
 import ast
+import datetime
+import os
+from pathlib import Path
+from typing import Any, Dict
+
+import geopandas as gpd
+from cht_delft3dfm import Delft3DFM
+
+from delftdashboard.app import app
+from delftdashboard.operations.model import GenericModel
+
+_MODEL = "delft3dfm"
+
 
 class Model(GenericModel):
-    def __init__(self, name):
-        super().__init__()
+    """DelftDashboard model wrapper for Delft3D-FM."""
 
+    def __init__(self, name: str) -> None:
+        super().__init__()
         self.name = name
         self.long_name = "Delft3D-FM"
 
-    def initialize(self):
-        # self.active_domain = 0
-        self.domain = Delft3DFM(crs = app.crs)
-        self.domain.fname = 'flow.mdu'
+    def initialize(self) -> None:
+        """Create a fresh Delft3DFM domain and set default GUI variables."""
+        self.domain = Delft3DFM(crs=app.crs)
+        self.domain.fname = "flow.mdu"
         self.set_gui_variables()
         self.observation_points_changed = False
         self.cross_sections_changed = False
-        # self.discharge_points_changed = False
         self.boundaries_changed = False
         self.thin_dams_changed = False
 
-    def get_view_menu(self):
-        model_view_menu = {}
+    def get_view_menu(self) -> Dict[str, Any]:
+        """Build the View menu entries for this model.
+
+        Returns
+        -------
+        dict
+            Menu definition dict with text, sub-items, and callbacks.
+        """
+        model_view_menu: Dict[str, Any] = {}
         model_view_menu["text"] = self.long_name
         model_view_menu["menu"] = []
-        model_view_menu["menu"].append({"variable_group": self.name,
-                                        "id": f"view.{self.name}.grid",
-                                        "text": "Grid",
-                                        "variable": "view_grid",
-                                        "separator": True,
-                                        "checkable": True,
-                                        "method": self.set_view_menu,
-                                        "option": "grid",
-                                        "dependency": [{"action": "check", "checkfor": "all", "check": [{"variable": "view_grid", "operator": "eq", "value": True}]}]})
+        model_view_menu["menu"].append(
+            {
+                "variable_group": self.name,
+                "id": f"view.{self.name}.grid",
+                "text": "Grid",
+                "variable": "view_grid",
+                "separator": True,
+                "checkable": True,
+                "method": self.set_view_menu,
+                "option": "grid",
+                "dependency": [
+                    {
+                        "action": "check",
+                        "checkfor": "all",
+                        "check": [
+                            {"variable": "view_grid", "operator": "eq", "value": True}
+                        ],
+                    }
+                ],
+            }
+        )
         return model_view_menu
 
-    def set_view_menu(self, option, checked):
+    def set_view_menu(self, option: str, checked: bool) -> None:
+        """Toggle map layer visibility from the view menu.
+
+        Parameters
+        ----------
+        option : str
+            The menu option toggled (e.g. ``"grid"``).
+        checked : bool
+            Whether the option is now checked.
+        """
         if option == "grid":
-            print(f"Checked: {checked}")
             if app.gui.getvar(self.name, "view_grid"):
-                app.map.layer["delft3dfm"].layer["grid"].show()
-                print("Grid is made visible")
+                app.map.layer[_MODEL].layer["grid"].show()
             else:
-                app.map.layer["delft3dfm"].layer["grid"].hide()
-                print("Grid is made invisible")
+                app.map.layer[_MODEL].layer["grid"].hide()
 
-    def add_layers(self):
-        # Add main DDB layer
-        layer = app.map.add_layer("delft3dfm")
+    def add_layers(self) -> None:
+        """Register all map layers for the Delft3D-FM model."""
+        layer = app.map.add_layer(_MODEL)
 
-        # layer.add_layer("grid", type="deck_geojson",
-        #                 file_name="delft3dfm_grid.geojson",
-        #                 line_color="black")
         layer.add_layer("grid", type="raster_image")
 
-        layer.add_layer("grid_exterior",
-                        type="line",
-                        circle_radius=0,
-                        line_color="yellow")
-        
-        # layer.add_layer("mask_include",
-        #                 type="circle",
-        #                 file_name="delft3dfm_mask_include.geojson",
-        #                 circle_radius=3,
-        #                 fill_color="yellow",
-        #                 line_color="transparent")
+        layer.add_layer(
+            "grid_exterior",
+            type="line",
+            circle_radius=0,
+            line_color="yellow",
+        )
 
-        # layer.add_layer("mask_boundary",
-        #                 type="circle",
-        #                 file_name="delft3dfm_mask_boundary.geojson",
-        #                 circle_radius=3,
-        #                 fill_color="red",
-        #                 line_color="transparent")
-
-        # Move this to delft3dfm.py
-        # from .boundary_conditions import select_boundary_point_from_map
-        layer.add_layer("boundary_line",
-                        type="line",
-                        hover_property="name",
-                        line_color="red",
-                        line_width= 3,
-                        line_opacity=1.0,
-                        fill_color="red",
-                        fill_opacity=1.0,
-                       )
+        layer.add_layer(
+            "boundary_line",
+            type="line",
+            hover_property="name",
+            line_color="red",
+            line_width=3,
+            line_opacity=1.0,
+            fill_color="red",
+            fill_opacity=1.0,
+        )
 
         from .observation_points_regular import select_observation_point_from_map
-        layer.add_layer("observation_points",
-                        type="circle_selector",
-                        hover_property="name",
-                        select=select_observation_point_from_map,
-                        line_color="white",
-                        line_opacity=1.0,
-                        fill_color="blue",
-                        fill_opacity=1.0,
-                        circle_radius=3,
-                        circle_radius_selected=4,
-                        line_color_selected="white",
-                        fill_color_selected="red")
-        
-        from .structures_thin_dams import thin_dam_created
-        from .structures_thin_dams import thin_dam_selected
-        from .structures_thin_dams import thin_dam_modified
-        layer.add_layer("thin_dams",
-                        type="draw",
-                        shape="polyline",
-                        create=thin_dam_created,
-                        modify=thin_dam_modified,
-                        select=thin_dam_selected,
-                        polyline_line_color="yellow",
-                        polyline_line_width=2.0,
-                        polyline_line_opacity=1.0)
-        
-        from .observation_points_crs import cross_section_created
-        from .observation_points_crs import cross_section_selected
-        from .observation_points_crs import cross_section_modified
-        layer.add_layer("cross_sections",
-                            type="draw",
-                            shape="polyline",
-                            create=cross_section_created,
-                            modify=cross_section_modified,
-                            select=cross_section_selected,
-                            polyline_line_color="yellow",
-                            polyline_line_width=2.0,
-                            polyline_line_opacity=1.0)
-        
-        # from .observation_points_spectra import select_observation_point_from_map_spectra
-        # layer.add_layer("observation_points_spectra",
-        #                 type="circle_selector",
-        #                 select=select_observation_point_from_map_spectra,
-        #                 line_color="white",
-        #                 line_opacity=1.0,
-        #                 fill_color="orange",
-        #                 fill_opacity=1.0,
-        #                 circle_radius=3,
-        #                 circle_radius_selected=4,
-        #                 line_color_selected="white",
-        #                 fill_color_selected="red")
 
-    def set_layer_mode(self, mode):
-        layer = app.map.layer["delft3dfm"]
+        layer.add_layer(
+            "observation_points",
+            type="circle_selector",
+            hover_property="name",
+            select=select_observation_point_from_map,
+            line_color="white",
+            line_opacity=1.0,
+            fill_color="blue",
+            fill_opacity=1.0,
+            circle_radius=3,
+            circle_radius_selected=4,
+            line_color_selected="white",
+            fill_color_selected="red",
+        )
+
+        from .structures_thin_dams import (
+            thin_dam_created,
+            thin_dam_modified,
+            thin_dam_selected,
+        )
+
+        layer.add_layer(
+            "thin_dams",
+            type="draw",
+            shape="polyline",
+            create=thin_dam_created,
+            modify=thin_dam_modified,
+            select=thin_dam_selected,
+            polyline_line_color="yellow",
+            polyline_line_width=2.0,
+            polyline_line_opacity=1.0,
+        )
+
+        from .observation_points_crs import (
+            cross_section_created,
+            cross_section_modified,
+            cross_section_selected,
+        )
+
+        layer.add_layer(
+            "cross_sections",
+            type="draw",
+            shape="polyline",
+            create=cross_section_created,
+            modify=cross_section_modified,
+            select=cross_section_selected,
+            polyline_line_color="yellow",
+            polyline_line_width=2.0,
+            polyline_line_opacity=1.0,
+        )
+
+    def set_layer_mode(self, mode: str) -> None:
+        """Show, hide, or deactivate map layers depending on *mode*.
+
+        Parameters
+        ----------
+        mode : str
+            One of ``'inactive'`` or ``'invisible'``.
+        """
+        layer = app.map.layer[_MODEL]
         if mode == "inactive":
-            # Grid is made visible
             layer.layer["grid"].deactivate()
-            # Grid exterior is made visible
             layer.layer["grid_exterior"].deactivate()
-            # Boundary line is made visible
             layer.layer["boundary_line"].deactivate()
-            # Observation points are made grey
             layer.layer["observation_points"].deactivate()
-            # layer.layer["cross_sections"].deactivate()
-            # Thin dams are made grey
-            # layer.layer["thin_dams"].deactivate()
-            # app.map.layer["delft3dfm"].layer["observation_points_spectra"].deactivate()
         elif mode == "invisible":
-            # Everything set to invisible
             layer.hide()
 
-    def set_crs(self):
+    def set_crs(self) -> None:
+        """Update the model CRS to match the application CRS and re-plot."""
         crs = app.crs
         old_crs = self.domain.crs
         if old_crs != crs:
@@ -180,38 +190,29 @@ class Model(GenericModel):
             self.domain.clear_spatial_attributes()
             self.plot()
 
-    def set_gui_variables(self):
-        group = "delft3dfm"
-        subgroups = ['numerics', 'physics', 'output', 'geometry','wind',]
+    def set_gui_variables(self) -> None:
+        """Copy model config and defaults to GUI variables."""
+        group = _MODEL
+        subgroups = ["numerics", "physics", "output", "geometry", "wind"]
 
-        # View  
         app.gui.setvar(group, "view_grid", True)
 
-        # Input variables
         for groupname in subgroups:
             subgroup = getattr(self.domain.input, groupname)
-
             for var_name, var_value in vars(subgroup).items():
-                if var_name == 'comments':
-                    continue  # Skip 'comments' variable
-
-                # if isinstance(var_value, list):  # Handle lists
-                #     app.gui.setvar(group, f'{groupname}.{var_name}', var_value)
-
-                    # for i, item in enumerate(var_value):
-                    #     app.gui.setvar(group, f'{groupname}.{var_name}', item)
-                if hasattr(var_value, '__dict__'): 
+                if var_name == "comments":
+                    continue
+                if hasattr(var_value, "__dict__"):
                     for subvar_name, subvar_value in vars(var_value).items():
-                        # if isinstance(subvar_value, Path): # Convert Path object to string if it's a filepath
-                        #     subvar_value = str(subvar_value)
-                        # Set the nested variable
-                        app.gui.setvar("delft3dfm", f'{groupname}.{var_name}.{subvar_name}', subvar_value)
+                        app.gui.setvar(
+                            _MODEL,
+                            f"{groupname}.{var_name}.{subvar_name}",
+                            subvar_value,
+                        )
                 else:
-                    # if isinstance(var_value, Path):   # Convert Path object to string if it's a filepath
-                    #     var_value = str(var_value)
-                    app.gui.setvar(group, f'{groupname}.{var_name}', var_value)
+                    app.gui.setvar(group, f"{groupname}.{var_name}", var_value)
 
-        # Overwrite time variables to set them to datetime objects
+        # Time defaults
         tnow = datetime.datetime.now().replace(
             hour=0, minute=0, second=0, microsecond=0
         )
@@ -219,7 +220,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "time.tstart", tnow)
         app.gui.setvar(group, "time.tstop", tnow + datetime.timedelta(days=1))
 
-        # Domain variables
+        # Domain
         app.gui.setvar(group, "setup.x0", 0)
         app.gui.setvar(group, "setup.y0", 1)
         app.gui.setvar(group, "setup.nmax", 0)
@@ -227,34 +228,20 @@ class Model(GenericModel):
         app.gui.setvar(group, "setup.dx", 0.01)
         app.gui.setvar(group, "setup.dy", 0.01)
 
-        # Boundary conditions
-        # app.gui.setvar(group, "boundary_point_names", []) 
-        # app.gui.setvar(group, "active_boundary_point", 0)
-        # app.gui.setvar(group, "boundary_forcing", self.domain.boundary_conditions.forcing)
-        # app.gui.setvar(group, "boundary_hm0", 1.0)
-        # app.gui.setvar(group, "boundary_tp", 6.0)
-        # app.gui.setvar(group, "boundary_wd", 0.0)
-        # app.gui.setvar(group, "boundary_ds", 30.0)
-
         # Observation points
         app.gui.setvar(group, "observation_point_names", [])
         app.gui.setvar(group, "nr_observation_points", 0)
         app.gui.setvar(group, "active_observation_point", 0)
 
-        # Observation cross sections
+        # Cross sections
         app.gui.setvar(group, "cross_section_names", [])
         app.gui.setvar(group, "nr_cross_sections", 0)
         app.gui.setvar(group, "active_cross_section", 0)
 
-        # Open boundary line
+        # Boundary line
         app.gui.setvar(group, "boundary_line_active", 0)
-        # app.gui.setvar(group, "boundary_conditions_tide_model", "GTSMv4.1_opendap")
 
         # Boundary conditions
-        # app.gui.setvar(group, "boundary_point_names", [])
-        # app.gui.setvar(group, "nr_boundary_points", 0)
-        # app.gui.setvar(group, "active_boundary_point", 0)
-        # app.gui.setvar(group, "boundary_dx", 10000.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_shape", "constant")
         app.gui.setvar(group, "boundary_conditions_timeseries_time_step", 600.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_offset", 0.0)
@@ -265,7 +252,11 @@ class Model(GenericModel):
         app.gui.setvar(group, "boundary_conditions_timeseries_peak", 1.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
-        app.gui.setvar(group, "boundary_conditions_tide_model", app.gui.getvar("tide_models", "names")[0])
+        app.gui.setvar(
+            group,
+            "boundary_conditions_tide_model",
+            app.gui.getvar("tide_models", "names")[0],
+        )
         app.gui.setvar(group, "boundary_conditions_tide_offset", 0.0)
 
         # Thin dams
@@ -273,146 +264,120 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_thin_dams", 0)
         app.gui.setvar(group, "active_thin_dam", 0)
 
-    # def set_model_variables(self, varid=None, value=None):
-    #     # Copies gui variables to delft3dfm input variables
-    #     group = "delft3dfm"
-    #     subgroups = ['numerics', 'physics', 'time', 'output', ]
-                     
-    #     # Input variables
-    #     for groupname in subgroups:
-    #         subgroup = getattr(self.domain.input, groupname)
-    #         for var_name, var_value in vars(subgroup).items():
-    #             setattr(f'{groupname}.{var_name}', var_name, app.gui.getvar(group, f'{groupname}.{var_name}'))
-
-    #     group = "delft3dfm"
-    #     for var_name in vars(self.domain.input.variables):
-    #         setattr(self.domain.input.variables, var_name, app.gui.getvar(group, var_name))
-
-
-    def set_input_variables(self):
-        # Update all model input variables
-        subgroups = ['numerics', 'physics', 'geometry', 'wind', ]
+    def set_input_variables(self) -> None:
+        """Copy GUI variables back to the Delft3D-FM model input."""
+        subgroups = ["numerics", "physics", "geometry", "wind"]
 
         for groupname in subgroups:
             subgroup = getattr(self.domain.input, groupname)
-
             for var_name, var_value in vars(subgroup).items():
-                if var_name in ['comments', 'landboundaryfile']:
-                    continue  # Skip 'comments' variable
-        
-                # if isinstance(var_value, list):  # Handle lists
-                #     val = app.gui.getvar(f'delft3dfm', f'{groupname}.{var_name}')
-                #     for i, item in enumerate(var_value):
-                #         value[i] = Path(val) if isinstance(item, Path) else val
-                #     setattr(subgroup, var_name, value)
-                if hasattr(var_value, '__dict__'): # Handle dictionaries
+                if var_name in ["comments", "landboundaryfile"]:
+                    continue
+                if hasattr(var_value, "__dict__"):
                     for subvar_name in vars(var_value):
-                        value = app.gui.getvar(f'delft3dfm', f'{groupname}.{var_name}.{subvar_name}')
-                        if 'filepath' in subvar_name.lower() and value is not None:  # Check if it's a filepath
-                            value = Path(value)  # Parse to Path
+                        value = app.gui.getvar(
+                            _MODEL, f"{groupname}.{var_name}.{subvar_name}"
+                        )
+                        if "filepath" in subvar_name.lower() and value is not None:
+                            value = Path(value)
                         setattr(var_value, subvar_name, value)
                 else:
-                    value = app.gui.getvar("delft3dfm", f'{groupname}.{var_name}')
-                    if 'filepath' in var_name.lower() and value is not None:  # Check if it's a filepath
-                        value = Path(value)  # Parse to Path
+                    value = app.gui.getvar(_MODEL, f"{groupname}.{var_name}")
+                    if "filepath" in var_name.lower() and value is not None:
+                        value = Path(value)
                     setattr(subgroup, var_name, value)
-        # Set timeframe of domain using set_timeframe
+
         self.set_timeframe()
-        
-        # Set output variables
-        hisinterval = app.gui.getvar("delft3dfm", "output.hisinterval")
-        if isinstance(hisinterval, str):
-            hisinterval = ast.literal_eval(hisinterval)
-        setattr(self.domain.input.output, "hisinterval", hisinterval)
-        mapinterval = app.gui.getvar("delft3dfm", "output.mapinterval")
-        if isinstance(mapinterval, str):
-            mapinterval = ast.literal_eval(mapinterval)
-        setattr(self.domain.input.output, "mapinterval", mapinterval)
-        rstinterval = app.gui.getvar("delft3dfm", "output.rstinterval")
-        if isinstance(rstinterval, str):
-            rstinterval = ast.literal_eval(rstinterval)
-        setattr(self.domain.input.output, "rstinterval", rstinterval)
 
-    def set_timeframe(self):
-        refdate = app.gui.getvar("delft3dfm", "time.refdate")
-        refdate = refdate.strftime("%Y%m%d")
-        setattr(self.domain.input.time, "refdate", refdate)
+        # Output intervals
+        for attr in ("hisinterval", "mapinterval", "rstinterval"):
+            val = app.gui.getvar(_MODEL, f"output.{attr}")
+            if isinstance(val, str):
+                val = ast.literal_eval(val)
+            setattr(self.domain.input.output, attr, val)
 
-        start_time = app.gui.getvar("delft3dfm", "time.tstart")
-        start_time = start_time.strftime("%Y%m%d%H%M%S")
-        setattr(self.domain.input.time, "startdatetime", start_time)
+    def set_timeframe(self) -> None:
+        """Copy GUI time variables to the model domain."""
+        refdate = app.gui.getvar(_MODEL, "time.refdate")
+        setattr(self.domain.input.time, "refdate", refdate.strftime("%Y%m%d"))
 
-        stop_time = app.gui.getvar("delft3dfm", "time.tstop")
-        stop_time = stop_time.strftime("%Y%m%d%H%M%S")
-        setattr(self.domain.input.time, "stopdatetime", stop_time)
-     
-    def open(self):
-        # Open input file, and change working directory
-        fname = app.gui.window.dialog_open_file("Open file", filter="Delft3D-FM input file (flow.mdu)")
+        start_time = app.gui.getvar(_MODEL, "time.tstart")
+        setattr(
+            self.domain.input.time, "startdatetime", start_time.strftime("%Y%m%d%H%M%S")
+        )
+
+        stop_time = app.gui.getvar(_MODEL, "time.tstop")
+        setattr(
+            self.domain.input.time, "stopdatetime", stop_time.strftime("%Y%m%d%H%M%S")
+        )
+
+    def open(self) -> None:
+        """Open an existing Delft3D-FM model from a file dialog."""
+        fname = app.gui.window.dialog_open_file(
+            "Open file", filter="Delft3D-FM input file (flow.mdu)"
+        )
         fname = fname[0]
         if fname:
             dlg = app.gui.window.dialog_wait("Loading Delft3D-FM model ...")
             path = os.path.dirname(fname)
-            # if path is and empty string, use current working directory
             if not path:
                 path = os.getcwd()
             self.domain.path = path
-            # Change working directory
             os.chdir(path)
             self.domain.fname = fname
             self.domain.read_input_file(fname)
             self.domain.read_attribute_files()
             self.set_gui_variables()
-            # Change CRS
             app.crs = self.domain.crs
             self.plot()
             dlg.close()
-            # Zoom to model extent
             bounds = self.domain.grid.bounds(crs=4326, buffer=0.1)
             app.map.fit_bounds(bounds[0], bounds[1], bounds[2], bounds[3])
 
-    def save(self):
-        # Write flow.mdu
+    def save(self) -> None:
+        """Write the current model to disk."""
         self.domain.path = os.getcwd()
-        self.domain.write_input_file(input_file=os.path.join(self.domain.path, self.domain.fname))        
-        # self.domain.write_batch_file()
+        self.domain.write_input_file(
+            input_file=os.path.join(self.domain.path, self.domain.fname)
+        )
 
-    def load(self):
-        self.domain.read_input_file(input_file=os.path.join(self.domain.path, self.domain.fname))
+    def load(self) -> None:
+        """Re-read the model input file from disk."""
+        self.domain.read_input_file(
+            input_file=os.path.join(self.domain.path, self.domain.fname)
+        )
 
-    def plot(self):
-        # Grid
-        app.map.layer["delft3dfm"].layer["grid"].set_data(self.domain.grid)
-        # # Mask
-        # app.map.layer["delft3dfm"].layer["mask_include"].set_data(self.domain.grid.mask_to_gdf(option="include"))
-        # app.map.layer["delft3dfm"].layer["mask_boundary"].set_data(self.domain.grid.mask_to_gdf(option="boundary"))
-        # Boundary points
-        app.map.layer["delft3dfm"].layer["boundary_line"].clear()
-        app.map.layer["delft3dfm"].layer["boundary_line"].set_data(self.domain.boundary_conditions.gdf)
+    def plot(self) -> None:
+        """Plot all model layers on the map."""
+        layer = app.map.layer[_MODEL]
+        layer.layer["grid"].set_data(self.domain.grid)
+        layer.layer["boundary_line"].clear()
+        layer.layer["boundary_line"].set_data(self.domain.boundary_conditions.gdf)
+        layer.layer["observation_points"].set_data(
+            self.domain.observation_points.gdf, 0
+        )
 
-        # Observation points
-        app.map.layer["delft3dfm"].layer["observation_points"].set_data(app.model["delft3dfm"].domain.observation_points.gdf, 0)
+    def add_stations(
+        self, gdf_stations_to_add: gpd.GeoDataFrame, naming_option: str = "id"
+    ) -> None:
+        """Add observation stations to the model.
 
-        # Observation cross sections
-        # app.map.layer["delft3dfm"].layer["observation_lines"].set_data(app.model["delft3dfm"].domain.observation_line_gdf)
-
-        # # Boundary points
-        # gdf = self.domain.boundary_conditions.gdf
-        # app.map.layer["delft3dfm"].layer["boundary_points"].set_data(gdf, 0)
-        # # Observation points
-        # gdf = self.domain.observation_points_regular.gdf
-        # app.map.layer["delft3dfm"].layer["observation_points_regular"].set_data(gdf, 0)
-        # gdf = self.domain.observation_points_sp2.gdf
-        # app.map.layer["delft3dfm"].layer["observation_points_spectra"].set_data(gdf, 0)
-
-    def add_stations(self, gdf_stations_to_add, naming_option="id"):
-        self.domain.observation_points.add_points(gdf_stations_to_add, name=naming_option)
+        Parameters
+        ----------
+        gdf_stations_to_add : gpd.GeoDataFrame
+            GeoDataFrame with station geometries.
+        naming_option : str, optional
+            Column name used for station names, by default ``'id'``.
+        """
+        self.domain.observation_points.add_points(
+            gdf_stations_to_add, name=naming_option
+        )
         gdf = self.domain.observation_points.gdf
-        app.map.layer["delft3dfm"].layer["observation_points"].set_data(gdf, 0)
+        app.map.layer[_MODEL].layer["observation_points"].set_data(gdf, 0)
         if not self.domain.input.output.obsfile:
             from hydrolib.core.dflowfm.xyn.models import XYNModel
+
             obs = XYNModel()
             obs.filepath = Path(self.domain.path) / "delft3dfm.obs"
-            app.model["delft3dfm"].domain.input.output.obsfile = [obs]
+            self.domain.input.output.obsfile = [obs]
         self.domain.observation_points.write()
-

@@ -8,6 +8,7 @@ element:
   text: X0
   variable: x0
   method: edit_origin
+  tooltip: Edit X-coordinate of the grid origin
 - style: edit
   position:
     x: 160
@@ -17,6 +18,7 @@ element:
   text: Y0
   variable: y0
   method: edit_origin
+  tooltip: Edit Y-coordinate of the grid origin
 - style: edit
   position:
     x: 60
@@ -26,6 +28,7 @@ element:
   text: MMax
   variable: mmax
   method: edit_nmmax
+  tooltip: Edit number of grid cells in M-direction
 - style: edit
   position:
     x: 160
@@ -35,6 +38,7 @@ element:
   text: NMax
   variable: nmax
   method: edit_nmmax
+  tooltip: Edit number of grid cells in N-direction
 - style: edit
   position:
     x: 60
@@ -44,6 +48,7 @@ element:
   text: dX
   variable: dx
   method: edit_dxdy
+  tooltip: Edit grid cell size in X-direction
 - style: edit
   position:
     x: 160
@@ -53,6 +58,7 @@ element:
   text: dY
   variable: dy
   method: edit_dxdy
+  tooltip: Edit grid cell size in Y-direction
 - style: pushbutton
   text: Draw Layout
   position:
@@ -61,6 +67,7 @@ element:
     width: 120
     height: 20
   method: draw_grid_outline
+  tooltip: Draw the grid layout on the map
 - style: pushbutton
   text: Generate Grid
   position:
@@ -69,6 +76,7 @@ element:
     width: 120
     height: 20
   method: generate_grid
+  tooltip: Generate the computational grid
 - style: pushbutton
   text: Read Set-up File
   position:
@@ -78,6 +86,7 @@ element:
     height: 20
   method: read_setup_yaml
   enable: True
+  tooltip: Read model set-up from a YAML file
 - style: pushbutton
   text: Write Set-up File
   position:
@@ -87,6 +96,7 @@ element:
     height: 20
   method: write_setup_yaml
   enable: True
+  tooltip: Write model set-up to a YAML file
 - style: pushbutton
   text: Build Model
   position:
@@ -95,3 +105,4 @@ element:
     width: 120
     height: 20
   method: build_model
+  tooltip: Build the complete model from the current set-up

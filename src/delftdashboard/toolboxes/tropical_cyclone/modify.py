@@ -1,27 +1,19 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the tropical cyclone modify tab.
 
-@author: ormondt
+Handle cyclone track modification on the map.
 """
-# import math
-# import numpy as np
-import geopandas as gpd
-# import shapely
-# import json
-# import os
+
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
 
-# Callbacks
-
-def select(*args):
-    # De-activate() existing layers
+def select(*args: Any) -> None:
+    """Activate the modify tab and show cyclone layers."""
     map.update()
-    # Tab selected
-    # Show track
     app.toolbox["tropical_cyclone"].set_layer_mode("active")
 
-def modify(*args):
-    pass
+
+def modify(*args: Any) -> None:
+    """Modify the tropical cyclone track (placeholder)."""

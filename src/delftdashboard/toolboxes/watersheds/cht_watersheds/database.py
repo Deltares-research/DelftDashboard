@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Apr 25 10:58:08 2021
+"""Watershed database management.
 
-@author: Maarten van Ormondt
+Provide the WatershedsDatabase class for reading, caching, and
+synchronizing watershed datasets from local storage and S3.
 """
 
 import os
@@ -15,15 +14,33 @@ from botocore.client import Config
 from .hydrobasins import HydroBASINSDataset
 from .wbd import WBDDataset
 
+
 class WatershedsDatabase:
-    """
-    The main Watersheds Database class
+    """Manage a collection of watershed datasets with optional S3 synchronization."""
 
-    :param pth: Path name where bathymetry tiles will be cached.
-    :type pth: string
-    """
+    def __init__(
+        self,
+        path: str = None,
+        s3_bucket: str = None,
+        s3_key: str = None,
+        s3_region: str = None,
+        check_online: bool = False,
+    ) -> None:
+        """Initialize the watersheds database.
 
-    def __init__(self, path=None, s3_bucket=None, s3_key=None, s3_region=None, check_online=False):
+        Parameters
+        ----------
+        path : str, optional
+            Local directory path for cached watershed data.
+        s3_bucket : str, optional
+            S3 bucket name for remote datasets.
+        s3_key : str, optional
+            S3 key prefix for watershed data.
+        s3_region : str, optional
+            AWS region for the S3 bucket.
+        check_online : bool
+            Whether to check for new datasets on S3.
+        """
         self.path = path
         self.dataset = {}
         self.s3_client = None
@@ -34,10 +51,8 @@ class WatershedsDatabase:
         if check_online:
             self.check_online_database()
 
-    def read(self):
-        """
-        Reads meta-data of all datasets in the database.
-        """
+    def read(self) -> None:
+        """Read metadata of all datasets in the local database."""
         if self.path is None:
             print("Path to watersheds database not set !")
             return
@@ -55,7 +70,6 @@ class WatershedsDatabase:
         datasets = toml.load(tml_file)
 
         for d in datasets["dataset"]:
-
             name = d["name"]
 
             if "path" in d:
@@ -69,13 +83,14 @@ class WatershedsDatabase:
                 print(f"Warning! Metadata file not found: {metadata_file}")
                 continue
             metadata = toml.load(metadata_file)
-            
+
             if metadata["format"] == "hydrosheds":
                 self.dataset[name] = HydroBASINSDataset(name, path)
             elif metadata["format"] == "wbd":
                 self.dataset[name] = WBDDataset(name, path)
 
-    def check_online_database(self):
+    def check_online_database(self) -> None:
+        """Synchronize the local database with available S3 datasets."""
         if self.s3_client is None:
             self.s3_client = boto3.client(
                 "s3", config=Config(signature_version=UNSIGNED)
@@ -147,7 +162,14 @@ class WatershedsDatabase:
             self.dataset = {}
             self.read()
 
-    def dataset_names(self):
+    def dataset_names(self) -> tuple:
+        """Return short and long names for all loaded datasets.
+
+        Returns
+        -------
+        tuple
+            A pair of lists: (short_names, long_names).
+        """
         short_name_list = []
         long_name_list = []
         # Loop through the keys of the dictionary

@@ -1,7 +1,9 @@
 import os
+
 import pyproj
 
 # Should this be part of Guitares instead?
+
 
 def select_projected_crs(app):
 
@@ -22,7 +24,12 @@ def select_projected_crs(app):
     app.gui.setvar("select_other_projected", "crs_index", 0)
 
     okay, data = app.gui.popup(
-        os.path.join(app.main_path, "misc", "select_other_projected", "select_other_projected.yml"),
+        os.path.join(
+            app.main_path,
+            "misc",
+            "select_other_projected",
+            "select_other_projected.yml",
+        ),
         id="select_other_projected",
         data=data,
     )
@@ -33,5 +40,5 @@ def select_projected_crs(app):
     filtered_names = app.gui.getvar("select_other_projected", "filtered_names")
     i = app.gui.getvar("select_other_projected", "crs_index")
     selected_name = filtered_names[i]
-    
+
     return pyproj.CRS(selected_name)

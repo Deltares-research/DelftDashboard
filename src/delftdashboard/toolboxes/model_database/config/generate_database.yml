@@ -10,6 +10,7 @@ element:
   method: select_collection
   module: delftdashboard.toolboxes.model_database.generate_database
   variable: active_available_collection_name
+  tooltip: Select an available collection
   variable_group: model_database
   select: item
   option_string:
@@ -30,6 +31,7 @@ element:
   method: select_selected_collections
   module: delftdashboard.toolboxes.model_database.generate_database
   variable: active_selected_collection_name
+  tooltip: Select a shown collection
   variable_group: model_database
   select: item
   option_string:
@@ -51,6 +53,7 @@ element:
   method: select_domain_from_list
 #  module: delftdashboard.toolboxes.model_database.generate_database
   variable: active_domain_name
+  tooltip: Select a domain from the list
   variable_group: model_database
   select: item
   option_string:
@@ -69,6 +72,7 @@ element:
   text: "Show ->"
   method: use_collection
   module: delftdashboard.toolboxes.model_database.generate_database
+  tooltip: Add the selected collection to the shown list
 
 - style: pushbutton
   position:
@@ -79,6 +83,7 @@ element:
   method: remove_collection
   text: <- Hide
   module: delftdashboard.toolboxes.model_database.generate_database
+  tooltip: Remove the selected collection from the shown list
 
 # - style: pushbutton
 #   position:
@@ -100,6 +105,7 @@ element:
   variable: show_sfincs
   variable_group: model_database
   method: toggle_sfincs
+  tooltip: Show or hide SFINCS domains on the map
   module: delftdashboard.toolboxes.model_database.generate_database
 
 
@@ -113,6 +119,7 @@ element:
   variable: show_hurrywave
   variable_group: model_database
   method: toggle_hurrywave
+  tooltip: Show or hide HurryWave domains on the map
   module: delftdashboard.toolboxes.model_database.generate_database
 
 
@@ -172,3 +179,4 @@ element:
   method: activate_domain
   text: Load Domain
   module: delftdashboard.toolboxes.model_database.generate_database
+  tooltip: Load the selected domain into the application

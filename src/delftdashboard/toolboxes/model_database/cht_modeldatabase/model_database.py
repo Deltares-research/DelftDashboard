@@ -7,12 +7,11 @@ Created on Sun Apr 25 10:58:08 2021
 
 import os
 import shutil
-import boto3
+
 import toml
-from botocore import UNSIGNED
-from botocore.client import Config
 
 from .model import Deltares_Model
+
 
 class ModelDatabase:
     """
@@ -22,13 +21,12 @@ class ModelDatabase:
     :type path: string
     """
 
-    def __init__(self,
-                 path=None):
+    def __init__(self, path=None):
         self.model = []
-        self.path   = path
+        self.path = path
         self.read()
         self.initialized = True
-       
+
     def read(self):
 
         if self.path is None:
@@ -50,14 +48,13 @@ class ModelDatabase:
                     # Try to get long_name from a metadata file, else use entry as long_name
                     long_name = entry.replace("_", " ").title()
                     collections.append({"name": entry, "long_name": long_name})
-            
+
             with open(model_tml_path, "w") as f:
                 f.write("# Default model.tml\n")
                 for col in collections:
-                    f.write('\n[[collection]]\n')
+                    f.write("\n[[collection]]\n")
                     f.write(f'name = "{col["name"]}"\n')
                     f.write(f'long_name = "{col["long_name"]}"\n')
-
 
         # Always expect this file
         tml_file = os.path.join(self.path, "model_database.tml")
@@ -96,7 +93,9 @@ class ModelDatabase:
                         model_metadata = toml.load(model_metadata_path)
                         actual_model_path = model_metadata.get("path", model_path)
                     else:
-                        print(f"Missing model.toml for model '{model_name}' in type '{type_name}' — skipping.")
+                        print(
+                            f"Missing model.toml for model '{model_name}' in type '{type_name}' — skipping."
+                        )
                         continue
 
                     full_model_name = f"{type_name}_{model_name}"
@@ -104,15 +103,15 @@ class ModelDatabase:
                         name=full_model_name,
                         path=actual_model_path,
                         type=type_name,
-                        collection=collection_name
+                        collection=collection_name,
                     )
                     self.model.append(model)
 
     def get_model(self, name):
-            for model in self.model:
-                if model.name == name:
-                    return model
-            return None
+        for model in self.model:
+            if model.name == name:
+                return model
+        return None
 
     def model_names(self, collection=None):
         short_name_list = []
@@ -137,7 +136,7 @@ class ModelDatabase:
         collection_names = []
 
         for model in self.model:
-            collection= model.collection
+            collection = model.collection
             if collection in collection_names:
                 # Existing source
                 for clt in collections:
@@ -176,7 +175,6 @@ class ModelDatabase:
         """
         Copy input files from the domain's input folder to the current working directory or a specified path.
         """
-
         # Ensure the destination path exists
         if not os.path.exists(to_path):
             os.makedirs(to_path)
@@ -185,12 +183,12 @@ class ModelDatabase:
         domain = self.get_model(name=domain_name)
 
         # Get domain path robustly
-        domain_path = getattr(domain, 'path', None)
+        domain_path = getattr(domain, "path", None)
         if not domain_path or not isinstance(domain_path, str):
             print(f"Invalid or missing domain path for domain: {domain_name}")
             return
         domain_input_folder = os.path.join(domain_path, "input")
-        
+
         # Copy all input files from the domain input folder to the current working directory
         # We do not want to overwrite existing files in the model database!
         for item in os.listdir(domain_input_folder):
@@ -208,14 +206,16 @@ class ModelDatabase:
                     if os.path.isfile(sub_src):
                         shutil.copy2(sub_src, sub_dst)
 
-class ModelCollection:  
-    def __init__(self, name):        
-        self.name    = name
+
+class ModelCollection:
+    def __init__(self, name):
+        self.name = name
         self.model = []
 
+
 # def dict2yaml(file_name, dct, sort_keys=False):
-#     yaml_string = yaml.dump(dct, sort_keys=sort_keys)    
-#     file = open(file_name, "w")  
+#     yaml_string = yaml.dump(dct, sort_keys=sort_keys)
+#     file = open(file_name, "w")
 #     file.write(yaml_string)
 #     file.close()
 

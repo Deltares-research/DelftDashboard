@@ -8,26 +8,14 @@ Created on Sun Apr 25 10:58:08 2021
 import os
 
 import geopandas as gpd
-import toml
-import boto3
-from botocore import UNSIGNED
-from botocore.client import Config
-
-import xarray as xr
 import numpy as np
-import geopandas as gpd
-from rasterio.features import shapes
-from shapely.geometry import shape
-
-from shapely.geometry import Polygon
-
+import toml
 from affine import Affine
-
-
-from shapely.geometry import box
-
-from cht_sfincs.sfincs import SFINCS
 from cht_hurrywave.hurrywave import HurryWave
+from cht_sfincs.sfincs import SFINCS
+from rasterio.features import shapes
+from shapely.geometry import Polygon, shape
+
 
 class Model:
     """
@@ -59,7 +47,8 @@ class Model:
         """
         Read metadata file and set attributes.
 
-        Raises:
+        Raises
+        ------
         FileNotFoundError: If the metadata file does not exist.
         """
         tml_file = os.path.join(self.local_path, self.name + ".tml")
@@ -90,39 +79,37 @@ class Model:
         """
         pass
 
+
 class Deltares_Model(Model):
     """
-    Bathymetry dataset class 
+    Bathymetry dataset class
 
     :ivar name: initial value: ''
     :ivar nr_zoom_levels: initial value: 0
     """
 
-    def __init__(self, name, path, type= None, collection=None):
-        super().__init__()        
-        self.name              = name
-        self.path              = path
-        self.collection        = collection
-        self.type              = type
-        self.local_path        = path
-        self.use_cache         = True
+    def __init__(self, name, path, type=None, collection=None):
+        super().__init__()
+        self.name = name
+        self.path = path
+        self.collection = collection
+        self.type = type
+        self.local_path = path
+        self.use_cache = True
         self.read_metadata()
-
 
     def get_model_gdf(self):
 
         # Read the specific layer from the geodatabase
-        
+
         # filename = os.path.join(self.path, "misc", f"{self.name}.geojson")
         filename = os.path.join(self.path, "misc", "exterior.geojson")
 
         if not os.path.exists(filename):
-
             print(f"File {filename} does not exist, creating file...")
 
             # Create a dummy GeoDataFrame
             if self.type == "sfincs":
-
                 try:
                     sfincs_model = SFINCS(os.path.join(self.path, "input"), crs=4326)
                     sfincs_model.read()  # Ideally we want to read the geojson directly and not all the gridded input for this model
@@ -134,10 +121,12 @@ class Deltares_Model(Model):
                     print(f"Error reading SFINCS model: {e}")
                     gdf = gpd.GeoDataFrame(geometry=[], crs=4326)
                     return gdf
-            
+
             elif self.type == "hurrywave":
                 try:
-                    hw_model = HurryWave(path=os.path.join(self.path, "input"), crs=4326)
+                    hw_model = HurryWave(
+                        path=os.path.join(self.path, "input"), crs=4326
+                    )
                     hw_model.read()  # Ideally we want to read the geojson directly and not all the gridded input for this model
                     # Convert to GeoDataFrame
                     gdf = hw_model.grid.data.exterior.to_crs(4326)
@@ -153,7 +142,7 @@ class Deltares_Model(Model):
 
             # 1. Load your DataArray
             mask = hw_model.grid.ds.mask
-            assert 'x' in mask.coords and 'y' in mask.coords
+            assert "x" in mask.coords and "y" in mask.coords
 
             # 2. Convert mask to binary numpy array
             mask_array = (mask.values > 0).astype(np.uint8)
@@ -194,7 +183,7 @@ class Deltares_Model(Model):
 
             # 9. Export to GeoJSON
             gdf.to_file(filename, driver="GeoJSON")
-            
+
         else:
             gdf = gpd.read_file(filename).to_crs(4326)
             gdf["name"] = self.name

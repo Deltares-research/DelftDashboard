@@ -10,9 +10,9 @@ import traceback
 import numpy as np
 import rasterio
 import yaml
+from cht_utils import geotiff_to_cog, netcdf_to_cog, xyz_to_cog
 from pyproj import CRS
 
-from cht_utils import geotiff_to_cog, netcdf_to_cog, xyz_to_cog
 from delftdashboard.app import app
 from delftdashboard.misc.select_other_geographic.select_geographic_crs import (
     select_geographic_crs,
@@ -128,7 +128,9 @@ class Toolbox(GenericToolbox):
 
         vertical_datum = app.gui.getvar("bathymetry", "vertical_datum")
         vertical_units = app.gui.getvar("bathymetry", "vertical_units")
-        difference_with_msl = app.gui.getvar("bathymetry", "vertical_difference_with_msl")
+        difference_with_msl = app.gui.getvar(
+            "bathymetry", "vertical_difference_with_msl"
+        )
 
         # Write data_catalog.yml for this dataset
         catalog_entry = {

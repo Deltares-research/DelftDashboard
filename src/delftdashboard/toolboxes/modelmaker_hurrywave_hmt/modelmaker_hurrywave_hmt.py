@@ -79,8 +79,8 @@ class Toolbox(GenericToolbox):
         source_names, _sources = app.topography_data_catalog.sources()
         app.gui.setvar(_TB, "bathymetry_source_names", source_names)
         app.gui.setvar(_TB, "active_bathymetry_source", source_names[0])
-        dataset_names, _long_names, _src_names = app.topography_data_catalog.dataset_names(
-            source=source_names[0]
+        dataset_names, _long_names, _src_names = (
+            app.topography_data_catalog.dataset_names(source=source_names[0])
         )
         app.gui.setvar(_TB, "bathymetry_dataset_names", dataset_names)
         app.gui.setvar(_TB, "bathymetry_dataset_index", 0)
@@ -248,7 +248,9 @@ class Toolbox(GenericToolbox):
             domain.config.set("rotation", rotation)
             app.model[_MODEL].set_gui_variables()
 
-            refpol = self.refinement_polygon if len(self.refinement_polygon) > 0 else None
+            refpol = (
+                self.refinement_polygon if len(self.refinement_polygon) > 0 else None
+            )
 
             domain.quadtree_grid.create(
                 x0,
@@ -261,7 +263,6 @@ class Toolbox(GenericToolbox):
                 epsg=app.crs.to_epsg(),
                 refinement_polygons=refpol,
                 elevation_list=app.selected_bathymetry_datasets,
-
             )
             domain.quadtree_grid.write()
             app.map.layer[_MODEL].layer["grid"].set_data(domain.quadtree_grid)
@@ -279,7 +280,6 @@ class Toolbox(GenericToolbox):
             domain = app.model[_MODEL].domain
             domain.quadtree_elevation.create(
                 elevation_list=app.selected_bathymetry_datasets,
-
                 nr_subgrid_pixels=20,
                 threshold_level=0.0,
                 mean_wet=True,
@@ -362,7 +362,6 @@ class Toolbox(GenericToolbox):
         try:
             domain.wave_blocking.create(
                 app.selected_bathymetry_datasets,
-
                 nr_dirs=nr_dirs,
                 nr_subgrid_pixels=nr_pixels,
                 threshold_level=threshold_level,

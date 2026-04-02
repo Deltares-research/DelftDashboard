@@ -1,72 +1,69 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for generating index tiles.
 
-@author: ormondt
+Create tiled web map index tiles from the active model grid.
 """
-# import geopandas as gpd
-from delftdashboard.app import app
-from delftdashboard.operations import map
-# from cht_tiling.indices import make_index_tiles
+
+from typing import Any
+
 from cht_tiling import TiledWebMap
 
-# Callbacks
+from delftdashboard.app import app
+from delftdashboard.operations import map
 
-def select(*args):
-    # De-activate() existing layers
+
+def select(*args: Any) -> None:
+    """Activate the index tiles tab."""
     map.update()
 
-def generate_index_tiles(*args):
 
-    # Check what sort of model this is
+def generate_index_tiles(*args: Any) -> None:
+    """Generate index tiles for the active model grid."""
     model = app.active_model
 
     if model.name == "sfincs_cht":
-    
         dlg = app.gui.window.dialog_wait("Generating index tiles ...")
-    
+
         grid = model.domain.grid.data
         path = "./tiling/indices"
         max_zoom = app.gui.getvar("tiling", "max_zoom")
         zoom_range = [0, max_zoom]
 
         # Create index tiles
-        twmi = TiledWebMap(path, type="data", parameter="index", data=grid, zoom_range=zoom_range)
+        twmi = TiledWebMap(
+            path,
+            type="data",
+            parameter="index",
+            data=grid,
+            zoom_range=zoom_range,
+        )
         twmi.make()
-        # twmi.generate_index_tiles(grid,
-        #                           zoom_range,
-        #                           webviewer=True)
 
-        # make_index_tiles(grid, path, zoom_range=zoom_range, format="png", webviewer=True)
         dlg.close()
 
     elif model.name == "hurrywave":
-
         dlg = app.gui.window.dialog_wait("Generating index tiles ...")
-    
+
         grid = model.domain.grid.data.xuds
         path = "./tiling/indices"
         max_zoom = app.gui.getvar("tiling", "max_zoom")
         zoom_range = [0, max_zoom]
 
         # Create index tiles
-        twmi = TiledWebMap(path,
-                           type="data",
-                           parameter="index",
-                           data=grid,
-                           zoom_range=zoom_range,
-                           topo_path=r"c:\work\delftdashboard\data\bathymetry\gebco_2024")
+        twmi = TiledWebMap(
+            path,
+            type="data",
+            parameter="index",
+            data=grid,
+            zoom_range=zoom_range,
+            topo_path=r"c:\work\delftdashboard\data\bathymetry\gebco_2024",
+        )
         twmi.make()
-        # twmi = TiledWebMap(path, "indices", parameter="index")
-        # twmi.generate_index_tiles(grid,
-        #                           zoom_range,
-        #                           webviewer=True)
 
         dlg.close()
 
-    else:        
+    else:
         app.gui.window.dialog_message(f"Tiling not supported for {model.name}")
 
 
-def edit_variables(*args):
-    pass
+def edit_variables(*args: Any) -> None:
+    """Handle variable editing events (placeholder)."""

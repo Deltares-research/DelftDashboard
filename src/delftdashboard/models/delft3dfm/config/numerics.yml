@@ -34,3 +34,4 @@ element:
     - 0
     - 33
     - 3
+    tooltip: Select advection scheme type

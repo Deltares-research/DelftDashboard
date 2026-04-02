@@ -7,3 +7,4 @@ element:
     width: 150
     height: 20
   method: generate_index_geotiff
+  tooltip: Generate an index GeoTiff file for the flood map tiles

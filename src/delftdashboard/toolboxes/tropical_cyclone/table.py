@@ -1,26 +1,19 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the tropical cyclone table tab.
 
-@author: ormondt
+Handle cyclone track data table editing and display.
 """
-# import math
-# import numpy as np
-import geopandas as gpd
-# import shapely
-# import json
-# import os
+
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
 
-# Callbacks
-
-def select(*args):
-    # De-activate() existing layers
+def select(*args: Any) -> None:
+    """Activate the table tab and show cyclone layers."""
     map.update()
-    # Tab selected
     app.toolbox["tropical_cyclone"].set_layer_mode("active")
 
-def edit_table(*args):
-    pass
+
+def edit_table(*args: Any) -> None:
+    """Edit the cyclone track data table (placeholder)."""

@@ -1,19 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the bathymetry export tab."""
 
-@author: ormondt
-"""
-import os
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-# Callbacks
 
-def select(*args):
-    # Tab selected
-    # De-activate() existing layers
+def select(*args: Any) -> None:
+    """Activate the export tab."""
     map.update()
 
-def export_dataset(*args):
+
+def export_dataset(*args: Any) -> None:
+    """Export the current bathymetry dataset."""
     app.toolbox["bathymetry"].export_dataset()

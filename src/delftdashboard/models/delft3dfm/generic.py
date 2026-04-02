@@ -1,16 +1,18 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the Delft3D-FM generic settings tab."""
 
-@author: ormondt
-"""
+from typing import Any
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-def select(*args):
-    # De-activate existing layers
+_MODEL = "delft3dfm"
+
+
+def select(*args: Any) -> None:
+    """Deactivate existing layers when the generic tab is selected."""
     map.update()
 
-def set_model_variables(*args):
-    app.model["delft3dfm"].set_input_variables()
+
+def set_model_variables(*args: Any) -> None:
+    """Copy GUI variable values into the domain input object."""
+    app.model[_MODEL].set_input_variables()

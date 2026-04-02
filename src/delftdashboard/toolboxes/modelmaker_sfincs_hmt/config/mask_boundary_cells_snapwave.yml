@@ -169,6 +169,7 @@ element:
     width: 100
     height: 20
   method: update_mask_snapwave
+  tooltip: Update the SnapWave boundary cell mask
 - style: pushbutton
   text: Cut Inactive Cells
   position:
@@ -177,4 +178,5 @@ element:
     width: 100
     height: 20
   method: cut_inactive_cells
+  tooltip: Remove inactive cells from the SnapWave grid
  

@@ -1,13 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jul  5 13:40:07 2022
+"""Map widget callbacks and background topography management.
 
-@author: ormondt
+Handles map lifecycle events (ready, moved, mouse), background topography
+rendering, layer mode updates, cursor resets, CRS changes, and status bar
+updates.
 """
+
+import traceback
+from typing import Any, Optional
+
+import geopandas as gpd
 import numpy as np
 import xarray as xr
-import geopandas as gpd
-import traceback
 from pyproj import CRS, Transformer
 from shapely.geometry import box
 
@@ -15,10 +18,14 @@ from delftdashboard.app import app
 
 transformer_4326_to_3857 = Transformer.from_crs(CRS(4326), CRS(3857), always_xy=True)
 
-def map_ready(*args):
 
-    # This method is called when the map has been loaded
-    print('Map is ready ! Adding background topography and other layers ...')
+def map_ready(*args: Any) -> None:
+    """Initialize map layers and select the default model once the map loads.
+
+    Add the main layer group, background topography raster layer, model
+    layers, and toolbox layers, then select the first configured model.
+    """
+    print("Map is ready ! Adding background topography and other layers ...")
 
     # Find map widget
     element = app.gui.window.find_element_by_id("map")
@@ -28,12 +35,12 @@ def map_ready(*args):
     main_layer = app.map.add_layer("main")
 
     # Add background topography layer
-    main_layer.add_layer("background_topography",
-                         type="raster_image")
+    main_layer.add_layer("background_topography", type="raster_image")
 
     # Set update method for topography layer (this is called in the layer's update method!)
-    # app.map.layer["main"].layer["background_topography"].get_data = update_background_topography_data
-    app.map.layer["main"].layer["background_topography"].set_data(update_background_topography_data)
+    app.map.layer["main"].layer["background_topography"].set_data(
+        update_background_topography_data
+    )
     app.map.layer["main"].layer["background_topography"].legend_position = "bottom-left"
     app.map.layer["main"].layer["background_topography"].legend_title = "XXX"
     app.map.layer["main"].layer["background_topography"].legend_label = "Elevation (m)"
@@ -55,20 +62,42 @@ def map_ready(*args):
 
     update_statusbar()
 
-    app.gui.window.resize() # Need to do this in order to get the correct size of the widgets. Should really be done by Guitares, but for some reason it does not work there.
+    # Need to do this in order to get the correct size of the widgets.
+    # Should really be done by Guitares, but for some reason it does not work there.
+    app.gui.window.resize()
 
     app.gui.close_splash()
 
-def map_moved(coords, widget):
-    # This method is called whenever the location of the map changes
-    # Layers are already automatically updated in MapBox
-    pass
 
-def mouse_moved(x, y, lon, lat):
-    # This method is called whenever the mouse moves over the map
-    # We can use this to show the coordinates of the mouse in the status bar
-    
-    # Check if the map is ready (it's possible that the map is not yet ready when this method is called)
+def map_moved(coords: Any, widget: Any) -> None:
+    """Handle map move events.
+
+    Parameters
+    ----------
+    coords : Any
+        New map coordinates after the move.
+    widget : Any
+        The map widget that triggered the event.
+    """
+    # Layers are already automatically updated in MapBox
+
+
+def mouse_moved(x: float, y: float, lon: float, lat: float) -> None:
+    """Update the status bar with the current mouse position and elevation.
+
+    Parameters
+    ----------
+    x : float
+        X coordinate in the map's projected CRS.
+    y : float
+        Y coordinate in the map's projected CRS.
+    lon : float
+        Longitude in WGS 84.
+    lat : float
+        Latitude in WGS 84.
+    """
+    # Check if the map is ready (it's possible that the map is not yet ready
+    # when this method is called)
     if not hasattr(app, "map"):
         return
 
@@ -83,7 +112,7 @@ def mouse_moved(x, y, lon, lat):
         app.gui.window.statusbar.set_text("x", f"X : {x:.1f}")
         app.gui.window.statusbar.set_text("y", f"Y : {y:.1f}")
 
-    x3857, y3857 = transformer_4326_to_3857.transform(lon, lat) 
+    x3857, y3857 = transformer_4326_to_3857.transform(lon, lat)
 
     z = np.nan
     if hasattr(app, "background_topography") and app.background_topography is not None:
@@ -96,13 +125,22 @@ def mouse_moved(x, y, lon, lat):
 
     if np.isnan(z):
         app.gui.window.statusbar.set_text("z", "Z : N/A")
-    else:       
+    else:
         app.gui.window.statusbar.set_text("z", f"Z : {z:.2f} m")
 
 
-def update_background_topography_data():
+def update_background_topography_data() -> Optional[xr.DataArray]:
+    """Fetch and configure background topography data for the current map extent.
 
-    # Function that is called whenever the map has moved
+    Query the topography data catalog for the visible area, apply colour
+    scale and hillshading settings, and return the resulting DataArray.
+
+    Returns
+    -------
+    xr.DataArray or None
+        The topography raster for the current view, or ``None`` if
+        unavailable.
+    """
     da = None
 
     if not app.map.map_extent:
@@ -110,7 +148,6 @@ def update_background_topography_data():
         return
 
     try:
-
         auto_update = app.gui.getvar("view_settings", "topography_auto_update")
         visible = app.gui.getvar("view_settings", "topography_visible")
         quality = app.gui.getvar("view_settings", "topography_quality")
@@ -123,19 +160,17 @@ def update_background_topography_data():
         hillshading = app.gui.getvar("view_settings", "topography_hillshading")
 
         if auto_update and visible:
-
             coords = app.map.map_extent
 
             hgt = app.map.view.geometry().height()
             if quality == "high":
                 npix = hgt
             elif quality == "medium":
-                npix = int(hgt*0.5)
+                npix = int(hgt * 0.5)
             else:
-                npix = int(hgt*0.25)
+                npix = int(hgt * 0.25)
 
             # Actually easiest to use web mercator
-            # transformer_4326_to_3857 = Transformer.from_crs(CRS(4326), CRS(3857), always_xy=True)
             if coords[1][0] - coords[0][0] > 360.0:
                 # If the map is larger than 360 degrees, we can make image of entire world
                 coords[0][0] = -180.0
@@ -148,7 +183,7 @@ def update_background_topography_data():
             if x0 < -20037508.342789244:
                 # Add max size of web mercator
                 x0 += 40075016.68557849
-                x1 += 40075016.68557849    
+                x1 += 40075016.68557849
             xl = [x0, x1]
             yl = [y0, y1]
 
@@ -187,7 +222,9 @@ def update_background_topography_data():
 
     return da
 
-def update():
+
+def update() -> None:
+    """Reset the cursor and set all model/toolbox layers to inactive or invisible."""
     reset_cursor()
     # Sets all layers to inactive
     for name, model in app.model.items():
@@ -202,20 +239,31 @@ def update():
             toolbox.set_layer_mode("inactive")
         else:
             toolbox.set_layer_mode("invisible")
-    app.map.close_popup()        
+    app.map.close_popup()
 
-def reset_cursor():
+
+def reset_cursor() -> None:
+    """Reset the map cursor to the default pointer."""
     app.map.set_mouse_default()
 
-def set_crs(crs):
+
+def set_crs(crs: CRS) -> None:
+    """Set the application and map coordinate reference system.
+
+    Parameters
+    ----------
+    crs : CRS
+        The new coordinate reference system to apply.
+    """
     app.crs = crs
     app.map.crs = crs
     update_statusbar()
 
-def update_statusbar():
-    # Update the status bar with the current CRS
+
+def update_statusbar() -> None:
+    """Update the status bar with the current CRS name and type."""
     if app.crs.is_geographic:
-        crstp = " (geographic) - " + app.crs.to_string()
+        crstp = f" (geographic) - {app.crs.to_string()}"
     else:
-        crstp = " (projected) - " + app.crs.to_string()
-    app.gui.window.statusbar.set_text("crs_name", "   " + app.crs.name + crstp)
+        crstp = f" (projected) - {app.crs.to_string()}"
+    app.gui.window.statusbar.set_text("crs_name", f"   {app.crs.name}{crstp}")
