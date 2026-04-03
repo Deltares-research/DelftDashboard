@@ -91,3 +91,4 @@ def select_toolbox(toolbox_name: str) -> None:
     """
     app.active_toolbox = app.toolbox[toolbox_name]
     app.active_toolbox.select()
+    app.info.update(toolbox_name)

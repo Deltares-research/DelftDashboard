@@ -88,18 +88,49 @@ def build_gui_config() -> None:
         tab_panel["tab"].insert(0, {"string": "Toolbox", "element": [], "module": ""})
         app.gui.config["element"].append(app.model[model_name].element)
 
-    # Now add map element
-    mp: dict[str, Any] = {}
-    mp["style"] = "map"
-    mp["id"] = "map"
-    mp["map_projection"] = "mercator"
-    mp["position"] = {}
-    mp["position"]["x"] = 20
-    mp["position"]["y"] = 180
-    mp["position"]["width"] = -20
-    mp["position"]["height"] = -40
-    mp["module"] = "delftdashboard.operations.map"
-    app.gui.config["element"].append(mp)
+    # Now add map + info panel in a collapsible dual-panel layout
+    # The collapsible panel holds two sub-panels:
+    #   Panel "a" = the map (visible when collapsed)
+    #   Panel "b" = the documentation webpage (visible when expanded)
+    dual_panel: dict[str, Any] = {
+        "style": "panel",
+        "id": "dual",
+        "collapse": True,
+        "collapse_orientation": "horizontal",
+        "collapsed": True,
+        "fraction_expanded": 0.33,
+        "fraction_collapsed": 1.0,
+        "collapse_id": "a",
+        "position": {"x": 20, "y": 180, "width": -20, "height": -40},
+        "element": [
+            {
+                "style": "panel",
+                "id": "a",
+                "element": [
+                    {
+                        "style": "map",
+                        "id": "map",
+                        "map_projection": "mercator",
+                        "module": "delftdashboard.operations.map",
+                        "position": {"x": 1, "y": 1, "width": -1, "height": -1},
+                    }
+                ],
+            },
+            {
+                "style": "panel",
+                "id": "b",
+                "element": [
+                    {
+                        "style": "webpage",
+                        "id": "info",
+                        "url": "https://guitares.readthedocs.io/en/latest/",
+                        "position": {"x": 1, "y": 1, "width": -1, "height": -1},
+                    }
+                ],
+            },
+        ],
+    }
+    app.gui.config["element"].append(dual_panel)
 
     # Menu
 
@@ -286,4 +317,19 @@ def build_gui_config() -> None:
     menu["text"] = "Help"
     menu["module"] = "delftdashboard.menu.help"
     menu["menu"] = []
+    menu["menu"].append(
+        {"text": "Documentation", "method": "open_documentation", "separator": True}
+    )
+    menu["menu"].append(
+        {"text": "Deltares Website", "method": "open_deltares_website"}
+    )
+    menu["menu"].append(
+        {"text": "SFINCS Website", "method": "open_sfincs_website"}
+    )
+    menu["menu"].append(
+        {"text": "Report Issue", "method": "open_issue_tracker", "separator": True}
+    )
+    menu["menu"].append(
+        {"text": "About", "method": "about"}
+    )
     app.gui.config["menu"].append(menu)

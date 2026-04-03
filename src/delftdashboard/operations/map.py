@@ -31,6 +31,11 @@ def map_ready(*args: Any) -> None:
     element = app.gui.window.find_element_by_id("map")
     app.map = element.widget
 
+    # Connect the documentation webpage widget (built during gui.build)
+    info_element = app.gui.window.find_element_by_id("info")
+    if info_element is not None:
+        app.info.widget = info_element.widget
+
     # Add main DDB layer
     main_layer = app.map.add_layer("main")
 

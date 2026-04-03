@@ -27,6 +27,33 @@ from delftdashboard.operations.topography import TopographyDataCatalog
 warnings.filterwarnings("ignore", message="All-NaN slice encountered")
 
 
+def _ask_data_folder() -> str:
+    """Open a native folder dialog to select the DelftDashboard data folder.
+
+    Creates a QApplication if one doesn't exist yet. Guitares will
+    reuse the same instance later.
+    """
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication, QFileDialog
+
+    if QApplication.instance() is None:
+        QApplication([])
+
+    dlg = QFileDialog()
+    dlg.setWindowTitle(
+        "Welcome! Select the DelftDashboard folder. This is the folder where bathymetry, tide models, and other data will be stored."
+    )
+    dlg.setFileMode(QFileDialog.FileMode.Directory)
+    dlg.setOption(QFileDialog.Option.ShowDirsOnly, True)
+    dlg.setDirectory(os.path.expanduser("~"))
+    dlg.setWindowFlags(dlg.windowFlags() | Qt.WindowStaysOnTopHint)
+
+    if dlg.exec():
+        folders = dlg.selectedFiles()
+        return folders[0] if folders else ""
+    return ""
+
+
 def initialize() -> None:
     """Run the full DelftDashboard initialization sequence.
 
@@ -75,25 +102,25 @@ def initialize() -> None:
 
     # First read delftdashboard.pth file. This contains the path to the
     # delftdashboard folder.
-    pth_file_name = os.path.join(app.main_path, "delftdashboard.pth")
-    # Check if pth file exist. If not, give error message and exit
+    # Check working directory first, then package directory
+    pth_file_name = os.path.join(os.getcwd(), "delftdashboard.pth")
     if not os.path.exists(pth_file_name):
-        # Ask the user to enter a path to the delftdashboard folder
-        print(
-            f"Cannot find the file {pth_file_name} which contains the name of the Delft Dashboard folder where the data will be stored."
-        )
-        print(
-            r"Please enter a path to the Delft Dashboard folder (e.g. c:\work\delftdashboard):"
-        )
-        pth = input()
-        pthfile = open(pth_file_name, "w")
-        pthfile.write(pth)
-        pthfile.close()
-    pthfile = open(pth_file_name, "r")
-    pth = pthfile.readline().strip()
+        pth_file_name = os.path.join(app.main_path, "delftdashboard.pth")
+    if not os.path.exists(pth_file_name):
+        # Ask the user to select a data folder via a native dialog
+        print("No delftdashboard.pth file found. Opening folder dialog...")
+        pth = _ask_data_folder()
+        if not pth:
+            print("No data folder selected. Exiting.")
+            raise SystemExit("No data folder selected. Exiting.")
+        # Write pth file in the source directory of delftdashboard, so it can be found next time
+        pth_file_name = os.path.join(app.main_path, "delftdashboard.pth") 
+        with open(pth_file_name, "w") as f:
+            f.write(pth)
+    with open(pth_file_name, "r") as f:
+        pth = f.readline().strip()
     app.config["delft_dashboard_path"] = pth
     app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
-    pthfile.close()
 
     # Now check if the ini file exists. If not, give warning and create it.
     ini_file_name = os.path.join(
@@ -155,6 +182,41 @@ def initialize() -> None:
         map_engine=app.config["map_engine"],
         copy_map_server_folder=True,
     )
+
+    # Documentation URLs (local Sphinx build)
+    # app.main_path = .../DelftDashboard/src/delftdashboard/
+    docs_base = os.path.join(
+        os.path.dirname(os.path.dirname(app.main_path)),
+        "docs", "build", "html",
+    )
+    # Convert to file:/// URL
+    docs_base_url = "file:///" + docs_base.replace("\\", "/")
+    app.info.urls = {
+        # Models
+        "sfincs_hmt": f"{docs_base_url}/models/sfincs_hmt.html",
+        "hurrywave_hmt": f"{docs_base_url}/models/hurrywave_hmt.html",
+        "delft3dfm": f"{docs_base_url}/models/delft3dfm.html",
+        # Toolboxes
+        "modelmaker_sfincs_hmt": f"{docs_base_url}/toolboxes/modelmaker_sfincs_hmt.html",
+        "modelmaker_hurrywave_hmt": f"{docs_base_url}/toolboxes/modelmaker_hurrywave_hmt.html",
+        "modelmaker_delft3dfm": f"{docs_base_url}/toolboxes/modelmaker_delft3dfm.html",
+        "bathymetry": f"{docs_base_url}/toolboxes/bathymetry.html",
+        "drawing": f"{docs_base_url}/toolboxes/drawing.html",
+        "flood_map": f"{docs_base_url}/toolboxes/flood_map.html",
+        "nesting": f"{docs_base_url}/toolboxes/nesting.html",
+        "observation_stations": f"{docs_base_url}/toolboxes/observation_stations.html",
+        "tide_stations": f"{docs_base_url}/toolboxes/tide_stations.html",
+        "meteo": f"{docs_base_url}/toolboxes/meteo.html",
+        "tropical_cyclone": f"{docs_base_url}/toolboxes/tropical_cyclone.html",
+        "tiling": f"{docs_base_url}/toolboxes/tiling.html",
+        "watersheds": f"{docs_base_url}/toolboxes/watersheds.html",
+        "model_database": f"{docs_base_url}/toolboxes/model_database.html",
+        # General
+        "index": f"{docs_base_url}/index.html",
+        "getting_started": f"{docs_base_url}/getting_started.html",
+        "installation": f"{docs_base_url}/installation.html",
+        "data_catalogs": f"{docs_base_url}/data_catalogs.html",
+    }
 
     # Check for internet connection
     app.online = True

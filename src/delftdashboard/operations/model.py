@@ -167,3 +167,4 @@ def select_model(model_name: str) -> None:
     """
     app.active_model = app.model[model_name]
     app.model[model_name].select()
+    app.info.update(model_name)
