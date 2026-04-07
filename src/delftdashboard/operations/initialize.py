@@ -229,6 +229,22 @@ def initialize() -> None:
     # Topography/bathymetry data catalog
     initialize_topography()
 
+    # 3D terrain sources for the map terrain control
+    s3_bucket = app.config.get("s3_bucket", "deltares-ddb")
+    app.terrain_sources = [
+        {
+            "id": "gebco_2024",
+            "name": "GEBCO 2024",
+            "tiles": [
+                f"https://{s3_bucket}.s3.eu-west-1.amazonaws.com"
+                f"/data/bathymetry/gebco_2024/{{z}}/{{x}}/{{y}}.png"
+            ],
+            "encoding": "terrarium",
+            "tileSize": 256,
+            "maxzoom": 8,
+        },
+    ]
+
     # Define some other variables
     app.crs = CRS(4326)
 
@@ -363,40 +379,61 @@ def initialize_toolboxes() -> None:
     Each toolbox is dynamically imported, instantiated, and has its callback
     module resolved. Toolboxes that fail to initialize are dropped with a
     warning.
+
+    After loading built-in toolboxes, external toolboxes registered via
+    the ``delftdashboard.toolboxes`` entry point group are discovered and
+    loaded automatically.
     """
+    from importlib.metadata import entry_points
+
     app.toolbox = {}
+
+    # --- Built-in toolboxes (from delftdashboard.cfg) ---
     for tlb in app.config["toolbox"]:
         try:
             toolbox_name = tlb["name"]
-            # And initialize this toolbox
             print(f"Adding toolbox : {toolbox_name}")
             module = importlib.import_module(
                 f"delftdashboard.toolboxes.{toolbox_name}.{toolbox_name}"
             )
-            # Initialize the toolbox
             app.toolbox[toolbox_name] = module.Toolbox(toolbox_name)
-            # Set the callback module. This is the module that contains the
-            # callback functions, and does not have to be the same as the
-            # toolbox module. This is useful as some toolboxes do not have
-            # tabs for which modules are defined, and the main module can
-            # become very busy with all the callbacks and the toolbox object.
             if app.toolbox[toolbox_name].callback_module_name is None:
-                # Callback module is same as toolbox module
                 app.toolbox[toolbox_name].callback_module = module
             else:
-                # Callback module is different from toolbox module
                 app.toolbox[toolbox_name].callback_module = importlib.import_module(
                     f"delftdashboard.toolboxes.{toolbox_name}.{app.toolbox[toolbox_name].callback_module_name}"
                 )
             app.toolbox[toolbox_name].initialize()
 
-        # Write error message if toolbox cannot be initialized
         except Exception as e:
             print(e)
             print(f"Error initializing toolbox {toolbox_name}.")
-            # Drop toolbox from dictionary
             if toolbox_name in app.toolbox:
                 del app.toolbox[toolbox_name]
+
+    # --- External toolboxes (discovered via entry points) ---
+    for ep in entry_points(group="delftdashboard.toolboxes"):
+        name = ep.name
+        if name in app.toolbox:
+            continue  # built-in takes precedence
+        try:
+            print(f"Adding external toolbox : {name}")
+            pkg = ep.load()  # imports the package (e.g. "tsunami")
+            module = importlib.import_module(f"{ep.value}.{name}")
+            app.toolbox[name] = module.Toolbox(name)
+            app.toolbox[name]._external_package = ep.value
+            if app.toolbox[name].callback_module_name is None:
+                app.toolbox[name].callback_module = module
+            else:
+                app.toolbox[name].callback_module = importlib.import_module(
+                    f"{ep.value}.{app.toolbox[name].callback_module_name}"
+                )
+            app.toolbox[name].initialize()
+        except Exception as e:
+            print(e)
+            print(f"Error loading external toolbox {name}.")
+            if name in app.toolbox:
+                del app.toolbox[name]
 
 
 def initialize_models() -> None:
@@ -428,4 +465,9 @@ def initialize_models() -> None:
                     okay = False
             if okay:
                 app.model[model_name].toolbox.append(tlb["name"])
+        # Also add external toolboxes (no for_model restriction)
+        for toolbox_name in app.toolbox:
+            if hasattr(app.toolbox[toolbox_name], "_external_package"):
+                if toolbox_name not in app.model[model_name].toolbox:
+                    app.model[model_name].toolbox.append(toolbox_name)
         app.model[model_name].initialize()

@@ -45,8 +45,28 @@ class Model(GenericModel):
         """Register all map layers for the HurryWave model."""
         layer = app.map.add_layer(_MODEL)
 
-        layer.add_layer("grid", type="raster_image")
-        layer.add_layer("mask", type="raster_image")
+        layer.add_layer(
+            "bathymetry",
+            type="raster_image",
+            map_overlay_options=self._bathymetry_overlay_options,
+        )
+
+        layer.add_layer(
+            "mask",
+            type="raster_image",
+            legend_title="Mask",
+            legend_position="bottom-right-2",
+            map_overlay_options={
+                "colors": {1: "yellow", 2: "red"},
+                "labels": {1: "Active", 2: "Boundary"},
+            },
+        )
+
+        layer.add_layer(
+            "grid",
+            type="raster_image",
+            map_overlay_options={"color": "black"},
+        )
 
         from .boundary_conditions import select_boundary_point_from_map
 
@@ -106,6 +126,18 @@ class Model(GenericModel):
             fill_color_selected="red",
         )
 
+    def _bathymetry_overlay_options(self) -> dict:
+        """Return current topography view settings for the bathymetry overlay."""
+        try:
+            # Get the info from the background topography layer
+            return {
+                "cmin": app.map.layer["main"].layer["background_topography"].current_cmin,
+                "cmax": app.map.layer["main"].layer["background_topography"].current_cmax,
+                "cmap": app.map.layer["main"].layer["background_topography"].current_cmap,
+            }
+        except Exception:
+            return {"cmin": -10.0, "cmax": 10.0, "cmap": "gist_earth"}
+
     def set_layer_mode(self, mode: str) -> None:
         """Show, hide, or deactivate map layers depending on *mode*.
 
@@ -116,8 +148,15 @@ class Model(GenericModel):
         """
         layer = app.map.layer[_MODEL]
         if mode == "inactive":
-            layer.layer["grid"].show()
+            if app.gui.getvar(self.name, "view_grid"):
+                layer.layer["grid"].show()
+            else:
+                layer.layer["grid"].hide()
             layer.layer["mask"].hide()
+            if app.gui.getvar(self.name, "view_bathymetry"):
+                layer.layer["bathymetry"].show()
+            else:
+                layer.layer["bathymetry"].hide()
             layer.layer["boundary_points"].deactivate()
             layer.layer["observation_points_regular"].deactivate()
             layer.layer["observation_points_spectra"].deactivate()
@@ -175,6 +214,9 @@ class Model(GenericModel):
         layer = app.map.layer[_MODEL]
         layer.layer["grid"].set_data(self.domain.quadtree_grid)
         layer.layer["mask"].set_data(self.domain.quadtree_mask)
+        # Bathymetry overlay is only shown when toggled from the View menu
+        if app.gui.getvar(_MODEL, "view_bathymetry"):
+            layer.layer["bathymetry"].set_data(self.domain.quadtree_elevation)
         layer.layer["boundary_points"].set_data(self.domain.boundary_conditions.gdf, 0)
         layer.layer["observation_points_regular"].set_data(
             self.domain.observation_points.gdf, 0
@@ -232,6 +274,7 @@ class Model(GenericModel):
 
         # Extra GUI-only variables
         app.gui.setvar(group, "view_grid", True)
+        app.gui.setvar(group, "view_bathymetry", False)
         app.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
         app.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
         app.gui.setvar(group, "wind_type", "uniform")
@@ -312,6 +355,27 @@ class Model(GenericModel):
                 ],
             }
         )
+        model_view_menu["menu"].append(
+            {
+                "variable_group": self.name,
+                "id": f"view.{self.name}.bathymetry",
+                "text": "Bathymetry",
+                "variable": "view_bathymetry",
+                "separator": False,
+                "checkable": True,
+                "method": self.set_view_menu,
+                "option": "bathymetry",
+                "dependency": [
+                    {
+                        "action": "check",
+                        "checkfor": "all",
+                        "check": [
+                            {"variable": "view_bathymetry", "operator": "eq", "value": True}
+                        ],
+                    }
+                ],
+            }
+        )
         return model_view_menu
 
     def set_view_menu(self, option: str, checked: bool) -> None:
@@ -329,3 +393,11 @@ class Model(GenericModel):
                 app.map.layer[_MODEL].layer["grid"].show()
             else:
                 app.map.layer[_MODEL].layer["grid"].hide()
+        elif option == "bathymetry":
+            if app.gui.getvar(self.name, "view_bathymetry"):
+                app.map.layer[_MODEL].layer["bathymetry"].set_data(
+                    self.domain.quadtree_elevation
+                )
+                app.map.layer[_MODEL].layer["bathymetry"].show()
+            else:
+                app.map.layer[_MODEL].layer["bathymetry"].hide()

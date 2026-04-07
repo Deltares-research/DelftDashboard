@@ -85,6 +85,31 @@ class Model(GenericModel):
                 ],
             }
         )
+        model_view_menu["menu"].append(
+            {
+                "variable_group": self.name,
+                "id": f"view.{self.name}.bathymetry",
+                "text": "Bathymetry",
+                "variable": "view_bathymetry",
+                "separator": False,
+                "checkable": True,
+                "method": self.set_view_menu,
+                "option": "bathymetry",
+                "dependency": [
+                    {
+                        "action": "check",
+                        "checkfor": "all",
+                        "check": [
+                            {
+                                "variable": "view_bathymetry",
+                                "operator": "eq",
+                                "value": True,
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
         return model_view_menu
 
     def set_view_menu(self, option: str, checked: bool) -> None:
@@ -98,27 +123,78 @@ class Model(GenericModel):
             Whether the option is now checked.
         """
         if option == "grid":
-            print(f"Checked: {checked}")
             if app.gui.getvar(self.name, "view_grid"):
                 app.map.layer[_MODEL].layer["grid"].show()
-                print("Grid is made visible")
             else:
                 app.map.layer[_MODEL].layer["grid"].hide()
-                print("Grid is made invisible")
+        elif option == "bathymetry":
+            if app.gui.getvar(self.name, "view_bathymetry"):
+                app.map.layer[_MODEL].layer["bathymetry"].set_data(
+                    self.domain.quadtree_elevation
+                )
+                app.map.layer[_MODEL].layer["bathymetry"].show()
+            else:
+                app.map.layer[_MODEL].layer["bathymetry"].hide()
+
+    def _bathymetry_overlay_options(self) -> dict:
+        """Return current topography view settings for the bathymetry overlay."""
+        try:
+            topo = app.map.layer["main"].layer["background_topography"]
+            return {
+                "cmin": topo.current_cmin,
+                "cmax": topo.current_cmax,
+                "cmap": topo.current_cmap,
+            }
+        except Exception:
+            return {"cmin": -10.0, "cmax": 10.0, "cmap": "gist_earth"}
 
     def add_layers(self) -> None:
         """Register all map layers for the SFINCS model."""
         layer = app.map.add_layer(_MODEL)
 
-        layer.add_layer("grid", type="raster_image")
+        layer.add_layer(
+            "bathymetry",
+            type="raster_image",
+            map_overlay_options=self._bathymetry_overlay_options,
+        )
+
+        layer.add_layer(
+            "mask",
+            type="raster_image",
+            legend_title="Mask",
+            legend_position="bottom-right-2",
+            map_overlay_options={
+                "colors": {1: "yellow", 2: "red", 3: "green", 5: "purple", 6: "blue"},
+                "labels": {
+                    1: "Active",
+                    2: "Water level",
+                    3: "Outflow",
+                    5: "Neumann",
+                    6: "Downstream",
+                },
+            },
+        )
+
+        layer.add_layer(
+            "mask_snapwave",
+            type="raster_image",
+            legend_title="SnapWave Mask",
+            legend_position="bottom-right-2",
+            map_overlay_options={
+                "colors": {1: "yellow", 2: "red", 3: "green"},
+                "labels": {1: "Active", 2: "Boundary", 3: "Neumann"},
+            },
+        )
+
+        layer.add_layer(
+            "grid",
+            type="raster_image",
+            map_overlay_options={"color": "black"},
+        )
 
         layer.add_layer(
             "grid_exterior", type="line", circle_radius=0, line_color="yellow"
         )
-
-        layer.add_layer("mask", type="raster_image")
-
-        layer.add_layer("mask_snapwave", type="raster_image")
 
         from .boundary_conditions import select_boundary_point_from_map
 
@@ -260,16 +336,6 @@ class Model(GenericModel):
             line_color_inactive="lightgrey",
         )
 
-        layer.add_layer(
-            "obs_points",
-            type="marker",
-            hover_property="description",
-            click_property="url",
-            icon_size=0.5,
-            click_popup_width=600,
-            click_popup_height=220,
-        )
-
         from .discharge_points import select_discharge_point_from_map
 
         layer.add_layer(
@@ -323,6 +389,7 @@ class Model(GenericModel):
             select=wave_maker_selected,
             add=wave_maker_modified,
             polygon_line_color="red",
+            show_endpoints=True,
         )
 
     def set_layer_mode(self, mode: str) -> None:
@@ -335,10 +402,17 @@ class Model(GenericModel):
         """
         layer = app.map.layer[_MODEL]
         if mode == "inactive":
-            layer.layer["grid"].deactivate()
+            if app.gui.getvar(self.name, "view_grid"):
+                layer.layer["grid"].show()
+            else:
+                layer.layer["grid"].hide()
             layer.layer["grid_exterior"].deactivate()
             layer.layer["mask"].hide()
             layer.layer["mask_snapwave"].hide()
+            if app.gui.getvar(self.name, "view_bathymetry"):
+                layer.layer["bathymetry"].show()
+            else:
+                layer.layer["bathymetry"].hide()
             layer.layer["boundary_points"].deactivate()
             layer.layer["observation_points"].deactivate()
             layer.layer["cross_sections"].layer["polylines"].deactivate()
@@ -412,6 +486,11 @@ class Model(GenericModel):
 
     def plot(self) -> None:
         """Plot all model features on the map."""
+        # Bathymetry (only shown when toggled from the View menu)
+        if app.gui.getvar(_GROUP, "view_bathymetry"):
+            app.map.layer[_MODEL].layer["bathymetry"].set_data(
+                app.model[_MODEL].domain.quadtree_elevation
+            )
         # Grid
         app.map.layer[_MODEL].layer["grid"].set_data(
             app.model[_MODEL].domain.quadtree_grid
@@ -477,6 +556,7 @@ class Model(GenericModel):
 
         # View
         app.gui.setvar(group, "view_grid", True)
+        app.gui.setvar(group, "view_bathymetry", False)
 
         # Now set some extra variables needed for SFINCS GUI
 

@@ -16,7 +16,7 @@ def select(*args: Any) -> None:
     # app.map.layer[_TB].layer["include_polygon"].activate()
     app.map.layer[_TB].layer["exclude_polygon"].activate()
     # Show the grid and mask
-    app.map.layer["sfincs_cht"].layer["grid"].activate()
+    app.map.layer[_MODEL].layer["grid"].activate()
     # app.map.layer["sfincs_cht"].layer["mask_include"].activate()
     # app.map.layer["sfincs_cht"].layer["mask_open_boundary"].activate()
     # app.map.layer["sfincs_cht"].layer["mask_outflow_boundary"].activate()

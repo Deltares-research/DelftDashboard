@@ -1,11 +1,90 @@
 element:
+
+# ── Draw button (top) ────────────────────────────────────────────
 - style: pushbutton
   text: Draw Track
   position:
-    x: 20
+    x: 10
     y: 110
     width: 120
     height: 20
   method: draw_track
-  enable: false
-  tooltip: Draw a tropical cyclone track on the map
+  tooltip: Draw a tropical cyclone track polyline on the map
+
+- style: edit
+  position:
+    x: 60
+    y: 85
+    width: 70
+    height: 20
+  variable: draw_name
+  text: Name
+  tooltip: Name of the tropical cyclone
+
+- style: pushbutton
+  text: Save Track ...
+  position:
+    x: 10
+    y: 60
+    width: 120
+    height: 20
+  method: save_track
+  tooltip: Save the current track to a .cyc file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: track_loaded
+      operator: eq
+      value: True
+
+# ── Start date/time + parameters ─────────────────────────────────
+- style: datetimeedit
+  position:
+    x: 220
+    y: 110
+    width: 150
+    height: 20
+  variable: draw_start_datetime
+  text: Start Date/Time
+  tooltip: Date and time of the first track point
+
+- style: edit
+  position:
+    x: 220
+    y: 85
+    width: 50
+    height: 20
+  variable: draw_dt_hours
+  text: dt (hrs)
+  tooltip: Time interval between track points in hours
+
+- style: edit
+  position:
+    x: 220
+    y: 60
+    width: 50
+    height: 20
+  variable: draw_vmax
+  text: Vmax (kts)
+  tooltip: Maximum sustained wind speed for all track points (knots)
+
+- style: edit
+  position:
+    x: 220
+    y: 35
+    width: 50
+    height: 20
+  variable: draw_rmax
+  text: Rmax (NM)
+  tooltip: Radius of maximum winds for all track points (nautical miles)
+
+- style: edit
+  position:
+    x: 220
+    y: 10
+    width: 50
+    height: 20
+  variable: draw_vt
+  text: Vt (kts)
+  tooltip: Forward propagation speed (knots)

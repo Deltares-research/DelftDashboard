@@ -60,7 +60,7 @@ element:
   method: edit_dxdy
   tooltip: Edit grid cell size in Y-direction
 - style: pushbutton
-  text: Draw Layout
+  text: Draw Model Domain
   position:
     x: 230
     y: 110

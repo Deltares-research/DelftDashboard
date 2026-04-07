@@ -5,6 +5,7 @@ assembles the menu bar, map widget, status bar, and tab panels into the
 ``app.gui.config`` dictionary that ``GUI.build()`` consumes.
 """
 
+import importlib
 import os
 from typing import Any
 
@@ -23,24 +24,32 @@ def build_gui_config() -> None:
 
     # Toolboxes
     for toolbox_name in app.toolbox:
-        # Read the GUI elements for this toolbox
-        path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
+        tb = app.toolbox[toolbox_name]
+
+        # Resolve config path: external packages have their own config dir
+        if hasattr(tb, "_external_package"):
+            pkg_path = os.path.dirname(
+                importlib.import_module(tb._external_package).__file__
+            )
+            path = os.path.join(pkg_path, "config")
+        else:
+            path = os.path.join(app.main_path, "toolboxes", toolbox_name, "config")
+
         file_name = f"{toolbox_name}.yml"
-        app.toolbox[toolbox_name].element = app.gui.read_gui_elements(path, file_name)
-        for element in app.toolbox[toolbox_name].element:
-            # Set the callback module. This is the module that contains the
-            # callback functions, and does not have to be the same as the
-            # toolbox module. This is useful as some toolboxes do not have
-            # tabs for which modules are defined, and the main module can
-            # become very busy with all the callbacks and the toolbox object.
-            if app.toolbox[toolbox_name].callback_module_name is None:
-                element["module"] = (
-                    f"delftdashboard.toolboxes.{toolbox_name}.{toolbox_name}"
-                )
-            else:
-                element["module"] = (
-                    f"delftdashboard.toolboxes.{toolbox_name}.{app.toolbox[toolbox_name].callback_module_name}"
-                )
+        tb.element = app.gui.read_gui_elements(path, file_name)
+
+        for element in tb.element:
+            # For external toolboxes, the YAML already contains the correct
+            # module path (e.g. "tsunami.source"), so don't override it.
+            if not hasattr(tb, "_external_package"):
+                if tb.callback_module_name is None:
+                    element["module"] = (
+                        f"delftdashboard.toolboxes.{toolbox_name}.{toolbox_name}"
+                    )
+                else:
+                    element["module"] = (
+                        f"delftdashboard.toolboxes.{toolbox_name}.{tb.callback_module_name}"
+                    )
             element["variable_group"] = toolbox_name
 
     # Models
@@ -113,6 +122,7 @@ def build_gui_config() -> None:
                         "map_projection": "mercator",
                         "module": "delftdashboard.operations.map",
                         "position": {"x": 1, "y": 1, "width": -1, "height": -1},
+                        "terrain_sources": getattr(app, "terrain_sources", None),
                     }
                 ],
             },

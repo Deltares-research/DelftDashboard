@@ -3,6 +3,7 @@
 import datetime
 import os
 
+import pandas as pd
 from cht_cyclones import CycloneTrackDatabase, TropicalCyclone
 
 from delftdashboard.app import app
@@ -49,6 +50,18 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "ensemble_start_time", None)
 
         app.gui.setvar(group, "track_time_strings", [])
+
+        # Draw track defaults
+        app.gui.setvar(group, "draw_start_datetime", None)
+        app.gui.setvar(group, "draw_dt_hours", 6.0)
+        app.gui.setvar(group, "draw_vmax", 100.0)
+        app.gui.setvar(group, "draw_rmax", 25.0)
+        app.gui.setvar(group, "draw_name", "TC Deepak")
+        app.gui.setvar(group, "draw_vt", 10.0)
+
+        # Modify track state
+        app.gui.setvar(group, "track_modified", False)
+        app.gui.setvar(group, "track_table", pd.DataFrame())
 
         app.gui.setvar(group, "include_rainfall", False)
         app.gui.setvar(group, "wind_profile_options", ["holland2010"])
@@ -116,13 +129,27 @@ class Toolbox(GenericToolbox):
         layer.add_layer(
             "cyclone_track",
             type="cyclone_track",
-            # file_name="tracks.geojson",
             line_color="dodgerblue",
             line_width=2,
             line_color_selected="red",
             line_width_selected=3,
             hover_param="description",
             icon_size=0.75,
+        )
+
+        # Drawing layer for manually drawing a track polyline
+        from .draw import track_drawn
+        from .modify import track_modified_on_map, track_edit_finished
+
+        layer.add_layer(
+            "draw_track",
+            type="draw",
+            shape="polyline",
+            create=track_drawn,
+            modify=track_modified_on_map,
+            deselect=track_edit_finished,
+            polyline_line_color="dodgerblue",
+            polyline_line_width=2,
         )
 
     def track_added(self) -> None:

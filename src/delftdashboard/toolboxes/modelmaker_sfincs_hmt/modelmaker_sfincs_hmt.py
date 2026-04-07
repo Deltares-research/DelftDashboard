@@ -269,7 +269,7 @@ class Toolbox(GenericToolbox):
             modify=grid_outline_modified,
             polygon_line_color="mediumblue",
             polygon_fill_opacity=0.1,
-            rotate=True,
+            rotate=not app.crs.is_geographic,
         )
 
         ### Mask
