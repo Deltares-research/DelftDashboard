@@ -43,16 +43,6 @@ element:
       y: 55
       width: 50
       height: 20
-    text: Stop Depth (m)
-    variable: stopdepth
-    method: set_model_variables
-    tooltipstring: Edit stop depth (simulation will stop when this depth is exceeded)
-  - style: edit
-    position:
-      x: 100
-      y: 30
-      width: 50
-      height: 20
     text: Spin-up Time (s)
     variable: tspinup
     method: set_model_variables

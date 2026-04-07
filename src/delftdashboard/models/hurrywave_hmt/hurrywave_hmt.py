@@ -204,7 +204,10 @@ class Model(GenericModel):
     def set_crs(self) -> None:
         """Update the model CRS to match the application CRS and re-plot."""
         crs = app.crs
-        old_crs = self.domain.crs
+        try:
+            old_crs = self.domain.crs
+        except (KeyError, AttributeError):
+            return
         if old_crs != crs:
             self.domain.config.set("crs_epsg", crs.to_epsg(), skip_validation=True)
             self.plot()

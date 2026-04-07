@@ -52,7 +52,7 @@ element:
       value: True
 
 - style: pushbutton
-  text: Save Track ...
+  text: Save Track
   position:
     x: 10
     y: 30

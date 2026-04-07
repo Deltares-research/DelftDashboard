@@ -5,7 +5,11 @@ generating tidal boundary conditions, and reading/writing .bnd, .bzs,
 and .bca files.
 """
 
+import os
 from typing import Any, Optional
+
+import pandas as pd
+import plotly.express as px
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -148,7 +152,7 @@ def point_clicked(x: float, y: float) -> None:
     """
     wl = app.gui.getvar(_GROUP, "boundary_conditions_timeseries_offset")
     app.model[_MODEL].domain.water_level.add_point(x, y, value=wl)
-    index = len(app.model[_MODEL].domain.water_level.gdf) - 1
+    index = app.model[_MODEL].domain.water_level.nr_points - 1
     gdf = app.model[_MODEL].domain.water_level.gdf
     app.map.layer[_MODEL].layer["boundary_points"].set_data(gdf, index)
     app.gui.setvar(_GROUP, "active_boundary_point", index)
@@ -162,14 +166,25 @@ def select_boundary_point_from_list(*args: Any) -> None:
     Parameters
     ----------
     *args : Any
-        Unused GUI callback arguments.
+        First argument is the selected index value from the listbox.
     """
-    index = app.gui.getvar(_GROUP, "active_boundary_point")
+    # Use the index passed directly from the listbox callback,
+    # not from getvar (which may be stale due to async JS updates)
+    if args:
+        index = args[0]
+        if isinstance(index, tuple):
+            index = index[0]
+        index = int(index)
+    else:
+        index = app.gui.getvar(_GROUP, "active_boundary_point")
+    app.gui.setvar(_GROUP, "active_boundary_point", index)
     app.map.layer[_MODEL].layer["boundary_points"].select_by_index(index)
 
 
 def select_boundary_point_from_map(*args: Any) -> None:
     """Handle map-based selection of a boundary point.
+
+    Opens a plotly time series popup for the selected point.
 
     Parameters
     ----------
@@ -179,6 +194,7 @@ def select_boundary_point_from_map(*args: Any) -> None:
     index = args[0]["id"]
     app.gui.setvar(_GROUP, "active_boundary_point", index)
     app.gui.window.update()
+    _show_timeseries_popup(index)
 
 
 def delete_point_from_list(*args: Any) -> None:
@@ -206,17 +222,12 @@ def select_timeseries_or_astro(*args: Any) -> None:
 
 def update_list() -> None:
     """Refresh the boundary point name list and count in the GUI."""
-    nr_boundary_points = len(app.model[_MODEL].domain.water_level.gdf)
+    nr_boundary_points = app.model[_MODEL].domain.water_level.nr_points
     boundary_point_names = []
     # Loop through boundary points
     for index, row in app.model[_MODEL].domain.water_level.gdf.iterrows():
-        if "name" in row and row["name"] is not None:
-            boundary_point_names.append(row["name"])
-        else:
-            name = f"Point {index + 1:03d}"
-            boundary_point_names.append(name)
-            # Add name to gdf for display purposes (not saved to file, just for display in list)
-            app.model[_MODEL].domain.water_level.gdf.at[index, "name"] = name
+        name = f"Point {index + 1:03d}"
+        boundary_point_names.append(name)
     app.gui.setvar(_GROUP, "boundary_point_names", boundary_point_names)
     app.gui.setvar(_GROUP, "nr_boundary_points", nr_boundary_points)
     app.gui.window.update()
@@ -332,7 +343,7 @@ def create_boundary_points(*args: Any) -> None:
             "Please first create a mask for this domain.", title=" "
         )
         return
-    if not app.model[_MODEL].domain.quadtree_mask.has_open_boundaries():
+    if not app.model[_MODEL].domain.quadtree_mask.has_open_boundaries:
         ok = app.gui.window.dialog_info(
             "The mask for this domain does not have any open boundary points !",
             title=" ",
@@ -370,6 +381,72 @@ def create_boundary_points(*args: Any) -> None:
     app.gui.setvar(_GROUP, "active_boundary_point", 0)
     update_list()
 
+
+def _show_timeseries_popup(index: int) -> None:
+    """Generate a plotly time series plot and show it as a map popup.
+
+    Parameters
+    ----------
+    index : int
+        Index of the boundary point in the GeoDataFrame.
+    """
+
+    gdf = app.model[_MODEL].domain.water_level.gdf
+    if gdf is None or index >= len(gdf):
+        return
+
+    # The time series are stored in app.model[_MODEL].domain.water_level.data as an xr.Dataset,
+    # but we need to get the time series for this point as a pandas DataFrame for plotting.
+    # We can get the point ID from the gdf, and then use that to select the time series from the Dataset.
+    # We need the time series for our point with index `index` as a pandas DataFrame with columns "time" and "value".
+    # The time series are stored in app.model[_MODEL].domain.water_level.data as an xarray Dataset,
+    # where each point has a unique ID that matches the "id" column in the gdf.
+    # We can use the point ID to select the time series for this point from the Dataset,
+    # and then convert it to a pandas DataFrame for plotting.
+    ts = app.model[_MODEL].domain.water_level.data.sel(index=index).to_dataframe().reset_index()
+    # And we only need the bzs column
+    ts = ts[["time", "bzs"]].rename(columns={"bzs": "water_level"})
+    ts.set_index("time", inplace=True)
+
+    if ts is None or (isinstance(ts, pd.DataFrame) and ts.empty):
+        return
+
+    name = gdf.iloc[index].get("name", f"Point {index}")
+
+    # Build the plotly figure
+    fig = px.line(
+        ts,
+        title=f"Boundary: {name}",
+        labels={"time": "Time", "water_level": "Water Level (m)"},
+    )
+    fig.update_layout(
+        margin=dict(l=40, r=20, t=40, b=30),
+        height=300,
+        width=500,
+        template="plotly_white",
+        showlegend=False,
+        yaxis_title="Water Level (m)",
+        xaxis_title="Time",
+    )
+
+    # Save as HTML in the server overlays folder
+    html_file = "boundary_point_time_series.html"
+    html_path = os.path.join(app.map.server_path, "overlays", html_file)
+    fig.write_html(
+        html_path,
+        include_plotlyjs="cdn",
+        full_html=True,
+        config={"displayModeBar": False},
+    )
+
+    # Show as popup on the map at the boundary point location
+    geom = gdf.iloc[index].geometry
+    lon, lat = geom.x, geom.y
+    url = f"./overlays/{html_file}"
+    app.map.runjs(
+        "/js/main.js", "showPopup",
+        lon=lon, lat=lat, url=url, width=520, height=320,
+    )
 
 def get_bnd_file_name(*args: Any) -> Optional[str]:
     """Prompt the user to select or confirm a .bnd file name.

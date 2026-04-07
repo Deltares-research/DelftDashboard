@@ -498,6 +498,11 @@ class Toolbox(GenericToolbox):
         # # Should we also remove all existing polygons? Refinement and mask?
         self.initialize()
         self.clear_layers()
+        # Update rotation setting for the grid outline draw layer
+        can_rotate = not app.crs.is_geographic
+        layer = app.map.layer.get(_TB)
+        if layer and "grid_outline" in layer.layer:
+            layer.layer["grid_outline"].set_paint_property("rotate", can_rotate)
 
     def generate_grid(self) -> None:
         """Generate the quadtree grid from current GUI parameters and refinement polygons."""

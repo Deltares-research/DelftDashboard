@@ -271,8 +271,9 @@ class Toolbox(GenericToolbox):
 
     def save_track(self) -> None:
         """Save the current cyclone track to a .cyc file via dialog."""
+        name = self.tc.name.replace(" ", "_").lower()
         file_name = app.gui.window.dialog_save_file(
-            "Save track", "*.cyc", self.tc.name + ".cyc"
+            "Save track", "*.cyc", name + ".cyc"
         )
         if file_name[0]:
             self.tc.name = os.path.basename(file_name[0]).split(".")[0]
@@ -299,8 +300,9 @@ class Toolbox(GenericToolbox):
 
     def save_config(self) -> None:
         """Save the current cyclone configuration to a .cfg file via dialog."""
+        name = self.tc.name.replace(" ", "_").lower()
         file_name = app.gui.window.dialog_save_file(
-            "Save configuration", "cfg", self.tc.name + ".cfg"
+            "Save configuration", "*.cfg", name + ".cfg"
         )
         self.set_config()
         if file_name[0]:

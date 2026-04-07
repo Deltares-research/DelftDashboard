@@ -90,11 +90,14 @@ def wave_maker_created(gdf: Any, index: int, id: Any) -> None:
     id : Any
         Feature identifier.
     """
-    app.model[_MODEL].domain.wave_makers.set(gdf, merge=False)
-    nrp = len(app.model[_MODEL].domain.wave_makers.gdf)
-    app.gui.setvar(_GROUP, "active_wave_maker", nrp - 1)
-    app.model[_MODEL].wave_makers_changed = True
-    update()
+    try:
+        app.model[_MODEL].domain.wave_makers.set(gdf, merge=False)
+        nrp = len(app.model[_MODEL].domain.wave_makers.gdf)
+        app.gui.setvar(_GROUP, "active_wave_maker", nrp - 1)
+        app.model[_MODEL].wave_makers_changed = True
+        update()
+    except Exception as e:
+        app.gui.window.dialog_warning(f"Error creating wave maker: {e}")
 
 
 def wave_maker_modified(gdf: Any, index: int, id: Any) -> None:

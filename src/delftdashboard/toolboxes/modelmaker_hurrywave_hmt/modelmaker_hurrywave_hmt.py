@@ -125,6 +125,13 @@ class Toolbox(GenericToolbox):
         if mode in ("inactive", "invisible"):
             app.map.layer[_TB].hide()
 
+    def set_crs(self) -> None:
+        """Update rotation setting when the CRS changes."""
+        can_rotate = not app.crs.is_geographic
+        layer = app.map.layer.get(_TB)
+        if layer and "grid_outline" in layer.layer:
+            layer.layer["grid_outline"].set_paint_property("rotate", can_rotate)
+
     def add_layers(self) -> None:
         """Register all map layers for the Model Maker toolbox."""
         layer = app.map.add_layer(_TB)

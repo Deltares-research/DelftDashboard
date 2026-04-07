@@ -24,6 +24,7 @@ dependencies = [
     "pyyaml>=5.1.1",
     "toml",
     "boto3",
+	"plotly_express",
     "guitares@ git+https://github.com/deltares-research/guitares.git",
     "cht-observations@ git+https://github.com/deltares-research/cht_observations.git",
     "cht_cyclones@ git+https://github.com/deltares-research/cht_cyclones.git",

@@ -22,7 +22,7 @@ element:
   tooltip: Name of the tropical cyclone
 
 - style: pushbutton
-  text: Save Track ...
+  text: Save Track
   position:
     x: 10
     y: 60

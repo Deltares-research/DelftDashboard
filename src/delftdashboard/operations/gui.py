@@ -69,6 +69,7 @@ def build_gui_config() -> None:
     app.gui.config["window"]["width"] = app.config["width"]
     app.gui.config["window"]["height"] = app.config["height"]
     app.gui.config["window"]["icon"] = app.config["window_icon"]
+    app.gui.config["window"]["maximize"] = app.config.get("maximize", False)
     app.gui.config["menu"] = []
     app.gui.config["toolbar"] = []
     app.gui.config["element"] = []

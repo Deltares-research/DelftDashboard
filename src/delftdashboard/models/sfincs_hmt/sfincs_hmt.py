@@ -144,9 +144,10 @@ class Model(GenericModel):
                 "cmin": topo.current_cmin,
                 "cmax": topo.current_cmax,
                 "cmap": topo.current_cmap,
+                "legend": False,
             }
         except Exception:
-            return {"cmin": -10.0, "cmax": 10.0, "cmap": "gist_earth"}
+            return {"cmin": -10.0, "cmax": 10.0, "cmap": "gist_earth", "legend": False}
 
     def add_layers(self) -> None:
         """Register all map layers for the SFINCS model."""
@@ -429,7 +430,11 @@ class Model(GenericModel):
     def set_crs(self) -> None:
         """Update the model CRS to match the application CRS and re-plot."""
         crs = app.crs
-        old_crs = self.domain.crs
+        try:
+            old_crs = self.domain.crs
+        except (KeyError, AttributeError):
+            # Model not yet initialized — no CRS to update
+            return
         if old_crs != crs:
             self.domain.crs = crs
             self.domain.clear_spatial_attributes()
