@@ -199,7 +199,7 @@ class Model(GenericModel):
     def save(self) -> None:
         """Write the current model configuration to disk."""
         self.domain.config.set("crs_epsg", app.crs.to_epsg(), skip_validation=True)
-        self.domain.config.write()
+        self.domain.config.write(write_description=True)
 
     def set_crs(self) -> None:
         """Update the model CRS to match the application CRS and re-plot."""

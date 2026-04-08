@@ -487,7 +487,7 @@ class Model(GenericModel):
     def save(self) -> None:
         """Write the SFINCS configuration to disk."""
         self.check_times()
-        app.model[_MODEL].domain.config.write()
+        app.model[_MODEL].domain.config.write(write_description=True)
 
     def plot(self) -> None:
         """Plot all model features on the map."""

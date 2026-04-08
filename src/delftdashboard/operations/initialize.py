@@ -325,6 +325,10 @@ def initialize() -> None:
     app.gui.setvar("menu", "active_toolbox_name", "")
     app.gui.setvar("menu", "active_topography_name", app.background_topography)
 
+    # Warm up numba JIT in background (xugrid snap_to_grid etc.)
+    # This call can be removed after the numba cell tree teams updates their code
+    _warmup_numba()
+
     # Now build up GUI config
     build_gui_config()
 
@@ -471,3 +475,40 @@ def initialize_models() -> None:
                 if toolbox_name not in app.model[model_name].toolbox:
                     app.model[model_name].toolbox.append(toolbox_name)
         app.model[model_name].initialize()
+
+
+def _warmup_numba() -> None:
+    """Trigger numba JIT compilation for xugrid in a background thread.
+
+    The first call to xugrid's snap_to_grid compiles several numba
+    functions which takes ~30 seconds. By running a tiny dummy call
+    during startup, the compilation happens in the background while
+    the user sees the splash screen.
+    """
+    import threading
+
+    def _warmup():
+        try:
+            import geopandas as gpd
+            import numpy as np
+            import xugrid as xu
+            from shapely.geometry import LineString
+
+            # Create a minimal 2x2 grid and snap a line to it.
+            # This triggers compilation of the slow snap_to_edges
+            # numba function (~50s on first call).
+            vertices = np.array(
+                [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]], dtype=float
+            )
+            faces = np.array([[0, 1, 4, 3], [1, 2, 5, 4]])
+            grid = xu.Ugrid2d(vertices[:, 0], vertices[:, 1], -1, faces)
+            line = gpd.GeoDataFrame(
+                {"geometry": [LineString([(0.5, 0), (0.5, 1)])]},
+            )
+            xu.snap_to_grid(line, grid, max_snap_distance=0.5)
+            print("Numba JIT warmup complete.")
+        except Exception as e:
+            print(f"Numba warmup failed (non-critical): {e}")
+
+    t = threading.Thread(target=_warmup, daemon=True)
+    t.start()
