@@ -12,7 +12,7 @@ from typing import List
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from cht_utils.misc_tools import dict2yaml, yaml2dict
+from cht_utils.fileio.yaml import dict2yaml, yaml2dict
 from pyproj import CRS
 
 from delftdashboard.app import app

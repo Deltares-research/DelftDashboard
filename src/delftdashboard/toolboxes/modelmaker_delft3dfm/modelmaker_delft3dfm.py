@@ -6,7 +6,7 @@ import traceback
 from typing import List, Optional
 
 import geopandas as gpd
-from cht_utils.misc_tools import dict2yaml, yaml2dict
+from cht_utils.fileio.yaml import dict2yaml, yaml2dict
 from pyproj import CRS
 
 from delftdashboard.app import app

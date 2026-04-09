@@ -36,7 +36,6 @@ dependencies = [
     "cht_hurrywave@ git+https://github.com/deltares-research/cht_hurrywave.git",
     "cht_tide@ git+https://github.com/deltares-research/cht_tide.git",
     "cht_tiling@ git+https://github.com/deltares-research/cht_tiling.git",
-    "cht_physics@ git+https://github.com/deltares-research/cht_physics.git",
 ]
 dynamic = ["version"]
 

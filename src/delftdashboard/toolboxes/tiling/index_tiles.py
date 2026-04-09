@@ -40,6 +40,25 @@ def generate_index_tiles(*args: Any) -> None:
 
         dlg.close()
 
+    elif model.name == "sfincs_hmt":
+        dlg = app.gui.window.dialog_wait("Generating index tiles ...")
+
+        grid = model.domain.grid.data
+        path = "./tiling/indices"
+        max_zoom = app.gui.getvar("tiling", "max_zoom")
+        zoom_range = [0, max_zoom]
+
+        twmi = TiledWebMap(
+            path,
+            type="data",
+            parameter="index",
+            data=grid,
+            zoom_range=zoom_range,
+        )
+        twmi.make()
+
+        dlg.close()
+
     elif model.name == "hurrywave":
         dlg = app.gui.window.dialog_wait("Generating index tiles ...")
 
@@ -48,14 +67,12 @@ def generate_index_tiles(*args: Any) -> None:
         max_zoom = app.gui.getvar("tiling", "max_zoom")
         zoom_range = [0, max_zoom]
 
-        # Create index tiles
         twmi = TiledWebMap(
             path,
             type="data",
             parameter="index",
             data=grid,
             zoom_range=zoom_range,
-            topo_path=r"c:\work\delftdashboard\data\bathymetry\gebco_2024",
         )
         twmi.make()
 

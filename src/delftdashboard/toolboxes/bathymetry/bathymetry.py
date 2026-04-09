@@ -10,7 +10,7 @@ import traceback
 import numpy as np
 import rasterio
 import yaml
-from cht_utils import geotiff_to_cog, netcdf_to_cog, xyz_to_cog
+from cht_utils.cog import geotiff_to_cog, netcdf_to_cog, xyz_to_cog
 from pyproj import CRS
 
 from delftdashboard.app import app

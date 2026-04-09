@@ -7,7 +7,7 @@ Created on Fri Jan 20 10:04:20 2023
 
 import os
 
-import cht_utils.xmlkit as xml
+import cht_utils.fileio.xml as xml
 import yaml
 from cht_utils import fileops as fo
 

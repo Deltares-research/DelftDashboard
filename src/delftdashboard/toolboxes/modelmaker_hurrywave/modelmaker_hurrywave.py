@@ -15,8 +15,8 @@ from delftdashboard.app import app
 from delftdashboard.misc.gdfutils import mpol2pol
 
 # from cht_bathymetry.bathymetry_database import bathymetry_database
-from cht_utils.misc_tools import dict2yaml
-from cht_utils.misc_tools import yaml2dict
+from cht_utils.fileio.yaml import dict2yaml
+from cht_utils.fileio.yaml import yaml2dict
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):
