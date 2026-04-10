@@ -1,0 +1,36 @@
+# Minimal requirements for a DelftDashboard distribution environment.
+#
+# Create a clean env: conda create -n ddb_dist python=3.12
+# Then: pip install -r requirements_minimal.txt
+#
+# DelftDashboard's pyproject.toml pulls in: guitares, all cht_*, cosmos.
+# We only need to add packages that pyproject.toml doesn't declare.
+
+# --- Qt GUI (not in pyproject.toml) ---
+PySide6
+
+# --- Geospatial (some missing from pyproject.toml) ---
+rasterio
+rioxarray
+fiona
+pyogrio
+xarray
+xugrid
+scipy
+netCDF4
+datashader
+Pillow
+requests
+pydantic
+pydantic-settings
+affine
+h5py
+dask
+
+# --- HydroMT (not in pyproject.toml) ---
+hydromt @ git+https://github.com/Deltares/hydromt.git
+hydromt_sfincs @ git+https://github.com/Deltares/hydromt_sfincs.git
+hydromt_hurrywave @ git+https://github.com/Deltares-research/hydromt-hurrywave.git
+
+# --- DelftDashboard (pulls in guitares, cht_*, cosmos via pyproject.toml) ---
+delftdashboard @ git+https://github.com/Deltares-research/DelftDashboard.git
