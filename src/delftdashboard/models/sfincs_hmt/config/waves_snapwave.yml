@@ -8,6 +8,7 @@ element:
   text: SnapWave
   variable: snapwave
   method: set_model_variables
+  tooltip: Enable or disable SnapWave spectral wave model
 - style: checkbox
   position:
     x: 10
@@ -17,6 +18,7 @@ element:
   text: IG Waves
   variable: snapwave_igwaves
   method: set_model_variables
+  tooltip: Enable or disable infragravity wave computation
   dependency:
   - action: enable
     checkfor: all

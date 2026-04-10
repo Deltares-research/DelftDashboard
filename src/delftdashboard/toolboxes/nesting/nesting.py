@@ -1,23 +1,31 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""Nesting toolbox class for managing model nesting GUI state and initialization."""
 
-@author: ormondt
-"""
+from __future__ import annotations
+
 from delftdashboard.app import app
 from delftdashboard.operations.toolbox import GenericToolbox
 
+
 class Toolbox(GenericToolbox):
-    def __init__(self, name):
+    """Toolbox for coupling overall and detail models via nesting steps."""
+
+    def __init__(self, name: str) -> None:
+        """Initialize the nesting toolbox.
+
+        Parameters
+        ----------
+        name : str
+            Short name for this toolbox instance.
+        """
         super().__init__()
 
         self.name = name
         self.long_name = "Nesting"
 
-    def initialize(self):
-
+    def initialize(self) -> None:
+        """Register all GUI variables for the nesting toolbox."""
         group = "nesting"
-        
+
         app.gui.setvar(group, "obs_point_prefix", "nest")
 
         app.gui.setvar(group, "detail_model_type", "")
@@ -34,9 +42,16 @@ class Toolbox(GenericToolbox):
 
         app.gui.setvar(group, "water_level_correction", 0.0)
 
-        
-    def set_layer_mode(self, mode):
+    def set_layer_mode(self, mode: str) -> None:
+        """Set the visibility mode for nesting map layers (no-op).
+
+        Parameters
+        ----------
+        mode : str
+            The layer mode to apply.
+        """
         pass
 
-    def add_layers(self):
+    def add_layers(self) -> None:
+        """Add map layers for the nesting toolbox (no-op)."""
         pass

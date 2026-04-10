@@ -71,6 +71,7 @@ element:
     - net
     - bin
     - asc
+    tooltipstring: Select the output file format
   - style: checkbox
     position:
       x: 220
@@ -78,6 +79,7 @@ element:
     text: Store Meteo
     variable: storemeteo
     method: set_model_variables
+    tooltipstring: Check to include meteo data in model output
   - style: checkbox
     position:
       x: 220
@@ -85,3 +87,4 @@ element:
     text: Store Velocity
     variable: storevel
     method: set_model_variables
+    tooltipstring: Check to include velocity data in model output

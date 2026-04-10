@@ -8,6 +8,7 @@ element:
   text: Uniform Friction Coefficient
   variable: physics.uniffrictcoef
   method: set_model_variables
+  tooltip: Edit uniform friction coefficient value
 - style: popupmenu
   position:
     x: 140
@@ -27,3 +28,4 @@ element:
   - 1
   - 2
   - 3
+  tooltip: Select bottom friction formulation

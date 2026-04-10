@@ -1,22 +1,27 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jul  5 13:40:07 2022
-
-@author: ormondt
-"""
+"""Menu callbacks for changing the application coordinate reference system."""
 
 import os
 
-from delftdashboard.app import app
-from delftdashboard.operations import map
-
-# import pyproj
 from pyproj import CRS
 
-from delftdashboard.misc.select_other_projected.select_projected_crs import select_projected_crs
-from delftdashboard.misc.select_other_geographic.select_geographic_crs import select_geographic_crs
+from delftdashboard.app import app
+from delftdashboard.misc.select_other_geographic.select_geographic_crs import (
+    select_geographic_crs,
+)
+from delftdashboard.misc.select_other_projected.select_projected_crs import (
+    select_projected_crs,
+)
+from delftdashboard.operations import map
 
-def wgs84(option):
+
+def wgs84(option: str) -> None:
+    """Switch the coordinate system to WGS 84 (EPSG:4326).
+
+    Parameters
+    ----------
+    option : str
+        Menu option identifier (unused).
+    """
     new_crs = CRS(4326)
     if new_crs == app.crs:
         return
@@ -27,13 +32,20 @@ def wgs84(option):
     )
     if not ok:
         return
-    
+
     app.crs = new_crs
     app.map.fly_to(0.0, 0.0, 1)
     update_crs()
 
 
-def utm_zone(option):
+def utm_zone(option: str) -> None:
+    """Prompt the user to select a UTM zone and apply it as the CRS.
+
+    Parameters
+    ----------
+    option : str
+        Menu option identifier (unused).
+    """
     okay, data = app.gui.popup(
         os.path.join(app.main_path, "misc", "select_utm_zone", "utm_zone.yml"),
         id="utm_zone",
@@ -73,7 +85,7 @@ def utm_zone(option):
     lon = -180.0 + utm_number * 6.0 - 3.0
     lat = -80.0 + index * 8.0 - 4.0
     zoom = 6
-    new_crs = CRS("WGS 84 / UTM zone " + utm)
+    new_crs = CRS(f"WGS 84 / UTM zone {utm}")
     if new_crs == app.crs:
         return
     ok = app.gui.window.dialog_yes_no(
@@ -81,14 +93,20 @@ def utm_zone(option):
         "Change Coordinate System",
     )
     if not ok:
-        return    
+        return
     app.crs = new_crs
     app.map.fly_to(lon, lat, zoom)
     update_crs()
 
 
-def other_projected(option):
+def other_projected(option: str) -> None:
+    """Open a dialog to select a projected CRS and apply it.
 
+    Parameters
+    ----------
+    option : str
+        Menu option identifier (unused).
+    """
     # # Get a list of all CRS
     # crs_info_list = pyproj.database.query_crs_info(auth_name=None, pj_types=None)
 
@@ -117,7 +135,7 @@ def other_projected(option):
     # filtered_names = app.gui.getvar("select_other_projected", "filtered_names")
     # i = app.gui.getvar("select_other_projected", "crs_index")
     # selected_name = filtered_names[i]
-    
+
     # new_crs = CRS(selected_name)
 
     new_crs = select_projected_crs(app)
@@ -148,8 +166,15 @@ def other_projected(option):
 
     update_crs()
 
-def other_geographic(option):
 
+def other_geographic(option: str) -> None:
+    """Open a dialog to select a geographic CRS and apply it.
+
+    Parameters
+    ----------
+    option : str
+        Menu option identifier (unused).
+    """
     # # Get a list of all CRS
     # crs_info_list = pyproj.database.query_crs_info(auth_name=None, pj_types=None)
 
@@ -178,7 +203,7 @@ def other_geographic(option):
     # filtered_names = app.gui.getvar("select_other_geographic", "filtered_names")
     # i = app.gui.getvar("select_other_geographic", "crs_index")
     # selected_name = filtered_names[i]
-    
+
     # new_crs = CRS(selected_name)
 
     new_crs = select_geographic_crs(app)
@@ -203,7 +228,9 @@ def other_geographic(option):
 
     update_crs()
 
-def update_crs():
+
+def update_crs() -> None:
+    """Propagate the current CRS to the map, all models, and all toolboxes."""
     app.map.crs = app.crs
 
     # Also change the model crs

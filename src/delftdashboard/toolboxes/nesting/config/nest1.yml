@@ -14,6 +14,7 @@ element:
     variable: detail_model_type_long_names
   option_value:
     variable: detail_model_types
+  tooltip: Select the type of the detail model
 - style: pushbutton
   text: Select Detail Model
   position:
@@ -22,6 +23,7 @@ element:
     width: 120
     height: 20
   method: load_detail_model
+  tooltip: Browse and select a detail model folder
 - style: edit
   text: Obs Point Prefix
   textposition: right
@@ -32,6 +34,7 @@ element:
     height: 20
   variable: obs_point_prefix
   method: edit_obs_point_prefix
+  tooltip: Edit prefix for observation point names
   dependency:
   - action: enable
     checkfor: all
@@ -47,6 +50,7 @@ element:
     width: 120
     height: 20
   method: perform_nesting_step_1
+  tooltip: Create observation points at detail model boundary locations
   dependency:
   - action: enable
     checkfor: all

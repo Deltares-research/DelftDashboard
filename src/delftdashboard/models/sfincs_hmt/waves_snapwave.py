@@ -1,21 +1,22 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the SFINCS HydroMT SnapWave settings sub-tab.
 
-@author: ormondt
+Handles tab selection and synchronization of SnapWave-related
+GUI variables with the model configuration.
 """
 
-import geopandas as gpd
+from typing import Any
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+_MODEL = "sfincs_hmt"
 
-def select(*args):
-    # De-activate() existing layers
+
+def select(*args: Any) -> None:
+    """Activate the SnapWave settings sub-tab and update map layers."""
     map.update()
 
 
-def set_model_variables(*args):
-    # All variables will be set
-    app.model["sfincs_hmt"].set_model_variables()
+def set_model_variables(*args: Any) -> None:
+    """Copy current GUI variables back to the model config."""
+    app.model[_MODEL].set_model_variables()

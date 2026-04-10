@@ -1,21 +1,31 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""Tiling toolbox for DelftDashboard.
 
-@author: ormondt
+Provides the main Toolbox class for generating tiled web map data
+(index tiles and topobathy tiles) from model grids.
 """
 
 from delftdashboard.app import app
 from delftdashboard.operations.toolbox import GenericToolbox
 
+
 class Toolbox(GenericToolbox):
-    def __init__(self, name):
+    """Toolbox for generating map tiles from model output."""
+
+    def __init__(self, name: str) -> None:
+        """Initialize the tiling toolbox.
+
+        Parameters
+        ----------
+        name : str
+            Name identifier for the toolbox.
+        """
         super().__init__()
 
         self.name = name
         self.long_name = "Tiling"
 
-    def initialize(self):
+    def initialize(self) -> None:
+        """Set up default GUI variables for zoom level selection."""
         group = "tiling"
         # Make a list of 0 to 23
         lst = list(range(24))
@@ -25,8 +35,14 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "zoom_levels_text", lststr)
         app.gui.setvar(group, "max_zoom", 13)
 
-    def set_layer_mode(self, mode):
-        pass
+    def set_layer_mode(self, mode: str) -> None:
+        """Handle layer mode changes (no layers for this toolbox).
 
-    def add_layers(self):
-        pass
+        Parameters
+        ----------
+        mode : str
+            The requested layer mode.
+        """
+
+    def add_layers(self) -> None:
+        """Register map layers (none for this toolbox)."""

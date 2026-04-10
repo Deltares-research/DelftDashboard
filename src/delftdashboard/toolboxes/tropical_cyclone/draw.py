@@ -1,27 +1,110 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the tropical cyclone draw track tab."""
 
-@author: ormondt
-"""
-# import math
-# import numpy as np
+from datetime import datetime, timedelta
+from typing import Any
+
 import geopandas as gpd
-# import shapely
-# import json
-# import os
+import numpy as np
+from shapely.geometry import Point
+
+from cht_cyclones import TropicalCyclone
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
+dateformat = "%Y%m%d %H%M%S"
 
-# Callbacks
 
-def select(*args):
-    # De-activate() existing layers
+def select(*args: Any) -> None:
+    """Activate the draw tab."""
     map.update()
-    # Tab selected
-    # Show track
-    app.map.layer["tropical_cyclone"].layer["cyclone_track"].show()
+    app.toolbox["tropical_cyclone"].set_layer_mode("active")
 
-def draw_track(*args):
-    pass
+    group = "tropical_cyclone"
+    if app.gui.getvar(group, "draw_start_datetime") is None:
+        app.gui.setvar(
+            group,
+            "draw_start_datetime",
+            datetime.now().replace(minute=0, second=0, microsecond=0),
+        )
+
+
+def draw_track(*args: Any) -> None:
+    """Start drawing a track polyline on the map with fixed-distance segments."""
+    group = "tropical_cyclone"
+    vt_knots = app.gui.getvar(group, "draw_vt")
+    dt_hours = app.gui.getvar(group, "draw_dt_hours")
+
+    # Distance per segment: vt (knots) * dt (hours) → nautical miles → km
+    dst_nm = vt_knots * dt_hours
+    dst_km = dst_nm * 1.852
+
+    layer = app.map.layer["tropical_cyclone"].layer["draw_track"]
+    layer.clear()
+    layer.draw(fixed_distance=dst_km)
+
+
+def track_drawn(gdf, feature_index, feature_id):
+    """Called after the user finishes drawing the track polyline.
+
+    Creates a new TropicalCyclone with a track built from the
+    drawn polyline vertices.
+    """
+    group = "tropical_cyclone"
+    toolbox = app.toolbox["tropical_cyclone"]
+
+    geom = gdf.loc[feature_index, "geometry"]
+    coords = list(geom.coords)
+
+    if len(coords) < 2:
+        return
+
+    t0 = app.gui.getvar(group, "draw_start_datetime")
+    dt_hours = app.gui.getvar(group, "draw_dt_hours")
+    vmax = app.gui.getvar(group, "draw_vmax")
+    rmax = app.gui.getvar(group, "draw_rmax")
+
+    # Create a fresh TropicalCyclone
+    # Build track GDF matching the cht_cyclones column schema
+    # (ideally cht_cyclones would have a from_points() method for this)
+    n = len(coords)
+    track_gdf = gpd.GeoDataFrame(
+        {
+            "datetime": [(t0 + timedelta(hours=i * dt_hours)).strftime(dateformat) for i in range(n)],
+            "geometry": [Point(lon, lat) for lon, lat in coords],
+            "vmax": np.full(n, vmax),
+            "pc": np.zeros(n),
+            "rmw": np.full(n, rmax),
+            "r35_ne": np.zeros(n),
+            "r35_se": np.zeros(n),
+            "r35_sw": np.zeros(n),
+            "r35_nw": np.zeros(n),
+            "r50_ne": np.zeros(n),
+            "r50_se": np.zeros(n),
+            "r50_sw": np.zeros(n),
+            "r50_nw": np.zeros(n),
+            "r65_ne": np.zeros(n),
+            "r65_se": np.zeros(n),
+            "r65_sw": np.zeros(n),
+            "r65_nw": np.zeros(n),
+            "r100_ne": np.zeros(n),
+            "r100_se": np.zeros(n),
+            "r100_sw": np.zeros(n),
+            "r100_nw": np.zeros(n),
+        },
+        crs=4326,
+    )
+
+    name = app.gui.getvar(group, "draw_name")
+    toolbox.tc = TropicalCyclone(name=name)
+    toolbox.tc.track.gdf = track_gdf
+
+    # Clear drawing layer and show as cyclone track
+    app.map.layer["tropical_cyclone"].layer["draw_track"].clear()
+    toolbox.track_added()
+
+
+
+def save_track(*args: Any) -> None:
+    """Save the current track to a .cyc file."""
+    app.toolbox["tropical_cyclone"].save_track()

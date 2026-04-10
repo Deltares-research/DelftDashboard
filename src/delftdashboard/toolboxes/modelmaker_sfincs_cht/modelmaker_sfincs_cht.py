@@ -5,6 +5,8 @@ Created on Mon May 10 12:18:09 2021
 @author: ormondt
 """
 
+import traceback
+
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -15,8 +17,8 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 from delftdashboard.misc.gdfutils import mpol2pol
 
-from cht_utils.misc_tools import dict2yaml
-from cht_utils.misc_tools import yaml2dict
+from cht_utils.fileio.yaml import dict2yaml
+from cht_utils.fileio.yaml import yaml2dict
 #from cht_sfincs.quadtree_grid_snapwave import snapwave_quadtree2mesh
 
 class Toolbox(GenericToolbox):
@@ -409,63 +411,74 @@ class Toolbox(GenericToolbox):
     def generate_grid(self):
         group = "modelmaker_sfincs_cht"
         dlg = app.gui.window.dialog_wait("Generating grid ...")
-        model = app.model["sfincs_cht"].domain
-        model.clear_spatial_attributes()    
-        x0       = app.gui.getvar(group, "x0")
-        y0       = app.gui.getvar(group, "y0")
-        dx       = app.gui.getvar(group, "dx")
-        dy       = app.gui.getvar(group, "dy")
-        nmax     = app.gui.getvar(group, "nmax")
-        mmax     = app.gui.getvar(group, "mmax")
-        rotation = app.gui.getvar(group, "rotation")
-        model.input.variables.qtrfile = "sfincs.nc"
-        app.gui.setvar("sfincs_cht", "qtrfile", model.input.variables.qtrfile)
+        try:
+            model = app.model["sfincs_cht"].domain
+            model.clear_spatial_attributes()
+            x0       = app.gui.getvar(group, "x0")
+            y0       = app.gui.getvar(group, "y0")
+            dx       = app.gui.getvar(group, "dx")
+            dy       = app.gui.getvar(group, "dy")
+            nmax     = app.gui.getvar(group, "nmax")
+            mmax     = app.gui.getvar(group, "mmax")
+            rotation = app.gui.getvar(group, "rotation")
+            model.input.variables.qtrfile = "sfincs.nc"
+            app.gui.setvar("sfincs_cht", "qtrfile", model.input.variables.qtrfile)
 
-        if len(self.refinement_polygon) == 0:
-            refpol = None
-        else:
-            # Make list of separate gdfs for each polygon
-            refpol = self.refinement_polygon
-            # # Add refinement_level column
-            # refpol["refinement_level"] = 0
-            # # Iterate through rows and set refinement levels            
-            # for irow, row in refpol.iterrows():
-            #     refpol.loc[irow, "refinement_level"] = self.refinement_levels[irow]
-            #     refpol.loc[irow, "zmin"] = self.refinement_zmin[irow]
-            #     refpol.loc[irow, "zmax"] = self.refinement_zmax[irow]
+            if len(self.refinement_polygon) == 0:
+                refpol = None
+            else:
+                # Make list of separate gdfs for each polygon
+                refpol = self.refinement_polygon
+                # # Add refinement_level column
+                # refpol["refinement_level"] = 0
+                # # Iterate through rows and set refinement levels
+                # for irow, row in refpol.iterrows():
+                #     refpol.loc[irow, "refinement_level"] = self.refinement_levels[irow]
+                #     refpol.loc[irow, "zmin"] = self.refinement_zmin[irow]
+                #     refpol.loc[irow, "zmax"] = self.refinement_zmax[irow]
 
-        # Build grid
+            # Build grid
 
-        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation,
-                         refinement_polygons=refpol,
-                         bathymetry_sets=app.selected_bathymetry_datasets,
-                         bathymetry_database=app.bathymetry_database)
+            model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation,
+                             refinement_polygons=refpol,
+                             bathymetry_sets=app.selected_bathymetry_datasets,
+                             bathymetry_database=app.bathymetry_database)
 
-        # Save grid 
-        model.grid.write()
+            # Save grid
+            model.grid.write()
 
-        # If SnapWave also generate SnapWave mesh and save it. Why?!
-        # if app.gui.getvar(group, "use_snapwave"):
-        #     snapwave_quadtree2mesh(model.grid, file_name="snapwave.nc")
+            # If SnapWave also generate SnapWave mesh and save it. Why?!
+            # if app.gui.getvar(group, "use_snapwave"):
+            #     snapwave_quadtree2mesh(model.grid, file_name="snapwave.nc")
 
-        # Replot everything
-        app.model["sfincs_cht"].plot()
-
+            # Replot everything
+            app.model["sfincs_cht"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating grid:\n{e}")
+            return
         dlg.close()
 
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
-        # bathymetry_list = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
-        # bathymetry_list = app.selected_bathymetry_datasets
-        app.model["sfincs_cht"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
-                                                           bathymetry_database=app.bathymetry_database,
-                                                           zmin=app.gui.getvar("modelmaker_sfincs_cht", "zmin"),
-                                                           zmax=app.gui.getvar("modelmaker_sfincs_cht", "zmax"))
-        # app.model["sfincs_cht"].domain.input.variables.qtrfile="sfincs_adjusted.nc"
-        app.model["sfincs_cht"].domain.grid.write()
-        # # If SnapWave also generate SnapWave mesh and save it
-        # if app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"):
-        #     snapwave_quadtree2mesh(app.model["sfincs_cht"].domain.grid, file_name="snapwave.nc")
+        try:
+            # bathymetry_list = app.toolbox["modelmaker_sfincs_cht"].selected_bathymetry_datasets
+            # bathymetry_list = app.selected_bathymetry_datasets
+            app.model["sfincs_cht"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
+                                                               bathymetry_database=app.bathymetry_database,
+                                                               zmin=app.gui.getvar("modelmaker_sfincs_cht", "zmin"),
+                                                               zmax=app.gui.getvar("modelmaker_sfincs_cht", "zmax"))
+            # app.model["sfincs_cht"].domain.input.variables.qtrfile="sfincs_adjusted.nc"
+            app.model["sfincs_cht"].domain.grid.write()
+            # # If SnapWave also generate SnapWave mesh and save it
+            # if app.gui.getvar("modelmaker_sfincs_cht", "use_snapwave"):
+            #     snapwave_quadtree2mesh(app.model["sfincs_cht"].domain.grid, file_name="snapwave.nc")
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating bathymetry:\n{e}")
+            return
         dlg.close()
 
     def update_mask(self):
@@ -477,42 +490,47 @@ class Toolbox(GenericToolbox):
             app.gui.window.dialog_warning("Please first generate a bathymetry !")
             return
         dlg = app.gui.window.dialog_wait("Updating mask ...")
-        if app.gui.getvar("modelmaker_sfincs_cht", "use_mask_global"):
-            global_zmin = app.gui.getvar("modelmaker_sfincs_cht", "global_zmin")
-            global_zmax = app.gui.getvar("modelmaker_sfincs_cht", "global_zmax")
-        else:
-            # Set zmax lower than zmin to avoid use of global mask
-            global_zmin = 10.0
-            global_zmax = -10.0
-        mask.build(zmin=global_zmin,
-                   zmax=global_zmax,
-                   include_polygon=app.toolbox["modelmaker_sfincs_cht"].include_polygon,
-                   include_zmin=app.gui.getvar("modelmaker_sfincs_cht", "include_zmin"),
-                   include_zmax=app.gui.getvar("modelmaker_sfincs_cht", "include_zmax"),
-                   exclude_polygon=app.toolbox["modelmaker_sfincs_cht"].exclude_polygon,
-                   exclude_zmin=app.gui.getvar("modelmaker_sfincs_cht", "exclude_zmin"),
-                   exclude_zmax=app.gui.getvar("modelmaker_sfincs_cht", "exclude_zmax"),
-                   open_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon,
-                   open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmin"),
-                   open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmax"),
-                   downstream_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon,
-                   downstream_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_zmin"),
-                   downstream_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_zmax"),
-                   neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon,
-                   neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmin"),
-                   neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmax"),
-                   outflow_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon,
-                   outflow_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmin"),
-                   outflow_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmax"),
-                   update_datashader_dataframe=True
-                   )
-        app.map.layer["sfincs_cht"].layer["mask"].set_data(mask)
+        try:
+            if app.gui.getvar("modelmaker_sfincs_cht", "use_mask_global"):
+                global_zmin = app.gui.getvar("modelmaker_sfincs_cht", "global_zmin")
+                global_zmax = app.gui.getvar("modelmaker_sfincs_cht", "global_zmax")
+            else:
+                # Set zmax lower than zmin to avoid use of global mask
+                global_zmin = 10.0
+                global_zmax = -10.0
+            mask.build(zmin=global_zmin,
+                       zmax=global_zmax,
+                       include_polygon=app.toolbox["modelmaker_sfincs_cht"].include_polygon,
+                       include_zmin=app.gui.getvar("modelmaker_sfincs_cht", "include_zmin"),
+                       include_zmax=app.gui.getvar("modelmaker_sfincs_cht", "include_zmax"),
+                       exclude_polygon=app.toolbox["modelmaker_sfincs_cht"].exclude_polygon,
+                       exclude_zmin=app.gui.getvar("modelmaker_sfincs_cht", "exclude_zmin"),
+                       exclude_zmax=app.gui.getvar("modelmaker_sfincs_cht", "exclude_zmax"),
+                       open_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon,
+                       open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmin"),
+                       open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmax"),
+                       downstream_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].downstream_boundary_polygon,
+                       downstream_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_zmin"),
+                       downstream_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "downstream_boundary_zmax"),
+                       neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon,
+                       neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmin"),
+                       neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmax"),
+                       outflow_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].outflow_boundary_polygon,
+                       outflow_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmin"),
+                       outflow_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "outflow_boundary_zmax"),
+                       update_datashader_dataframe=True
+                       )
+            app.map.layer["sfincs_cht"].layer["mask"].set_data(mask)
 
-        # if app.model["sfincs_cht"].domain.grid_type == "quadtree":
-        grid.write() # Write new qtr file
-        # else:
-        #     mask.write() # Write mask, index and depth files    
-
+            # if app.model["sfincs_cht"].domain.grid_type == "quadtree":
+            grid.write() # Write new qtr file
+            # else:
+            #     mask.write() # Write mask, index and depth files
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error updating mask:\n{e}")
+            return
         dlg.close()
 
     def update_mask_snapwave(self):
@@ -522,38 +540,44 @@ class Toolbox(GenericToolbox):
             app.gui.window.dialog_warning("Please first generate a bathymetry !")
             return
         dlg = app.gui.window.dialog_wait("Updating SnapWave mask ...")
-        if app.gui.getvar("modelmaker_sfincs_cht", "use_mask_snapwave_global"):
-            global_zmin = app.gui.getvar("modelmaker_sfincs_cht", "global_zmin_snapwave")
-            global_zmax = app.gui.getvar("modelmaker_sfincs_cht", "global_zmax_snapwave")
-        else:
-            # Set zmax lower than zmin to avoid use of global mask
-            global_zmin = 10.0
-            global_zmax = -10.0
+        try:
+            if app.gui.getvar("modelmaker_sfincs_cht", "use_mask_snapwave_global"):
+                global_zmin = app.gui.getvar("modelmaker_sfincs_cht", "global_zmin_snapwave")
+                global_zmax = app.gui.getvar("modelmaker_sfincs_cht", "global_zmax_snapwave")
+            else:
+                # Set zmax lower than zmin to avoid use of global mask
+                global_zmin = 10.0
+                global_zmax = -10.0
 
-        mask.build(zmin=global_zmin,
-                   zmax=global_zmax,
-                   include_polygon=app.toolbox["modelmaker_sfincs_cht"].include_polygon_snapwave,
-                   include_zmin=app.gui.getvar("modelmaker_sfincs_cht", "include_zmin_snapwave"),
-                   include_zmax=app.gui.getvar("modelmaker_sfincs_cht", "include_zmax_snapwave"),
-                   exclude_polygon=app.toolbox["modelmaker_sfincs_cht"].exclude_polygon_snapwave,
-                   exclude_zmin=app.gui.getvar("modelmaker_sfincs_cht", "exclude_zmin_snapwave"),
-                   exclude_zmax=app.gui.getvar("modelmaker_sfincs_cht", "exclude_zmax_snapwave"),
-                   open_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon_snapwave,
-                   open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmin_snapwave"),
-                   open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmax_snapwave"),
-                   neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon_snapwave,
-                   neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmin_snapwave"),
-                   neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmax_snapwave"),
-                   update_datashader_dataframe=True
-                  )
+            mask.build(zmin=global_zmin,
+                       zmax=global_zmax,
+                       include_polygon=app.toolbox["modelmaker_sfincs_cht"].include_polygon_snapwave,
+                       include_zmin=app.gui.getvar("modelmaker_sfincs_cht", "include_zmin_snapwave"),
+                       include_zmax=app.gui.getvar("modelmaker_sfincs_cht", "include_zmax_snapwave"),
+                       exclude_polygon=app.toolbox["modelmaker_sfincs_cht"].exclude_polygon_snapwave,
+                       exclude_zmin=app.gui.getvar("modelmaker_sfincs_cht", "exclude_zmin_snapwave"),
+                       exclude_zmax=app.gui.getvar("modelmaker_sfincs_cht", "exclude_zmax_snapwave"),
+                       open_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].open_boundary_polygon_snapwave,
+                       open_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmin_snapwave"),
+                       open_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "open_boundary_zmax_snapwave"),
+                       neumann_boundary_polygon=app.toolbox["modelmaker_sfincs_cht"].neumann_boundary_polygon_snapwave,
+                       neumann_boundary_zmin=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmin_snapwave"),
+                       neumann_boundary_zmax=app.gui.getvar("modelmaker_sfincs_cht", "neumann_boundary_zmax_snapwave"),
+                       update_datashader_dataframe=True
+                      )
 
-        # mask has a method to make an overlay
-        app.map.layer["sfincs_cht"].layer["mask_snapwave"].set_data(mask)
-        # if not app.model["sfincs_cht"].domain.input.variables.snapwave_mskfile:
-        #     app.model["sfincs_cht"].domain.input.variables.snapwave_mskfile = "snapwave.msk"
-        grid.write()
-        # # GUI variables
-        # app.gui.setvar("sfincs_cht", "snapwave_mskfile", app.model["sfincs_cht"].domain.input.variables.snapwave_mskfile)
+            # mask has a method to make an overlay
+            app.map.layer["sfincs_cht"].layer["mask_snapwave"].set_data(mask)
+            # if not app.model["sfincs_cht"].domain.input.variables.snapwave_mskfile:
+            #     app.model["sfincs_cht"].domain.input.variables.snapwave_mskfile = "snapwave.msk"
+            grid.write()
+            # # GUI variables
+            # app.gui.setvar("sfincs_cht", "snapwave_mskfile", app.model["sfincs_cht"].domain.input.variables.snapwave_mskfile)
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error updating SnapWave mask:\n{e}")
+            return
         dlg.close()
 
     def generate_subgrid(self):
@@ -572,18 +596,24 @@ class Toolbox(GenericToolbox):
         zmin = app.gui.getvar(group, "zmin")
         zmax = app.gui.getvar(group, "zmax")
         p = app.gui.window.dialog_progress("               Generating Sub-grid Tables ...                ", 100)
-        app.model["sfincs_cht"].domain.subgrid.build(bathymetry_sets,
-                                                     roughness_sets,
-                                                     bathymetry_database=app.bathymetry_database,
-                                                     manning_land=manning_land,
-                                                     manning_water=manning_water,
-                                                     manning_level=manning_level,
-                                                     nr_levels=nr_levels,
-                                                     nr_subgrid_pixels=nr_pixels,
-                                                     max_gradient=max_dzdv,
-                                                     zmin=zmin,
-                                                     zmax=zmax,
-                                                     progress_bar=p)
+        try:
+            app.model["sfincs_cht"].domain.subgrid.build(bathymetry_sets,
+                                                         roughness_sets,
+                                                         bathymetry_database=app.bathymetry_database,
+                                                         manning_land=manning_land,
+                                                         manning_water=manning_water,
+                                                         manning_level=manning_level,
+                                                         nr_levels=nr_levels,
+                                                         nr_subgrid_pixels=nr_pixels,
+                                                         max_gradient=max_dzdv,
+                                                         zmin=zmin,
+                                                         zmax=zmax,
+                                                         progress_bar=p)
+        except Exception as e:
+            traceback.print_exc()
+            p.close()
+            app.gui.window.dialog_warning(f"Error generating sub-grid tables:\n{e}")
+            return
         p.close()
         app.model["sfincs_cht"].domain.input.variables.sbgfile = "sfincs.sbg"
         app.gui.setvar("sfincs_cht", "sbgfile", app.model["sfincs_cht"].domain.input.variables.sbgfile)
@@ -591,10 +621,16 @@ class Toolbox(GenericToolbox):
 
     def cut_inactive_cells(self):
         dlg = app.gui.window.dialog_wait("Cutting Inactive Cells ...")
-        app.model["sfincs_cht"].domain.grid.cut_inactive_cells()
-        app.model["sfincs_cht"].domain.grid.write()
-        # Replot everything
-        app.model["sfincs_cht"].plot()
+        try:
+            app.model["sfincs_cht"].domain.grid.cut_inactive_cells()
+            app.model["sfincs_cht"].domain.grid.write()
+            # Replot everything
+            app.model["sfincs_cht"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error cutting inactive cells:\n{e}")
+            return
         dlg.close()
 
     def build_model(self):

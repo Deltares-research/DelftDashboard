@@ -8,6 +8,7 @@ element:
   text: Horizontal Eddy Viscosity (m2/s)
   variable: physics.vicouv
   method: set_model_variables
+  tooltip: Edit horizontal eddy viscosity
 - style: edit
   position:
     x: 150
@@ -17,6 +18,7 @@ element:
   text: Vertical Eddy Viscosity (m2/s)
   variable: physics.vicoww
   method: set_model_variables
+  tooltip: Edit vertical eddy viscosity
 - style: edit
   position:
     x: 150
@@ -26,6 +28,7 @@ element:
   text: Vertical Eddy Diffusivity (m2/s)
   variable: physics.dicoww
   method: set_model_variables
+  tooltip: Edit vertical eddy diffusivity
 - style: edit
   position:
     x: 150
@@ -35,6 +38,7 @@ element:
   text: Smagorinsky
   variable: physics.smagorinsky
   method: set_model_variables
+  tooltip: Edit Smagorinsky coefficient for horizontal turbulence
 - style: edit
   position:
     x: 150
@@ -44,6 +48,7 @@ element:
   text: Average Water Density (kg/m3)
   variable: physics.rhomean
   method: set_model_variables
+  tooltip: Edit average water density
 - style: checkbox
   position:
     x: 310
@@ -53,6 +58,7 @@ element:
   text: Tidal Forcing
   variable: physics.tidalforcing
   method: set_model_variables
+  tooltip: Enable or disable tidal forcing
 - style: checkbox
   position:
     x: 310
@@ -62,6 +68,7 @@ element:
   text: Salinity
   variable: physics.salinity
   method: set_model_variables
+  tooltip: Enable or disable salinity transport
 - style: checkbox
   position:
     x: 310
@@ -71,4 +78,5 @@ element:
   text: Secondary Flow
   variable: physics.secondaryflow
   method: set_model_variables
+  tooltip: Enable or disable secondary flow computation
 

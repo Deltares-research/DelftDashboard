@@ -22,3 +22,4 @@ element:
     width: 150
     height: 20
   method: generate_topobathy_tiles
+  tooltip: Generate topography/bathymetry tiles for the current domain

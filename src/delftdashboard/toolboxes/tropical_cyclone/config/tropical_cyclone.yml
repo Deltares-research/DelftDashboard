@@ -15,9 +15,6 @@ element:
   - string: Modify Track
     module: delftdashboard.toolboxes.tropical_cyclone.modify
     element: modify.yml
-  - string: Track Table
-    module: delftdashboard.toolboxes.tropical_cyclone.table
-    element: table.yml
   - string: Wind Field
     module: delftdashboard.toolboxes.tropical_cyclone.wind_field
     element: wind_field.yml

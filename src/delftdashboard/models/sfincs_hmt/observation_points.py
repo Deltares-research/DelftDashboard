@@ -1,12 +1,14 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the SFINCS HydroMT Observation Points parent tab.
 
-@author: ormondt
+Handles tab selection for the observation points panel which contains
+sub-tabs for observation points and cross sections.
 """
 
-from delftdashboard.app import app
+from typing import Any
+
 from delftdashboard.operations import map
 
-def select(*args):
+
+def select(*args: Any) -> None:
+    """Activate the Observation Points tab and update map layers."""
     map.update()

@@ -16,6 +16,7 @@ element:
     text: Wind Friction Type
     variable: wind.icdtyp
     method: set_model_variables
+    tooltip: Select wind friction type
     option_string:
     - Constant
     - S&B 2 breakpoints
@@ -35,6 +36,7 @@ element:
     text: Cd Breakpoints (list)
     variable: wind.cdbreakpoints
     method: set_model_variables
+    tooltip: Edit drag coefficient breakpoints as comma-separated list
   - style: edit
     position:
       x: 150
@@ -44,6 +46,7 @@ element:
     text: Wind Speed Breakpoints (list)
     variable: wind.windspeedbreakpoints
     method: set_model_variables
+    tooltip: Edit wind speed breakpoints as comma-separated list (m/s)
   - style: edit
     position:
       x: 150
@@ -53,6 +56,7 @@ element:
     text: Air density (kg/m3)
     variable: wind.rhoair
     method: set_model_variables
+    tooltip: Edit air density used in wind drag computation
   - style: edit
     position:
       x: 150
@@ -62,4 +66,5 @@ element:
     text: Relative Wind Speed Factor (kg/m3)
     variable: wind.relativewind
     method: set_model_variables
+    tooltip: Edit relative wind speed factor
 

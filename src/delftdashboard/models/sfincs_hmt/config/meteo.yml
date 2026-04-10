@@ -24,6 +24,7 @@ element:
     - spiderweb
     - rectangular
     - rectangular_and_spiderweb
+    tooltip: Select the type of meteorological forcing
   - style: checkbox
     position:
       x: 10
@@ -33,6 +34,7 @@ element:
     text: Wind
     variable: wind
     method: set_model_variables
+    tooltip: Enable or disable wind forcing
   - style: checkbox
     position:
       x: 10
@@ -42,6 +44,7 @@ element:
     text: Barometric Pressure
     variable: baro
     method: set_model_variables
+    tooltip: Enable or disable barometric pressure forcing
   - style: checkbox
     position:
       x: 10
@@ -51,6 +54,7 @@ element:
     text: Rain
     variable: rain
     method: set_model_variables
+    tooltip: Enable or disable rainfall forcing
 - style: panel
   text: Wind
   position:

@@ -22,3 +22,4 @@ element:
     width: 150
     height: 20
   method: generate_index_tiles
+  tooltip: Generate index tiles for the current domain

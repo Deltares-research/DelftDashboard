@@ -1,37 +1,52 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the flood map topobathy tab.
 
-@author: ormondt
+Handle polygon drawing for custom extents and topobathy GeoTIFF generation.
 """
+
+from typing import Any
+
 import geopandas as gpd
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-# Callbacks
-def select(*args):
-    # De-activate() existing layers
+
+def select(*args: Any) -> None:
+    """Activate the topobathy tab and enable polygon drawing."""
     map.update()
-    # Tab selected
     app.toolbox["flood_map"].set_layer_mode("active")
     app.map.layer["flood_map"].layer["polygon"].show()
     app.map.layer["flood_map"].layer["polygon"].activate()
 
-def generate_topobathy_geotiff(*args):
-    # Generate topobathy geotiff
+
+def generate_topobathy_geotiff(*args: Any) -> None:
+    """Generate a topobathy GeoTIFF for the current extent."""
     app.toolbox["flood_map"].generate_topobathy_geotiff()
 
-def draw_polygon(*args):
-    # Delete existing polygon
+
+def draw_polygon(*args: Any) -> None:
+    """Start drawing a new polygon after clearing existing ones."""
     delete_polygon()
     app.map.layer["flood_map"].layer["polygon"].crs = app.crs
     app.map.layer["flood_map"].layer["polygon"].draw()
 
-def delete_polygon(*args):
-    # Delete polygon
+
+def delete_polygon(*args: Any) -> None:
+    """Delete the current polygon from the map and toolbox state."""
     app.toolbox["flood_map"].polygon = gpd.GeoDataFrame()
     app.map.layer["flood_map"].layer["polygon"].clear()
 
-def polygon_created(gdf, index, id):
+
+def polygon_created(gdf: gpd.GeoDataFrame, index: int, id: Any) -> None:
+    """Store a newly created polygon.
+
+    Parameters
+    ----------
+    gdf : gpd.GeoDataFrame
+        GeoDataFrame containing the polygon geometries.
+    index : int
+        Index of the created feature.
+    id : Any
+        Identifier of the created feature.
+    """
     app.toolbox["flood_map"].polygon = gdf

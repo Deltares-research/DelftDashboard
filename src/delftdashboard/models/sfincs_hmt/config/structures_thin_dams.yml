@@ -10,6 +10,7 @@ element:
   select: index
   option_string:
     variable: thin_dam_names
+  tooltip: Select thin dam from the list
 - style: pushbutton
   text: Draw Thin Dam
   position:

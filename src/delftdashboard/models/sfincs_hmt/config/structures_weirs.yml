@@ -10,6 +10,7 @@ element:
   select: index
   option_string:
     variable: weir_names
+  tooltip: Select weir from the list
 - style: pushbutton
   text: Draw Weir
   position:

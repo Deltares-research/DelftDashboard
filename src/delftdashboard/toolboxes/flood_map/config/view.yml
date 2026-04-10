@@ -56,6 +56,7 @@ element:
   method: edit_cmin_cmax
   select: item
   text: Color Map
+  tooltip: Select color map for the flood map
   option_string:
     variable: colormaps
   option_value:

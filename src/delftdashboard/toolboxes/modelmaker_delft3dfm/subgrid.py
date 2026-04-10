@@ -1,19 +1,23 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the subgrid tab of the Delft3D-FM model maker toolbox (placeholder)."""
 
-@author: ormondt
-"""
+from typing import Any
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-def select(*args):
-    # De-activate existing layers
+_TB = "modelmaker_sfincs_cht"
+
+
+def select(*args: Any) -> None:
+    """Activate the subgrid tab and deactivate other layers."""
     map.update()
 
-def edit(*args):
+
+def edit(*args: Any) -> None:
+    """Edit subgrid settings (not yet implemented)."""
     pass
-    
-def generate_subgrid(*args):
-    app.toolbox["modelmaker_sfincs_cht"].generate_subgrid()
+
+
+def generate_subgrid(*args: Any) -> None:
+    """Generate the subgrid tables."""
+    app.toolbox[_TB].generate_subgrid()

@@ -1,7 +1,9 @@
 from delftdashboard.app import app
 
+
 def select_crs(*args):
     pass
+
 
 def edit_search_string(*args):
 
@@ -10,8 +12,11 @@ def edit_search_string(*args):
     search_string = search_string.strip()
 
     if len(search_string) == 0:
-        app.gui.setvar("select_other_projected", "filtered_names",
-                       app.gui.getvar("select_other_projected", "crs_names"))
+        app.gui.setvar(
+            "select_other_projected",
+            "filtered_names",
+            app.gui.getvar("select_other_projected", "crs_names"),
+        )
         return
     else:
         # Find all names that contain the search string

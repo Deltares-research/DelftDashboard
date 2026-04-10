@@ -14,6 +14,7 @@ element:
     variable: overall_model_type_long_names
   option_value:
     variable: overall_model_types
+  tooltip: Select the type of the overall model
 - style: pushbutton
   text: Select Overall Model
   position:
@@ -22,6 +23,7 @@ element:
     width: 120
     height: 20
   method: load_overall_model
+  tooltip: Browse and select an overall model folder
 - style: edit
   text: Obs Point Prefix
   textposition: right
@@ -32,6 +34,7 @@ element:
     height: 20
   variable: obs_point_prefix
   method: edit_obs_point_prefix
+  tooltip: Edit prefix for observation point names
   dependency:
   - action: enable
     checkfor: all
@@ -49,6 +52,7 @@ element:
     height: 20
   variable: water_level_correction
   method: edit_water_level_correction
+  tooltip: Edit water level correction to apply at boundary (in metres)
   dependency:
   - action: enable
     checkfor: all
@@ -64,6 +68,7 @@ element:
     width: 120
     height: 20
   method: perform_nesting_step_2
+  tooltip: Extract boundary conditions from the overall model output
   dependency:
   - action: enable
     checkfor: all

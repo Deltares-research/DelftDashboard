@@ -47,6 +47,7 @@ element:
   option_string: ["Cloud Optimized GeoTIFF", "Tiles"]
   option_value: ["cog", "tiles"]
   method: select_import_as
+  tooltip: Select the format to import the data as
 - style: edit
   text: Name
   position:

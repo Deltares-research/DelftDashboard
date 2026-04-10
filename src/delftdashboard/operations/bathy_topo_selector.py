@@ -1,39 +1,83 @@
-# -*- coding: utf-8 -*-
+"""GUI callbacks for the bathymetry/topography dataset selector panel.
+
+Handle source selection, dataset add/remove/reorder, z-range editing,
+polygon loading, and refresh of the selected-datasets list in the GUI.
 """
-Callback functions for bathy/topo selection
-"""
+
+from typing import Any
 
 from delftdashboard.app import app
 
-def select_bathymetry_source(*args):
+
+def select_bathymetry_source(*args: Any) -> None:
+    """Update the dataset list when the user selects a different source.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments; ``args[0]`` is the source name.
+    """
     source = args[0]
-    dataset_names, dataset_long_names, dataset_source_names = app.bathymetry_database.dataset_names(source=source)
+    dataset_names, dataset_long_names, dataset_source_names = (
+        app.topography_data_catalog.dataset_names(source=source)
+    )
     group = "bathy_topo_selector"
     app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
     app.gui.setvar(group, "bathymetry_dataset_index", 0)
 
 
-def select_bathymetry_dataset(*args):
-    pass
+def select_bathymetry_dataset(*args: Any) -> None:
+    """Handle selection of a dataset in the available-datasets list.
 
-def use_dataset(*args):
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments (unused).
+    """
+
+
+def use_dataset(*args: Any) -> None:
+    """Add the currently highlighted dataset to the selected-datasets list.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments (unused).
+    """
     group = "bathy_topo_selector"
     names = app.gui.getvar(group, "bathymetry_dataset_names")
     index = app.gui.getvar(group, "bathymetry_dataset_index")
-    name  = names[index]
+    name = names[index]
     if name not in app.gui.getvar(group, "selected_bathymetry_dataset_names"):
-        # d = bathymetry_database.get_dataset(name)
-        dataset = {"name": name, "zmin": -99999.0, "zmax": 99999.0}
+        dataset = {"name": name, "elevation": name, "zmin": -99999.0, "zmax": 99999.0}
         app.selected_bathymetry_datasets.append(dataset)
-        app.gui.setvar(group, "selected_bathymetry_dataset_index", len(app.selected_bathymetry_datasets) - 1)
+        app.gui.setvar(
+            group,
+            "selected_bathymetry_dataset_index",
+            len(app.selected_bathymetry_datasets) - 1,
+        )
         update()
 
 
-def select_selected_bathymetry_dataset(*args):
+def select_selected_bathymetry_dataset(*args: Any) -> None:
+    """Handle selection change in the selected-datasets list.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments (unused).
+    """
     update()
 
 
-def remove_selected_bathymetry_dataset(*args):
+def remove_selected_bathymetry_dataset(*args: Any) -> None:
+    """Remove the currently selected dataset from the selected-datasets list.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments (unused).
+    """
     if len(app.selected_bathymetry_datasets) == 0:
         return
     group = "bathy_topo_selector"
@@ -42,7 +86,14 @@ def remove_selected_bathymetry_dataset(*args):
     update()
 
 
-def move_up_selected_bathymetry_dataset(*args):
+def move_up_selected_bathymetry_dataset(*args: Any) -> None:
+    """Move the currently selected dataset one position up in the list.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments (unused).
+    """
     if len(app.selected_bathymetry_datasets) < 2:
         return
     group = "bathy_topo_selector"
@@ -51,15 +102,22 @@ def move_up_selected_bathymetry_dataset(*args):
         return
     i0 = index
     i1 = index - 1
-    app.selected_bathymetry_datasets[i0],\
-    app.selected_bathymetry_datasets[i1] = \
-    app.selected_bathymetry_datasets[i1], \
-    app.selected_bathymetry_datasets[i0]
+    app.selected_bathymetry_datasets[i0], app.selected_bathymetry_datasets[i1] = (
+        app.selected_bathymetry_datasets[i1],
+        app.selected_bathymetry_datasets[i0],
+    )
     app.gui.setvar(group, "selected_bathymetry_dataset_index", index - 1)
     update()
 
 
-def move_down_selected_bathymetry_dataset(*args):
+def move_down_selected_bathymetry_dataset(*args: Any) -> None:
+    """Move the currently selected dataset one position down in the list.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments (unused).
+    """
     if len(app.selected_bathymetry_datasets) < 2:
         return
     group = "bathy_topo_selector"
@@ -68,44 +126,75 @@ def move_down_selected_bathymetry_dataset(*args):
         return
     i0 = index
     i1 = index + 1
-    app.selected_bathymetry_datasets[i0],\
-    app.selected_bathymetry_datasets[i1] = \
-    app.selected_bathymetry_datasets[i1], \
-    app.selected_bathymetry_datasets[i0]
+    app.selected_bathymetry_datasets[i0], app.selected_bathymetry_datasets[i1] = (
+        app.selected_bathymetry_datasets[i1],
+        app.selected_bathymetry_datasets[i0],
+    )
     app.gui.setvar(group, "selected_bathymetry_dataset_index", index + 1)
     update()
 
 
-def edit_zmax_bathymetry_dataset(*args):
+def edit_zmax_bathymetry_dataset(*args: Any) -> None:
+    """Update the maximum elevation filter for the selected dataset.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments; ``args[0]`` is the new zmax value.
+    """
     group = "bathy_topo_selector"
     index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
     app.selected_bathymetry_datasets[index]["zmax"] = args[0]
 
 
-def edit_zmin_bathymetry_dataset(*args):
+def edit_zmin_bathymetry_dataset(*args: Any) -> None:
+    """Update the minimum elevation filter for the selected dataset.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments; ``args[0]`` is the new zmin value.
+    """
     group = "bathy_topo_selector"
     index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
     app.selected_bathymetry_datasets[index]["zmin"] = args[0]
 
-def load_polygon(*args):
-    """Load a polygon from a file"""
+
+def load_polygon(*args: Any) -> None:
+    """Load a polygon GeoJSON file and attach it to the selected dataset.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments (unused).
+    """
     group = "bathy_topo_selector"
-    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file("Select polygon file", filter="*.geojson")
+    full_name, path, name, ext, fltr = app.gui.window.dialog_open_file(
+        "Select polygon file", filter="*.geojson"
+    )
     if not full_name:
         return
     index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
     app.selected_bathymetry_datasets[index]["polygon_file"] = full_name
 
-def edit(*args):
-    pass
 
-def update():
+def edit(*args: Any) -> None:
+    """Handle the edit action for the selected dataset (not yet implemented).
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments (unused).
+    """
+
+
+def update() -> None:
+    """Refresh the GUI variables for the selected-datasets list."""
     group = "bathy_topo_selector"
     selected_names = []
     nrd = len(app.selected_bathymetry_datasets)
-    if nrd>0:
+    if nrd > 0:
         for dataset in app.selected_bathymetry_datasets:
-            # selected_names.append(dataset["dataset"].name)
             selected_names.append(dataset["name"])
         app.gui.setvar(group, "selected_bathymetry_dataset_names", selected_names)
         index = app.gui.getvar(group, "selected_bathymetry_dataset_index")
@@ -121,5 +210,12 @@ def update():
         app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
     app.gui.setvar(group, "nr_selected_bathymetry_datasets", nrd)
 
-def info(*args):
-    pass
+
+def info(*args: Any) -> None:
+    """Display information about the selected dataset (not yet implemented).
+
+    Parameters
+    ----------
+    *args : Any
+        Positional callback arguments (unused).
+    """

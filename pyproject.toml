@@ -24,9 +24,9 @@ dependencies = [
     "pyyaml>=5.1.1",
     "toml",
     "boto3",
+	"plotly_express",
     "guitares@ git+https://github.com/deltares-research/guitares.git",
     "cht-observations@ git+https://github.com/deltares-research/cht_observations.git",
-    "cht_bathymetry@ git+https://github.com/deltares-research/cht_bathymetry.git",
     "cht_cyclones@ git+https://github.com/deltares-research/cht_cyclones.git",
     "cht_sfincs@ git+https://github.com/deltares-research/cht_sfincs.git",
     "cht_delft3dfm@ git+https://github.com/deltares-research/cht_delft3dfm.git",
@@ -35,10 +35,7 @@ dependencies = [
     "cht_nesting@ git+https://github.com/deltares-research/cht_nesting.git",
     "cht_hurrywave@ git+https://github.com/deltares-research/cht_hurrywave.git",
     "cht_tide@ git+https://github.com/deltares-research/cht_tide.git",
-    "cht_tsunami@ git+https://github.com/deltares-research/cht_tsunami.git",
     "cht_tiling@ git+https://github.com/deltares-research/cht_tiling.git",
-    "cht_physics@ git+https://github.com/deltares-research/cht_physics.git",
-    "cosmos@ git+https://github.com/deltares/cosmos.git",
 ]
 dynamic = ["version"]
 

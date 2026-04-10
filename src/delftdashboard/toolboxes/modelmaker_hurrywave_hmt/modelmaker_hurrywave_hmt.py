@@ -5,6 +5,7 @@ interpolation, mask building, wave blocking, and polygon I/O for a
 HurryWave (HydroMT) model.
 """
 
+import traceback
 from typing import List
 
 import geopandas as gpd
@@ -75,11 +76,11 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(_TB, "refinement_polygon_levels", levstr)
 
         # Bathymetry
-        source_names, _sources = app.bathymetry_database.sources()
+        source_names, _sources = app.topography_data_catalog.sources()
         app.gui.setvar(_TB, "bathymetry_source_names", source_names)
         app.gui.setvar(_TB, "active_bathymetry_source", source_names[0])
-        dataset_names, _long_names, _src_names = app.bathymetry_database.dataset_names(
-            source=source_names[0]
+        dataset_names, _long_names, _src_names = (
+            app.topography_data_catalog.dataset_names(source=source_names[0])
         )
         app.gui.setvar(_TB, "bathymetry_dataset_names", dataset_names)
         app.gui.setvar(_TB, "bathymetry_dataset_index", 0)
@@ -124,6 +125,13 @@ class Toolbox(GenericToolbox):
         if mode in ("inactive", "invisible"):
             app.map.layer[_TB].hide()
 
+    def set_crs(self) -> None:
+        """Update rotation setting when the CRS changes."""
+        can_rotate = not app.crs.is_geographic
+        layer = app.map.layer.get(_TB)
+        if layer and "grid_outline" in layer.layer:
+            layer.layer["grid_outline"].set_paint_property("rotate", can_rotate)
+
     def add_layers(self) -> None:
         """Register all map layers for the Model Maker toolbox."""
         layer = app.map.add_layer(_TB)
@@ -138,7 +146,7 @@ class Toolbox(GenericToolbox):
             modify=grid_outline_modified,
             polygon_line_color="mediumblue",
             polygon_fill_opacity=0.3,
-            rotate=True,
+            rotate=not app.crs.is_geographic,
         )
 
         from .quadtree import (
@@ -229,93 +237,109 @@ class Toolbox(GenericToolbox):
         app.model[_MODEL].clear_spatial_attributes()
 
         dlg = app.gui.window.dialog_wait("Generating grid ...")
+        try:
+            x0 = app.gui.getvar(_TB, "x0")
+            y0 = app.gui.getvar(_TB, "y0")
+            dx = app.gui.getvar(_TB, "dx")
+            dy = app.gui.getvar(_TB, "dy")
+            nmax = app.gui.getvar(_TB, "nmax")
+            mmax = app.gui.getvar(_TB, "mmax")
+            rotation = app.gui.getvar(_TB, "rotation")
 
-        x0 = app.gui.getvar(_TB, "x0")
-        y0 = app.gui.getvar(_TB, "y0")
-        dx = app.gui.getvar(_TB, "dx")
-        dy = app.gui.getvar(_TB, "dy")
-        nmax = app.gui.getvar(_TB, "nmax")
-        mmax = app.gui.getvar(_TB, "mmax")
-        rotation = app.gui.getvar(_TB, "rotation")
+            domain.config.set("x0", x0)
+            domain.config.set("y0", y0)
+            domain.config.set("dx", dx)
+            domain.config.set("dy", dy)
+            domain.config.set("nmax", nmax)
+            domain.config.set("mmax", mmax)
+            domain.config.set("rotation", rotation)
+            app.model[_MODEL].set_gui_variables()
 
-        domain.config.set("x0", x0)
-        domain.config.set("y0", y0)
-        domain.config.set("dx", dx)
-        domain.config.set("dy", dy)
-        domain.config.set("nmax", nmax)
-        domain.config.set("mmax", mmax)
-        domain.config.set("rotation", rotation)
-        app.model[_MODEL].set_gui_variables()
+            refpol = (
+                self.refinement_polygon if len(self.refinement_polygon) > 0 else None
+            )
 
-        refpol = self.refinement_polygon if len(self.refinement_polygon) > 0 else None
-
-        domain.quadtree_grid.create(
-            x0,
-            y0,
-            nmax,
-            mmax,
-            dx,
-            dy,
-            rotation,
-            epsg=app.crs.to_epsg(),
-            refinement_polygons=refpol,
-            elevation_list=app.selected_bathymetry_datasets,
-            bathymetry_database=app.bathymetry_database,
-        )
-        domain.quadtree_grid.write()
-        app.map.layer[_MODEL].layer["grid"].set_data(domain.quadtree_grid)
-
+            domain.quadtree_grid.create(
+                x0,
+                y0,
+                nmax,
+                mmax,
+                dx,
+                dy,
+                rotation,
+                epsg=app.crs.to_epsg(),
+                refinement_polygons=refpol,
+                elevation_list=app.selected_bathymetry_datasets,
+            )
+            domain.quadtree_grid.write()
+            app.map.layer[_MODEL].layer["grid"].set_data(domain.quadtree_grid)
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating grid:\n{e}")
+            return
         dlg.close()
 
     def generate_bathymetry(self) -> None:
         """Interpolate bathymetry onto the grid using mean-wet subgrid averaging."""
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
-
-        domain = app.model[_MODEL].domain
-        domain.quadtree_elevation.create(
-            elevation_list=app.selected_bathymetry_datasets,
-            bathymetry_database=app.bathymetry_database,
-            nr_subgrid_pixels=20,
-            threshold_level=0.0,
-            mean_wet=True,
-        )
-        domain.quadtree_grid.write()
-
+        try:
+            domain = app.model[_MODEL].domain
+            domain.quadtree_elevation.create(
+                elevation_list=app.selected_bathymetry_datasets,
+                nr_subgrid_pixels=20,
+                threshold_level=0.0,
+                mean_wet=True,
+            )
+            domain.quadtree_grid.write()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating bathymetry:\n{e}")
+            return
         dlg.close()
 
     def update_mask(self) -> None:
         """Recompute the mask from current polygon and elevation settings."""
         dlg = app.gui.window.dialog_wait("Updating mask ...")
-
-        domain = app.model[_MODEL].domain
-        domain.quadtree_mask.create(
-            zmin=app.gui.getvar(_TB, "global_zmin"),
-            zmax=app.gui.getvar(_TB, "global_zmax"),
-            include_polygon=self.include_polygon,
-            include_zmin=app.gui.getvar(_TB, "include_zmin"),
-            include_zmax=app.gui.getvar(_TB, "include_zmax"),
-            exclude_polygon=self.exclude_polygon,
-            exclude_zmin=app.gui.getvar(_TB, "exclude_zmin"),
-            exclude_zmax=app.gui.getvar(_TB, "exclude_zmax"),
-            open_boundary_polygon=self.boundary_polygon,
-            open_boundary_zmin=app.gui.getvar(_TB, "boundary_zmin"),
-            open_boundary_zmax=app.gui.getvar(_TB, "boundary_zmax"),
-            update_datashader_dataframe=True,
-        )
-        domain.quadtree_grid.write()
-        app.map.layer[_MODEL].layer["mask"].set_data(domain.quadtree_mask)
-
+        try:
+            domain = app.model[_MODEL].domain
+            domain.quadtree_mask.create(
+                zmin=app.gui.getvar(_TB, "global_zmin"),
+                zmax=app.gui.getvar(_TB, "global_zmax"),
+                include_polygon=self.include_polygon,
+                include_zmin=app.gui.getvar(_TB, "include_zmin"),
+                include_zmax=app.gui.getvar(_TB, "include_zmax"),
+                exclude_polygon=self.exclude_polygon,
+                exclude_zmin=app.gui.getvar(_TB, "exclude_zmin"),
+                exclude_zmax=app.gui.getvar(_TB, "exclude_zmax"),
+                open_boundary_polygon=self.boundary_polygon,
+                open_boundary_zmin=app.gui.getvar(_TB, "boundary_zmin"),
+                open_boundary_zmax=app.gui.getvar(_TB, "boundary_zmax"),
+                update_datashader_dataframe=True,
+            )
+            domain.quadtree_grid.write()
+            app.map.layer[_MODEL].layer["mask"].set_data(domain.quadtree_mask)
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error updating mask:\n{e}")
+            return
         dlg.close()
 
     def cut_inactive_cells(self) -> None:
         """Remove inactive cells from the grid to reduce model size."""
         dlg = app.gui.window.dialog_wait("Cutting Inactive Cells ...")
-
-        domain = app.model[_MODEL].domain
-        domain.quadtree_grid.cut_inactive_cells()
-        domain.quadtree_grid.write()
-        app.model[_MODEL].plot()
-
+        try:
+            domain = app.model[_MODEL].domain
+            domain.quadtree_grid.cut_inactive_cells()
+            domain.quadtree_grid.write()
+            app.model[_MODEL].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error cutting inactive cells:\n{e}")
+            return
         dlg.close()
 
     def generate_waveblocking(self) -> None:
@@ -342,16 +366,20 @@ class Toolbox(GenericToolbox):
         p = app.gui.window.dialog_progress(
             "               Generating Wave blocking file ...                ", 100
         )
-
-        domain.wave_blocking.create(
-            app.selected_bathymetry_datasets,
-            bathymetry_database=app.bathymetry_database,
-            nr_dirs=nr_dirs,
-            nr_subgrid_pixels=nr_pixels,
-            threshold_level=threshold_level,
-            quiet=False,
-            progress_bar=p,
-        )
+        try:
+            domain.wave_blocking.create(
+                app.selected_bathymetry_datasets,
+                nr_dirs=nr_dirs,
+                nr_subgrid_pixels=nr_pixels,
+                threshold_level=threshold_level,
+                quiet=False,
+                progress_bar=p,
+            )
+        except Exception as e:
+            traceback.print_exc()
+            p.close()
+            app.gui.window.dialog_warning(f"Error generating wave blocking file:\n{e}")
+            return
         p.close()
 
         domain.wave_blocking.write(filename=filename)

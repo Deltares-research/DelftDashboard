@@ -1,16 +1,22 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the SFINCS HydroMT Domain tab.
 
-@author: ormondt
+Handles tab selection and propagation of domain-related GUI variables
+back to the SFINCS model configuration.
 """
+
+from typing import Any
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-def select(*args):
-    # De-activate existing layers
+_MODEL = "sfincs_hmt"
+
+
+def select(*args: Any) -> None:
+    """Activate the Domain tab and update map layers."""
     map.update()
 
-def set_model_variables(*args):
-    app.model["sfincs_hmt"].set_model_variables()
+
+def set_model_variables(*args: Any) -> None:
+    """Copy current GUI variables back to the model config."""
+    app.model[_MODEL].set_model_variables()

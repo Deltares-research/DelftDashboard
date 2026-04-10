@@ -1,7 +1,9 @@
 import os
+
 import pyproj
 
 # Should this be part of Guitares instead?
+
 
 def select_geographic_crs(app):
 
@@ -17,7 +19,7 @@ def select_geographic_crs(app):
     # Set WGS 84 as the first item in the list
     if "WGS 84" in crs_names:
         wgs_84_index = crs_names.index("WGS 84")
-        crs_names[0], crs_names[wgs_84_index] = crs_names[wgs_84_index], crs_names[0]        
+        crs_names[0], crs_names[wgs_84_index] = crs_names[wgs_84_index], crs_names[0]
 
     data = {}
     data["crs_info_list"] = crs_info_list
@@ -27,7 +29,12 @@ def select_geographic_crs(app):
     app.gui.setvar("select_other_geographic", "crs_index", 0)
 
     okay, data = app.gui.popup(
-        os.path.join(app.main_path, "misc", "select_other_geographic", "select_other_geographic.yml"),
+        os.path.join(
+            app.main_path,
+            "misc",
+            "select_other_geographic",
+            "select_other_geographic.yml",
+        ),
         id="select_other_geographic",
         data=data,
     )
@@ -38,5 +45,5 @@ def select_geographic_crs(app):
     filtered_names = app.gui.getvar("select_other_geographic", "filtered_names")
     i = app.gui.getvar("select_other_geographic", "crs_index")
     selected_name = filtered_names[i]
-    
+
     return pyproj.CRS(selected_name)

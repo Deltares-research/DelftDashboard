@@ -6,4 +6,5 @@ element:
     y: 10
     width: 120
     height: 20
-  method: export  
+  method: export
+  tooltip: Export the flood map to file

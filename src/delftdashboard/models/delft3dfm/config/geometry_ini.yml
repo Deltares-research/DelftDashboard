@@ -34,3 +34,4 @@ element:
   text: Initial WL (m)
   variable: geometry.waterlevini
   method: set_model_variables
+  tooltip: Edit uniform initial water level in metres

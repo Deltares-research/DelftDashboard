@@ -1,32 +1,33 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the meteo download tab."""
 
-@author: ormondt
-"""
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-# Callbacks
-def select(*args):
-    # De-activate() existing layers
+
+def select(*args: Any) -> None:
+    """Activate the download tab and update the map."""
     map.update()
-    # Tab selected
     app.toolbox["meteo"].set_layer_mode("active")
 
-def select_dataset(*args):
+
+def select_dataset(*args: Any) -> None:
+    """Handle dataset selection change."""
     pass
 
-def edit_time(*args):
+
+def edit_time(*args: Any) -> None:
+    """Handle time range editing."""
     pass
 
-def download(*args):
+
+def download(*args: Any) -> None:
+    """Download meteo data for the selected dataset and time range."""
     dataset_name = app.gui.getvar("meteo", "selected_dataset")
     tstart = app.gui.getvar("meteo", "tstart")
     tend = app.gui.getvar("meteo", "tstop")
     dataset = app.meteo_database.dataset[dataset_name]
-    # Add waitbox
     wb = app.gui.window.dialog_wait("Downloading meteo data ...")
     dataset.download([tstart, tend])
     wb.close()
- 

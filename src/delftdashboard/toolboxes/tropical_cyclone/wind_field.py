@@ -1,35 +1,34 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the tropical cyclone wind field tab.
 
-@author: ormondt
+Handle wind field variable editing, spiderweb generation, and config I/O.
 """
-# import math
-# import numpy as np
-import geopandas as gpd
-# import shapely
-# import json
-# import os
+
+from typing import Any
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
 
-# Callbacks
-
-def select(*args):
-    # De-activate existing layers
+def select(*args: Any) -> None:
+    """Activate the wind field tab and show cyclone layers."""
     map.update()
-    # Tab selected
     app.toolbox["tropical_cyclone"].set_layer_mode("active")
 
-def edit_variables(*args):
-    pass
 
-def build_spiderweb(*args):
+def edit_variables(*args: Any) -> None:
+    """Handle wind field variable edit events (placeholder)."""
+
+
+def build_spiderweb(*args: Any) -> None:
+    """Generate the spiderweb wind field file."""
     app.toolbox["tropical_cyclone"].build_spiderweb()
 
-def load_config(*args):
+
+def load_config(*args: Any) -> None:
+    """Load wind field configuration from file."""
     app.toolbox["tropical_cyclone"].load_config()
 
-def save_config(*args):
+
+def save_config(*args: Any) -> None:
+    """Save wind field configuration to file."""
     app.toolbox["tropical_cyclone"].save_config()

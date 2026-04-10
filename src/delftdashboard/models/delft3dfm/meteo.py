@@ -1,23 +1,27 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the Delft3D-FM meteorological forcing tab."""
 
-@author: ormondt
-"""
+import ast
+from typing import Any
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
-import ast
 
-def select(*args):
-    # De-activate existing layers
+_MODEL = "delft3dfm"
+
+
+def select(*args: Any) -> None:
+    """Deactivate existing layers when the meteo tab is selected."""
     map.update()
 
-def set_model_variables(*args):
-    # Convert string list to list
-    vars = ['wind.cdbreakpoints', 'wind.windspeedbreakpoints']
-    for i,v in enumerate(vars):
-        if isinstance(app.gui.variables['delft3dfm'][v]['value'], str):
-            app.gui.variables['delft3dfm'][v]['value'] = ast.literal_eval(app.gui.variables['delft3dfm'][v]['value'])
 
-    app.model["delft3dfm"].set_input_variables()
+def set_model_variables(*args: Any) -> None:
+    """Parse string-encoded breakpoint lists and copy GUI values to the domain."""
+    # Convert string list to list
+    vars = ["wind.cdbreakpoints", "wind.windspeedbreakpoints"]
+    for i, v in enumerate(vars):
+        if isinstance(app.gui.variables[_MODEL][v]["value"], str):
+            app.gui.variables[_MODEL][v]["value"] = ast.literal_eval(
+                app.gui.variables[_MODEL][v]["value"]
+            )
+
+    app.model[_MODEL].set_input_variables()

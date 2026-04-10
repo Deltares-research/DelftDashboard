@@ -1,41 +1,41 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:18:09 2021
+"""GUI callbacks for the flood map prepare tab.
 
-@author: ormondt
+Handle loading topobathy/index GeoTIFFs and map output files.
 """
-# import geopandas as gpd
+
 import os
+from typing import Any
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
-# Callbacks
-def select(*args):
-    # De-activate() existing layers
+
+def select(*args: Any) -> None:
+    """Activate the prepare tab and update map layers."""
     map.update()
-    # Tab selected
     app.toolbox["flood_map"].set_layer_mode("active")
 
-def load_topobathy_geotiff(*args):
-    # Load topobathy geotiff
+
+def load_topobathy_geotiff(*args: Any) -> None:
+    """Load a topobathy GeoTIFF and update the file label."""
     app.toolbox["flood_map"].load_topobathy_geotiff()
-    # Now set the text in the label (File : and file name without path)
     fname = os.path.basename(app.toolbox["flood_map"].topobathy_geotiff)
-    app.gui.setvar("flood_map", "topo_file_string", "File : " + fname)
+    app.gui.setvar("flood_map", "topo_file_string", f"File : {fname}")
 
-def load_index_geotiff(*args):
-    # Load index geotiff
+
+def load_index_geotiff(*args: Any) -> None:
+    """Load an index GeoTIFF and update the file label."""
     app.toolbox["flood_map"].load_index_geotiff()
-    # Now set the text in the label (File : and file name without path)
     fname = os.path.basename(app.toolbox["flood_map"].index_geotiff)
-    app.gui.setvar("flood_map", "index_file_string", "File : " + fname)
+    app.gui.setvar("flood_map", "index_file_string", f"File : {fname}")
 
-def load_map_output(*args):
-    # Load map output
+
+def load_map_output(*args: Any) -> None:
+    """Load model map output and update the file label."""
     app.toolbox["flood_map"].load_map_output()
     fname = os.path.basename(app.toolbox["flood_map"].map_file_name)
-    app.gui.setvar("flood_map", "map_file_string", "File : " + fname)
+    app.gui.setvar("flood_map", "map_file_string", f"File : {fname}")
 
-def edit_table(*args):
-    pass
+
+def edit_table(*args: Any) -> None:
+    """Handle table edit events (placeholder)."""

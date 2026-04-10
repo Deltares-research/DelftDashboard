@@ -1,11 +1,83 @@
 element:
+# ── Buttons (top row) ────────────────────────────────────────────
 - style: pushbutton
-  text: Modify (tbd)
+  text: Modify on Map
   position:
-    x: 20
-    y: 110
-    width: 120
+    x: 10
+    y: 105
+    width: 110
     height: 20
-  method: modify
-  enable: false
-  
+  method: modify_on_map
+  tooltip: Load the track into the drawing layer for vertex editing
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: track_loaded
+      operator: eq
+      value: True
+
+- style: pushbutton
+  text: Accept
+  position:
+    x: 10
+    y: 80
+    width: 110
+    height: 20
+  method: accept_modification
+  tooltip: Accept the modified track
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: track_modified
+      operator: eq
+      value: True
+
+- style: pushbutton
+  text: Cancel
+  position:
+    x: 10
+    y: 55
+    width: 110
+    height: 20
+  method: cancel_modification
+  tooltip: Cancel modification and restore the original track
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: track_modified
+      operator: eq
+      value: True
+
+- style: pushbutton
+  text: Save Track
+  position:
+    x: 10
+    y: 30
+    width: 110
+    height: 20
+  method: save_track
+  tooltip: Save the current track to a .cyc file
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: track_loaded
+      operator: eq
+      value: True
+
+# ── Track table (fills rest of panel) ────────────────────────────
+- style: table
+  position:
+    x: 140
+    y: 10
+    width: -10
+    height: 125
+  option_value:
+    variable: track_table
+  sortable: false
+  editable: true
+  method: table_edited
+  tooltip: Track data table (double-click a cell to edit)

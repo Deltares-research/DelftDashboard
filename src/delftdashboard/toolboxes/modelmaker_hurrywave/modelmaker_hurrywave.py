@@ -4,6 +4,8 @@ Created on Mon May 10 12:18:09 2021
 
 @author: ormondt
 """
+import traceback
+
 import pandas as pd
 import geopandas as gpd
 from pyproj import CRS
@@ -13,8 +15,8 @@ from delftdashboard.app import app
 from delftdashboard.misc.gdfutils import mpol2pol
 
 # from cht_bathymetry.bathymetry_database import bathymetry_database
-from cht_utils.misc_tools import dict2yaml
-from cht_utils.misc_tools import yaml2dict
+from cht_utils.fileio.yaml import dict2yaml
+from cht_utils.fileio.yaml import yaml2dict
 
 class Toolbox(GenericToolbox):
     def __init__(self, name):
@@ -210,108 +212,127 @@ class Toolbox(GenericToolbox):
         app.model["hurrywave"].clear_spatial_attributes()
 
         dlg = app.gui.window.dialog_wait("Generating grid ...")
+        try:
+            # Get bbox coords from toolbox, and set them in the model input variables (do we actually need them for the model when using quadtree?)
+            group = "modelmaker_hurrywave"
+            model.input.variables.x0       = app.gui.getvar(group, "x0")
+            model.input.variables.y0       = app.gui.getvar(group, "y0")
+            model.input.variables.dx       = app.gui.getvar(group, "dx")
+            model.input.variables.dy       = app.gui.getvar(group, "dy")
+            model.input.variables.nmax     = app.gui.getvar(group, "nmax")
+            model.input.variables.mmax     = app.gui.getvar(group, "mmax")
+            model.input.variables.rotation = app.gui.getvar(group, "rotation")
 
-        # Get bbox coords from toolbox, and set them in the model input variables (do we actually need them for the model when using quadtree?)
-        group = "modelmaker_hurrywave"
-        model.input.variables.x0       = app.gui.getvar(group, "x0")
-        model.input.variables.y0       = app.gui.getvar(group, "y0")
-        model.input.variables.dx       = app.gui.getvar(group, "dx")
-        model.input.variables.dy       = app.gui.getvar(group, "dy")
-        model.input.variables.nmax     = app.gui.getvar(group, "nmax")
-        model.input.variables.mmax     = app.gui.getvar(group, "mmax")
-        model.input.variables.rotation = app.gui.getvar(group, "rotation")
-               
-        app.model["hurrywave"].set_gui_variables()
-        # group = "hurrywave"
-        # app.gui.setvar(group, "x0", model.input.variables.x0)
-        # app.gui.setvar(group, "y0", model.input.variables.y0)
-        # app.gui.setvar(group, "dx", model.input.variables.dx)
-        # app.gui.setvar(group, "dy", model.input.variables.dy)
-        # app.gui.setvar(group, "nmax", model.input.variables.nmax)
-        # app.gui.setvar(group, "mmax", model.input.variables.mmax)
-        # app.gui.setvar(group, "rotation", model.input.variables.rotation)
+            app.model["hurrywave"].set_gui_variables()
+            # group = "hurrywave"
+            # app.gui.setvar(group, "x0", model.input.variables.x0)
+            # app.gui.setvar(group, "y0", model.input.variables.y0)
+            # app.gui.setvar(group, "dx", model.input.variables.dx)
+            # app.gui.setvar(group, "dy", model.input.variables.dy)
+            # app.gui.setvar(group, "nmax", model.input.variables.nmax)
+            # app.gui.setvar(group, "mmax", model.input.variables.mmax)
+            # app.gui.setvar(group, "rotation", model.input.variables.rotation)
 
-        x0 = model.input.variables.x0
-        y0 = model.input.variables.y0
-        dx = model.input.variables.dx
-        dy = model.input.variables.dy
-        nmax = model.input.variables.nmax
-        mmax = model.input.variables.mmax
-        rotation = model.input.variables.rotation
+            x0 = model.input.variables.x0
+            y0 = model.input.variables.y0
+            dx = model.input.variables.dx
+            dy = model.input.variables.dy
+            nmax = model.input.variables.nmax
+            mmax = model.input.variables.mmax
+            rotation = model.input.variables.rotation
 
-        if len(self.refinement_polygon) == 0:
-            refpol = None
-        else:
-            # Make list of separate gdfs for each polygon
-            refpol = self.refinement_polygon
+            if len(self.refinement_polygon) == 0:
+                refpol = None
+            else:
+                # Make list of separate gdfs for each polygon
+                refpol = self.refinement_polygon
 
-        model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation,
-                         refinement_polygons=refpol,
-                         bathymetry_sets=app.selected_bathymetry_datasets,
-                         bathymetry_database=app.bathymetry_database)
+            model.grid.build(x0, y0, nmax, mmax, dx, dy, rotation,
+                             refinement_polygons=refpol,
+                             bathymetry_sets=app.selected_bathymetry_datasets,
+                             bathymetry_database=app.bathymetry_database)
 
-        app.model["hurrywave"].domain.grid.write()
+            app.model["hurrywave"].domain.grid.write()
 
-        app.map.layer["hurrywave"].layer["grid"].set_data(model.grid)
-
+            app.map.layer["hurrywave"].layer["grid"].set_data(model.grid)
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating grid:\n{e}")
+            return
         dlg.close()
 
     def generate_bathymetry(self):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
+        try:
+            # app.model["hurrywave"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
+            #                                                   bathymetry_database=app.bathymetry_database)
 
-        # app.model["hurrywave"].domain.grid.set_bathymetry(app.selected_bathymetry_datasets,
-        #                                                   bathymetry_database=app.bathymetry_database)
+            app.model["hurrywave"].domain.grid.set_bathymetry_mean_wet(
+                    app.selected_bathymetry_datasets,
+                    bathymetry_database=app.bathymetry_database,
+                    nr_subgrid_pixels=20,
+                    threshold_level=0.0,
+                    quiet=False,
+                    progress_bar=None)
 
-        app.model["hurrywave"].domain.grid.set_bathymetry_mean_wet(
-                app.selected_bathymetry_datasets,
-                bathymetry_database=app.bathymetry_database,
-                nr_subgrid_pixels=20,
-                threshold_level=0.0,
-                quiet=False,
-                progress_bar=None)  
-
-        app.model["hurrywave"].domain.grid.write()
+            app.model["hurrywave"].domain.grid.write()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error generating bathymetry:\n{e}")
+            return
         dlg.close()
 
 
     def update_mask(self):
 
         dlg = app.gui.window.dialog_wait("Updating mask ...")
-
-        grid = app.model["hurrywave"].domain.grid
-        mask = app.model["hurrywave"].domain.mask
-        mask.build(zmin=app.gui.getvar("modelmaker_hurrywave", "global_zmin"),
-                   zmax=app.gui.getvar("modelmaker_hurrywave", "global_zmax"),
-                   include_polygon=app.toolbox["modelmaker_hurrywave"].include_polygon,
-                   include_zmin=app.gui.getvar("modelmaker_hurrywave", "include_zmin"),
-                   include_zmax=app.gui.getvar("modelmaker_hurrywave", "include_zmax"),
-                   exclude_polygon=app.toolbox["modelmaker_hurrywave"].exclude_polygon,
-                   exclude_zmin=app.gui.getvar("modelmaker_hurrywave", "exclude_zmin"),
-                   exclude_zmax=app.gui.getvar("modelmaker_hurrywave", "exclude_zmax"),
-                   boundary_polygon=app.toolbox["modelmaker_hurrywave"].boundary_polygon,
-                   boundary_zmin=app.gui.getvar("modelmaker_hurrywave", "boundary_zmin"),
-                   boundary_zmax=app.gui.getvar("modelmaker_hurrywave", "boundary_zmax"),
-                   update_datashader_dataframe=True
-                  )
-        # app.map.layer["hurrywave"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
-        # app.map.layer["hurrywave"].layer["mask_boundary"].set_data(mask.to_gdf(option="boundary"))
-        app.map.layer["hurrywave"].layer["mask"].set_data(mask)
-        # app.map.layer["hurrywave"].layer["mask_boundary"].set_data(mask.to_gdf(option="boundary"))
-        grid.write()
-        # if not app.model["hurrywave"].domain.input.variables.mskfile:
-        #     app.model["hurrywave"].domain.input.variables.mskfile = "hurrywave.msk"
-        # grid.write_msk_file()
-        # # GUI variables
-        # app.gui.setvar("hurrywave", "mskfile", app.model["hurrywave"].domain.input.variables.mskfile)
-
+        try:
+            grid = app.model["hurrywave"].domain.grid
+            mask = app.model["hurrywave"].domain.mask
+            mask.build(zmin=app.gui.getvar("modelmaker_hurrywave", "global_zmin"),
+                       zmax=app.gui.getvar("modelmaker_hurrywave", "global_zmax"),
+                       include_polygon=app.toolbox["modelmaker_hurrywave"].include_polygon,
+                       include_zmin=app.gui.getvar("modelmaker_hurrywave", "include_zmin"),
+                       include_zmax=app.gui.getvar("modelmaker_hurrywave", "include_zmax"),
+                       exclude_polygon=app.toolbox["modelmaker_hurrywave"].exclude_polygon,
+                       exclude_zmin=app.gui.getvar("modelmaker_hurrywave", "exclude_zmin"),
+                       exclude_zmax=app.gui.getvar("modelmaker_hurrywave", "exclude_zmax"),
+                       boundary_polygon=app.toolbox["modelmaker_hurrywave"].boundary_polygon,
+                       boundary_zmin=app.gui.getvar("modelmaker_hurrywave", "boundary_zmin"),
+                       boundary_zmax=app.gui.getvar("modelmaker_hurrywave", "boundary_zmax"),
+                       update_datashader_dataframe=True
+                      )
+            # app.map.layer["hurrywave"].layer["mask_include"].set_data(mask.to_gdf(option="include"))
+            # app.map.layer["hurrywave"].layer["mask_boundary"].set_data(mask.to_gdf(option="boundary"))
+            app.map.layer["hurrywave"].layer["mask"].set_data(mask)
+            # app.map.layer["hurrywave"].layer["mask_boundary"].set_data(mask.to_gdf(option="boundary"))
+            grid.write()
+            # if not app.model["hurrywave"].domain.input.variables.mskfile:
+            #     app.model["hurrywave"].domain.input.variables.mskfile = "hurrywave.msk"
+            # grid.write_msk_file()
+            # # GUI variables
+            # app.gui.setvar("hurrywave", "mskfile", app.model["hurrywave"].domain.input.variables.mskfile)
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error updating mask:\n{e}")
+            return
         dlg.close()
 
     def cut_inactive_cells(self):
         dlg = app.gui.window.dialog_wait("Cutting Inactive Cells ...")
-        app.model["hurrywave"].domain.grid.cut_inactive_cells()
-        app.model["hurrywave"].domain.grid.write()
-        # Replot everything
-        app.model["hurrywave"].plot()
+        try:
+            app.model["hurrywave"].domain.grid.cut_inactive_cells()
+            app.model["hurrywave"].domain.grid.write()
+            # Replot everything
+            app.model["hurrywave"].plot()
+        except Exception as e:
+            traceback.print_exc()
+            dlg.close()
+            app.gui.window.dialog_warning(f"Error cutting inactive cells:\n{e}")
+            return
         dlg.close()
 
     def generate_waveblocking(self):
@@ -334,13 +355,19 @@ class Toolbox(GenericToolbox):
         nr_pixels = app.gui.getvar(group, "waveblocking_nr_pixels")
         threshold_level = app.gui.getvar(group, "waveblocking_threshold_level")
         p = app.gui.window.dialog_progress("               Generating Wave blocking file ...                ", 100)
-        ds_wbl = app.model["hurrywave"].domain.waveblocking.build(app.selected_bathymetry_datasets,
-                                                                  bathymetry_database=app.bathymetry_database,
-                                                                  nr_dirs=nr_dirs,
-                                                                  nr_subgrid_pixels=nr_pixels,
-                                                                  threshold_level=threshold_level,
-                                                                  quiet=False, 
-                                                                  progress_bar=p)
+        try:
+            ds_wbl = app.model["hurrywave"].domain.waveblocking.build(app.selected_bathymetry_datasets,
+                                                                      bathymetry_database=app.bathymetry_database,
+                                                                      nr_dirs=nr_dirs,
+                                                                      nr_subgrid_pixels=nr_pixels,
+                                                                      threshold_level=threshold_level,
+                                                                      quiet=False,
+                                                                      progress_bar=p)
+        except Exception as e:
+            traceback.print_exc()
+            p.close()
+            app.gui.window.dialog_warning(f"Error generating wave blocking file:\n{e}")
+            return
         p.close()
         if ds_wbl:
             app.model["hurrywave"].domain.input.variables.wblfile = filename

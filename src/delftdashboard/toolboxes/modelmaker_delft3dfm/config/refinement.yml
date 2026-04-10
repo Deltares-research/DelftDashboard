@@ -18,6 +18,7 @@ element:
     select: index
     option_string:
       variable: refinement_polygon_names
+    tooltip: Select refinement polygon from list
   # - style: popupmenu
   #   position:
   #     x: 10
@@ -61,6 +62,7 @@ element:
       width: 80
       height: 20
     method: draw_refinement_polygon
+    tooltip: Draw refinement polygon on the map
   - style: pushbutton
     text: Delete Polygon
     position:
@@ -69,6 +71,7 @@ element:
       width: 80
       height: 20
     method: delete_refinement_polygon
+    tooltip: Delete selected refinement polygon
     dependency:
     - action: enable
       checkfor: all
@@ -84,6 +87,7 @@ element:
       width: 80
       height: 20
     method: load_refinement_polygon
+    tooltip: Load refinement polygons from file
   - style: pushbutton
     text: Save Polygons
     position:
@@ -92,6 +96,7 @@ element:
       width: 80
       height: 20
     method: save_refinement_polygon
+    tooltip: Save refinement polygons to file
     dependency:
     - action: enable
       checkfor: all

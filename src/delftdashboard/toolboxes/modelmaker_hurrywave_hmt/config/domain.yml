@@ -70,7 +70,7 @@ element:
   method: edit_rotation
   tooltip: Grid rotation angle in degrees
 - style: pushbutton
-  text: Draw Layout
+  text: Draw Model Domain
   position:
     x: 230
     y: 110

@@ -18,6 +18,7 @@ element:
     select: index
     option_string:
       variable: open_boundary_polygon_names
+    tooltip: Select open boundary polygon from list
   - style: pushbutton
     text: Draw
     position:
@@ -26,6 +27,7 @@ element:
       width: 40
       height: 20
     method: draw_open_boundary_polygon
+    tooltip: Draw open boundary polygon on the map
   - style: pushbutton
     text: Delete
     position:
@@ -34,6 +36,7 @@ element:
       width: 40
       height: 20
     method: delete_open_boundary_polygon
+    tooltip: Delete selected open boundary polygon
     dependency:
     - action: enable
       checkfor: all
@@ -49,6 +52,7 @@ element:
       width: 40
       height: 20
     method: load_open_boundary_polygon
+    tooltip: Load open boundary polygon from file
   - style: pushbutton
     text: Save
     position:
@@ -57,6 +61,7 @@ element:
       width: 40
       height: 20
     method: save_open_boundary_polygon
+    tooltip: Save open boundary polygon to file
     dependency:
     - action: enable
       checkfor: all
@@ -73,6 +78,7 @@ element:
     text: Zmax
     text_position: above-left
     variable: open_boundary_zmax
+    tooltip: Maximum elevation for open boundary
   - style: edit
     position:
       x: 90
@@ -82,6 +88,7 @@ element:
     text: Zmin
     text_position: above-left
     variable: open_boundary_zmin
+    tooltip: Minimum elevation for open boundary
 - style: panel
   title: Downstream Boundary Polygons
   position:
@@ -101,6 +108,7 @@ element:
     select: index
     option_string:
       variable: downstream_boundary_polygon_names
+    tooltip: Select downstream boundary polygon from list
   - style: pushbutton
     text: Draw
     position:
@@ -109,6 +117,7 @@ element:
       width: 40
       height: 20
     method: draw_downstream_boundary_polygon
+    tooltip: Draw downstream boundary polygon on the map
   - style: pushbutton
     text: Delete
     position:
@@ -117,6 +126,7 @@ element:
       width: 40
       height: 20
     method: delete_downstream_boundary_polygon
+    tooltip: Delete selected downstream boundary polygon
     dependency:
     - action: enable
       checkfor: all
@@ -132,6 +142,7 @@ element:
       width: 40
       height: 20
     method: load_downstream_boundary_polygon
+    tooltip: Load downstream boundary polygon from file
   - style: pushbutton
     text: Save
     position:
@@ -140,6 +151,7 @@ element:
       width: 40
       height: 20
     method: save_downstream_boundary_polygon
+    tooltip: Save downstream boundary polygon to file
     dependency:
     - action: enable
       checkfor: all
@@ -156,6 +168,7 @@ element:
     text: Zmax
     text_position: above-left
     variable: downstream_boundary_zmax
+    tooltip: Maximum elevation for downstream boundary
   - style: edit
     position:
       x: 90
@@ -165,6 +178,7 @@ element:
     text: Zmin
     text_position: above-left
     variable: downstream_boundary_zmin
+    tooltip: Minimum elevation for downstream boundary
 - style: panel
   title: Neumann Boundary Polygons
   position:
@@ -184,6 +198,7 @@ element:
     select: index
     option_string:
       variable: neumann_boundary_polygon_names
+    tooltip: Select Neumann boundary polygon from list
   - style: pushbutton
     text: Draw
     position:
@@ -192,6 +207,7 @@ element:
       width: 40
       height: 20
     method: draw_neumann_boundary_polygon
+    tooltip: Draw Neumann boundary polygon on the map
   - style: pushbutton
     text: Delete
     position:
@@ -200,6 +216,7 @@ element:
       width: 40
       height: 20
     method: delete_neumann_boundary_polygon
+    tooltip: Delete selected Neumann boundary polygon
     dependency:
     - action: enable
       checkfor: all
@@ -215,6 +232,7 @@ element:
       width: 40
       height: 20
     method: load_neumann_boundary_polygon
+    tooltip: Load Neumann boundary polygon from file
   - style: pushbutton
     text: Save
     position:
@@ -223,6 +241,7 @@ element:
       width: 40
       height: 20
     method: save_neumann_boundary_polygon
+    tooltip: Save Neumann boundary polygon to file
     dependency:
     - action: enable
       checkfor: all
@@ -239,6 +258,7 @@ element:
     text: Zmax
     text_position: above-left
     variable: neumann_boundary_zmax
+    tooltip: Maximum elevation for Neumann boundary
   - style: edit
     position:
       x: 90
@@ -248,6 +268,7 @@ element:
     text: Zmin
     text_position: above-left
     variable: neumann_boundary_zmin
+    tooltip: Minimum elevation for Neumann boundary
 - style: panel
   title: Outflow Boundary Polygons
   position:
@@ -267,6 +288,7 @@ element:
     select: index
     option_string:
       variable: outflow_boundary_polygon_names
+    tooltip: Select outflow boundary polygon from list
   - style: pushbutton
     text: Draw
     position:
@@ -275,6 +297,7 @@ element:
       width: 40
       height: 20
     method: draw_outflow_boundary_polygon
+    tooltip: Draw outflow boundary polygon on the map
   - style: pushbutton
     text: Delete
     position:
@@ -283,6 +306,7 @@ element:
       width: 40
       height: 20
     method: delete_outflow_boundary_polygon
+    tooltip: Delete selected outflow boundary polygon
     dependency:
     - action: enable
       checkfor: all
@@ -298,6 +322,7 @@ element:
       width: 40
       height: 20
     method: load_outflow_boundary_polygon
+    tooltip: Load outflow boundary polygon from file
   - style: pushbutton
     text: Save
     position:
@@ -306,6 +331,7 @@ element:
       width: 40
       height: 20
     method: save_outflow_boundary_polygon
+    tooltip: Save outflow boundary polygon to file
     dependency:
     - action: enable
       checkfor: all
@@ -322,6 +348,7 @@ element:
     text: Zmax
     text_position: above-left
     variable: outflow_boundary_zmax
+    tooltip: Maximum elevation for outflow boundary
   - style: edit
     position:
       x: 90
@@ -331,6 +358,7 @@ element:
     text: Zmin
     text_position: above-left
     variable: outflow_boundary_zmin
+    tooltip: Minimum elevation for outflow boundary
 - style: pushbutton
   text: Update Mask
   position:
@@ -339,6 +367,7 @@ element:
     width: 100
     height: 20
   method: update_mask
+  tooltip: Update the boundary cell mask based on current settings
 - style: pushbutton
   text: Cut Inactive Cells
   position:
@@ -347,4 +376,5 @@ element:
     width: 100
     height: 20
   method: cut_inactive_cells
+  tooltip: Remove inactive cells from the grid
 
