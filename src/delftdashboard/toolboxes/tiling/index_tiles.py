@@ -59,7 +59,7 @@ def generate_index_tiles(*args: Any) -> None:
 
         dlg.close()
 
-    elif model.name == "hurrywave":
+    elif model.name == "hurrywave_hmt":
         dlg = app.gui.window.dialog_wait("Generating index tiles ...")
 
         grid = model.domain.grid.data.xuds
