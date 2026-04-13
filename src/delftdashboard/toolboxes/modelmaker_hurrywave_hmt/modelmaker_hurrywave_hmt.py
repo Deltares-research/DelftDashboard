@@ -9,18 +9,19 @@ import traceback
 from typing import List
 
 import geopandas as gpd
-import pandas as pd
 
 from delftdashboard.app import app
-from delftdashboard.misc.gdfutils import mpol2pol
 from delftdashboard.operations.toolbox import GenericToolbox
 from delftdashboard.operations.topography import to_hydromt_elevation_list
+
+from ._polygons import PolygonsMixin
+from ._setup_yaml import SetupYamlMixin
 
 _TB = "modelmaker_hurrywave_hmt"
 _MODEL = "hurrywave_hmt"
 
 
-class Toolbox(GenericToolbox):
+class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
     """Model Maker toolbox for HurryWave (HydroMT)."""
 
     def __init__(self, name: str) -> None:
@@ -342,21 +343,31 @@ class Toolbox(GenericToolbox):
             return
         dlg.close()
 
-    def generate_waveblocking(self) -> None:
-        """Generate the wave blocking file from sub-grid bathymetry."""
+    def generate_waveblocking(self, ask_filename: bool = False) -> None:
+        """Generate the wave blocking file from sub-grid bathymetry.
+
+        Parameters
+        ----------
+        ask_filename : bool, optional
+            When True (e.g. invoked from the dedicated GUI button), open
+            a save-file dialog. When False (default — used by
+            :py:meth:`build_model`) write straight to the configured
+            ``wblfile`` path or ``hurrywave.wbl``.
+        """
         filename = app.model[_MODEL].domain.config.get("wblfile")
         if not filename:
             filename = "hurrywave.wbl"
-        rsp = app.gui.window.dialog_save_file(
-            "Select file ...",
-            file_name=filename,
-            filter="*.wbl",
-            allow_directory_change=False,
-        )
-        if rsp[0]:
-            filename = rsp[2]
-        else:
-            return
+        if ask_filename:
+            rsp = app.gui.window.dialog_save_file(
+                "Select file ...",
+                file_name=filename,
+                filter="*.wbl",
+                allow_directory_change=False,
+            )
+            if rsp[0]:
+                filename = rsp[2]
+            else:
+                return
 
         domain = app.model[_MODEL].domain
         nr_dirs = domain.config.get("ntheta") or 36
@@ -392,146 +403,3 @@ class Toolbox(GenericToolbox):
         self.update_mask()
         self.generate_waveblocking()
 
-    # ── Polygon I/O ──────────────────────────────────────────────────
-
-    def read_refinement_polygon(self, file_name: str, append: bool) -> None:
-        """Load refinement polygons from a GeoJSON file.
-
-        Parameters
-        ----------
-        file_name : str
-            Path to the GeoJSON file.
-        append : bool
-            If True, add to existing polygons; otherwise replace.
-        """
-        refinement_polygon = gpd.read_file(file_name).to_crs(app.crs)
-        if "refinement_level" not in refinement_polygon.columns:
-            refinement_polygon["refinement_level"] = 1
-        if "zmin" not in refinement_polygon.columns:
-            refinement_polygon["zmin"] = -99999.0
-        if "zmax" not in refinement_polygon.columns:
-            refinement_polygon["zmax"] = 99999.0
-        if append:
-            self.refinement_polygon = gpd.GeoDataFrame(
-                pd.concat(
-                    [self.refinement_polygon, refinement_polygon], ignore_index=True
-                )
-            )
-        else:
-            self.refinement_polygon = refinement_polygon
-
-    def read_include_polygon(self, fname: str, append: bool) -> None:
-        """Load include polygons from file.
-
-        Parameters
-        ----------
-        fname : str
-            Path to the GeoJSON file.
-        append : bool
-            If True, add to existing polygons; otherwise replace.
-        """
-        if not append:
-            self.include_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
-        else:
-            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
-            self.include_polygon = gpd.GeoDataFrame(
-                pd.concat([self.include_polygon, gdf], ignore_index=True)
-            )
-
-    def read_exclude_polygon(self, fname: str, append: bool) -> None:
-        """Load exclude polygons from file.
-
-        Parameters
-        ----------
-        fname : str
-            Path to the GeoJSON file.
-        append : bool
-            If True, add to existing polygons; otherwise replace.
-        """
-        if not append:
-            self.exclude_polygon = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
-        else:
-            gdf = mpol2pol(gpd.read_file(fname)).to_crs(app.crs)
-            self.exclude_polygon = gpd.GeoDataFrame(
-                pd.concat([self.exclude_polygon, gdf], ignore_index=True)
-            )
-
-    def read_boundary_polygon(self, fname: str, append: bool) -> None:
-        """Load boundary polygons from file.
-
-        Parameters
-        ----------
-        fname : str
-            Path to the GeoJSON file.
-        append : bool
-            If True, add to existing polygons; otherwise replace.
-        """
-        if not append:
-            self.boundary_polygon = gpd.read_file(fname).to_crs(app.crs)
-        else:
-            gdf = gpd.read_file(fname).to_crs(app.crs)
-            self.boundary_polygon = gpd.GeoDataFrame(
-                pd.concat([self.boundary_polygon, gdf], ignore_index=True)
-            )
-
-    def write_refinement_polygon(self) -> None:
-        """Save refinement polygons to a GeoJSON file."""
-        if len(self.refinement_polygon) == 0:
-            return
-        gdf = (
-            self.refinement_polygon.drop(columns=["id"])
-            if "id" in self.refinement_polygon.columns
-            else self.refinement_polygon
-        )
-        fname = app.gui.getvar(_TB, "refinement_polygon_file")
-        gdf.to_file(fname, driver="GeoJSON")
-
-    def write_include_polygon(self) -> None:
-        """Save include polygons to include.geojson."""
-        if len(self.include_polygon) == 0:
-            return
-        gpd.GeoDataFrame(geometry=self.include_polygon["geometry"]).to_file(
-            self.include_file_name, driver="GeoJSON"
-        )
-
-    def write_exclude_polygon(self) -> None:
-        """Save exclude polygons to exclude.geojson."""
-        if len(self.exclude_polygon) == 0:
-            return
-        gpd.GeoDataFrame(geometry=self.exclude_polygon["geometry"]).to_file(
-            self.exclude_file_name, driver="GeoJSON"
-        )
-
-    def write_boundary_polygon(self) -> None:
-        """Save boundary polygons to boundary.geojson."""
-        if len(self.boundary_polygon) == 0:
-            return
-        gpd.GeoDataFrame(geometry=self.boundary_polygon["geometry"]).to_file(
-            self.boundary_file_name, driver="GeoJSON"
-        )
-
-    # ── Plotting ─────────────────────────────────────────────────────
-
-    def plot_refinement_polygon(self) -> None:
-        """Plot refinement polygons on the map."""
-        app.map.layer[_TB].layer["quadtree_refinement"].set_data(
-            self.refinement_polygon
-        )
-
-    def plot_include_polygon(self) -> None:
-        """Plot include polygons on the map."""
-        layer = app.map.layer[_TB].layer["mask_include"]
-        layer.clear()
-        layer.add_feature(self.include_polygon)
-
-    def plot_exclude_polygon(self) -> None:
-        """Plot exclude polygons on the map."""
-        layer = app.map.layer[_TB].layer["mask_exclude"]
-        layer.clear()
-        layer.add_feature(self.exclude_polygon)
-
-    def plot_boundary_polygon(self) -> None:
-        """Plot boundary polygons on the map."""
-        layer = app.map.layer[_TB].layer["mask_boundary"]
-        layer.clear()
-        layer.add_feature(self.boundary_polygon)

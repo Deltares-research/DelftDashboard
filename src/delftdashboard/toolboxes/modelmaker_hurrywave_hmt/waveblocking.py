@@ -18,5 +18,5 @@ def edit(*args: Any) -> None:
 
 
 def generate_waveblocking(*args: Any) -> None:
-    """Trigger wave blocking file generation."""
-    app.toolbox[_TB].generate_waveblocking()
+    """Trigger wave blocking file generation (prompts for output file)."""
+    app.toolbox[_TB].generate_waveblocking(ask_filename=True)

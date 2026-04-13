@@ -43,7 +43,15 @@ def map_ready(*args: Any) -> None:
     main_layer = app.map.add_layer("main")
 
     # Add background topography layer
-    main_layer.add_layer("background_topography", type="raster_image")
+    # Pin the background topography to the very bottom of the MapLibre
+    # layer stack (just above ``dummy_layer_0``). Without this the layer
+    # falls back to ``dummy_layer_1`` and ends up sitting in the data
+    # band on top of model overlays.
+    main_layer.add_layer(
+        "background_topography",
+        type="raster_image",
+        before_layer_ids=["dummy_layer_0"],
+    )
 
     # Set update method for topography layer (this is called in the layer's update method!)
     app.map.layer["main"].layer["background_topography"].set_data(
