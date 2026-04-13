@@ -202,7 +202,7 @@ class TopographyDataCatalog:
                 da = self.catalog.get_rasterdataset(
                     name, geom=geom, zoom=(res, "metre")
                 )
-                entry = {"da": da, "name": name}
+                entry = {"da": da}
                 if "zmin" in ds:
                     entry["zmin"] = ds["zmin"]
                 if "zmax" in ds:

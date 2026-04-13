@@ -316,7 +316,6 @@ class Toolbox(GenericToolbox):
                 open_boundary_polygon=self.boundary_polygon,
                 open_boundary_zmin=app.gui.getvar(_TB, "boundary_zmin"),
                 open_boundary_zmax=app.gui.getvar(_TB, "boundary_zmax"),
-                update_datashader_dataframe=True,
             )
             domain.quadtree_grid.write()
             app.map.layer[_MODEL].layer["mask"].set_data(domain.quadtree_mask)

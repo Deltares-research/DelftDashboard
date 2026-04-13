@@ -611,7 +611,6 @@ class Toolbox(GenericToolbox):
                 outflow_boundary_polygon=app.toolbox[_TB].outflow_boundary_polygon,
                 outflow_boundary_zmin=app.gui.getvar(_TB, "outflow_boundary_zmin"),
                 outflow_boundary_zmax=app.gui.getvar(_TB, "outflow_boundary_zmax"),
-                update_datashader_dataframe=True,
             )
         except Exception as e:
             traceback.print_exc()
@@ -667,7 +666,6 @@ class Toolbox(GenericToolbox):
                 neumann_boundary_zmax=app.gui.getvar(
                     _TB, "neumann_boundary_zmax_snapwave"
                 ),
-                update_datashader_dataframe=True,
             )
 
             app.map.layer[_MODEL].layer["mask_snapwave"].set_data(mask)
