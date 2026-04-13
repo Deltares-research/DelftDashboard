@@ -1,1 +1,0 @@
-"""Tiling toolbox for DelftDashboard."""
