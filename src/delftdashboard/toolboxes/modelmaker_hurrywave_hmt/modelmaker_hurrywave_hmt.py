@@ -14,6 +14,7 @@ import pandas as pd
 from delftdashboard.app import app
 from delftdashboard.misc.gdfutils import mpol2pol
 from delftdashboard.operations.toolbox import GenericToolbox
+from delftdashboard.operations.topography import to_hydromt_elevation_list
 
 _TB = "modelmaker_hurrywave_hmt"
 _MODEL = "hurrywave_hmt"
@@ -269,7 +270,7 @@ class Toolbox(GenericToolbox):
                 rotation,
                 epsg=app.crs.to_epsg(),
                 refinement_polygons=refpol,
-                elevation_list=app.selected_bathymetry_datasets,
+                elevation_list=to_hydromt_elevation_list(app.selected_bathymetry_datasets),
             )
             domain.quadtree_grid.write()
             app.map.layer[_MODEL].layer["grid"].set_data(domain.quadtree_grid)
@@ -286,7 +287,7 @@ class Toolbox(GenericToolbox):
         try:
             domain = app.model[_MODEL].domain
             domain.quadtree_elevation.create(
-                elevation_list=app.selected_bathymetry_datasets,
+                elevation_list=to_hydromt_elevation_list(app.selected_bathymetry_datasets),
                 nr_subgrid_pixels=20,
                 threshold_level=0.0,
                 mean_wet=True,
@@ -367,7 +368,7 @@ class Toolbox(GenericToolbox):
         )
         try:
             domain.wave_blocking.create(
-                app.selected_bathymetry_datasets,
+                to_hydromt_elevation_list(app.selected_bathymetry_datasets),
                 nr_dirs=nr_dirs,
                 nr_subgrid_pixels=nr_pixels,
                 threshold_level=threshold_level,

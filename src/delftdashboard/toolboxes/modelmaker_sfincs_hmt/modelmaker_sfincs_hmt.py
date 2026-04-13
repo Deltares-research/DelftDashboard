@@ -19,6 +19,7 @@ from delftdashboard.app import app
 from delftdashboard.misc.gdfutils import mpol2pol
 from delftdashboard.operations import map
 from delftdashboard.operations.toolbox import GenericToolbox
+from delftdashboard.operations.topography import to_hydromt_elevation_list
 
 _TB = "modelmaker_sfincs_hmt"
 _MODEL = "sfincs_hmt"
@@ -552,7 +553,7 @@ class Toolbox(GenericToolbox):
         dlg = app.gui.window.dialog_wait("Generating bathymetry ...")
         try:
             app.model[_MODEL].domain.quadtree_elevation.create(
-                app.selected_bathymetry_datasets,
+                to_hydromt_elevation_list(app.selected_bathymetry_datasets),
                 zmin=app.gui.getvar(_TB, "zmin"),
                 zmax=app.gui.getvar(_TB, "zmax"),
             )
@@ -683,7 +684,7 @@ class Toolbox(GenericToolbox):
         """Generate sub-grid tables from high-resolution bathymetry data."""
         group = _TB
         # bathymetry_sets = app.toolbox[_TB].selected_bathymetry_datasets
-        bathymetry_sets = app.selected_bathymetry_datasets
+        bathymetry_sets = to_hydromt_elevation_list(app.selected_bathymetry_datasets)
         roughness_sets = []
         manning_land = app.gui.getvar(group, "manning_land")
         manning_water = app.gui.getvar(group, "manning_water")

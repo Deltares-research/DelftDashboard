@@ -211,3 +211,24 @@ class TopographyDataCatalog:
             except Exception as e:
                 logger.warning(f"Could not load dataset '{name}': {e}")
         return result
+
+
+def to_hydromt_elevation_list(
+    selected_datasets: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Convert DDB-format selections to a hydromt ``elevation_list``.
+
+    DDB stores selections as ``{"name": ..., "zmin": ..., "zmax": ...}``,
+    while hydromt's ``_parse_datasets_elevation`` expects the source name
+    under the key ``"elevation"``. This helper rewrites each entry so
+    hydromt-side code stays strict about the keys it accepts.
+    """
+    out: List[Dict[str, Any]] = []
+    for ds in selected_datasets:
+        entry: Dict[str, Any] = {"elevation": ds["name"]}
+        if "zmin" in ds:
+            entry["zmin"] = ds["zmin"]
+        if "zmax" in ds:
+            entry["zmax"] = ds["zmax"]
+        out.append(entry)
+    return out
