@@ -9,9 +9,35 @@ element:
   - style: listbox
     position:
       x: 10
+      y: 60
+      width: 100
+      height: 80
+    text: Data Provider
+    text_position: above
+    method: select_provider
+    variable: provider_name
+    select: item
+    option_string:
+      variable: provider_long_names
+    option_value:
+      variable: provider_names
+    tooltip: Select the observation data provider
+  - style: radiobuttongroup
+    position:
+      x: 10
       y: 10
-      width: 300
-      height: 130
+      width: 100
+    variable: naming_option
+    option_string: ["Name", "ID"]
+    option_value: ["name", "id"]
+    method: select_naming_option
+    tooltip: Select whether to use station name or ID for labelling
+  - style: listbox
+    position:
+      x: 120
+      y: 40
+      width: 200
+      height: 100
     text: Stations
     text_position: above
     method: select_station
@@ -22,20 +48,90 @@ element:
     tooltip: Select an observation station from the list
   - style: pushbutton
     position:
-      x: 320
+      x: 120
+      y: 10
+      width: 95
+      height: 20
+    text: Draw Polygon
+    method: draw_polygon
+    enable: true
+    tooltip: Draw a polygon to filter stations by area
+  - style: pushbutton
+    position:
+      x: 225
+      y: 10
+      width: 95
+      height: 20
+    text: Delete Polygon
+    method: delete_polygon
+    enable: true
+    tooltip: Delete the filter polygon
+  - style: pushbutton
+    position:
+      x: 330
       y: 120
       width: 100
       height: 20
     text: Add to Model
     method: add_stations_to_model
     tooltip: Add selected stations as observation points to the active model
-  - style: radiobuttongroup
+  - style: pushbutton
     position:
-      x: 320
-      y: 75
+      x: 330
+      y: 95
       width: 100
-    variable: naming_option
-    option_string: ["Name", "ID"]
-    option_value: ["name", "id"]
-    method: select_naming_option
-    tooltip: Select whether to use station name or ID for labelling
+      height: 20
+    text: View Time Series
+    method: view_time_series
+    enable: true
+    tooltip: Plot the observational time series for the selected station
+  - style: pushbutton
+    position:
+      x: 330
+      y: 70
+      width: 100
+      height: 20
+    text: Export Time Series
+    method: export_time_series
+    tooltip: Export the time series to file
+  - style: datetimeedit
+    position:
+      x: 500
+      y: 120
+      width: 120
+      height: 20
+    text: Start Time
+    variable: tstart
+    tooltip: Set the start date and time for the time series
+  - style: datetimeedit
+    position:
+      x: 500
+      y: 95
+      width: 120
+      height: 20
+    text: End Time
+    variable: tend
+    tooltip: Set the end date and time for the time series
+  - style: edit
+    position:
+      x: 500
+      y: 70
+      width: 120
+      height: 20
+    text: Parameter
+    variable: parameter
+    tooltip: Data parameter (provider-specific — e.g. 'water_level', '00060', 'WATHTE')
+  - style: popupmenu
+    position:
+      x: 500
+      y: 20
+      width: 50
+      height: 20
+    text: Format
+    variable: format
+    select: item
+    tooltip: Select the export file format
+    option_string:
+      variable: format_text
+    option_value:
+      variable: format_value
