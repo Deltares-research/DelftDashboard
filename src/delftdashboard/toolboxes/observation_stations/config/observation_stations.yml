@@ -25,7 +25,7 @@ element:
   - style: radiobuttongroup
     position:
       x: 10
-      y: 10
+      y: 0
       width: 100
     variable: naming_option
     option_string: ["Name", "ID"]

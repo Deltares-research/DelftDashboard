@@ -36,42 +36,40 @@ def update(*args: Any) -> None:
     *args : Any
         Unused GUI callback arguments.
     """
-    # Set the detail model names
+    # Set the overall model names
     if app.active_model.name == "sfincs_cht":
         # Check if waves are turned on
         if app.active_model.domain.input.variables.snapwave:
             overall_model_types = ["sfincs_cht", "delft3dfm", "hurrywave"]
         else:
             overall_model_types = ["sfincs_cht", "delft3dfm"]
+    elif app.active_model.name == "sfincs_hmt":
+        overall_model_types = ["sfincs_hmt", "hurrywave_hmt"]
     elif app.active_model.name == "delft3dfm":
         overall_model_types = ["sfincs_cht", "delft3dfm"]
     elif app.active_model.name == "hurrywave":
         overall_model_types = ["hurrywave"]
+    elif app.active_model.name == "hurrywave_hmt":
+        overall_model_types = ["hurrywave_hmt"]
     else:
         overall_model_types = []
 
-    # Check if all overall model types are available
-    for model_name in overall_model_types:
-        if model_name not in app.model:
-            overall_model_types.remove(model_name)
-
+    # Drop any types that aren't actually loaded as models in this session.
+    overall_model_types = [t for t in overall_model_types if t in app.model]
     app.gui.setvar("nesting", "overall_model_types", overall_model_types)
 
-    # Check if the current model name is in the detail model names
-    # If not set the detail model name to the first in the list
+    # Check if the current model name is in the overall model names. If the
+    # list is empty (no compatible overall model loaded) leave the var alone.
     overall_model_type = app.gui.getvar("nesting", "overall_model_type")
-    if overall_model_type not in overall_model_types:
+    if overall_model_types and overall_model_type not in overall_model_types:
         app.gui.setvar(
             "nesting",
             "overall_model_type",
-            app.gui.getvar("nesting", "overall_model_types")[0],
+            overall_model_types[0],
         )
 
-    # Set the detail model long names
-    long_names = []
-    for model_name in app.gui.getvar("nesting", "overall_model_types"):
-        long_names.append(app.model[model_name].long_name)
-
+    # Set the overall model long names
+    long_names = [app.model[m].long_name for m in overall_model_types]
     app.gui.setvar("nesting", "overall_model_type_long_names", long_names)
 
     app.gui.window.update()

@@ -39,29 +39,33 @@ def update(*args: Any) -> None:
     # Set the detail model names
     if app.active_model.name == "sfincs_cht":
         detail_model_types = ["sfincs_cht"]
+    elif app.active_model.name == "sfincs_hmt":
+        detail_model_types = ["sfincs_hmt"]
     elif app.active_model.name == "delft3dfm":
         detail_model_types = ["sfincs_cht", "delft3dfm"]
     elif app.active_model.name == "hurrywave":
         detail_model_types = ["sfincs_cht", "hurrywave"]
+    elif app.active_model.name == "hurrywave_hmt":
+        detail_model_types = ["sfincs_hmt", "hurrywave_hmt"]
     else:
         detail_model_types = []
+
+    # Drop any types that aren't actually loaded as models in this session.
+    detail_model_types = [t for t in detail_model_types if t in app.model]
     app.gui.setvar("nesting", "detail_model_types", detail_model_types)
 
-    # Check if the current model name is in the detail model names
-    # If not set the detail model name to the first in the list
+    # Check if the current model name is in the detail model names. If the
+    # list is empty (no compatible detail model loaded) leave the var alone.
     detail_model_type = app.gui.getvar("nesting", "detail_model_type")
-    if detail_model_type not in detail_model_types:
+    if detail_model_types and detail_model_type not in detail_model_types:
         app.gui.setvar(
             "nesting",
             "detail_model_type",
-            app.gui.getvar("nesting", "detail_model_types")[0],
+            detail_model_types[0],
         )
 
     # Set the detail model long names
-    long_names = []
-    for model_name in app.gui.getvar("nesting", "detail_model_types"):
-        long_names.append(app.model[model_name].long_name)
-
+    long_names = [app.model[m].long_name for m in detail_model_types]
     app.gui.setvar("nesting", "detail_model_type_long_names", long_names)
 
     app.gui.window.update()
