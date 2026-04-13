@@ -6,6 +6,8 @@ as well as map interaction for point selection and placement.
 
 from typing import Any
 
+import pandas as pd
+
 from delftdashboard.app import app
 from delftdashboard.operations import map
 
@@ -210,6 +212,42 @@ def select_discharge_point_from_map(*args: Any) -> None:
     index = args[0]["id"]
     app.gui.setvar(_GROUP, "active_discharge_point", index)
     app.gui.window.update()
+    _show_timeseries_popup(index)
+
+
+def _show_timeseries_popup(index: int) -> None:
+    """Generate a styled discharge timeseries popup for a clicked point.
+
+    Parameters
+    ----------
+    index : int
+        Index of the discharge point in the GeoDataFrame.
+    """
+    gdf = app.model[_MODEL].domain.discharge_points.gdf
+    if gdf is None or index >= len(gdf):
+        return
+
+    data = app.model[_MODEL].domain.discharge_points.data
+    if "dis" not in data:
+        return
+
+    ts = data.sel(index=index).to_dataframe().reset_index()
+    ts = ts[["time", "dis"]].rename(columns={"dis": "discharge"})
+    ts.set_index("time", inplace=True)
+
+    if isinstance(ts, pd.DataFrame) and ts.empty:
+        return
+
+    name = gdf.iloc[index].get("name", f"Point {index}")
+    geom = gdf.iloc[index].geometry
+    map.show_timeseries_popup(
+        ts,
+        lon=geom.x,
+        lat=geom.y,
+        title=f"Discharge {name}",
+        y_label="Discharge (m³/s)",
+        html_name="discharge_point_time_series.html",
+    )
 
 
 def delete_point_from_list(*args: Any) -> None:

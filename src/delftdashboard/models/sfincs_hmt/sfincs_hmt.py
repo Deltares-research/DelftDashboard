@@ -464,6 +464,18 @@ class Model(GenericModel):
             os.chdir(path)
             self.initialize()
             self.domain = SfincsModel(root=".", mode="r+")
+
+            # DelftDashboard only supports quadtree SFINCS models
+            if self.domain.config.get("qtrfile") is None:    
+                dlg.close()
+                app.gui.window.dialog_warning(
+                    "DelftDashboard only supports SFINCS models with a "
+                    "quadtree grid. This model uses a regular grid and "
+                    "cannot be opened."
+                )
+                self.initialize()
+                return
+
             self.set_gui_variables()
             # Change CRS
             map.set_crs(self.domain.crs)

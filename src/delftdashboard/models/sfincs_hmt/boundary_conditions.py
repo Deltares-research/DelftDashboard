@@ -5,11 +5,10 @@ generating tidal boundary conditions, and reading/writing .bnd, .bzs,
 and .bca files.
 """
 
-import os
+import traceback
 from typing import Any, Optional
 
 import pandas as pd
-import plotly.express as px
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -252,21 +251,35 @@ def generate_boundary_conditions_from_tide_model(*args: Any) -> None:
     app.model[_MODEL].domain.config.set("bcafile", bcafile)
     app.gui.setvar(_GROUP, "bcafile", bcafile)
 
-    # Now interpolate tidal data to boundary points
-    tide_model_name = app.gui.getvar(_GROUP, "boundary_conditions_tide_model")
-    gdf = app.model[_MODEL].domain.water_level.gdf
-    tide_model = app.tide_model_database.get_dataset(tide_model_name)
-    gdf = tide_model.get_data_on_points(
-        gdf=gdf, crs=app.model[_MODEL].domain.crs, format="gdf", constituents="all"
-    )
-    # TODO: Following still needs to be built into HydroMT-SFINCS
-    app.model[_MODEL].domain.water_level.from_gdf(gdf)
+    dlg = app.gui.window.dialog_wait("Generating boundary conditions from tide model ...")
+    try:
+        # Now interpolate tidal data to boundary points
+        tide_model_name = app.gui.getvar(_GROUP, "boundary_conditions_tide_model")
+        gdf = app.model[_MODEL].domain.water_level.gdf
+        tide_model = app.tide_model_database.get_dataset(tide_model_name)
+        gdf = tide_model.get_data_on_points(
+            gdf=gdf, crs=app.model[_MODEL].domain.crs, format="gdf", constituents="all"
+        )
+        app.model[_MODEL].domain.water_level.set_boundary_conditions_astro(gdf)
 
-    # Save bca file
-    app.model[_MODEL].domain.water_level.write_boundary_conditions_astro()
-    app.gui.setvar(_GROUP, "boundary_conditions_timeseries_shape", "astronomical")
+        # Save bca file
+        app.model[_MODEL].domain.water_level.write_boundary_conditions_astro()
 
-    set_boundary_conditions()  # This is where the bzs file gets saved
+        # Also set bzs file to None in this case
+        app.model[_MODEL].domain.config.set("bzsfile", None)
+        app.gui.setvar(_GROUP, "bzsfile", None)
+
+        app.gui.setvar(_GROUP, "boundary_conditions_timeseries_shape", "astronomical")
+
+        # set_boundary_conditions()  # This is where the bzs file gets saved. But we do not want that anymore.
+    except Exception as e:
+        traceback.print_exc()
+        dlg.close()
+        app.gui.window.dialog_warning(
+            f"Error generating boundary conditions from tide model:\n{e}"
+        )
+        return
+    dlg.close()
 
     app.gui.window.update()
 
@@ -395,57 +408,44 @@ def _show_timeseries_popup(index: int) -> None:
     if gdf is None or index >= len(gdf):
         return
 
-    # The time series are stored in app.model[_MODEL].domain.water_level.data as an xr.Dataset,
-    # but we need to get the time series for this point as a pandas DataFrame for plotting.
-    # We can get the point ID from the gdf, and then use that to select the time series from the Dataset.
-    # We need the time series for our point with index `index` as a pandas DataFrame with columns "time" and "value".
-    # The time series are stored in app.model[_MODEL].domain.water_level.data as an xarray Dataset,
-    # where each point has a unique ID that matches the "id" column in the gdf.
-    # We can use the point ID to select the time series for this point from the Dataset,
-    # and then convert it to a pandas DataFrame for plotting.
-    ts = app.model[_MODEL].domain.water_level.data.sel(index=index).to_dataframe().reset_index()
-    # And we only need the bzs column
-    ts = ts[["time", "bzs"]].rename(columns={"bzs": "water_level"})
-    ts.set_index("time", inplace=True)
+    data = app.model[_MODEL].domain.water_level.data
+
+    # If astronomical constituents are present for this point, predict a
+    # timeseries from them on the fly. Otherwise fall back to the stored
+    # bzs timeseries.
+    if "amplitude" in data and "phase" in data:
+        from cht_tide import predict
+
+        tstart = app.model[_MODEL].domain.config.get("tstart")
+        tstop = app.model[_MODEL].domain.config.get("tstop")
+        times = pd.date_range(start=tstart, end=tstop, freq="10min")
+        df = pd.DataFrame(
+            {
+                "constituent": data.constituent.values,
+                "amplitude": data["amplitude"].sel(index=index).values,
+                "phase": data["phase"].sel(index=index).values,
+            }
+        ).dropna(subset=["amplitude", "phase"]).set_index("constituent")
+        ts = pd.DataFrame(
+            {"water_level": predict(df, times)}, index=pd.Index(times, name="time")
+        )
+    else:
+        ts = data.sel(index=index).to_dataframe().reset_index()
+        ts = ts[["time", "bzs"]].rename(columns={"bzs": "water_level"})
+        ts.set_index("time", inplace=True)
 
     if ts is None or (isinstance(ts, pd.DataFrame) and ts.empty):
         return
 
     name = gdf.iloc[index].get("name", f"Point {index}")
-
-    # Build the plotly figure
-    fig = px.line(
-        ts,
-        title=f"Boundary: {name}",
-        labels={"time": "Time", "water_level": "Water Level (m)"},
-    )
-    fig.update_layout(
-        margin=dict(l=40, r=20, t=40, b=30),
-        height=300,
-        width=500,
-        template="plotly_white",
-        showlegend=False,
-        yaxis_title="Water Level (m)",
-        xaxis_title="Time",
-    )
-
-    # Save as HTML in the server overlays folder
-    html_file = "boundary_point_time_series.html"
-    html_path = os.path.join(app.map.server_path, "overlays", html_file)
-    fig.write_html(
-        html_path,
-        include_plotlyjs="cdn",
-        full_html=True,
-        config={"displayModeBar": False},
-    )
-
-    # Show as popup on the map at the boundary point location
     geom = gdf.iloc[index].geometry
-    lon, lat = geom.x, geom.y
-    url = f"./overlays/{html_file}"
-    app.map.runjs(
-        "/js/main.js", "showPopup",
-        lon=lon, lat=lat, url=url, width=520, height=320,
+    map.show_timeseries_popup(
+        ts,
+        lon=geom.x,
+        lat=geom.y,
+        title=f"Water level {name}",
+        y_label="Elevation in metres",
+        html_name="boundary_point_time_series.html",
     )
 
 def get_bnd_file_name(*args: Any) -> Optional[str]:

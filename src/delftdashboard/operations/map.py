@@ -5,11 +5,14 @@ rendering, layer mode updates, cursor resets, CRS changes, and status bar
 updates.
 """
 
+import os
 import traceback
 from typing import Any, Optional
 
 import geopandas as gpd
 import numpy as np
+import pandas as pd
+import plotly.express as px
 import xarray as xr
 from pyproj import CRS, Transformer
 from shapely.geometry import box
@@ -263,6 +266,76 @@ def set_crs(crs: CRS) -> None:
     app.crs = crs
     app.map.crs = crs
     update_statusbar()
+
+
+def show_timeseries_popup(
+    ts: pd.DataFrame,
+    lon: float,
+    lat: float,
+    title: str,
+    y_label: str = "Value",
+    x_label: str = "Time (UTC)",
+    line_color: str = "#ff7f0e",
+    html_name: str = "timeseries_popup.html",
+    width: int = 520,
+    height: int = 320,
+) -> None:
+    """Render a styled plotly line chart and show it as a map popup.
+
+    Parameters
+    ----------
+    ts : pd.DataFrame
+        Time-indexed DataFrame. Each column is drawn as a separate line.
+    lon, lat : float
+        Map location (EPSG:4326) where the popup anchors.
+    title : str
+        Plot title.
+    y_label, x_label : str
+        Axis labels.
+    line_color : str
+        Colour of the (first) line. Extra columns use plotly defaults.
+    html_name : str
+        File name written to ``<map_server>/overlays/``.
+    width, height : int
+        Popup size in pixels.
+    """
+    fig = px.line(
+        ts,
+        title=title,
+        color_discrete_sequence=[line_color],
+    )
+    fig.update_traces(line=dict(width=2))
+    fig.update_layout(
+        margin=dict(l=50, r=20, t=50, b=40),
+        height=height - 20,
+        width=width - 20,
+        title=dict(x=0.5, xanchor="center", font=dict(size=14, color="#333")),
+        plot_bgcolor="#d9ecf7",
+        paper_bgcolor="white",
+        showlegend=False,
+        yaxis_title=y_label,
+        xaxis_title=x_label,
+        font=dict(family="Arial, sans-serif", size=11, color="#333"),
+    )
+    axis_style = dict(
+        showgrid=True, gridcolor="white", gridwidth=1,
+        zeroline=False, linecolor="#333", ticks="outside",
+    )
+    fig.update_xaxes(**axis_style)
+    fig.update_yaxes(**axis_style)
+
+    html_path = os.path.join(app.map.server_path, "overlays", html_name)
+    fig.write_html(
+        html_path,
+        include_plotlyjs="cdn",
+        full_html=True,
+        config={"displayModeBar": False},
+    )
+
+    app.map.show_popup(
+        lon=lon, lat=lat, url=f"./overlays/{html_name}",
+        width=width, height=height,
+    )
 
 
 def update_statusbar() -> None:

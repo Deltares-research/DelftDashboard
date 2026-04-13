@@ -205,7 +205,14 @@ class Toolbox(GenericToolbox):
             return
         wb = app.gui.window.dialog_wait("Generating index geotiff ...")
         try:
-            grid.make_index_cog(full_name, app.toolbox["flood_map"].topobathy_geotiff)
+            if model.name == "sfincs_hmt":
+                grid.create_index_cog(
+                    full_name, app.toolbox["flood_map"].topobathy_geotiff
+                )
+            else:
+                grid.make_index_cog(
+                    full_name, app.toolbox["flood_map"].topobathy_geotiff
+                )
             self.flood_map.set_index_file(full_name)
             self.index_geotiff = full_name
         except Exception as e:

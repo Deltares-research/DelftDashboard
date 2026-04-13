@@ -34,6 +34,9 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(group, "zoom_levels", lst)
         app.gui.setvar(group, "zoom_levels_text", lststr)
         app.gui.setvar(group, "max_zoom", 13)
+        # Elevation range for index-tile filtering
+        app.gui.setvar(group, "index_zmin", -99999.0)
+        app.gui.setvar(group, "index_zmax", 99999.0)
 
     def set_layer_mode(self, mode: str) -> None:
         """Handle layer mode changes (no layers for this toolbox).
