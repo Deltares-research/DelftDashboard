@@ -197,18 +197,19 @@ class Model(GenericModel):
             self.zoom_to_model()
 
     def save(self) -> None:
-        """Write the current model configuration (and a Windows run.bat) to disk."""
+        """Write the current model configuration (and a launcher script) to disk."""
         self.domain.config.set("crs_epsg", app.crs.to_epsg(), skip_validation=True)
-        self.domain.config.write(write_description=True)
-        # Write a Windows batch launcher next to hurrywave.inp, matching
-        # the cht_hurrywave behaviour. Needs the configured executable folder.
         exe_path = app.config.get("hurrywave_exe_path")
         if exe_path:
             self.domain.exe_path = exe_path
+        self.domain.config.write(write_description=True)
+        # DDB always wants the launcher; the hydromt default is False so
+        # script callers don't get a surprise batch file.
+        if exe_path:
             try:
                 self.domain.write_batch_file()
             except Exception as e:
-                print(f"Could not write run.bat: {e}")
+                print(f"Could not write run script: {e}")
 
     def set_crs(self) -> None:
         """Update the model CRS to match the application CRS and re-plot."""
