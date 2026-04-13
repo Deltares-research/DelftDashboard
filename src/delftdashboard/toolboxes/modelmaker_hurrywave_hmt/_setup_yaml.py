@@ -111,7 +111,13 @@ class SetupYamlMixin:
                 }
             )
 
-        dct = {"global": {"data_libs": []}, "steps": steps}
+        # Emit the catalog YAML(s) that back the selected bathymetry
+        # datasets so the setup yaml is directly runnable with
+        # ``hydromt build hurrywave <root> -i model_setup_hurrywave.yml``.
+        data_libs = app.topography_data_catalog.data_libs_for(
+            [d["name"] for d in app.selected_bathymetry_datasets]
+        )
+        dct = {"global": {"data_libs": data_libs}, "steps": steps}
         self.setup_dict = dct
         dict2yaml("model_setup_hurrywave.yml", dct)
 

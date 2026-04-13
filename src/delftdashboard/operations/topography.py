@@ -7,6 +7,7 @@ interface that the DDB GUI expects.
 import glob
 import logging
 import os
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import geopandas as gpd
@@ -31,6 +32,10 @@ class TopographyDataCatalog:
     def __init__(self, path: str) -> None:
         self.path = path
         self.catalog = DataCatalog()
+        # Maps source name → YAML file that provided it. Populated by
+        # :py:meth:`_load` and consumed by :py:meth:`data_libs_for` to
+        # emit an accurate ``global.data_libs`` in the model setup yaml.
+        self._source_yaml: Dict[str, str] = {}
         self._load(path)
 
     def _load(self, path: str) -> None:
@@ -38,11 +43,36 @@ class TopographyDataCatalog:
         # First try the master catalog at the root
         master = os.path.join(path, "data_catalog.yml")
         if os.path.exists(master):
+            before = set(self.catalog.sources)
             self.catalog.from_yml(master, root=path)
+            for name in set(self.catalog.sources) - before:
+                self._source_yaml[name] = master
         else:
             # Fall back to individual catalogs in sub-folders
             for yml in sorted(glob.glob(os.path.join(path, "*", "data_catalog.yml"))):
+                before = set(self.catalog.sources)
                 self.catalog.from_yml(yml, root=os.path.dirname(yml))
+                for name in set(self.catalog.sources) - before:
+                    self._source_yaml[name] = yml
+
+    def data_libs_for(self, names: List[str]) -> List[str]:
+        """Return the minimal set of catalog YAML paths covering *names*.
+
+        Used when writing a hydromt build YAML so ``global.data_libs``
+        lists exactly the catalog files needed to resolve the selected
+        elevation datasets. Duplicates and unknown names are dropped.
+        Paths are normalised to forward-slash form so the emitted YAML
+        is the same regardless of OS.
+        """
+        seen: List[str] = []
+        for n in names:
+            path = self._source_yaml.get(n)
+            if not path:
+                continue
+            normalised = Path(path).as_posix()
+            if normalised not in seen:
+                seen.append(normalised)
+        return seen
 
     def sources(self) -> Tuple[List[str], List[str]]:
         """Return a sorted list of unique source names.

@@ -254,7 +254,13 @@ class SetupYamlMixin:
         nmax = int(app.gui.getvar(group, "nmax"))
         mmax = int(app.gui.getvar(group, "mmax"))
         rotation = float(app.gui.getvar(group, "rotation"))
-        crs = app.model[_MODEL].domain.crs
+        # ``SfincsModel.crs`` only resolves once the grid is built (it
+        # reads from ``components["grid"]``). When writing a setup yaml
+        # before build, fall back to the app-level CRS.
+        try:
+            crs = app.model[_MODEL].domain.crs
+        except KeyError:
+            crs = app.crs
         epsg = crs.to_epsg() if crs is not None else None
 
         grid_args: dict = {
@@ -373,7 +379,13 @@ class SetupYamlMixin:
         # ------------------------------------------------------------------
         # Assemble the hydromt build YAML
         # ------------------------------------------------------------------
-        dct = {"global": {"data_libs": []}, "steps": steps}
+        # Emit the catalog YAML(s) that back the selected bathymetry
+        # datasets so the setup yaml is directly runnable with
+        # ``hydromt build sfincs <root> -i model_setup_sfincs.yml``.
+        data_libs = app.topography_data_catalog.data_libs_for(
+            [d["name"] for d in app.selected_bathymetry_datasets]
+        )
+        dct = {"global": {"data_libs": data_libs}, "steps": steps}
         self.setup_dict = dct
         dict2yaml("model_setup_sfincs.yml", dct)
 
