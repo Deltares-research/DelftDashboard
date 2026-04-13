@@ -497,9 +497,19 @@ class Model(GenericModel):
             app.map.fit_bounds(crds[0], crds[1], crds[2], crds[3])
 
     def save(self) -> None:
-        """Write the SFINCS configuration to disk."""
+        """Write the SFINCS configuration (and a Windows run.bat) to disk."""
         self.check_times()
-        app.model[_MODEL].domain.config.write(write_description=True)
+        domain = app.model[_MODEL].domain
+        domain.config.write(write_description=True)
+        # Write a Windows batch launcher next to sfincs.inp, matching the
+        # cht_sfincs behaviour. Needs the configured executable folder.
+        exe_path = app.config.get("sfincs_exe_path")
+        if exe_path:
+            domain.exe_path = exe_path
+            try:
+                domain.write_batch_file()
+            except Exception as e:
+                print(f"Could not write run.bat: {e}")
 
     def plot(self) -> None:
         """Plot all model features on the map."""
