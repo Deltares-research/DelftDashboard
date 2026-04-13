@@ -44,6 +44,11 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
         # Grid outline
         self.grid_outline = gpd.GeoDataFrame()
 
+        # Track whether the user has invoked ``cut_inactive_cells`` on
+        # the current grid — drives whether the step is emitted in the
+        # setup yaml and replayed by ``build_model``.
+        self._inactive_cells_cut = False
+
         # Bathymetry
         self.selected_bathymetry_datasets = []
 
@@ -507,6 +512,8 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
     def generate_grid(self) -> None:
         """Generate the quadtree grid from current GUI parameters and refinement polygons."""
         group = _TB
+        # Building the grid from scratch invalidates any previous cut.
+        self._inactive_cells_cut = False
         dlg = app.gui.window.dialog_wait("Generating grid ...")
         try:
             model = app.model[_MODEL].domain
@@ -741,6 +748,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             app.model[_MODEL].domain.quadtree_grid.cut_inactive_cells()
             app.model[_MODEL].domain.quadtree_grid.write()
             app.model[_MODEL].plot()
+            self._inactive_cells_cut = True
         except Exception as e:
             traceback.print_exc()
             dlg.close()
@@ -749,12 +757,18 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
         dlg.close()
 
     def build_model(self) -> None:
-        """Build the full SFINCS model: grid, bathymetry, mask, and optionally sub-grid."""
+        """Build the full SFINCS model: grid, bathymetry, mask, and optionally sub-grid.
+
+        ``cut_inactive_cells`` is only included if the user previously
+        invoked it in the current session (``self._inactive_cells_cut``).
+        """
         self.generate_grid()
         self.generate_bathymetry()
         self.update_mask()
         if app.gui.getvar(_TB, "use_snapwave"):
             self.update_mask_snapwave()
+        if getattr(self, "_inactive_cells_cut", False):
+            self.cut_inactive_cells()
         if app.gui.getvar(_TB, "use_subgrid"):
             self.generate_subgrid()
 

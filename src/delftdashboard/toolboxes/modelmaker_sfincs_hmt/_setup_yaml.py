@@ -147,6 +147,10 @@ class SetupYamlMixin:
             snapwave=False,
         )
 
+        # Remember whether the setup YAML requested a cut_inactive_cells
+        # step; ``build_model`` replays it only when the flag is set.
+        self._inactive_cells_cut = "quadtree_grid.cut_inactive_cells" in step_args
+
         # ------------------------------------------------------------------
         # Subgrid (optional)
         # ------------------------------------------------------------------
@@ -331,6 +335,14 @@ class SetupYamlMixin:
             mask_args["downstream_boundary_zmax"] = app.gui.getvar(_TB, "downstream_boundary_zmax")
         if mask_args:
             steps.append({"quadtree_mask.create": mask_args})
+
+        # ------------------------------------------------------------------
+        # Optional ``cut_inactive_cells`` step. Only emitted if the user
+        # actually clicked "Cut Inactive Cells" in the current session;
+        # a fresh build (re-generating the grid) resets the flag.
+        # ------------------------------------------------------------------
+        if getattr(self, "_inactive_cells_cut", False):
+            steps.append({"quadtree_grid.cut_inactive_cells": {}})
 
         # ------------------------------------------------------------------
         # Optional subgrid step

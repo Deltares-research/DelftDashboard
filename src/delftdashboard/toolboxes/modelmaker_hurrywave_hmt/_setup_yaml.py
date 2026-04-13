@@ -93,6 +93,12 @@ class SetupYamlMixin:
             mask_args["open_boundary_zmax"] = app.gui.getvar(_TB, "boundary_zmax")
         steps.append({"quadtree_mask.create": mask_args})
 
+        # Optional ``cut_inactive_cells`` step. Only emitted if the user
+        # actually clicked "Cut Inactive Cells" in the current session;
+        # a fresh build (re-generating the grid) resets the flag.
+        if getattr(self, "_inactive_cells_cut", False):
+            steps.append({"quadtree_grid.cut_inactive_cells": {}})
+
         # Optional wave-blocking step (own elevation_list copy — see above).
         if app.gui.getvar(_TB, "use_waveblocking") and app.selected_bathymetry_datasets:
             steps.append(
@@ -250,6 +256,10 @@ class SetupYamlMixin:
                 setattr(self, f"{ddb_prefix}_file_name", poly_arg)
                 getattr(self, reader_name)(poly_arg, False)
                 getattr(self, plotter_name)()
+
+        # Remember whether the setup YAML requested a cut_inactive_cells
+        # step; ``build_model`` replays it only when the flag is set.
+        self._inactive_cells_cut = "quadtree_grid.cut_inactive_cells" in step_args
 
         # ------------------------------------------------------------------
         # Wave blocking (toggle + parameters if present)

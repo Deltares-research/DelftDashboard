@@ -34,6 +34,11 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
         # Grid outline
         self.grid_outline = gpd.GeoDataFrame()
 
+        # Tracks whether the user has invoked ``cut_inactive_cells`` on
+        # the current grid — drives whether the step is emitted in the
+        # setup yaml and replayed by ``build_model``.
+        self._inactive_cells_cut = False
+
         # Bathymetry
         self.selected_bathymetry_datasets: List[dict] = []
 
@@ -225,6 +230,8 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
 
     def generate_grid(self) -> None:
         """Generate the computational grid from domain settings."""
+        # Building the grid from scratch invalidates any previous cut.
+        self._inactive_cells_cut = False
         domain = app.model[_MODEL].domain
 
         nmax = domain.config.get("nmax") or 0
@@ -336,6 +343,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             domain.quadtree_grid.cut_inactive_cells()
             domain.quadtree_grid.write()
             app.model[_MODEL].plot()
+            self._inactive_cells_cut = True
         except Exception as e:
             traceback.print_exc()
             dlg.close()
@@ -397,9 +405,15 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
         app.gui.setvar(_MODEL, "wblfile", filename)
 
     def build_model(self) -> None:
-        """Run the full model build pipeline."""
+        """Run the full model build pipeline.
+
+        ``cut_inactive_cells`` is only included if the user previously
+        invoked it in the current session (``self._inactive_cells_cut``).
+        """
         self.generate_grid()
         self.generate_bathymetry()
         self.update_mask()
+        if getattr(self, "_inactive_cells_cut", False):
+            self.cut_inactive_cells()
         self.generate_waveblocking()
 
