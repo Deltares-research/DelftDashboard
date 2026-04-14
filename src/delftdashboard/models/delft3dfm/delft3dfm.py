@@ -51,6 +51,27 @@ class Model(GenericModel):
         model_view_menu["menu"].append(
             {
                 "variable_group": self.name,
+                "id": f"view.{self.name}.bathymetry",
+                "text": "Bathymetry",
+                "variable": "view_bathymetry",
+                "separator": False,
+                "checkable": True,
+                "method": self.set_view_menu,
+                "option": "bathymetry",
+                "dependency": [
+                    {
+                        "action": "check",
+                        "checkfor": "all",
+                        "check": [
+                            {"variable": "view_bathymetry", "operator": "eq", "value": True}
+                        ],
+                    }
+                ],
+            }
+        )
+        model_view_menu["menu"].append(
+            {
+                "variable_group": self.name,
                 "id": f"view.{self.name}.grid",
                 "text": "Grid",
                 "variable": "view_grid",
@@ -86,12 +107,49 @@ class Model(GenericModel):
                 app.map.layer[_MODEL].layer["grid"].show()
             else:
                 app.map.layer[_MODEL].layer["grid"].hide()
+        elif option == "bathymetry":
+            on = app.gui.getvar(self.name, "view_bathymetry")
+            print(
+                f"[delft3dfm] set_view_menu bathymetry: on={on}, "
+                f"grid.data={'set' if self.domain.grid.data is not None else 'None'}, "
+                f"node_z={'mesh2d_node_z' in (self.domain.grid.data or {})}"
+            )
+            if on:
+                app.map.layer[_MODEL].layer["bathymetry"].set_data(
+                    self.domain.grid.elevation
+                )
+                app.map.layer[_MODEL].layer["bathymetry"].show()
+            else:
+                app.map.layer[_MODEL].layer["bathymetry"].hide()
+
+    def _bathymetry_overlay_options(self) -> dict:
+        """Return current topography view settings for the bathymetry overlay."""
+        try:
+            topo = app.map.layer["main"].layer["background_topography"]
+            return {
+                "cmin": topo.current_cmin,
+                "cmax": topo.current_cmax,
+                "cmap": topo.current_cmap,
+                "legend": False,
+            }
+        except Exception:
+            return {"cmin": -10.0, "cmax": 10.0, "cmap": "gist_earth", "legend": False}
 
     def add_layers(self) -> None:
         """Register all map layers for the Delft3D-FM model."""
         layer = app.map.add_layer(_MODEL)
 
-        layer.add_layer("grid", type="raster_image")
+        layer.add_layer(
+            "bathymetry",
+            type="raster_image",
+            map_overlay_options=self._bathymetry_overlay_options,
+        )
+
+        layer.add_layer(
+            "grid",
+            type="raster_image",
+            map_overlay_options={"color": "black"},
+        )
 
         layer.add_layer(
             "grid_exterior",
@@ -174,6 +232,7 @@ class Model(GenericModel):
         """
         layer = app.map.layer[_MODEL]
         if mode == "inactive":
+            layer.layer["bathymetry"].deactivate()
             layer.layer["grid"].deactivate()
             layer.layer["grid_exterior"].deactivate()
             layer.layer["boundary_line"].deactivate()
@@ -195,6 +254,7 @@ class Model(GenericModel):
         group = _MODEL
         subgroups = ["numerics", "physics", "output", "geometry", "wind"]
 
+        app.gui.setvar(group, "view_bathymetry", False)
         app.gui.setvar(group, "view_grid", True)
 
         for groupname in subgroups:
@@ -350,6 +410,8 @@ class Model(GenericModel):
     def plot(self) -> None:
         """Plot all model layers on the map."""
         layer = app.map.layer[_MODEL]
+        if app.gui.getvar(self.name, "view_bathymetry"):
+            layer.layer["bathymetry"].set_data(self.domain.grid.elevation)
         layer.layer["grid"].set_data(self.domain.grid)
         layer.layer["boundary_line"].clear()
         layer.layer["boundary_line"].set_data(self.domain.boundary_conditions.gdf)
