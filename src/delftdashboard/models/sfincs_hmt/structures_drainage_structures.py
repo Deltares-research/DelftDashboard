@@ -109,7 +109,7 @@ def save(*args: Any) -> None:
         Unused GUI callback arguments.
     """
     map.reset_cursor()
-    filename = app.model[_MODEL].domain.config.get("thdfile")
+    filename = app.model[_MODEL].domain.config.get("drnfile")
     if not filename:
         filename = "sfincs.drn"
     rsp = app.gui.window.dialog_save_file(
@@ -119,7 +119,7 @@ def save(*args: Any) -> None:
         allow_directory_change=False,
     )
     if rsp[0]:
-        app.model[_MODEL].domain.config.set("thdfile", rsp[2])
+        app.model[_MODEL].domain.config.set("drnfile", rsp[2])
         app.model[_MODEL].domain.drainage_structures.write()
     app.model[_MODEL].drainage_structures_changed = False
 
