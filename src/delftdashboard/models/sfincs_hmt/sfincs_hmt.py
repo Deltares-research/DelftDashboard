@@ -50,6 +50,7 @@ class Model(GenericModel):
         self.thin_dams_changed = False
         self.weirs_changed = False
         self.drainage_structures_changed = False
+        self.urban_drainage_changed = False
         self.wave_boundaries_changed = False
         self.wave_makers_changed = False
 
@@ -289,6 +290,26 @@ class Model(GenericModel):
             polyline_line_opacity=1.0,
         )
 
+        from .urban_drainage import (
+            urban_drainage_area_created,
+            urban_drainage_area_modified,
+            urban_drainage_area_selected,
+        )
+
+        layer.add_layer(
+            "urban_drainage_areas",
+            type="draw",
+            shape="polygon",
+            create=urban_drainage_area_created,
+            modify=urban_drainage_area_modified,
+            select=urban_drainage_area_selected,
+            polygon_line_color="orange",
+            polygon_line_width=2.0,
+            polygon_line_opacity=1.0,
+            polygon_fill_color="orange",
+            polygon_fill_opacity=0.2,
+        )
+
         from .observation_points_observation_points import (
             select_observation_point_from_map,
         )
@@ -422,6 +443,7 @@ class Model(GenericModel):
             layer.layer["thin_dams"].layer["polylines"].deactivate()
             layer.layer["thin_dams"].layer["snapped"].hide()
             layer.layer["drainage_structures"].deactivate()
+            layer.layer["urban_drainage_areas"].deactivate()
             layer.layer["boundary_points_snapwave"].deactivate()
             layer.layer["wave_makers"].hide()
         elif mode == "invisible":
@@ -542,6 +564,10 @@ class Model(GenericModel):
         # Drainage structures
         app.map.layer[_MODEL].layer["drainage_structures"].set_data(
             app.model[_MODEL].domain.drainage_structures.gdf
+        )
+        # Urban drainage areas
+        app.map.layer[_MODEL].layer["urban_drainage_areas"].set_data(
+            app.model[_MODEL].domain.urban_drainage_areas.gdf
         )
         # Observation points
         app.map.layer[_MODEL].layer["observation_points"].set_data(
@@ -680,6 +706,46 @@ class Model(GenericModel):
             "drainage_structure_type_names",
             ["Pump", "Culvert", "Check Valve", "Gate"],
         )
+
+        # Urban drainage areas
+        app.gui.setvar(group, "urban_drainage_area_names", [])
+        app.gui.setvar(group, "nr_urban_drainage_areas", 0)
+        app.gui.setvar(group, "urban_drainage_area_index", 0)
+        app.gui.setvar(group, "urban_drainage_area_type", "piped_drainage")
+        app.gui.setvar(
+            group,
+            "urban_drainage_area_types",
+            ["piped_drainage", "injection_well"],
+        )
+        app.gui.setvar(
+            group,
+            "urban_drainage_area_type_names",
+            ["Piped Drainage", "Injection Well"],
+        )
+        app.gui.setvar(
+            group, "urban_drainage_area_type_to_add", "piped_drainage"
+        )
+        app.gui.setvar(group, "urban_drainage_area_h_threshold", 0.0)
+        app.gui.setvar(group, "urban_drainage_area_outfall_x", 0.0)
+        app.gui.setvar(group, "urban_drainage_area_outfall_y", 0.0)
+        app.gui.setvar(group, "urban_drainage_area_capacity_mode", "design_precip")
+        app.gui.setvar(
+            group,
+            "urban_drainage_area_capacity_modes",
+            ["design_precip", "max_outfall_rate"],
+        )
+        app.gui.setvar(
+            group,
+            "urban_drainage_area_capacity_mode_names",
+            ["Design precipitation", "Max outfall rate"],
+        )
+        app.gui.setvar(group, "urban_drainage_area_design_precip", 20.0)
+        app.gui.setvar(group, "urban_drainage_area_max_outfall_rate", 1.0)
+        app.gui.setvar(group, "urban_drainage_area_dh_design_min", 0.1)
+        app.gui.setvar(group, "urban_drainage_area_include_outfall", True)
+        app.gui.setvar(group, "urban_drainage_area_check_valve", False)
+        app.gui.setvar(group, "urban_drainage_area_injection_rate", 0.5)
+        app.gui.setvar(group, "urban_drainage_area_maximum_capacity", 1000.0)
 
         # SnapWave
         app.gui.setvar(

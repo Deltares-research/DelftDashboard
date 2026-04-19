@@ -27,6 +27,9 @@ element:
     element: discharge_points.yml
   - string: Structures
     element: structures.yml
+  - string: Urban Drainage
+    module: delftdashboard.models.sfincs_hmt.urban_drainage
+    element: urban_drainage.yml
   - string: Waves
     element: waves.yml
   - string: Meteo

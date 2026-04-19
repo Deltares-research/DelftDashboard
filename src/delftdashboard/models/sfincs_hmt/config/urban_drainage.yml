@@ -1,0 +1,369 @@
+element:
+- style: panel
+  title: Urban Drainage
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 100
+      height: 140
+    method: select_urban_drainage_area
+    variable: urban_drainage_area_index
+    select: index
+    option_string:
+      variable: urban_drainage_area_names
+    tooltip: Select urban drainage area from the list
+    text_position: left
+  - style: pushbutton
+    text: Draw Area
+    position:
+      x: 120
+      y: 130
+      width: 90
+      height: 20
+    method: draw_urban_drainage_area
+    tooltip: Draw an urban drainage area polygon on the map
+    text_position: left
+  - style: pushbutton
+    text: Delete Area
+    position:
+      x: 120
+      y: 105
+      width: 90
+      height: 20
+    method: delete_urban_drainage_area
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_urban_drainage_areas
+        operator: gt
+        value: 0
+    tooltip: Delete the selected urban drainage area
+    text_position: left
+  - style: pushbutton
+    text: Load
+    position:
+      x: 120
+      y: 80
+      width: 90
+      height: 20
+    method: load
+    tooltip: Load urban drainage areas from a .urb file
+    text_position: left
+  - style: pushbutton
+    text: Save
+    position:
+      x: 120
+      y: 55
+      width: 90
+      height: 20
+    method: save
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_urban_drainage_areas
+        operator: gt
+        value: 0
+    tooltip: Save urban drainage areas to a .urb file
+    text_position: left
+  - style: panel
+    text: Selected Area
+    position:
+      x: 220
+      y: 10
+      width: -10
+      height: 140
+    element:
+    - style: popupmenu
+      text: Type
+      position:
+        x: 60
+        y: 110
+        width: 120
+        height: 20
+      variable: urban_drainage_area_type
+      option_value:
+        variable: urban_drainage_area_types
+      option_string:
+        variable: urban_drainage_area_type_names
+      enable: false
+      tooltip: Zone type (set when the area is drawn; not editable afterwards)
+      text_position: left
+    - style: edit
+      text: Ponding threshold (m)
+      position:
+        x: 120
+        y: 85
+        width: 60
+        height: 20
+      variable: urban_drainage_area_h_threshold
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Depth over which drainage ramps from 0 to qmax (m)
+      text_position: left
+    - style: edit
+      text: Outfall x (m)
+      position:
+        x: 120
+        y: 60
+        width: 60
+        height: 20
+      variable: urban_drainage_area_outfall_x
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: piped_drainage
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Outfall x-coordinate (model CRS)
+      text_position: left
+    - style: edit
+      text: Outfall y (m)
+      position:
+        x: 120
+        y: 35
+        width: 60
+        height: 20
+      variable: urban_drainage_area_outfall_y
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: piped_drainage
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Outfall y-coordinate (model CRS)
+      text_position: left
+    - style: popupmenu
+      text: Capacity mode
+      position:
+        x: 260
+        y: 110
+        width: 120
+        height: 20
+      variable: urban_drainage_area_capacity_mode
+      option_value:
+        variable: urban_drainage_area_capacity_modes
+      option_string:
+        variable: urban_drainage_area_capacity_mode_names
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: piped_drainage
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Specify zone capacity as design precipitation or as maximum outfall
+        rate
+      text_position: left
+    - style: edit
+      text: Design precip (mm/hr)
+      position:
+        x: 320
+        y: 85
+        width: 60
+        height: 20
+      variable: urban_drainage_area_design_precip
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: piped_drainage
+        - variable: urban_drainage_area_capacity_mode
+          operator: eq
+          value: design_precip
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Design rainfall intensity the drainage is sized for (mm/hr)
+      text_position: left
+    - style: edit
+      text: Max outfall rate (m3/s)
+      position:
+        x: 320
+        y: 85
+        width: 60
+        height: 20
+      variable: urban_drainage_area_max_outfall_rate
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: piped_drainage
+        - variable: urban_drainage_area_capacity_mode
+          operator: eq
+          value: max_outfall_rate
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Total zone outfall capacity (m3/s)
+      text_position: left
+    - style: edit
+      text: Min design head (m)
+      position:
+        x: 320
+        y: 60
+        width: 60
+        height: 20
+      variable: urban_drainage_area_dh_design_min
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: piped_drainage
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Floor on the per-cell design head used for backflow (m)
+      text_position: left
+    - style: checkbox
+      text: Include outfall
+      position:
+        x: 95
+        y: 10
+        width: 140
+        height: 20
+      variable: urban_drainage_area_include_outfall
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: piped_drainage
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: If unchecked, flow leaves the zone but is not deposited anywhere
+      text_position: left
+    - style: checkbox
+      text: Check valve (no backflow)
+      position:
+        x: 250
+        y: 35
+        width: 160
+        height: 20
+      variable: urban_drainage_area_check_valve
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: piped_drainage
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: 'Flap-valve / tide-gate: suppress backflow from the outfall into the
+        zone'
+      text_position: left
+    - style: edit
+      text: Injection rate (m3/s)
+      position:
+        x: 120
+        y: 60
+        width: 60
+        height: 20
+      variable: urban_drainage_area_injection_rate
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: injection_well
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Total pumping rate across the zone (m3/s)
+      text_position: left
+    - style: edit
+      text: Maximum capacity (m3)
+      position:
+        x: 120
+        y: 35
+        width: 60
+        height: 20
+      variable: urban_drainage_area_maximum_capacity
+      method: edit_urban_drainage_area_parameter
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: injection_well
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Total volume the injection well can accept (m3)
+      text_position: left
