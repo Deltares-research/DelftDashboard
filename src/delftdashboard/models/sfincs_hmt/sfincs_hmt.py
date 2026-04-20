@@ -565,10 +565,10 @@ class Model(GenericModel):
         app.map.layer[_MODEL].layer["drainage_structures"].set_data(
             app.model[_MODEL].domain.drainage_structures.gdf
         )
-        # Urban drainage areas
-        app.map.layer[_MODEL].layer["urban_drainage_areas"].set_data(
-            app.model[_MODEL].domain.urban_drainage_areas.gdf
-        )
+        # # Urban drainage areas
+        # app.map.layer[_MODEL].layer["urban_drainage_areas"].set_data(
+        #     app.model[_MODEL].domain.urban_drainage_areas.gdf
+        # )
         # Observation points
         app.map.layer[_MODEL].layer["observation_points"].set_data(
             app.model[_MODEL].domain.observation_points.gdf, 0
@@ -696,15 +696,17 @@ class Model(GenericModel):
         app.gui.setvar(group, "drainage_structure_width", 100.0)
         app.gui.setvar(group, "drainage_structure_sill_elevation", 0.0)
         app.gui.setvar(group, "drainage_structure_manning_n", 0.024)
-        app.gui.setvar(group, "drainage_structure_zmin", 0.0)
-        app.gui.setvar(group, "drainage_structure_zmax", 1.0)
         app.gui.setvar(group, "drainage_structure_closing_time", 600.0)
+        app.gui.setvar(group, "drainage_structure_rules_open", "")
+        app.gui.setvar(group, "drainage_structure_rules_close", "")
         app.gui.setvar(group, "drainage_structure_type", 1)
-        app.gui.setvar(group, "drainage_structure_types", [1, 2, 3, 4])
+        # Integer codes used internally: 1=pump, 2=culvert_simple,
+        # 5=culvert (detailed), 4=gate.
+        app.gui.setvar(group, "drainage_structure_types", [1, 2, 5, 4])
         app.gui.setvar(
             group,
             "drainage_structure_type_names",
-            ["Pump", "Culvert", "Check Valve", "Gate"],
+            ["Pump", "Culvert Simple", "Culvert", "Gate"],
         )
 
         # Urban drainage areas

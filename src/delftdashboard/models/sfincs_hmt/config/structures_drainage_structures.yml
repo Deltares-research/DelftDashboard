@@ -212,56 +212,10 @@ element:
         value: 0
     tooltip: Edit gate Manning's n
   - style: edit
-    text: Min water level for open
-    position:
-      x: 300
-      y: 60
-      width: 50
-      height: 20
-    variable: drainage_structure_zmin
-    method: edit_drainage_structure_parameter
-    dependency:
-    - action: visible
-      checkfor: any
-      check:
-      - variable: drainage_structure_type
-        operator: eq
-        value: 4
-    - action: enable
-      checkfor: any
-      check:
-      - variable: nr_drainage_structures
-        operator: gt
-        value: 0
-    tooltip: Edit minimum water level for gate to open (metres with respect to reference plane)
-  - style: edit
-    text: Max water level for open
-    position:
-      x: 300
-      y: 35
-      width: 50
-      height: 20
-    variable: drainage_structure_zmax
-    method: edit_drainage_structure_parameter
-    dependency:
-    - action: visible
-      checkfor: any
-      check:
-      - variable: drainage_structure_type
-        operator: eq
-        value: 4
-    - action: enable
-      checkfor: any
-      check:
-      - variable: nr_drainage_structures
-        operator: gt
-        value: 0
-    tooltip: Edit maximum water level for gate to open (metres with respect to reference plane)
-  - style: edit
     text: Closing time (s)
     position:
       x: 300
-      y: 10
+      y: 60
       width: 50
       height: 20
     variable: drainage_structure_closing_time
@@ -280,3 +234,61 @@ element:
         operator: gt
         value: 0
     tooltip: Edit time it takes for gate to open or close (s)
+  - style: edit
+    text: Rules open
+    position:
+      x: 180
+      y: 35
+      width: 200
+      height: 20
+    variable: drainage_structure_rules_open
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 2
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Rules_open expression (e.g. "z1<0.5 | z2-z1>0.05"); leave empty for no trigger
+  - style: edit
+    text: Rules close
+    position:
+      x: 180
+      y: 10
+      width: 200
+      height: 20
+    variable: drainage_structure_rules_close
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 2
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Rules_close expression (e.g. "z2>2.0"); leave empty for no trigger
