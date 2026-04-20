@@ -10,15 +10,33 @@ element:
   - style: listbox
     position:
       x: 10
-      y: 10
+      y: 40
       width: 100
-      height: 140
+      height: 110
     method: select_urban_drainage_area
     variable: urban_drainage_area_index
     select: index
     option_string:
       variable: urban_drainage_area_names
     tooltip: Select urban drainage area from the list
+    text_position: left
+  - style: edit
+    text: Name
+    position:
+      x: 40
+      y: 10
+      width: 70
+      height: 20
+    variable: selected_urban_drainage_area_name
+    method: edit_urban_drainage_area_name
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable: nr_urban_drainage_areas
+        operator: gt
+        value: 0
+    tooltip: Edit name of urban drainage area
     text_position: left
   - style: pushbutton
     text: Draw Area

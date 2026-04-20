@@ -36,7 +36,7 @@ class Model(GenericModel):
 
     def initialize(self) -> None:
         """Create a fresh SfincsModel domain and set default GUI variables."""
-        self.domain = SfincsModel(root=".", mode="w")
+        self.domain = SfincsModel(root=".", mode="w", write_gis=False)
         if hasattr(app, "topography_data_catalog"):
             app.topography_data_catalog.add_to_model_catalog(self.domain.data_catalog)
         self.domain.config.set("epsg", app.crs.to_epsg())
@@ -310,6 +310,19 @@ class Model(GenericModel):
             polygon_fill_opacity=0.2,
         )
 
+        layer.add_layer(
+            "outfall_locations",
+            type="circle",
+            hover_property="name",
+            line_color="white",
+            line_opacity=1.0,
+            fill_color="orange",
+            fill_opacity=1.0,
+            circle_radius=5,
+            legend_label="outfall location",
+            legend_position="bottom-right-2",
+        )
+
         from .observation_points_observation_points import (
             select_observation_point_from_map,
         )
@@ -444,6 +457,8 @@ class Model(GenericModel):
             layer.layer["thin_dams"].layer["snapped"].hide()
             layer.layer["drainage_structures"].deactivate()
             layer.layer["urban_drainage_areas"].deactivate()
+            layer.layer["urban_drainage_areas"].hide()
+            layer.layer["outfall_locations"].hide()
             layer.layer["boundary_points_snapwave"].deactivate()
             layer.layer["wave_makers"].hide()
         elif mode == "invisible":
@@ -485,7 +500,7 @@ class Model(GenericModel):
                 path = os.getcwd()
             os.chdir(path)
             self.initialize()
-            self.domain = SfincsModel(root=".", mode="r+")
+            self.domain = SfincsModel(root=".", mode="r+", write_gis=False)
 
             # DelftDashboard only supports quadtree SFINCS models
             if self.domain.config.get("qtrfile") is None:    
@@ -713,6 +728,7 @@ class Model(GenericModel):
         app.gui.setvar(group, "urban_drainage_area_names", [])
         app.gui.setvar(group, "nr_urban_drainage_areas", 0)
         app.gui.setvar(group, "urban_drainage_area_index", 0)
+        app.gui.setvar(group, "selected_urban_drainage_area_name", "")
         app.gui.setvar(group, "urban_drainage_area_type", "piped_drainage")
         app.gui.setvar(
             group,

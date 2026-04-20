@@ -292,7 +292,9 @@ def initialize() -> None:
     # Projection
     app.gui.setvar("view_settings", "projection", "mercator")
     # Topography
-    app.gui.setvar("view_settings", "topography_dataset", app.background_topography)
+    app.gui.setvar(
+        "view_settings", "topography_dataset", app.background_topography_name
+    )
     app.gui.setvar("view_settings", "topography_auto_update", "True")
     app.gui.setvar("view_settings", "topography_visible", True)
     app.gui.setvar("view_settings", "topography_colormap", "earth")
@@ -323,7 +325,7 @@ def initialize() -> None:
     # GUI variables
     app.gui.setvar("menu", "active_model_name", "")
     app.gui.setvar("menu", "active_toolbox_name", "")
-    app.gui.setvar("menu", "active_topography_name", app.background_topography)
+    app.gui.setvar("menu", "active_topography_name", app.background_topography_name)
 
     # Warm up numba JIT in background (xugrid snap_to_grid etc.)
     # This call can be removed after the numba cell tree teams updates their code
@@ -366,15 +368,21 @@ def initialize_topography() -> None:
     app.gui.setvar(group, "selected_bathymetry_dataset_zmax", 99999.0)
     app.gui.setvar(group, "nr_selected_bathymetry_datasets", 0)
 
-    # Default background topography
+    # Default background topography — ``background_topography_name`` is
+    # the catalog source name (str); ``background_topography`` is the
+    # actual DataArray for the currently-visible tile, set by
+    # ``update_background_topography_data`` after the first successful
+    # fetch. They are split so the hover handler can safely test for a
+    # loaded DataArray without confusing it with the startup name.
     if "default_bathymetry_dataset" in app.config:
-        app.background_topography = app.config["default_bathymetry_dataset"]
+        app.background_topography_name = app.config["default_bathymetry_dataset"]
     else:
         all_names, _, _ = app.topography_data_catalog.dataset_names()
         if "gebco_2024" in all_names:
-            app.background_topography = "gebco_2024"
+            app.background_topography_name = "gebco_2024"
         else:
-            app.background_topography = all_names[0] if all_names else None
+            app.background_topography_name = all_names[0] if all_names else None
+    app.background_topography = None
 
 
 def initialize_toolboxes() -> None:

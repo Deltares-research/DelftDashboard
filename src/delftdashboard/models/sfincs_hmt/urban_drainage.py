@@ -8,6 +8,8 @@ from typing import Any
 
 import geopandas as gpd
 import numpy as np
+import pandas as pd
+from shapely.geometry import Point
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
@@ -22,9 +24,12 @@ _GROUP = "sfincs_hmt"
 
 
 def select(*args: Any) -> None:
-    """Activate the Urban Drainage tab and its polygon draw layer."""
+    """Activate the Urban Drainage tab, show its layers and plot outfalls."""
     map.update()
+    app.map.layer[_MODEL].layer["urban_drainage_areas"].show()
     app.map.layer[_MODEL].layer["urban_drainage_areas"].activate()
+    app.map.layer[_MODEL].layer["outfall_locations"].show()
+    plot_outfall_layer()
     update()
 
 
@@ -61,6 +66,7 @@ def load(*args: Any) -> None:
         gdf = app.model[_MODEL].domain.urban_drainage_areas.gdf
         app.map.layer[_MODEL].layer["urban_drainage_areas"].set_data(gdf)
         app.gui.setvar(_GROUP, "urban_drainage_area_index", 0)
+        plot_outfall_layer()
         update()
     app.model[_MODEL].urban_drainage_changed = False
 
@@ -112,11 +118,25 @@ def delete_urban_drainage_area(*args: Any) -> None:
     app.map.layer[_MODEL].layer["urban_drainage_areas"].delete_feature(index)
     app.model[_MODEL].domain.urban_drainage_areas.delete(index)
     app.model[_MODEL].urban_drainage_changed = True
+    plot_outfall_layer()
     update()
 
 
 def select_urban_drainage_area(*args: Any) -> None:
     """Handle list-box selection of an urban drainage area."""
+    update()
+
+
+def edit_urban_drainage_area_name(*args: Any) -> None:
+    """Rename the currently selected urban drainage area."""
+    nrt = app.model[_MODEL].domain.urban_drainage_areas.nr_areas
+    if nrt == 0:
+        return
+    index = app.gui.getvar(_GROUP, "urban_drainage_area_index")
+    new_name = str(app.gui.getvar(_GROUP, "selected_urban_drainage_area_name"))
+    gdf = app.model[_MODEL].domain.urban_drainage_areas.data
+    gdf.at[index, "name"] = new_name
+    app.model[_MODEL].urban_drainage_changed = True
     update()
 
 
@@ -169,6 +189,7 @@ def edit_urban_drainage_area_parameter(*args: Any) -> None:
         )
 
     app.model[_MODEL].urban_drainage_changed = True
+    plot_outfall_layer()
 
 
 # ---------------------------------------------------------------------------
@@ -186,7 +207,21 @@ def urban_drainage_area_created(gdf: Any, index: int, id: Any) -> None:
     name = f"area_{existing + 1:04d}"
     gdf_new["name"] = name
     gdf_new["type"] = ztype
-    gdf_new["polygon_file"] = "sfincs.pol"
+
+    # Reuse the existing polygon_file when every current area already
+    # shares one; fall back to the default name otherwise (either no
+    # areas yet, or the existing ones are split across multiple files).
+    default_polygon_file = "urban_drainage_areas.pol"
+    if existing == 0:
+        polygon_file = default_polygon_file
+    else:
+        existing_files = (
+            app.model[_MODEL].domain.urban_drainage_areas.data["polygon_file"].unique()
+        )
+        polygon_file = (
+            existing_files[0] if len(existing_files) == 1 else default_polygon_file
+        )
+    gdf_new["polygon_file"] = polygon_file
     gdf_new["h_threshold"] = app.gui.getvar(_GROUP, "urban_drainage_area_h_threshold")
 
     if ztype == "piped_drainage":
@@ -229,6 +264,7 @@ def urban_drainage_area_created(gdf: Any, index: int, id: Any) -> None:
 
     gdf = app.model[_MODEL].domain.urban_drainage_areas.gdf
     app.map.layer[_MODEL].layer["urban_drainage_areas"].set_data(gdf)
+    plot_outfall_layer()
     update()
 
 
@@ -244,6 +280,38 @@ def urban_drainage_area_selected(index: int) -> None:
     """Handle selection of a zone polygon on the map."""
     app.gui.setvar(_GROUP, "urban_drainage_area_index", index)
     update()
+
+
+# ---------------------------------------------------------------------------
+# Map helpers
+# ---------------------------------------------------------------------------
+
+
+def plot_outfall_layer() -> None:
+    """Rebuild the outfall-circle GeoDataFrame from scratch and push it to the map.
+
+    Called whenever the set of urban drainage areas changes (tab select,
+    file load, area add/delete, outfall edit).
+    """
+    gdf = app.model[_MODEL].domain.urban_drainage_areas.gdf
+    crs = app.model[_MODEL].domain.crs
+
+    if gdf is None or len(gdf) == 0:
+        outfall_gdf = gpd.GeoDataFrame(
+            {"name": []}, geometry=[], crs=crs
+        )
+    else:
+        piped = gdf[gdf["type"] == "piped_drainage"]
+        outfall_gdf = gpd.GeoDataFrame(
+            {"name": list(piped["name"].astype(str).values)},
+            geometry=[
+                Point(x, y)
+                for x, y in zip(piped["outfall_x"], piped["outfall_y"])
+            ],
+            crs=crs,
+        )
+
+    app.map.layer[_MODEL].layer["outfall_locations"].set_data(outfall_gdf)
 
 
 # ---------------------------------------------------------------------------
@@ -267,6 +335,7 @@ def update() -> None:
 
     if nrt == 0:
         app.gui.setvar(_GROUP, "urban_drainage_area_type", "piped_drainage")
+        app.gui.setvar(_GROUP, "selected_urban_drainage_area_name", "")
         app.gui.window.update()
         return
 
@@ -274,27 +343,26 @@ def update() -> None:
     row = app.model[_MODEL].domain.urban_drainage_areas.gdf.iloc[index]
     ztype = str(row["type"])
     app.gui.setvar(_GROUP, "urban_drainage_area_type", ztype)
-
-    h_threshold = row.get("h_threshold", 0.0)
     app.gui.setvar(
-        _GROUP,
-        "urban_drainage_area_h_threshold",
-        float(h_threshold) if _is_set(h_threshold) else 0.0,
+        _GROUP, "selected_urban_drainage_area_name", str(row["name"])
+    )
+
+    app.gui.setvar(
+        _GROUP, "urban_drainage_area_h_threshold", float(row["h_threshold"])
     )
 
     if ztype == "piped_drainage":
         app.gui.setvar(
-            _GROUP,
-            "urban_drainage_area_outfall_x",
-            float(row["outfall_x"]) if _is_set(row.get("outfall_x")) else 0.0,
+            _GROUP, "urban_drainage_area_outfall_x", float(row["outfall_x"])
         )
         app.gui.setvar(
-            _GROUP,
-            "urban_drainage_area_outfall_y",
-            float(row["outfall_y"]) if _is_set(row.get("outfall_y")) else 0.0,
+            _GROUP, "urban_drainage_area_outfall_y", float(row["outfall_y"])
         )
-        if _is_set(row.get("design_precip")):
-            app.gui.setvar(_GROUP, "urban_drainage_area_capacity_mode", "design_precip")
+        # design_precip XOR max_outfall_rate — exactly one is NaN by design.
+        if pd.notna(row["design_precip"]):
+            app.gui.setvar(
+                _GROUP, "urban_drainage_area_capacity_mode", "design_precip"
+            )
             app.gui.setvar(
                 _GROUP,
                 "urban_drainage_area_design_precip",
@@ -307,42 +375,29 @@ def update() -> None:
             app.gui.setvar(
                 _GROUP,
                 "urban_drainage_area_max_outfall_rate",
-                float(row["max_outfall_rate"]) if _is_set(row.get("max_outfall_rate")) else 0.0,
+                float(row["max_outfall_rate"]),
             )
         app.gui.setvar(
-            _GROUP,
-            "urban_drainage_area_dh_design_min",
-            float(row["dh_design_min"]) if _is_set(row.get("dh_design_min")) else 0.1,
+            _GROUP, "urban_drainage_area_dh_design_min", float(row["dh_design_min"])
         )
         app.gui.setvar(
             _GROUP,
             "urban_drainage_area_include_outfall",
-            bool(row["include_outfall"]) if _is_set(row.get("include_outfall")) else True,
+            bool(row["include_outfall"]),
         )
         app.gui.setvar(
-            _GROUP,
-            "urban_drainage_area_check_valve",
-            bool(row["check_valve"]) if _is_set(row.get("check_valve")) else False,
+            _GROUP, "urban_drainage_area_check_valve", bool(row["check_valve"])
         )
     elif ztype == "injection_well":
         app.gui.setvar(
             _GROUP,
             "urban_drainage_area_injection_rate",
-            float(row["injection_rate"]) if _is_set(row.get("injection_rate")) else 0.0,
+            float(row["injection_rate"]),
         )
         app.gui.setvar(
             _GROUP,
             "urban_drainage_area_maximum_capacity",
-            float(row["maximum_capacity"]) if _is_set(row.get("maximum_capacity")) else 0.0,
+            float(row["maximum_capacity"]),
         )
 
     app.gui.window.update()
-
-
-def _is_set(value) -> bool:
-    if value is None:
-        return False
-    try:
-        return not (isinstance(value, float) and np.isnan(value))
-    except TypeError:
-        return True
