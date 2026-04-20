@@ -262,6 +262,11 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
         """Register all map layers for this toolbox (grid outline, polygons, etc.)."""
         # Add Mapbox layers
         layer = app.map.add_layer(_TB)
+        # Single shared legend for every mask / boundary / refinement
+        # polygon. Sits at ``bottom-right-3`` so it doesn't collide
+        # with the raster mask legend at ``bottom-right-2`` shown by
+        # the SFINCS model.
+        layer.legend_position = "bottom-right-3"
 
         # Grid outline
         from .domain import grid_outline_created, grid_outline_modified
@@ -275,6 +280,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="mediumblue",
             polygon_fill_opacity=0.1,
             rotate=not app.crs.is_geographic,
+            legend_label="grid outline",
         )
 
         ### Mask
@@ -292,9 +298,10 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             create=include_polygon_created,
             modify=include_polygon_modified,
             select=include_polygon_selected,
-            polygon_line_color="limegreen",
-            polygon_fill_color="limegreen",
+            polygon_line_color="yellow",
+            polygon_fill_color="yellow",
             polygon_fill_opacity=0.1,
+            legend_label="include (active cells)",
         )
         # Exclude
         from .mask_active_cells import (
@@ -310,9 +317,10 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             create=exclude_polygon_created,
             modify=exclude_polygon_modified,
             select=exclude_polygon_selected,
-            polygon_line_color="orangered",
-            polygon_fill_color="orangered",
+            polygon_line_color="blue",
+            polygon_fill_color="blue",
             polygon_fill_opacity=0.1,
+            legend_label="exclude (inactive cells)",
         )
         # Open boundary
         from .mask_boundary_cells import (
@@ -328,9 +336,10 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             create=open_boundary_polygon_created,
             modify=open_boundary_polygon_modified,
             select=open_boundary_polygon_selected,
-            polygon_line_color="deepskyblue",
-            polygon_fill_color="deepskyblue",
+            polygon_line_color="red",
+            polygon_fill_color="red",
             polygon_fill_opacity=0.1,
+            legend_label="open boundary",
         )
         # Downstream boundary
         from .mask_boundary_cells import (
@@ -346,9 +355,10 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             create=downstream_boundary_polygon_created,
             modify=downstream_boundary_polygon_modified,
             select=downstream_boundary_polygon_selected,
-            polygon_line_color="purple",
-            polygon_fill_color="purple",
+            polygon_line_color="orange",
+            polygon_fill_color="orange",
             polygon_fill_opacity=0.1,
+            legend_label="downstream boundary",
         )
         # Neumann boundary
         from .mask_boundary_cells import (
@@ -364,9 +374,10 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             create=neumann_boundary_polygon_created,
             modify=neumann_boundary_polygon_modified,
             select=neumann_boundary_polygon_selected,
-            polygon_line_color="magenta",
-            polygon_fill_color="magenta",
+            polygon_line_color="limegreen",
+            polygon_fill_color="limegreen",
             polygon_fill_opacity=0.1,
+            legend_label="Neumann boundary",
         )
         # Outflow boundary
         from .mask_boundary_cells import (
@@ -382,9 +393,10 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             create=outflow_boundary_polygon_created,
             modify=outflow_boundary_polygon_modified,
             select=outflow_boundary_polygon_selected,
-            polygon_line_color="orange",
-            polygon_fill_color="orange",
+            polygon_line_color="pink",
+            polygon_fill_color="pink",
             polygon_fill_opacity=0.1,
+            legend_label="outflow boundary",
         )
 
         ### Mask SnapWave
@@ -405,6 +417,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="limegreen",
             polygon_fill_color="limegreen",
             polygon_fill_opacity=0.1,
+            legend_label="SnapWave include",
         )
         # Exclude
         from .mask_active_cells_snapwave import (
@@ -423,6 +436,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="orangered",
             polygon_fill_color="orangered",
             polygon_fill_opacity=0.1,
+            legend_label="SnapWave exclude",
         )
         # SnapWave boundaries
         from .mask_boundary_cells_snapwave import (
@@ -441,6 +455,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="deepskyblue",
             polygon_fill_color="deepskyblue",
             polygon_fill_opacity=0.1,
+            legend_label="SnapWave open boundary",
         )
         from .mask_boundary_cells_snapwave import (
             neumann_boundary_polygon_created_snapwave,
@@ -458,6 +473,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="red",
             polygon_fill_color="orange",
             polygon_fill_opacity=0.1,
+            legend_label="SnapWave Neumann boundary",
         )
 
         # Refinement polygons
@@ -478,6 +494,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="red",
             polygon_fill_color="orange",
             polygon_fill_opacity=0.1,
+            legend_label="quadtree refinement",
         )
 
     def set_crs(self) -> None:

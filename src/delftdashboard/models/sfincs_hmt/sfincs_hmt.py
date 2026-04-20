@@ -36,6 +36,10 @@ class Model(GenericModel):
 
     def initialize(self) -> None:
         """Create a fresh SfincsModel domain and set default GUI variables."""
+        # Drop any features left over from a previously-loaded model so
+        # a "New Model" or a second "Open Model" doesn't leak stale
+        # polygons / points onto the map.
+        self.clear_layers()
         self.domain = SfincsModel(root=".", mode="w", write_gis=False)
         if hasattr(app, "topography_data_catalog"):
             app.topography_data_catalog.add_to_model_catalog(self.domain.data_catalog)
@@ -153,6 +157,10 @@ class Model(GenericModel):
     def add_layers(self) -> None:
         """Register all map layers for the SFINCS model."""
         layer = app.map.add_layer(_MODEL)
+        # Single shared legend for every geometry descendant. Leaves
+        # that declare ``legend_label`` contribute a swatch; layers
+        # that don't, stay out.
+        layer.legend_position = "bottom-right-2"
 
         layer.add_layer(
             "bathymetry",
@@ -166,13 +174,13 @@ class Model(GenericModel):
             legend_title="Mask",
             legend_position="bottom-right-2",
             map_overlay_options={
-                "colors": {1: "yellow", 2: "red", 3: "green", 5: "purple", 6: "blue"},
+                "colors": {1: "yellow", 2: "red", 3: "pink", 5: "orange", 6: "limegreen"},
                 "labels": {
                     1: "Active",
                     2: "Water level",
                     3: "Outflow",
-                    5: "Neumann",
-                    6: "Downstream",
+                    5: "Downstream",
+                    6: "Neumann",
                 },
             },
         )
@@ -216,6 +224,7 @@ class Model(GenericModel):
             circle_radius_inactive=4,
             line_color_inactive="white",
             fill_color_inactive="lightgrey",
+            legend_label="boundary point",
         )
 
         from .structures_thin_dams import (
@@ -224,9 +233,7 @@ class Model(GenericModel):
             thin_dam_selected,
         )
 
-        thd_layer = layer.add_layer(
-            "thin_dams"
-        )  # Container layer for thin dams and snapped thin dams
+        thd_layer = layer.add_layer("thin_dams")
         thd_layer.add_layer(
             "polylines",
             type="draw",
@@ -237,6 +244,7 @@ class Model(GenericModel):
             polyline_line_color="yellow",
             polyline_line_width=2.0,
             polyline_line_opacity=1.0,
+            legend_label="thin dam",
         )
         thd_layer.add_layer(
             "snapped",
@@ -245,13 +253,12 @@ class Model(GenericModel):
             line_opacity=1.0,
             circle_radius=0,
             line_color_inactive="lightgrey",
+            legend_label="thin dam (snapped)",
         )
 
         from .structures_weirs import weir_created, weir_modified, weir_selected
 
-        weir_layer = layer.add_layer(
-            "weirs"
-        )  # Container layer for weirs and snapped weirs
+        weir_layer = layer.add_layer("weirs")
         weir_layer.add_layer(
             "polylines",
             type="draw",
@@ -262,6 +269,7 @@ class Model(GenericModel):
             polyline_line_color="yellow",
             polyline_line_width=2.0,
             polyline_line_opacity=1.0,
+            legend_label="weir",
         )
         weir_layer.add_layer(
             "snapped",
@@ -270,6 +278,7 @@ class Model(GenericModel):
             line_opacity=1.0,
             circle_radius=0,
             line_color_inactive="lightgrey",
+            legend_label="weir (snapped)",
         )
 
         from .structures_drainage_structures import (
@@ -288,6 +297,7 @@ class Model(GenericModel):
             polyline_line_color="yellow",
             polyline_line_width=2.0,
             polyline_line_opacity=1.0,
+            legend_label="drainage structure",
         )
 
         from .urban_drainage import (
@@ -296,7 +306,12 @@ class Model(GenericModel):
             urban_drainage_area_selected,
         )
 
-        layer.add_layer(
+        # Container grouping the two urban-drainage sub-layers. The
+        # legend is owned by the top-level SFINCS container, so no
+        # per-sub-container ``legend_position`` is needed here.
+        urban_drainage_layer = layer.add_layer("urban_drainage")
+
+        urban_drainage_layer.add_layer(
             "urban_drainage_areas",
             type="draw",
             shape="polygon",
@@ -308,9 +323,10 @@ class Model(GenericModel):
             polygon_line_opacity=1.0,
             polygon_fill_color="orange",
             polygon_fill_opacity=0.2,
+            legend_label="urban drainage area",
         )
 
-        layer.add_layer(
+        urban_drainage_layer.add_layer(
             "outfall_locations",
             type="circle",
             hover_property="name",
@@ -320,7 +336,6 @@ class Model(GenericModel):
             fill_opacity=1.0,
             circle_radius=5,
             legend_label="outfall location",
-            legend_position="bottom-right-2",
         )
 
         from .observation_points_observation_points import (
@@ -340,6 +355,7 @@ class Model(GenericModel):
             circle_radius_selected=4,
             line_color_selected="white",
             fill_color_selected="red",
+            legend_label="observation point",
         )
 
         from .observation_points_cross_sections import (
@@ -348,9 +364,7 @@ class Model(GenericModel):
             cross_section_selected,
         )
 
-        crs_layer = layer.add_layer(
-            "cross_sections"
-        )  # Container layer for cross sections and snapped cross sections
+        crs_layer = layer.add_layer("cross_sections")
         crs_layer.add_layer(
             "polylines",
             type="draw",
@@ -361,6 +375,7 @@ class Model(GenericModel):
             polyline_line_color="yellow",
             polyline_line_width=2.0,
             polyline_line_opacity=1.0,
+            legend_label="cross section",
         )
         crs_layer.add_layer(
             "snapped",
@@ -369,6 +384,7 @@ class Model(GenericModel):
             line_opacity=1.0,
             circle_radius=0,
             line_color_inactive="lightgrey",
+            legend_label="cross section (snapped)",
         )
 
         from .discharge_points import select_discharge_point_from_map
@@ -386,6 +402,7 @@ class Model(GenericModel):
             circle_radius_selected=4,
             line_color_selected="white",
             fill_color_selected="red",
+            legend_label="discharge point",
         )
 
         from .waves_boundary_conditions import select_boundary_point_from_map_snapwave
@@ -406,6 +423,7 @@ class Model(GenericModel):
             circle_radius_inactive=4,
             line_color_inactive="white",
             fill_color_inactive="lightgrey",
+            legend_label="SnapWave boundary point",
         )
 
         # Wave makers
@@ -425,6 +443,7 @@ class Model(GenericModel):
             add=wave_maker_modified,
             polygon_line_color="red",
             show_endpoints=True,
+            legend_label="wave maker",
         )
 
     def set_layer_mode(self, mode: str) -> None:
@@ -456,9 +475,8 @@ class Model(GenericModel):
             layer.layer["thin_dams"].layer["polylines"].deactivate()
             layer.layer["thin_dams"].layer["snapped"].hide()
             layer.layer["drainage_structures"].deactivate()
-            layer.layer["urban_drainage_areas"].deactivate()
-            layer.layer["urban_drainage_areas"].hide()
-            layer.layer["outfall_locations"].hide()
+            layer.layer["urban_drainage"].layer["urban_drainage_areas"].deactivate()
+            layer.layer["urban_drainage"].hide()
             layer.layer["boundary_points_snapwave"].deactivate()
             layer.layer["wave_makers"].hide()
         elif mode == "invisible":
@@ -580,10 +598,14 @@ class Model(GenericModel):
         app.map.layer[_MODEL].layer["drainage_structures"].set_data(
             app.model[_MODEL].domain.drainage_structures.gdf
         )
-        # # Urban drainage areas
-        # app.map.layer[_MODEL].layer["urban_drainage_areas"].set_data(
-        #     app.model[_MODEL].domain.urban_drainage_areas.gdf
-        # )
+        # Urban drainage areas (under the urban_drainage container) and
+        # their derived outfall-location circles.
+        app.map.layer[_MODEL].layer["urban_drainage"].layer[
+            "urban_drainage_areas"
+        ].set_data(app.model[_MODEL].domain.urban_drainage_areas.gdf)
+        from .urban_drainage import plot_outfall_layer
+
+        plot_outfall_layer()
         # Observation points
         app.map.layer[_MODEL].layer["observation_points"].set_data(
             app.model[_MODEL].domain.observation_points.gdf, 0

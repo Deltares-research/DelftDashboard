@@ -26,9 +26,9 @@ _GROUP = "sfincs_hmt"
 def select(*args: Any) -> None:
     """Activate the Urban Drainage tab, show its layers and plot outfalls."""
     map.update()
-    app.map.layer[_MODEL].layer["urban_drainage_areas"].show()
-    app.map.layer[_MODEL].layer["urban_drainage_areas"].activate()
-    app.map.layer[_MODEL].layer["outfall_locations"].show()
+    container = app.map.layer[_MODEL].layer["urban_drainage"]
+    container.show()
+    container.layer["urban_drainage_areas"].activate()
     plot_outfall_layer()
     update()
 
@@ -64,7 +64,7 @@ def load(*args: Any) -> None:
         app.model[_MODEL].domain.config.set("urbfile", rsp[2])
         app.model[_MODEL].domain.urban_drainage_areas.read()
         gdf = app.model[_MODEL].domain.urban_drainage_areas.gdf
-        app.map.layer[_MODEL].layer["urban_drainage_areas"].set_data(gdf)
+        app.map.layer[_MODEL].layer["urban_drainage"].layer["urban_drainage_areas"].set_data(gdf)
         app.gui.setvar(_GROUP, "urban_drainage_area_index", 0)
         plot_outfall_layer()
         update()
@@ -106,7 +106,7 @@ def draw_urban_drainage_area(*args: Any) -> None:
     index = app.gui.getvar(_GROUP, "urban_drainage_area_type_names").index(tp)
     type_to_add = app.gui.getvar(_GROUP, "urban_drainage_area_types")[index]
     app.gui.setvar(_GROUP, "urban_drainage_area_type_to_add", type_to_add)
-    app.map.layer[_MODEL].layer["urban_drainage_areas"].draw()
+    app.map.layer[_MODEL].layer["urban_drainage"].layer["urban_drainage_areas"].draw()
 
 
 def delete_urban_drainage_area(*args: Any) -> None:
@@ -115,7 +115,7 @@ def delete_urban_drainage_area(*args: Any) -> None:
     if len(gdf) == 0:
         return
     index = app.gui.getvar(_GROUP, "urban_drainage_area_index")
-    app.map.layer[_MODEL].layer["urban_drainage_areas"].delete_feature(index)
+    app.map.layer[_MODEL].layer["urban_drainage"].layer["urban_drainage_areas"].delete_feature(index)
     app.model[_MODEL].domain.urban_drainage_areas.delete(index)
     app.model[_MODEL].urban_drainage_changed = True
     plot_outfall_layer()
@@ -263,7 +263,7 @@ def urban_drainage_area_created(gdf: Any, index: int, id: Any) -> None:
     app.model[_MODEL].urban_drainage_changed = True
 
     gdf = app.model[_MODEL].domain.urban_drainage_areas.gdf
-    app.map.layer[_MODEL].layer["urban_drainage_areas"].set_data(gdf)
+    app.map.layer[_MODEL].layer["urban_drainage"].layer["urban_drainage_areas"].set_data(gdf)
     plot_outfall_layer()
     update()
 
@@ -293,25 +293,31 @@ def plot_outfall_layer() -> None:
     Called whenever the set of urban drainage areas changes (tab select,
     file load, area add/delete, outfall edit).
     """
+
+    if app.model[_MODEL].domain.urban_drainage_areas.nr_areas == 0:
+        app.map.layer[_MODEL].layer["urban_drainage"].layer["outfall_locations"].clear()
+        return
+
     gdf = app.model[_MODEL].domain.urban_drainage_areas.gdf
     crs = app.model[_MODEL].domain.crs
 
-    if gdf is None or len(gdf) == 0:
-        outfall_gdf = gpd.GeoDataFrame(
-            {"name": []}, geometry=[], crs=crs
-        )
-    else:
-        piped = gdf[gdf["type"] == "piped_drainage"]
-        outfall_gdf = gpd.GeoDataFrame(
-            {"name": list(piped["name"].astype(str).values)},
-            geometry=[
-                Point(x, y)
-                for x, y in zip(piped["outfall_x"], piped["outfall_y"])
-            ],
-            crs=crs,
-        )
+    piped = gdf[gdf["type"] == "piped_drainage"]
 
-    app.map.layer[_MODEL].layer["outfall_locations"].set_data(outfall_gdf)
+    if len(piped) == 0:
+        # Probably only injection_well zones, which don't have outfalls. Clear the layer just in case.
+        app.map.layer[_MODEL].layer["urban_drainage"].layer["outfall_locations"].clear()
+        return
+
+    outfall_gdf = gpd.GeoDataFrame(
+        {"name": list(piped["name"].astype(str).values)},
+        geometry=[
+            Point(x, y)
+            for x, y in zip(piped["outfall_x"], piped["outfall_y"])
+        ],
+        crs=crs,
+    )
+
+    app.map.layer[_MODEL].layer["urban_drainage"].layer["outfall_locations"].set_data(outfall_gdf)
 
 
 # ---------------------------------------------------------------------------

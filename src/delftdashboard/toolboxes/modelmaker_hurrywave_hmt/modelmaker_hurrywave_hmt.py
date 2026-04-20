@@ -142,6 +142,11 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
     def add_layers(self) -> None:
         """Register all map layers for the Model Maker toolbox."""
         layer = app.map.add_layer(_TB)
+        # Single shared legend for every mask / refinement polygon.
+        # Sits at ``bottom-right-3`` so it doesn't collide with the
+        # raster mask legend at ``bottom-right-2`` shown by the
+        # HurryWave model.
+        layer.legend_position = "bottom-right-3"
 
         from .domain import grid_outline_created, grid_outline_modified
 
@@ -154,6 +159,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="mediumblue",
             polygon_fill_opacity=0.3,
             rotate=not app.crs.is_geographic,
+            legend_label="grid outline",
         )
 
         from .quadtree import (
@@ -173,6 +179,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="red",
             polygon_fill_color="orange",
             polygon_fill_opacity=0.1,
+            legend_label="quadtree refinement",
         )
 
         from .mask_active_cells import (
@@ -194,6 +201,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="limegreen",
             polygon_fill_color="limegreen",
             polygon_fill_opacity=0.3,
+            legend_label="include (active cells)",
         )
 
         layer.add_layer(
@@ -206,6 +214,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="orangered",
             polygon_fill_color="orangered",
             polygon_fill_opacity=0.3,
+            legend_label="exclude (inactive cells)",
         )
 
         from .mask_boundary_cells import (
@@ -224,6 +233,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
             polygon_line_color="deepskyblue",
             polygon_fill_color="deepskyblue",
             polygon_fill_opacity=0.3,
+            legend_label="boundary",
         )
 
     # ── Grid / bathymetry / mask / wave blocking ─────────────────────

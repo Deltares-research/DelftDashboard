@@ -21,6 +21,7 @@ def select(*args: Any) -> None:
     # Activate draw layer
     app.map.layer[_MODEL].layer["thin_dams"].layer["polylines"].activate()
     app.map.layer[_MODEL].layer["thin_dams"].layer["snapped"].activate()
+    update_grid_snapper()
     update()
 
 
@@ -213,6 +214,9 @@ def set_model_variables(*args: Any) -> None:
 
 def update_grid_snapper() -> None:
     """Snap thin dams to the grid and update the snapped layer."""
+    if app.model[_MODEL].domain.thin_dams.nr_lines == 0:
+        app.map.layer[_MODEL].layer["thin_dams"].layer["snapped"].clear()
+        return
     snap_gdf = app.model[_MODEL].domain.thin_dams.snap_to_grid()
     if len(snap_gdf) > 0:
         app.map.layer[_MODEL].layer["thin_dams"].layer["snapped"].set_data(snap_gdf)

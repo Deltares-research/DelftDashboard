@@ -44,6 +44,8 @@ class Model(GenericModel):
     def add_layers(self) -> None:
         """Register all map layers for the HurryWave model."""
         layer = app.map.add_layer(_MODEL)
+        # Single shared legend for every geometry descendant.
+        layer.legend_position = "bottom-right-2"
 
         layer.add_layer(
             "bathymetry",
@@ -86,6 +88,7 @@ class Model(GenericModel):
             circle_radius_inactive=4,
             line_color_inactive="white",
             fill_color_inactive="lightgrey",
+            legend_label="boundary point",
         )
 
         from .observation_points_regular import (
@@ -105,6 +108,7 @@ class Model(GenericModel):
             circle_radius_selected=4,
             line_color_selected="white",
             fill_color_selected="red",
+            legend_label="observation point",
         )
 
         from .observation_points_spectra import (
@@ -124,6 +128,7 @@ class Model(GenericModel):
             circle_radius_selected=4,
             line_color_selected="white",
             fill_color_selected="red",
+            legend_label="spectra observation point",
         )
 
     def _bathymetry_overlay_options(self) -> dict:
