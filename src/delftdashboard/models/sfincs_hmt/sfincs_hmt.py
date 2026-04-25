@@ -519,6 +519,8 @@ class Model(GenericModel):
             os.chdir(path)
             self.initialize()
             self.domain = SfincsModel(root=".", mode="r+", write_gis=False)
+            if hasattr(app, "topography_data_catalog"):
+                app.topography_data_catalog.add_to_model_catalog(self.domain.data_catalog)
 
             # DelftDashboard only supports quadtree SFINCS models
             if self.domain.config.get("qtrfile") is None:    

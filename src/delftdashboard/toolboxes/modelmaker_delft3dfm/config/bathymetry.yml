@@ -44,7 +44,7 @@ element:
     height: 20
   text: "Info"
   method: info
-  enable: False
+  module: delftdashboard.operations.bathy_topo_selector
   tooltip: Show information about the selected dataset
 - style: listbox
   position:

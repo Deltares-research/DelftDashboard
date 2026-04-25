@@ -93,10 +93,10 @@ class Toolbox(GenericToolbox):
         wb = app.gui.window.dialog_wait("Generating Cloud Optimized GeoTIFF ...")
         try:
             if fmt == "geotiff":
-                ok = geotiff_to_cog.geotiff_to_cog(filename, filename_cog)
+                ok = geotiff_to_cog(filename, filename_cog)
             elif fmt == "netcdf":
                 variable_name = app.gui.getvar("bathymetry", "variable_name")
-                ok = netcdf_to_cog.netcdf_to_cog(filename, variable_name, filename_cog)
+                ok = netcdf_to_cog(filename, variable_name, filename_cog)
             elif fmt == "xyz":
                 xyz = np.loadtxt(filename)
                 xx, yy = xyz[:, 0], xyz[:, 1]
@@ -108,7 +108,7 @@ class Toolbox(GenericToolbox):
                 if crs is None:
                     wb.close()
                     return
-                ok = xyz_to_cog.xyz_to_cog(filename, filename_cog, crs)
+                ok = xyz_to_cog(filename, filename_cog, crs)
             else:
                 ok = False
         except Exception as e:
@@ -132,20 +132,29 @@ class Toolbox(GenericToolbox):
             "bathymetry", "vertical_difference_with_msl"
         )
 
-        # Write data_catalog.yml for this dataset
+        # Write data_catalog.yml for this dataset. Include ``crs`` in
+        # the metadata when the COG isn't already in EPSG:4326 — some
+        # hydromt read paths silently default the catalog CRS to 4326
+        # when it's omitted, which yields empty-data bbox queries for
+        # projected sources (see the AHN RD New case).
+        metadata = {
+            "category": "bathymetry",
+            "unit": vertical_units,
+            "long_name": long_name,
+            "source": src,
+            "difference_with_msl": difference_with_msl,
+        }
+        epsg = crs.to_epsg()
+        if epsg is not None and epsg != 4326:
+            metadata["crs"] = epsg
+
         catalog_entry = {
             "meta": {"root": "."},
             name: {
                 "data_type": "RasterDataset",
                 "driver": "rasterio",
                 "uri": f"{name}.tif",
-                "metadata": {
-                    "category": "bathymetry",
-                    "unit": vertical_units,
-                    "long_name": long_name,
-                    "source": src,
-                    "difference_with_msl": difference_with_msl,
-                },
+                "metadata": metadata,
             },
         }
         catalog_file = os.path.join(output_dir, "data_catalog.yml")
@@ -157,16 +166,19 @@ class Toolbox(GenericToolbox):
         if os.path.exists(master_file):
             with open(master_file, "r") as f:
                 master = yaml.safe_load(f)
+            master_metadata = {
+                "unit": vertical_units,
+                "long_name": long_name,
+                "source": src,
+                "difference_with_msl": difference_with_msl,
+            }
+            if epsg is not None and epsg != 4326:
+                master_metadata["crs"] = epsg
             master[name] = {
                 "data_type": "RasterDataset",
                 "driver": "rasterio",
                 "uri": f"{name}/{name}.tif",
-                "metadata": {
-                    "unit": vertical_units,
-                    "long_name": long_name,
-                    "source": src,
-                    "difference_with_msl": difference_with_msl,
-                },
+                "metadata": master_metadata,
             }
             with open(master_file, "w") as f:
                 yaml.dump(master, f, default_flow_style=False, sort_keys=False)

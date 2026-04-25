@@ -226,20 +226,30 @@ class TopographyDataCatalog:
             ``"zmax"`` keys.
         """
         result = []
+        errors: List[str] = []
         for ds in selected_datasets:
             name = ds["name"]
             try:
                 da = self.catalog.get_rasterdataset(
                     name, geom=geom, zoom=(res, "metre")
                 )
-                entry = {"da": da}
-                if "zmin" in ds:
-                    entry["zmin"] = ds["zmin"]
-                if "zmax" in ds:
-                    entry["zmax"] = ds["zmax"]
-                result.append(entry)
             except Exception as e:
                 logger.warning(f"Could not load dataset '{name}': {e}")
+                errors.append(f"- {name}: {e}")
+                continue
+            entry = {"da": da}
+            if "zmin" in ds:
+                entry["zmin"] = ds["zmin"]
+            if "zmax" in ds:
+                entry["zmax"] = ds["zmax"]
+            result.append(entry)
+        # Re-raise when nothing resolved, so callers don't hit a
+        # downstream IndexError on an empty list.
+        if not result:
+            raise RuntimeError(
+                "No elevation datasets could be resolved for this bbox:\n"
+                + "\n".join(errors)
+            )
         return result
 
 

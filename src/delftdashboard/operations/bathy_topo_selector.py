@@ -212,10 +212,61 @@ def update() -> None:
 
 
 def info(*args: Any) -> None:
-    """Display information about the selected dataset (not yet implemented).
+    """Show the metadata of the currently highlighted dataset in a modal.
 
-    Parameters
-    ----------
-    *args : Any
-        Positional callback arguments (unused).
+    Reads the selection from the available-datasets listbox
+    (``bathymetry_dataset_names`` + ``bathymetry_dataset_index``),
+    pulls the corresponding ``BathymetryDataset`` from
+    ``app.topography_data_catalog``, and pretty-prints its public
+    attributes. Container-heavy values (the back-reference to the
+    database, the in-memory xr.Dataset cache, dunder keys) are
+    filtered out; everything else the catalog loaded from the
+    dataset's ``*.tml`` / ``data_catalog.yml`` is shown.
     """
+    group = "bathy_topo_selector"
+    names = app.gui.getvar(group, "bathymetry_dataset_names")
+    if not names:
+        app.gui.window.dialog_info("No dataset selected.", title="Dataset info")
+        return
+    index = app.gui.getvar(group, "bathymetry_dataset_index")
+    if index < 0 or index >= len(names):
+        app.gui.window.dialog_info("No dataset selected.", title="Dataset info")
+        return
+    name = names[index]
+
+    try:
+        src = app.topography_data_catalog.get_source(name)
+    except Exception:
+        app.gui.window.dialog_info(
+            f"Dataset {name!r} not found in the catalog.",
+            title="Dataset info",
+        )
+        return
+
+    lines: list[str] = []
+    # Top-level source attributes worth surfacing.
+    for key in ("uri", "data_type", "driver"):
+        value = getattr(src, key, None)
+        if value is None or value == "":
+            continue
+        # ``driver`` is a pydantic model on hydromt v1 — show its ``name``.
+        driver_name = getattr(value, "name", None)
+        if driver_name is not None:
+            value = driver_name
+        lines.append(f"{key}: {value}")
+
+    # Everything the user / importer put under ``metadata:`` in the YAML.
+    metadata = getattr(src, "metadata", None)
+    if metadata is not None:
+        try:
+            md_dict = metadata.model_dump(exclude_none=True)
+        except AttributeError:
+            md_dict = dict(metadata) if isinstance(metadata, dict) else {}
+        for key in sorted(md_dict):
+            value = md_dict[key]
+            if value is None or value == "":
+                continue
+            lines.append(f"{key}: {value}")
+
+    text = "\n".join(lines) if lines else "(no metadata available)"
+    app.gui.window.dialog_info(text, title=f"Dataset info — {name}")
