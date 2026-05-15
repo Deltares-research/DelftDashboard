@@ -1,0 +1,114 @@
+element:
+- style: panel
+  title: Transport
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 170
+  element:
+  - style: popupmenu
+    text: Formula
+    position:
+      x: 100
+      y: 135
+      width: 90
+      height: 20
+    variable: trform
+    method: set_model_variables
+    option_string:
+    - CERC
+    - Kamphuis
+    - Mil-Homens
+    - Van Rijn 2014
+    - Rayleigh
+    option_value:
+    - CERC
+    - KAMP
+    - MILH
+    - VR14
+    - RAY
+  - style: edit
+    text: Q scale
+    position:
+      x: 100
+      y: 110
+      width: 60
+      height: 20
+    variable: qscal
+    method: set_model_variables
+  - style: edit
+    text: D50
+    position:
+      x: 100
+      y: 85
+      width: 60
+      height: 20
+    variable: d50
+    method: set_model_variables
+  - style: edit
+    text: D90
+    position:
+      x: 100
+      y: 60
+      width: 60
+      height: 20
+    variable: d90
+    method: set_model_variables
+  - style: edit
+    text: Beach slope
+    position:
+      x: 100
+      y: 35
+      width: 60
+      height: 20
+    variable: tanbeta
+    method: set_model_variables
+  - style: popupmenu
+    text: Start BC
+    position:
+      x: 310
+      y: 135
+      width: 110
+      height: 20
+    variable: boundaryconditionstart
+    method: set_model_variables
+    option_string:
+    - Fixed
+    - Closed
+    - Angle constant
+    - Periodic
+    option_value:
+    - Fixed
+    - Closed
+    - Angleconstant
+    - Periodic
+  - style: popupmenu
+    text: End BC
+    position:
+      x: 310
+      y: 110
+      width: 110
+      height: 20
+    variable: boundaryconditionend
+    method: set_model_variables
+    option_string:
+    - Fixed
+    - Closed
+    - Angle constant
+    - Periodic
+    option_value:
+    - Fixed
+    - Closed
+    - Angleconstant
+    - Periodic
+  - style: checkbox
+    text: Cyclic
+    position:
+      x: 230
+      y: 80
+      width: 90
+      height: 20
+    variable: cyclic
+    method: set_model_variables
+

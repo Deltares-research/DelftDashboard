@@ -30,6 +30,7 @@ dependencies = [
     "cht_cyclones@ git+https://github.com/deltares-research/cht_cyclones.git",
     "cht_sfincs@ git+https://github.com/deltares-research/cht_sfincs.git",
     "cht_delft3dfm@ git+https://github.com/deltares-research/cht_delft3dfm.git",
+    "cht_shorelines@ git+https://github.com/jreyns/cht_shorelines.git",
     "cht_utils@ git+https://github.com/deltares-research/cht_utils.git",
     "cht_meteo@ git+https://github.com/deltares-research/cht_meteo.git",
     "cht_nesting@ git+https://github.com/deltares-research/cht_nesting.git",

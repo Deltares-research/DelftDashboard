@@ -1,0 +1,64 @@
+element:
+- style: panel
+  title: Output
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 150
+  element:
+  - style: edit
+    text: Output dir
+    position:
+      x: 100
+      y: 115
+      width: 150
+      height: 20
+    variable: outputdir
+    method: set_model_variables
+  - style: edit
+    text: Output file
+    position:
+      x: 100
+      y: 90
+      width: 150
+      height: 20
+    variable: outputfile
+    method: set_model_variables
+  - style: edit
+    text: Storage interval
+    position:
+      x: 100
+      y: 55
+      width: 70
+      height: 20
+    variable: storageinterval
+    method: set_model_variables
+  - style: checkbox
+    text: NetCDF
+    position:
+      x: 310
+      y: 115
+      width: 90
+      height: 20
+    variable: netcdf
+    method: set_model_variables
+  - style: checkbox
+    text: Plot
+    position:
+      x: 310
+      y: 90
+      width: 90
+      height: 20
+    variable: yesplot
+    method: set_model_variables
+  - style: checkbox
+    text: Print figures
+    position:
+      x: 310
+      y: 65
+      width: 110
+      height: 20
+    variable: printfig
+    method: set_model_variables
+

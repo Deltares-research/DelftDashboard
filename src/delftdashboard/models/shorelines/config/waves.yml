@@ -1,0 +1,105 @@
+element:
+- style: panel
+  title: Waves
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 170
+  element:
+  - style: popupmenu
+    text: Input
+    position:
+      x: 90
+      y: 135
+      width: 110
+      height: 20
+    variable: wave_input_type
+    method: set_model_variables
+    option_string:
+    - Constant
+    - Climate file
+    - Time series file
+    option_value:
+    - constant
+    - climate
+    - timeseries
+  - style: edit
+    text: Wave file
+    position:
+      x: 90
+      y: 110
+      width: 180
+      height: 20
+    variable: wvcfile
+    method: set_model_variables
+  - style: edit
+    text: Hs
+    position:
+      x: 90
+      y: 75
+      width: 60
+      height: 20
+    variable: hso
+    method: set_model_variables
+  - style: edit
+    text: Tper
+    position:
+      x: 90
+      y: 50
+      width: 60
+      height: 20
+    variable: tper
+    method: set_model_variables
+  - style: edit
+    text: Direction
+    position:
+      x: 90
+      y: 25
+      width: 60
+      height: 20
+    variable: phiw0
+    method: set_model_variables
+  - style: edit
+    text: Spreading
+    position:
+      x: 300
+      y: 75
+      width: 60
+      height: 20
+    variable: spread
+    method: set_model_variables
+  - style: edit
+    text: Deep depth
+    position:
+      x: 300
+      y: 50
+      width: 60
+      height: 20
+    variable: ddeep
+    method: set_model_variables
+  - style: edit
+    text: Nearshore depth
+    position:
+      x: 300
+      y: 25
+      width: 60
+      height: 20
+    variable: dnearshore
+    method: set_model_variables
+  - style: popupmenu
+    text: Interpolation
+    position:
+      x: 455
+      y: 135
+      width: 140
+      height: 20
+    variable: interpolationmethod
+    method: set_model_variables
+    option_string:
+    - Weighted distance
+    - Alongshore mapping
+    option_value:
+    - weighted_distance
+    - alongshore_mapping
+

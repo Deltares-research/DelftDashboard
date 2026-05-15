@@ -21,6 +21,8 @@ The following models are available:
      - HurryWave (HydroMT) -- third-generation spectral wave model for nearshore and coastal wave transformation.
    * - :doc:`delft3dfm`
      - Delft3D-FM -- full 2D/3D hydrodynamic model with flexible mesh for tidal, storm surge, and river flow simulations.
+   * - :doc:`shorelines`
+     - ShorelineS -- one-line shoreline evolution model setup for coastline, waves, structures, and nourishments.
 
 .. toctree::
    :maxdepth: 2
@@ -29,3 +31,4 @@ The following models are available:
    sfincs_hmt
    hurrywave_hmt
    delft3dfm
+   shorelines

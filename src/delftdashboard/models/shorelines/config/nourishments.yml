@@ -1,0 +1,98 @@
+element:
+- style: panel
+  title: Nourishments
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 170
+  element:
+  - style: checkbox
+    text: Use nourishments
+    position:
+      x: 10
+      y: 135
+      width: 150
+      height: 20
+    variable: nourish
+    method: set_model_variables
+  - style: edit
+    text: Nourishment file
+    position:
+      x: 120
+      y: 105
+      width: 150
+      height: 20
+    variable: norfile
+    method: set_model_variables
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 110
+      height: 85
+    variable: active_nourishments
+    select: index
+    option_string:
+      variable: nourishments_names
+  - style: pushbutton
+    text: Draw
+    position:
+      x: 130
+      y: 75
+      width: 70
+      height: 20
+    method: draw_nourishments
+  - style: pushbutton
+    text: Delete
+    position:
+      x: 210
+      y: 75
+      width: 70
+      height: 20
+    method: delete_nourishments
+  - style: pushbutton
+    text: Load
+    position:
+      x: 290
+      y: 75
+      width: 70
+      height: 20
+    method: load_nourishments
+  - style: edit
+    text: Start
+    position:
+      x: 470
+      y: 130
+      width: 70
+      height: 20
+    variable: nourishment_tstart
+    method: set_model_variables
+  - style: edit
+    text: End
+    position:
+      x: 470
+      y: 105
+      width: 70
+      height: 20
+    variable: nourishment_tend
+    method: set_model_variables
+  - style: edit
+    text: Volume
+    position:
+      x: 470
+      y: 80
+      width: 70
+      height: 20
+    variable: nourishment_totalvolume
+    method: set_model_variables
+  - style: edit
+    text: Growth
+    position:
+      x: 470
+      y: 45
+      width: 70
+      height: 20
+    variable: growth
+    method: set_model_variables
+

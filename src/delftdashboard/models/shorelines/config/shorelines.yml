@@ -1,0 +1,32 @@
+element:
+- style: tabpanel
+  id: shorelines
+  position:
+    x: 10
+    y: 1
+    width: -10
+    height: -10
+  variable_group: shorelines
+  tab:
+  - string: Domain
+    module: delftdashboard.models.shorelines.domain
+    element: domain.yml
+  - string: Time Frame
+    module: delftdashboard.models.shorelines.timeframe
+    element: timeframe.yml
+  - string: Waves
+    module: delftdashboard.models.shorelines.waves
+    element: waves.yml
+  - string: Transport
+    module: delftdashboard.models.shorelines.transport
+    element: transport.yml
+  - string: Structures
+    module: delftdashboard.models.shorelines.structures
+    element: structures.yml
+  - string: Nourishments
+    module: delftdashboard.models.shorelines.nourishments
+    element: nourishments.yml
+  - string: Output
+    module: delftdashboard.models.shorelines.output
+    element: output.yml
+

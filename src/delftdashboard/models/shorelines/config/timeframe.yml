@@ -1,0 +1,73 @@
+element:
+- style: panel
+  title: Time Frame
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 150
+  element:
+  - style: edit
+    text: Reference date
+    position:
+      x: 120
+      y: 115
+      width: 120
+      height: 20
+    variable: reftime
+    method: set_model_variables
+  - style: edit
+    text: End date
+    position:
+      x: 120
+      y: 90
+      width: 120
+      height: 20
+    variable: endofsimulation
+    method: set_model_variables
+  - style: edit
+    text: Morph. time scale
+    position:
+      x: 120
+      y: 55
+      width: 70
+      height: 20
+    variable: tc
+    method: set_model_variables
+  - style: edit
+    text: Time step
+    position:
+      x: 120
+      y: 30
+      width: 70
+      height: 20
+    variable: dt
+    method: set_model_variables
+  - style: checkbox
+    text: Two coastline points
+    position:
+      x: 330
+      y: 115
+      width: 150
+      height: 20
+    variable: twopoints
+    method: set_model_variables
+  - style: edit
+    text: Smooth
+    position:
+      x: 420
+      y: 90
+      width: 60
+      height: 20
+    variable: smoothfac
+    method: set_model_variables
+  - style: edit
+    text: Smooth refr.
+    position:
+      x: 420
+      y: 65
+      width: 60
+      height: 20
+    variable: smoothrefrac
+    method: set_model_variables
+

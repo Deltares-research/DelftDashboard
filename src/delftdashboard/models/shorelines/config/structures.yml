@@ -1,0 +1,132 @@
+element:
+- style: panel
+  title: Structures
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 190
+  element:
+  - style: checkbox
+    text: Use hard structures
+    position:
+      x: 10
+      y: 160
+      width: 150
+      height: 20
+    variable: struct
+    method: set_model_variables
+  - style: edit
+    text: Structures file
+    position:
+      x: 110
+      y: 130
+      width: 150
+      height: 20
+    variable: ldbstructures
+    method: set_model_variables
+  - style: listbox
+    position:
+      x: 10
+      y: 35
+      width: 110
+      height: 85
+    variable: active_structures
+    select: index
+    option_string:
+      variable: structures_names
+  - style: pushbutton
+    text: Draw
+    position:
+      x: 130
+      y: 100
+      width: 70
+      height: 20
+    method: draw_structures
+  - style: pushbutton
+    text: Delete
+    position:
+      x: 210
+      y: 100
+      width: 70
+      height: 20
+    method: delete_structures
+  - style: pushbutton
+    text: Load
+    position:
+      x: 290
+      y: 100
+      width: 70
+      height: 20
+    method: load_structures
+  - style: checkbox
+    text: Use revetments
+    position:
+      x: 390
+      y: 160
+      width: 130
+      height: 20
+    variable: revet
+    method: set_model_variables
+  - style: edit
+    text: Revetment file
+    position:
+      x: 500
+      y: 130
+      width: 150
+      height: 20
+    variable: ldbrevetments
+    method: set_model_variables
+  - style: listbox
+    position:
+      x: 390
+      y: 35
+      width: 110
+      height: 85
+    variable: active_revetments
+    select: index
+    option_string:
+      variable: revetments_names
+  - style: pushbutton
+    text: Draw
+    position:
+      x: 510
+      y: 100
+      width: 70
+      height: 20
+    method: draw_revetments
+  - style: pushbutton
+    text: Delete
+    position:
+      x: 590
+      y: 100
+      width: 70
+      height: 20
+    method: delete_revetments
+  - style: pushbutton
+    text: Load
+    position:
+      x: 670
+      y: 100
+      width: 70
+      height: 20
+    method: load_revetments
+  - style: checkbox
+    text: Diffraction
+    position:
+      x: 390
+      y: 10
+      width: 100
+      height: 20
+    variable: diffraction
+    method: set_model_variables
+  - style: checkbox
+    text: Transmission
+    position:
+      x: 500
+      y: 10
+      width: 110
+      height: 20
+    variable: transmission
+    method: set_model_variables
+

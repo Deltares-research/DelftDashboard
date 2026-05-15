@@ -1,0 +1,115 @@
+element:
+- style: panel
+  title: Domain
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 170
+  element:
+  - style: edit
+    text: Runfile
+    position:
+      x: 90
+      y: 140
+      width: 160
+      height: 20
+    variable: runfile
+    method: set_model_variables
+  - style: edit
+    text: Coastline file
+    position:
+      x: 90
+      y: 115
+      width: 160
+      height: 20
+    variable: ldbcoastline
+    method: set_model_variables
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 110
+      height: 90
+    variable: active_coastline
+    select: index
+    option_string:
+      variable: coastline_names
+  - style: pushbutton
+    text: Draw
+    position:
+      x: 130
+      y: 80
+      width: 70
+      height: 20
+    method: draw_coastline
+  - style: pushbutton
+    text: Delete
+    position:
+      x: 210
+      y: 80
+      width: 70
+      height: 20
+    method: delete_coastline
+  - style: pushbutton
+    text: Load
+    position:
+      x: 290
+      y: 80
+      width: 70
+      height: 20
+    method: load_coastline
+  - style: edit
+    text: Spacing
+    position:
+      x: 460
+      y: 140
+      width: 60
+      height: 20
+    variable: ds0
+    method: set_model_variables
+  - style: edit
+    text: Depth
+    position:
+      x: 460
+      y: 115
+      width: 60
+      height: 20
+    variable: d
+    method: set_model_variables
+  - style: edit
+    text: Coast angle
+    position:
+      x: 460
+      y: 90
+      width: 60
+      height: 20
+    variable: phif
+    method: set_model_variables
+  - style: popupmenu
+    text: Grid method
+    position:
+      x: 460
+      y: 65
+      width: 90
+      height: 20
+    variable: griddingmethod
+    method: set_model_variables
+    option_string:
+    - Equal distance
+    - Smooth
+    - ShorelineS
+    option_value:
+    - 0
+    - 1
+    - 2
+  - style: checkbox
+    text: GIS convention
+    position:
+      x: 400
+      y: 35
+      width: 130
+      height: 20
+    variable: gisconvention
+    method: set_model_variables
+
