@@ -8,6 +8,24 @@ from shapely.geometry import LineString, MultiLineString, box
 
 import delftdashboard.operations.model
 from delftdashboard.app import app
+from delftdashboard.models.shorelines.domain import (
+    coastline_created,
+    coastline_modified,
+    coastline_selected,
+)
+from delftdashboard.models.shorelines.nourishments import (
+    nourishments_created,
+    nourishments_modified,
+    nourishments_selected,
+)
+from delftdashboard.models.shorelines.structures import (
+    revetments_created,
+    revetments_modified,
+    revetments_selected,
+    structures_created,
+    structures_modified,
+    structures_selected,
+)
 
 try:
     from cht_shorelines import Shorelines
@@ -59,9 +77,9 @@ class Model(delftdashboard.operations.model.GenericModel):
             "coastline",
             type="draw",
             shape="polyline",
-            create="delftdashboard.models.shorelines.domain.coastline_created",
-            modify="delftdashboard.models.shorelines.domain.coastline_modified",
-            select="delftdashboard.models.shorelines.domain.coastline_selected",
+            create=coastline_created,
+            modify=coastline_modified,
+            select=coastline_selected,
             polyline_line_color="#ffcc00",
             polyline_line_width=4,
         )
@@ -69,9 +87,9 @@ class Model(delftdashboard.operations.model.GenericModel):
             "structures",
             type="draw",
             shape="polyline",
-            create="delftdashboard.models.shorelines.structures.structures_created",
-            modify="delftdashboard.models.shorelines.structures.structures_modified",
-            select="delftdashboard.models.shorelines.structures.structures_selected",
+            create=structures_created,
+            modify=structures_modified,
+            select=structures_selected,
             polyline_line_color="#e11d48",
             polyline_line_width=4,
         )
@@ -79,9 +97,9 @@ class Model(delftdashboard.operations.model.GenericModel):
             "revetments",
             type="draw",
             shape="polyline",
-            create="delftdashboard.models.shorelines.structures.revetments_created",
-            modify="delftdashboard.models.shorelines.structures.revetments_modified",
-            select="delftdashboard.models.shorelines.structures.revetments_selected",
+            create=revetments_created,
+            modify=revetments_modified,
+            select=revetments_selected,
             polyline_line_color="#9333ea",
             polyline_line_width=4,
         )
@@ -89,9 +107,9 @@ class Model(delftdashboard.operations.model.GenericModel):
             "nourishments",
             type="draw",
             shape="polyline",
-            create="delftdashboard.models.shorelines.nourishments.nourishments_created",
-            modify="delftdashboard.models.shorelines.nourishments.nourishments_modified",
-            select="delftdashboard.models.shorelines.nourishments.nourishments_selected",
+            create=nourishments_created,
+            modify=nourishments_modified,
+            select=nourishments_selected,
             polyline_line_color="#16a34a",
             polyline_line_width=5,
         )
@@ -163,7 +181,7 @@ class Model(delftdashboard.operations.model.GenericModel):
             return
         for name in ["coastline", "structures", "revetments", "nourishments"]:
             app.map.layer[_MODEL].layer[name].set_data(getattr(self, f"{name}_gdf"))
-        app.map.update()
+        app.gui.window.update()
 
     def zoom_to_model(self):
         bounds = self._total_bounds()
@@ -243,6 +261,8 @@ class Model(delftdashboard.operations.model.GenericModel):
             return
         if isinstance(filename, (list, tuple)):
             filename = filename[0]
+        if not filename:
+            return
         if layer_name == "nourishments" and self._looks_like_nourishment_file(filename):
             gdf = self._load_optional_nourishments(filename)
         else:

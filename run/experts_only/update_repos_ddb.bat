@@ -1,6 +1,6 @@
 REM Checkout the following git repositories in e.g. c:\git (or another folder)
 
-cd c:\git
+cd d:\oss\github_repos\
 
 git -C guitares          pull 
 git -C cht_bathymetry    pull 
@@ -17,6 +17,7 @@ git -C cht_tide          pull
 git -C cht_tiling        pull 
 git -C cht_tsunami       pull 
 git -C cht_utils         pull 
-git -C cht_xbeach        pull 
+git -C cht_xbeach        pull
+git -C cht_shorelines    pull 
 git -C delftdashboard    pull 
 git -C cosmos            pull 

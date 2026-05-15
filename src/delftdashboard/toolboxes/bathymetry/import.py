@@ -68,6 +68,10 @@ def edit_dataset_source(*args: Any) -> None:
     """Handle dataset source edit events (placeholder)."""
 
 
+def edit(*args: Any) -> None:
+    """Handle generic metadata edit events (placeholder)."""
+
+
 def select_variable_name(*args: Any) -> None:
     """Handle variable name selection events (placeholder)."""
 

@@ -2,7 +2,7 @@ rem Script to create the editable delftdashboard environment
 rem The delftdashboard_dev environment only needs to be created and used if you are interested in editing the source code!
 
 rem CHANGE GITDIR to point to you local repos folder !!!
-set GITDIR=c:\work\checkouts\git
+set GITDIR=d:\oss\github_repos\
 rem  set ENVNAME=delftdashboard_dev
 
 rem call mamba env remove -n delftdashboard_dev
@@ -29,5 +29,6 @@ pip install -e %GITDIR%\cht_tiling
 pip install -e %GITDIR%\cht_tsunami
 pip install -e %GITDIR%\cht_utils
 pip install -e %GITDIR%\cht_xbeach
+pip install -e %GITDIR%\cht_shorelines
 pip install -e %GITDIR%\hydromt_sfincs
 pip install -e %GITDIR%\hydromt_hurrywave

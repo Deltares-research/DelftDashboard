@@ -352,14 +352,19 @@ def initialize_topography() -> None:
 
     # Populate GUI variables for the bathy/topo selector
     source_names, _ = app.topography_data_catalog.sources()
-    dataset_names, _, _ = app.topography_data_catalog.dataset_names(
-        source=source_names[0]
-    )
+    if source_names:
+        active_source = source_names[0]
+        dataset_names, _, _ = app.topography_data_catalog.dataset_names(
+            source=active_source
+        )
+    else:
+        active_source = None
+        dataset_names = []
     group = "bathy_topo_selector"
     app.gui.setvar(group, "names", [])
     app.gui.setvar(group, "zmin", [])
     app.gui.setvar(group, "bathymetry_source_names", source_names)
-    app.gui.setvar(group, "active_bathymetry_source", source_names[0])
+    app.gui.setvar(group, "active_bathymetry_source", active_source)
     app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
     app.gui.setvar(group, "bathymetry_dataset_index", 0)
     app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
@@ -455,34 +460,50 @@ def initialize_models() -> None:
     toolboxes determined from the toolbox config entries.
     """
     app.model = {}
+    app.skipped_models = {}
     for mdl in app.config["model"]:
         model_name = mdl["name"]
         # And initialize the domain for this model
         print(f"Adding model   : {model_name}")
-        module = importlib.import_module(
-            f"delftdashboard.models.{model_name}.{model_name}"
-        )
-        app.model[model_name] = module.Model(model_name)
-        if "exe_path" in mdl:
-            app.model[model_name].exe_path = mdl["exe_path"]
-        else:
-            app.model[model_name].exe_path = ""
-        # Loop through toolboxes to see which ones should be activated for
-        # which model
-        app.model[model_name].toolbox = []
-        for tlb in app.config["toolbox"]:
-            okay = True
-            if "for_model" in tlb:
-                if model_name not in tlb["for_model"]:
-                    okay = False
-            if okay:
-                app.model[model_name].toolbox.append(tlb["name"])
-        # Also add external toolboxes (no for_model restriction)
-        for toolbox_name in app.toolbox:
-            if hasattr(app.toolbox[toolbox_name], "_external_package"):
-                if toolbox_name not in app.model[model_name].toolbox:
-                    app.model[model_name].toolbox.append(toolbox_name)
-        app.model[model_name].initialize()
+        try:
+            module = importlib.import_module(
+                f"delftdashboard.models.{model_name}.{model_name}"
+            )
+            model = module.Model(model_name)
+            if "exe_path" in mdl:
+                model.exe_path = mdl["exe_path"]
+            else:
+                model.exe_path = ""
+            # Loop through toolboxes to see which ones should be activated for
+            # which model
+            model.toolbox = []
+            for tlb in app.config["toolbox"]:
+                okay = True
+                if "for_model" in tlb:
+                    if model_name not in tlb["for_model"]:
+                        okay = False
+                if okay:
+                    model.toolbox.append(tlb["name"])
+            # Also add external toolboxes (no for_model restriction)
+            for toolbox_name in app.toolbox:
+                if hasattr(app.toolbox[toolbox_name], "_external_package"):
+                    if toolbox_name not in model.toolbox:
+                        model.toolbox.append(toolbox_name)
+            app.model[model_name] = model
+            model.initialize()
+        except ModuleNotFoundError as e:
+            missing_module = e.name or str(e)
+            app.skipped_models[model_name] = missing_module
+            print(
+                f"Skipping model : {model_name} "
+                f"(missing Python module: {missing_module})"
+            )
+            if model_name in app.model:
+                del app.model[model_name]
+            continue
+
+    if not app.model:
+        raise RuntimeError("No configured models could be loaded.")
 
 
 def _warmup_numba() -> None:

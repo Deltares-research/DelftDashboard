@@ -8,13 +8,26 @@ import glob
 import logging
 import os
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, Dict, List, Optional, Tuple
 
 import geopandas as gpd
+import numpy as np
+import xarray as xr
 from hydromt import DataCatalog
 from shapely.geometry import box
 
 logger = logging.getLogger(__name__)
+
+
+class _LegacyMetadata(SimpleNamespace):
+    """Small adapter exposing legacy TOML metadata like HydroMT metadata."""
+
+    def model_dump(self, exclude_none: bool = False) -> dict:
+        values = vars(self).copy()
+        if exclude_none:
+            values = {key: value for key, value in values.items() if value is not None}
+        return values
 
 
 class TopographyDataCatalog:
@@ -32,11 +45,13 @@ class TopographyDataCatalog:
     def __init__(self, path: str) -> None:
         self.path = path
         self.catalog = DataCatalog()
+        self.legacy_database = None
         # Maps source name → YAML file that provided it. Populated by
         # :py:meth:`_load` and consumed by :py:meth:`data_libs_for` to
         # emit an accurate ``global.data_libs`` in the model setup yaml.
         self._source_yaml: Dict[str, str] = {}
         self._load(path)
+        self._load_legacy(path)
 
     def _load(self, path: str) -> None:
         """Load all data catalog YAML files from the database directory."""
@@ -54,6 +69,27 @@ class TopographyDataCatalog:
                 self.catalog.from_yml(yml, root=os.path.dirname(yml))
                 for name in set(self.catalog.sources) - before:
                     self._source_yaml[name] = yml
+
+    def _load_legacy(self, path: str) -> None:
+        """Load legacy ``bathymetry.tml`` databases when available."""
+        tml = os.path.join(path, "bathymetry.tml")
+        if not os.path.exists(tml):
+            return
+
+        try:
+            from cht_bathymetry import BathymetryDatabase
+        except ImportError:
+            logger.warning(
+                "Found legacy bathymetry database %s, but cht_bathymetry is not "
+                "installed.",
+                tml,
+            )
+            return
+
+        try:
+            self.legacy_database = BathymetryDatabase(path)
+        except Exception:
+            logger.exception("Could not load legacy bathymetry database %s.", tml)
 
     def data_libs_for(self, names: List[str]) -> List[str]:
         """Return the minimal set of catalog YAML paths covering *names*.
@@ -88,6 +124,9 @@ class TopographyDataCatalog:
             src = self.catalog.get_source(name)
             source = getattr(src.metadata, "source", "unknown")
             source_set.add(source)
+        if self.legacy_database is not None:
+            source_names, _ = self.legacy_database.sources()
+            source_set.update(source_names)
         source_names = sorted(source_set)
         return source_names, source_names
 
@@ -118,6 +157,18 @@ class TopographyDataCatalog:
             names.append(name)
             long_names.append(src_long_name)
             source_names.append(src_source)
+        if self.legacy_database is not None:
+            legacy_names, legacy_long_names, legacy_source_names = (
+                self.legacy_database.dataset_names(source=source)
+            )
+            for name, long_name, source_name in zip(
+                legacy_names, legacy_long_names, legacy_source_names
+            ):
+                if name in self.catalog.sources:
+                    continue
+                names.append(name)
+                long_names.append(long_name)
+                source_names.append(source_name)
         return names, long_names, source_names
 
     def get_source(self, name: str):
@@ -128,6 +179,22 @@ class TopographyDataCatalog:
         name : str
             Dataset name as it appears in the catalog.
         """
+        if name not in self.catalog.sources and self.legacy_database is not None:
+            dataset = self.legacy_database.get_dataset(name)
+            if dataset is not None:
+                metadata = _LegacyMetadata(
+                    source=dataset.source,
+                    long_name=dataset.long_name,
+                    unit=dataset.vertical_units,
+                    data_format=getattr(dataset, "format", ""),
+                    difference_with_msl=getattr(dataset, "difference_with_msl", None),
+                )
+                return SimpleNamespace(
+                    data_type="RasterDataset",
+                    driver=SimpleNamespace(name=getattr(dataset, "format", "")),
+                    metadata=metadata,
+                    uri=getattr(dataset, "path", ""),
+                )
         return self.catalog.get_source(name)
 
     def add_to_model_catalog(self, model_data_catalog: DataCatalog) -> None:
@@ -174,7 +241,7 @@ class TopographyDataCatalog:
         for ds in selected_datasets:
             name = ds["name"]
             try:
-                self.catalog.get_rasterdataset(name, geom=geom)
+                self.get_rasterdataset(name, geom=geom)
                 covered.append(name)
             except (NoDataException, IndexError, ValueError, IOError):
                 not_covered.append(name)
@@ -194,7 +261,65 @@ class TopographyDataCatalog:
             Forwarded to ``DataCatalog.get_rasterdataset()`` (e.g.
             ``geom``, ``zoom``, ``bbox``).
         """
+        if name not in self.catalog.sources and self.legacy_database is not None:
+            return self._get_legacy_rasterdataset(name, **kwargs)
         return self.catalog.get_rasterdataset(name, **kwargs)
+
+    def _get_legacy_rasterdataset(self, name: str, **kwargs) -> xr.DataArray:
+        """Fetch a legacy cht_bathymetry dataset as an xarray DataArray."""
+        dataset = self.legacy_database.get_dataset(name)
+        if dataset is None:
+            raise KeyError(f"Dataset {name!r} not found in topography catalog.")
+
+        geom = kwargs.get("geom")
+        if geom is None:
+            raise ValueError("Legacy bathymetry datasets require a 'geom' argument.")
+        if getattr(geom, "crs", None) is not None and dataset.crs is not None:
+            geom = geom.to_crs(dataset.crs)
+        xmin, ymin, xmax, ymax = geom.total_bounds
+
+        zoom = kwargs.get("zoom", (1000.0, "metre"))
+        max_cell_size = zoom[0] if isinstance(zoom, tuple) else zoom
+        x, y, z = dataset.get_data(
+            [xmin, xmax],
+            [ymin, ymax],
+            max_cell_size=max_cell_size,
+        )
+        if np.isscalar(z) and np.isnan(z):
+            raise ValueError(f"No data returned for dataset {name!r}.")
+
+        da = xr.DataArray(
+            z,
+            coords={"y": y, "x": x},
+            dims=("y", "x"),
+            name=name,
+            attrs={
+                "source": dataset.source,
+                "long_name": dataset.long_name,
+                "units": dataset.vertical_units,
+            },
+        )
+        if dataset.crs is not None:
+            da.attrs["crs"] = dataset.crs.to_string()
+        return da
+
+    def get_dataset(self, name: str):
+        """Return a legacy bathymetry dataset by name, when available."""
+        if self.legacy_database is None:
+            return None
+        return self.legacy_database.get_dataset(name)
+
+    def get_bathymetry_on_points(self, *args, **kwargs):
+        """Delegate legacy point interpolation to cht_bathymetry."""
+        if self.legacy_database is None:
+            raise RuntimeError("No legacy bathymetry database is loaded.")
+        return self.legacy_database.get_bathymetry_on_points(*args, **kwargs)
+
+    def get_bathymetry_on_grid(self, *args, **kwargs):
+        """Delegate legacy grid interpolation to cht_bathymetry."""
+        if self.legacy_database is None:
+            raise RuntimeError("No legacy bathymetry database is loaded.")
+        return self.legacy_database.get_bathymetry_on_grid(*args, **kwargs)
 
     def resolve_elevation_list(
         self,
@@ -230,9 +355,7 @@ class TopographyDataCatalog:
         for ds in selected_datasets:
             name = ds["name"]
             try:
-                da = self.catalog.get_rasterdataset(
-                    name, geom=geom, zoom=(res, "metre")
-                )
+                da = self.get_rasterdataset(name, geom=geom, zoom=(res, "metre"))
             except Exception as e:
                 logger.warning(f"Could not load dataset '{name}': {e}")
                 errors.append(f"- {name}: {e}")
