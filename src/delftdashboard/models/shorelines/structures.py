@@ -23,6 +23,10 @@ def load_structures(*args):
     app.model[_MODEL].load_xy_feature("structures")
 
 
+def save_structures(*args):
+    app.model[_MODEL].save_feature("structures")
+
+
 def draw_revetments(*args):
     app.model[_MODEL].draw_feature("revetments")
 
@@ -33,6 +37,10 @@ def delete_revetments(*args):
 
 def load_revetments(*args):
     app.model[_MODEL].load_xy_feature("revetments")
+
+
+def save_revetments(*args):
+    app.model[_MODEL].save_feature("revetments")
 
 
 def structures_created(gdf, index=None, id=None):

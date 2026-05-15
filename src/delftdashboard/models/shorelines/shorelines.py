@@ -176,6 +176,72 @@ class Model(delftdashboard.operations.model.GenericModel):
         self._sync_geometry_to_domain()
         self.domain.write()
 
+    def save_feature(self, layer_name):
+        """Write a drawn feature layer to its ShorelineS attribute file."""
+        self.set_model_variables()
+        self._sync_domain_path()
+        variables = self.domain.input.variables
+
+        if layer_name == "coastline":
+            sections = self._sections_from_gdf(self.coastline_gdf)
+            if not sections:
+                app.gui.window.dialog_warning("No coastline features to save.")
+                return
+            file_name = (
+                self._get_gui("ldbcoastline", variables.ldbcoastline)
+                or "coastline.ldb"
+            )
+            self.domain.grid.set_coastline(sections, file_name=file_name)
+            self.domain.grid.write()
+            app.gui.setvar(_MODEL, "ldbcoastline", file_name)
+
+        elif layer_name == "structures":
+            sections = self._sections_from_gdf(self.structures_gdf)
+            if not sections:
+                app.gui.window.dialog_warning("No structure features to save.")
+                return
+            file_name = (
+                self._get_gui("ldbstructures", variables.ldbstructures)
+                or "structures.ldb"
+            )
+            self.domain.structures.set_structures(sections, file_name=file_name)
+            self.domain.structures.write()
+            app.gui.setvar(_MODEL, "ldbstructures", file_name)
+
+        elif layer_name == "revetments":
+            sections = self._sections_from_gdf(self.revetments_gdf)
+            if not sections:
+                app.gui.window.dialog_warning("No revetment features to save.")
+                return
+            file_name = (
+                self._get_gui("ldbrevetments", variables.ldbrevetments)
+                or "revetments.ldb"
+            )
+            self.domain.structures.set_revetments(sections, file_name=file_name)
+            self.domain.structures.write()
+            app.gui.setvar(_MODEL, "ldbrevetments", file_name)
+
+        elif layer_name == "nourishments":
+            nourishments = self._nourishments_from_gdf()
+            if not nourishments:
+                app.gui.window.dialog_warning("No nourishment features to save.")
+                return
+            file_name = (
+                self._get_gui("norfile", variables.norfile) or "nourishments.nor"
+            )
+            self.domain.nourishments.set_nourishments(
+                nourishments,
+                file_name=file_name,
+            )
+            self.domain.nourishments.write()
+            app.gui.setvar(_MODEL, "norfile", file_name)
+
+        else:
+            raise ValueError(f"Unknown ShorelineS feature layer: {layer_name}")
+
+        self.domain.input.write()
+        app.gui.window.update()
+
     def plot(self):
         if _MODEL not in app.map.layer:
             return

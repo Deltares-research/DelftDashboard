@@ -23,6 +23,10 @@ def load_coastline(*args):
     app.model[_MODEL].load_xy_feature("coastline")
 
 
+def save_coastline(*args):
+    app.model[_MODEL].save_feature("coastline")
+
+
 def coastline_created(gdf, index=None, id=None):
     app.model[_MODEL].feature_created("coastline", gdf, index, id)
 

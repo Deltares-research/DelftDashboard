@@ -61,4 +61,3 @@ element:
       height: 20
     variable: printfig
     method: set_model_variables
-

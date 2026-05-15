@@ -20,7 +20,7 @@ element:
     text: Nourishment file
     position:
       x: 120
-      y: 105
+      y: 110
       width: 150
       height: 20
     variable: norfile
@@ -39,31 +39,39 @@ element:
     text: Draw
     position:
       x: 130
-      y: 75
+      y: 10
       width: 70
       height: 20
     method: draw_nourishments
   - style: pushbutton
     text: Delete
     position:
-      x: 210
-      y: 75
+      x: 130
+      y: 35
       width: 70
       height: 20
     method: delete_nourishments
   - style: pushbutton
     text: Load
     position:
-      x: 290
-      y: 75
+      x: 130
+      y: 60
       width: 70
       height: 20
     method: load_nourishments
+  - style: pushbutton
+    text: Save
+    position:
+      x: 130
+      y: 85
+      width: 70
+      height: 20
+    method: save_nourishments
   - style: edit
     text: Start
     position:
       x: 470
-      y: 130
+      y: 35
       width: 70
       height: 20
     variable: nourishment_tstart
@@ -72,7 +80,7 @@ element:
     text: End
     position:
       x: 470
-      y: 105
+      y: 60
       width: 70
       height: 20
     variable: nourishment_tend
@@ -81,7 +89,7 @@ element:
     text: Volume
     position:
       x: 470
-      y: 80
+      y: 85
       width: 70
       height: 20
     variable: nourishment_totalvolume
@@ -90,9 +98,8 @@ element:
     text: Growth
     position:
       x: 470
-      y: 45
+      y: 110
       width: 70
       height: 20
     variable: growth
     method: set_model_variables
-

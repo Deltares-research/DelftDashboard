@@ -70,4 +70,3 @@ element:
       height: 20
     variable: smoothrefrac
     method: set_model_variables
-

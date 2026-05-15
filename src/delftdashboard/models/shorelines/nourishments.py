@@ -23,6 +23,10 @@ def load_nourishments(*args):
     app.model[_MODEL].load_xy_feature("nourishments")
 
 
+def save_nourishments(*args):
+    app.model[_MODEL].save_feature("nourishments")
+
+
 def nourishments_created(gdf, index=None, id=None):
     app.model[_MODEL].feature_created("nourishments", gdf, index, id)
 

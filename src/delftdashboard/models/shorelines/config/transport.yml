@@ -21,13 +21,11 @@ element:
     - Kamphuis
     - Mil-Homens
     - Van Rijn 2014
-    - Rayleigh
     option_value:
     - CERC
     - KAMP
     - MILH
     - VR14
-    - RAY
   - style: edit
     text: Q scale
     position:
@@ -111,4 +109,3 @@ element:
       height: 20
     variable: cyclic
     method: set_model_variables
-

@@ -11,7 +11,7 @@ element:
     text: Runfile
     position:
       x: 90
-      y: 140
+      y: 135
       width: 160
       height: 20
     variable: runfile
@@ -20,7 +20,7 @@ element:
     text: Coastline file
     position:
       x: 90
-      y: 115
+      y: 110
       width: 160
       height: 20
     variable: ldbcoastline
@@ -39,31 +39,39 @@ element:
     text: Draw
     position:
       x: 130
-      y: 80
+      y: 10
       width: 70
       height: 20
     method: draw_coastline
   - style: pushbutton
     text: Delete
     position:
-      x: 210
-      y: 80
+      x: 130
+      y: 35
       width: 70
       height: 20
     method: delete_coastline
   - style: pushbutton
     text: Load
     position:
-      x: 290
-      y: 80
+      x: 130
+      y: 60
       width: 70
       height: 20
     method: load_coastline
+  - style: pushbutton
+    text: Save
+    position:
+      x: 130
+      y: 85
+      width: 70
+      height: 20
+    method: save_coastline
   - style: edit
     text: Spacing
     position:
       x: 460
-      y: 140
+      y: 110
       width: 60
       height: 20
     variable: ds0
@@ -72,7 +80,7 @@ element:
     text: Depth
     position:
       x: 460
-      y: 115
+      y: 85
       width: 60
       height: 20
     variable: d
@@ -81,7 +89,7 @@ element:
     text: Coast angle
     position:
       x: 460
-      y: 90
+      y: 60
       width: 60
       height: 20
     variable: phif
@@ -90,7 +98,7 @@ element:
     text: Grid method
     position:
       x: 460
-      y: 65
+      y: 35
       width: 90
       height: 20
     variable: griddingmethod
@@ -107,9 +115,8 @@ element:
     text: GIS convention
     position:
       x: 400
-      y: 35
+      y: 10
       width: 130
       height: 20
     variable: gisconvention
     method: set_model_variables
-

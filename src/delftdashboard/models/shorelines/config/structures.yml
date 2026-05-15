@@ -39,26 +39,34 @@ element:
     text: Draw
     position:
       x: 130
-      y: 100
+      y: 35
       width: 70
       height: 20
     method: draw_structures
   - style: pushbutton
     text: Delete
     position:
-      x: 210
-      y: 100
+      x: 130
+      y: 60
       width: 70
       height: 20
     method: delete_structures
   - style: pushbutton
     text: Load
     position:
-      x: 290
-      y: 100
+      x: 130
+      y: 85
       width: 70
       height: 20
     method: load_structures
+  - style: pushbutton
+    text: Save
+    position:
+      x: 130
+      y: 110
+      width: 70
+      height: 20
+    method: save_structures
   - style: checkbox
     text: Use revetments
     position:
@@ -91,26 +99,34 @@ element:
     text: Draw
     position:
       x: 510
-      y: 100
+      y: 35
       width: 70
       height: 20
     method: draw_revetments
   - style: pushbutton
     text: Delete
     position:
-      x: 590
-      y: 100
+      x: 510
+      y: 60
       width: 70
       height: 20
     method: delete_revetments
   - style: pushbutton
     text: Load
     position:
-      x: 670
-      y: 100
+      x: 510
+      y: 85
       width: 70
       height: 20
     method: load_revetments
+  - style: pushbutton
+    text: Save
+    position:
+      x: 510
+      y: 110
+      width: 70
+      height: 20
+    method: save_revetments
   - style: checkbox
     text: Diffraction
     position:
@@ -129,4 +145,3 @@ element:
       height: 20
     variable: transmission
     method: set_model_variables
-
