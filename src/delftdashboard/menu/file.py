@@ -1,6 +1,7 @@
 """Menu callbacks for File menu actions (new, open, save, exit)."""
 
 import os
+from pathlib import Path
 
 from delftdashboard.app import app
 
@@ -69,10 +70,16 @@ def select_working_directory(option: str) -> None:
         os.chdir(path)
         # Set path for all models to new working directory
         for model in app.model:
+            if hasattr(app.model[model], "path"):
+                app.model[model].path = path
             try:
                 app.model[model].domain.path = path
             except Exception:
                 print("Could not set path for model : ", model)
+                pass
+            try:
+                app.model[model].domain.input.root = Path(path)
+            except Exception:
                 pass
 
 

@@ -4,10 +4,12 @@ from pathlib import Path
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString, box
 
 import delftdashboard.operations.model
 from delftdashboard.app import app
+from delftdashboard.operations import map
 from delftdashboard.models.shorelines.domain import (
     coastline_created,
     coastline_modified,
@@ -50,6 +52,9 @@ class Model(delftdashboard.operations.model.GenericModel):
         self.path = os.getcwd()
         self.runfile = "shorelines.txt"
         self.domain = self._new_domain(self.path, self.runfile)
+        epsg = app.crs.to_epsg()
+        if epsg is not None:
+            self.domain.input.variables.epsg = epsg
 
         self.coastline_gdf = self._empty_gdf()
         self.structures_gdf = self._empty_gdf()
@@ -157,29 +162,57 @@ class Model(delftdashboard.operations.model.GenericModel):
         if isinstance(filename, (list, tuple)):
             filename = filename[0]
 
-        path = Path(filename)
-        self.path = str(path.parent)
-        self.runfile = path.name
-        os.chdir(self.path)
+        dlg = app.gui.window.dialog_wait("Loading ShorelineS model ...")
+        try:
+            self._set_case_file(filename)
+            os.chdir(self.path)
 
-        self.domain = self._new_domain(self.path, self.runfile)
-        self.domain.input.read()
-        self._load_attribute_files()
-        self.set_gui_variables()
-        self.plot()
-        self.zoom_to_model()
-        app.gui.window.update()
+            self.domain = self._new_domain(self.path, self.runfile)
+            self.domain.read()
+
+            saved_epsg = getattr(self.domain.input.variables, "epsg", None)
+            if saved_epsg not in (None, ""):
+                self.domain.crs = CRS.from_user_input(saved_epsg)
+                map.set_crs(self.domain.crs)
+
+            self._load_attribute_files()
+            self.set_gui_variables()
+            self.plot()
+            self.zoom_to_model()
+            app.gui.window.update()
+        finally:
+            dlg.close()
 
     def save(self):
         self.set_model_variables()
         self._sync_domain_path()
+        self.domain.crs = app.crs
+        epsg = app.crs.to_epsg()
+        if epsg is not None:
+            self.domain.input.variables.epsg = epsg
         self._sync_geometry_to_domain()
         self.domain.write()
+        self.domain.write_matlab_runner()
+        app.gui.window.update()
+
+    def save_setup(self):
+        filename = self._get_save_setup_filename()
+        if filename is None:
+            return
+
+        self._set_case_file(filename)
+        os.chdir(self.path)
+        app.gui.setvar(_MODEL, "runfile", self.runfile)
+        self.save()
 
     def save_feature(self, layer_name):
         """Write a drawn feature layer to its ShorelineS attribute file."""
         self.set_model_variables()
         self._sync_domain_path()
+        self.domain.crs = app.crs
+        epsg = app.crs.to_epsg()
+        if epsg is not None:
+            self.domain.input.variables.epsg = epsg
         variables = self.domain.input.variables
 
         if layer_name == "coastline":
@@ -338,8 +371,11 @@ class Model(delftdashboard.operations.model.GenericModel):
         self.plot()
 
     def _sync_domain_path(self):
+        current_path = self.path or getattr(self.domain, "path", None) or os.getcwd()
+        self.path = str(Path(current_path))
         self.domain.path = self.path
         self.domain.input.root = Path(self.path)
+        self.domain.input.runfile = self.runfile
 
     def _sync_geometry_to_domain(self):
         variables = self.domain.input.variables
@@ -559,6 +595,21 @@ class Model(delftdashboard.operations.model.GenericModel):
             return app.gui.getvar(_MODEL, name)
         except Exception:
             return default
+
+    def _set_case_file(self, filename):
+        path = Path(filename)
+        self.path = str(path.parent)
+        self.runfile = path.name
+
+    def _get_save_setup_filename(self):
+        response = app.gui.window.dialog_save_file(
+            "Save ShorelineS input file",
+            file_name=self.runfile,
+            filter="Input files (*.txt *.inp);;All files (*)",
+        )
+        if response[0]:
+            return response[2]
+        return None
 
     def _value_for_gui(self, value):
         if value is None:

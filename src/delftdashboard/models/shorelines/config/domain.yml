@@ -16,6 +16,14 @@ element:
       height: 20
     variable: runfile
     method: set_model_variables
+  - style: pushbutton
+    text: Save setup
+    position:
+      x: 260
+      y: 135
+      width: 90
+      height: 20
+    method: save_setup
   - style: edit
     text: Coastline file
     position:
