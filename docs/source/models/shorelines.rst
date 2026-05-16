@@ -9,10 +9,9 @@ and supported attribute files.
 The GUI supports:
 
 * drawing or loading coastline polylines;
-* editing core simulation, wave, transport, structure, nourishment, and output
+* editing core simulation, wave, transport, structure, nourishment, dune, and output
   parameters;
-* drawing or loading hard structures, revetments, and nourishment sections;
+* drawing or loading hard structures, revetments, nourishment sections, and dune points;
 * saving the model setup files.
 
 Running ShorelineS from DelftDashboard is not included.
-

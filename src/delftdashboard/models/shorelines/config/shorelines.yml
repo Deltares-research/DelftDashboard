@@ -26,6 +26,9 @@ element:
   - string: Nourish
     module: delftdashboard.models.shorelines.nourishments
     element: nourishments.yml
+  - string: Dunes
+    module: delftdashboard.models.shorelines.dunes
+    element: dunes.yml
   - string: Output
     module: delftdashboard.models.shorelines.output
     element: output.yml

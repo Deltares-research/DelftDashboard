@@ -22,7 +22,7 @@ The following models are available:
    * - :doc:`delft3dfm`
      - Delft3D-FM -- full 2D/3D hydrodynamic model with flexible mesh for tidal, storm surge, and river flow simulations.
    * - :doc:`shorelines`
-     - ShorelineS -- one-line shoreline evolution model setup for coastline, waves, structures, and nourishments.
+     - ShorelineS -- one-line shoreline evolution model setup for coastline, waves, structures, nourishments, and dunes.
 
 .. toctree::
    :maxdepth: 2
