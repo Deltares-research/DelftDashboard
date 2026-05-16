@@ -5,7 +5,7 @@ element:
     x: 10
     y: 10
     width: -10
-    height: 170
+    height: 165
   element:
   - style: edit
     text: Runfile
