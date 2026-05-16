@@ -1,0 +1,312 @@
+element:
+- style: panel
+  title: Dunes
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 230
+  element:
+  - style: checkbox
+    text: Use dunes
+    position:
+      x: 10
+      y: 200
+      width: 100
+      height: 20
+    variable: dune
+    method: set_model_variables
+  - style: edit
+    text: Dune file
+    position:
+      x: 120
+      y: 175
+      width: 150
+      height: 20
+    variable: ldbdune
+    method: set_model_variables
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 110
+      height: 155
+    method: select_dune_from_list
+    variable: active_dunes
+    select: index
+    option_string:
+      variable: dunes_names
+  - style: pushbutton
+    text: Add
+    position:
+      x: 130
+      y: 10
+      width: 70
+      height: 20
+    method: add_dune_point_on_map
+  - style: pushbutton
+    text: Delete
+    position:
+      x: 130
+      y: 35
+      width: 70
+      height: 20
+    method: delete_dune
+  - style: pushbutton
+    text: Load
+    position:
+      x: 130
+      y: 60
+      width: 70
+      height: 20
+    method: load_dunes
+  - style: pushbutton
+    text: Save
+    position:
+      x: 130
+      y: 85
+      width: 70
+      height: 20
+    method: save_dunes
+  - style: edit
+    text: X
+    position:
+      x: 300
+      y: 10
+      width: 90
+      height: 20
+    variable: dune_x
+    method: edit_dune_parameter
+  - style: edit
+    text: Y
+    position:
+      x: 300
+      y: 35
+      width: 90
+      height: 20
+    variable: dune_y
+    method: edit_dune_parameter
+  - style: edit
+    text: Wberm
+    position:
+      x: 300
+      y: 60
+      width: 90
+      height: 20
+    variable: dune_wberm
+    method: edit_dune_parameter
+  - style: edit
+    text: Df elev
+    position:
+      x: 300
+      y: 85
+      width: 90
+      height: 20
+    variable: dune_dfelev
+    method: edit_dune_parameter
+  - style: edit
+    text: Dc elev
+    position:
+      x: 300
+      y: 110
+      width: 90
+      height: 20
+    variable: dune_dcelev
+    method: edit_dune_parameter
+  - style: edit
+    text: Cs
+    position:
+      x: 300
+      y: 135
+      width: 90
+      height: 20
+    variable: dune_cs
+    method: edit_dune_parameter
+  - style: edit
+    text: Cstill
+    position:
+      x: 300
+      y: 160
+      width: 90
+      height: 20
+    variable: dune_cstill
+    method: edit_dune_parameter
+  - style: edit
+    text: Xtill
+    position:
+      x: 300
+      y: 185
+      width: 90
+      height: 20
+    variable: dune_xtill
+    method: edit_dune_parameter
+  - style: edit
+    text: "% till"
+    position:
+      x: 300
+      y: 210
+      width: 90
+      height: 20
+    variable: dune_perctill
+    method: edit_dune_parameter
+- style: panel
+  title: Dune Parameters
+  position:
+    x: 10
+    y: 250
+    width: -10
+    height: 220
+  element:
+  - style: edit
+    text: Dune dt
+    position:
+      x: 10
+      y: 10
+      width: 80
+      height: 20
+    variable: dtdune
+    method: set_model_variables
+  - style: edit
+    text: Overwash A
+    position:
+      x: 10
+      y: 35
+      width: 80
+      height: 20
+    variable: aoverwash
+    method: set_model_variables
+  - style: edit
+    text: Runup form
+    position:
+      x: 10
+      y: 60
+      width: 110
+      height: 20
+    variable: runupform
+    method: set_model_variables
+  - style: edit
+    text: Runup factor
+    position:
+      x: 10
+      y: 85
+      width: 80
+      height: 20
+    variable: runupfactor
+    method: set_model_variables
+  - style: edit
+    text: Wind file
+    position:
+      x: 10
+      y: 110
+      width: 140
+      height: 20
+    variable: wndfile
+    method: set_model_variables
+  - style: edit
+    text: Water file
+    position:
+      x: 10
+      y: 135
+      width: 140
+      height: 20
+    variable: watfile
+    method: set_model_variables
+  - style: edit
+    text: Static U
+    position:
+      x: 180
+      y: 10
+      width: 70
+      height: 20
+    variable: uz
+    method: set_model_variables
+  - style: edit
+    text: Wind dir
+    position:
+      x: 180
+      y: 35
+      width: 70
+      height: 20
+    variable: phiwnd0
+    method: set_model_variables
+  - style: edit
+    text: Z
+    position:
+      x: 180
+      y: 60
+      width: 70
+      height: 20
+    variable: z
+    method: set_model_variables
+  - style: edit
+    text: SWL
+    position:
+      x: 180
+      y: 85
+      width: 70
+      height: 20
+    variable: swl0
+    method: set_model_variables
+  - style: edit
+    text: Dune aw
+    position:
+      x: 180
+      y: 110
+      width: 70
+      height: 20
+    variable: duneaw
+    method: set_model_variables
+  - style: edit
+    text: D50r
+    position:
+      x: 180
+      y: 135
+      width: 70
+      height: 20
+    variable: d50r
+    method: set_model_variables
+  - style: edit
+    text: Rhoa
+    position:
+      x: 180
+      y: 160
+      width: 70
+      height: 20
+    variable: rhoa
+    method: set_model_variables
+  - style: edit
+    text: Kw
+    position:
+      x: 180
+      y: 185
+      width: 70
+      height: 20
+    variable: kw
+    method: set_model_variables
+  - style: edit
+    text: Segmaw
+    position:
+      x: 320
+      y: 10
+      width: 80
+      height: 20
+    variable: segmaw
+    method: set_model_variables
+  - style: edit
+    text: Max slope
+    position:
+      x: 320
+      y: 35
+      width: 80
+      height: 20
+    variable: maxslope
+    method: set_model_variables
+  - style: edit
+    text: CS model
+    position:
+      x: 320
+      y: 60
+      width: 140
+      height: 20
+    variable: csmodel
+    method: set_model_variables
