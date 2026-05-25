@@ -13,6 +13,7 @@ rem We first install delftdashboard, which also installs some cht packages direc
 rem Then we override with editable packages.
 
 pip install -e %GITDIR%\delftdashboard
+pip install -e %GITDIR%\cosmos
 pip install -e %GITDIR%\guitares
 pip install -e %GITDIR%\cht_bathymetry
 pip install -e %GITDIR%\cht_beware
