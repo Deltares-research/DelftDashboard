@@ -15,16 +15,13 @@ rem Then we override with editable packages.
 pip install -e %GITDIR%\delftdashboard
 pip install -e %GITDIR%\cosmos
 pip install -e %GITDIR%\guitares
-pip install -e %GITDIR%\cht_bathymetry
 pip install -e %GITDIR%\cht_beware
 pip install -e %GITDIR%\cht_cyclones
 pip install -e %GITDIR%\cht_delft3dfm
-pip install -e %GITDIR%\cht_hurrywave
 pip install -e %GITDIR%\cht_meteo
 pip install -e %GITDIR%\cht_nesting
 pip install -e %GITDIR%\cht_observations
 pip install -e %GITDIR%\cht_physics
-pip install -e %GITDIR%\cht_sfincs
 pip install -e %GITDIR%\cht_tide
 pip install -e %GITDIR%\cht_tiling
 pip install -e %GITDIR%\cht_tsunami
