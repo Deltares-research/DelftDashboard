@@ -124,13 +124,13 @@ cd c:\work\checkouts\git\DelftDashboard\installer
 Output: `installer\dist_innosetup\DelftDashboard_Setup_<version>.exe`
 
 What the installer does (`delftdashboard_nuitka.iss`):
-- installs the dist folder to `%LOCALAPPDATA%\Programs\DelftDashboard\bin\`
-  (per-user, writable, no admin rights needed);
-- wizard page asks where the **data folder** should live: a user-chosen
-  accessible folder (recommended) or `%LOCALAPPDATA%\DelftDashboard`;
-- writes that choice to `bin\delftdashboard.pth` (read by the exe at startup);
+- asks for ONE DelftDashboard folder (default `C:\DelftDashboard`; must be
+  writable, so not Program Files) and installs the dist into `<folder>\bin\`;
+- writes `<folder>` to `bin\delftdashboard.pth` (read by the exe at startup),
+  so `data\`, `server\`, `working_directory\` and `delftdashboard.ini` are all
+  created by the app inside that same folder;
 - creates Start-menu / optional desktop shortcuts;
-- uninstall removes the program but **never** the data folder.
+- uninstall removes `bin\` but **never** the data and user files next to it.
 
 Remember to bump `#define MyAppVersion` in the `.iss` (and the version of the
 installed `delftdashboard` package, which feeds the exe's version resource).

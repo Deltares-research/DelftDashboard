@@ -12,17 +12,17 @@
 ;   - iscc delftdashboard_nuitka.iss
 ;   -> produces installer\dist_innosetup\DelftDashboard_Setup_<ver>.exe
 ;
-; Layout produced by the installer:
+; Layout: ONE DelftDashboard folder, chosen on the single directory page:
 ;   {app}\bin\DelftDashboard.exe        (the compiled program + all DLLs/data)
-;   {app}\bin\delftdashboard.pth        (pointer file: path to the data folder)
-;   <data folder>\data\ , \server\ , delftdashboard.ini   (created by the app)
+;   {app}\bin\delftdashboard.pth        (pointer file, contains {app})
+;   {app}\data\ , {app}\server\ , {app}\working_directory\ ,
+;   {app}\delftdashboard.ini            (created by the app on first run)
 ;
-; The wizard asks the user WHERE the data folder should live (a chosen,
-; accessible location - recommended - or the per-user application-data folder).
-; That choice is written to {app}\bin\delftdashboard.pth, which the frozen exe
-; reads at startup (env var DELFTDASHBOARD_DATA overrides it). The app then
-; stores everything it downloads/creates under that folder, NOT under {app},
-; so the (possibly large) data survives uninstall and can sit on any drive.
+; The pointer file tells the exe that its DelftDashboard folder is {app}
+; (env var DELFTDASHBOARD_DATA overrides it). Downloads can grow to several
+; GB, so the default install location is an accessible, writable folder
+; (C:\DelftDashboard), not Program Files. Uninstall removes only bin\ -
+; data and user files under {app} are left untouched.
 
 #define MyAppName "DelftDashboard"
 ; The version is passed on the ISCC command line by package_ddb.bat, which
@@ -44,10 +44,10 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
-; Per-user install: writable, no admin prompt. {autopf} would need admin AND a
-; separate writable data location (not yet implemented in the app).
+; Per-user install: writable, no admin prompt. The app writes data next to
+; bin\, so the whole folder must be writable - hence NOT Program Files.
 PrivilegesRequired=lowest
-DefaultDirName={localappdata}\Programs\{#MyAppName}
+DefaultDirName={sd}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 ; Always show the install-location page. The Inno default (auto) silently
 ; skips it when the same AppId is already installed (upgrade), which makes it
@@ -68,6 +68,13 @@ UninstallDisplayIcon={app}\bin\{#MyAppExeName}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
+
+[Messages]
+; Make clear that the chosen folder is the ONE DelftDashboard folder: the
+; program goes into bin\ and downloaded data (which can grow to several GB)
+; is stored right next to it.
+SelectDirDesc=Where should [name] be installed?
+SelectDirLabel3=Setup will install [name] into the following folder. The program is placed in a "bin" sub-folder; downloaded data (bathymetry, tide models, ...) will also be stored in this folder, so choose a location with sufficient disk space.
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional options:"; Flags: unchecked
@@ -92,55 +99,13 @@ Filename: "{app}\bin\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; Flags
 Type: files; Name: "{app}\bin\delftdashboard.pth"
 
 [Code]
-var
-  DataChoicePage: TInputOptionWizardPage;
-  DataDirPage: TInputDirWizardPage;
-
-procedure InitializeWizard;
-begin
-  { Page 1: how to store data - a chosen folder (recommended) or app data. }
-  DataChoicePage := CreateInputOptionPage(wpSelectDir,
-    'Data location',
-    'Where should DelftDashboard keep its data?',
-    'DelftDashboard downloads bathymetry, tide models and other data (this can grow to several GB). Choose where to store it, then click Next.',
-    True, False);
-  DataChoicePage.Add('A folder I choose  (recommended - accessible and easy to back up)');
-  DataChoicePage.Add('Application data folder  (' + ExpandConstant('{localappdata}\{#MyAppName}') + ')');
-  DataChoicePage.SelectedValueIndex := 0;
-
-  { Page 2: pick the folder (only used when option 1 is selected). }
-  DataDirPage := CreateInputDirPage(DataChoicePage.ID,
-    'Data folder',
-    'Select the folder where DelftDashboard should store its data.',
-    'A "data" sub-folder (plus a "server" folder and settings file) will be created inside it. Click Next to continue.',
-    False, '');
-  DataDirPage.Add('');
-  DataDirPage.Values[0] := ExpandConstant('{sd}\{#MyAppName}');
-end;
-
-function ShouldSkipPage(PageID: Integer): Boolean;
-begin
-  { Skip the folder-picker page when the user chose the application-data folder. }
-  Result := (PageID = DataDirPage.ID) and (DataChoicePage.SelectedValueIndex <> 0);
-end;
-
-function GetDataFolder(): String;
-begin
-  if DataChoicePage.SelectedValueIndex = 0 then
-    Result := DataDirPage.Values[0]
-  else
-    Result := ExpandConstant('{localappdata}\{#MyAppName}');
-end;
-
 procedure CurStepChanged(CurStep: TSetupStep);
-var
-  DataFolder: String;
 begin
   if CurStep = ssPostInstall then
   begin
-    { Create the data folder and write the pointer file the exe reads at startup. }
-    DataFolder := GetDataFolder();
-    ForceDirectories(DataFolder);
-    SaveStringToFile(ExpandConstant('{app}\bin\delftdashboard.pth'), DataFolder + #13#10, False);
+    { The DelftDashboard folder (data, server, working_directory, ini) is the
+      install folder itself. Write the pointer file the exe reads at startup. }
+    SaveStringToFile(ExpandConstant('{app}\bin\delftdashboard.pth'),
+      ExpandConstant('{app}') + #13#10, False);
   end;
 end;
