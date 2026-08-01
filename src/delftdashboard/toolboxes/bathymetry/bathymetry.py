@@ -161,27 +161,31 @@ class Toolbox(GenericToolbox):
         with open(catalog_file, "w") as f:
             yaml.dump(catalog_entry, f, default_flow_style=False, sort_keys=False)
 
-        # Add to the master data_catalog.yml
-        master_file = os.path.join(dbpath, "data_catalog.yml")
-        if os.path.exists(master_file):
-            with open(master_file, "r") as f:
-                master = yaml.safe_load(f)
-            master_metadata = {
-                "unit": vertical_units,
-                "long_name": long_name,
-                "source": src,
-                "difference_with_msl": difference_with_msl,
-            }
-            if epsg is not None and epsg != 4326:
-                master_metadata["crs"] = epsg
-            master[name] = {
-                "data_type": "RasterDataset",
-                "driver": "rasterio",
-                "uri": f"{name}/{name}.tif",
-                "metadata": master_metadata,
-            }
-            with open(master_file, "w") as f:
-                yaml.dump(master, f, default_flow_style=False, sort_keys=False)
+        # Add to the user-managed local catalog (data_catalog_local.yml).
+        # This file is read first by TopographyDataCatalog, so entries here
+        # take precedence over the S3-provided catalog (data_catalog_s3.yml).
+        local_file = os.path.join(dbpath, "data_catalog_local.yml")
+        if os.path.exists(local_file):
+            with open(local_file, "r") as f:
+                local_catalog = yaml.safe_load(f) or {}
+        else:
+            local_catalog = {"meta": {"root": "."}}
+        local_metadata = {
+            "unit": vertical_units,
+            "long_name": long_name,
+            "source": src,
+            "difference_with_msl": difference_with_msl,
+        }
+        if epsg is not None and epsg != 4326:
+            local_metadata["crs"] = epsg
+        local_catalog[name] = {
+            "data_type": "RasterDataset",
+            "driver": "rasterio",
+            "uri": f"{name}/{name}.tif",
+            "metadata": local_metadata,
+        }
+        with open(local_file, "w") as f:
+            yaml.dump(local_catalog, f, default_flow_style=False, sort_keys=False)
 
         # Add to in-memory catalog
         app.topography_data_catalog.catalog.from_yml(catalog_file, root=output_dir)

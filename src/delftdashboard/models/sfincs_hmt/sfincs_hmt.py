@@ -600,18 +600,22 @@ class Model(GenericModel):
         app.map.layer[_MODEL].layer["drainage_structures"].set_data(
             app.model[_MODEL].domain.drainage_structures.gdf
         )
-        # Urban drainage areas (under the urban_drainage container) and
-        # their derived outfall-location circles.
-        app.map.layer[_MODEL].layer["urban_drainage"].layer[
-            "urban_drainage_areas"
-        ].set_data(app.model[_MODEL].domain.urban_drainage_areas.gdf)
-        from .urban_drainage import plot_outfall_layer
 
-        plot_outfall_layer()
+
+        # # Urban drainage areas (under the urban_drainage container) and
+        # # their derived outfall-location circles.
+        # app.map.layer[_MODEL].layer["urban_drainage"].layer[
+        #     "urban_drainage_areas"
+        # ].set_data(app.model[_MODEL].domain.urban_drainage_areas.gdf)
+        # from .urban_drainage import plot_outfall_layer
+        # plot_outfall_layer()
+
         # Observation points
         app.map.layer[_MODEL].layer["observation_points"].set_data(
             app.model[_MODEL].domain.observation_points.gdf, 0
         )
+
+
         # Cross sections
         app.map.layer[_MODEL].layer["cross_sections"].layer["polylines"].set_data(
             app.model[_MODEL].domain.cross_sections.gdf

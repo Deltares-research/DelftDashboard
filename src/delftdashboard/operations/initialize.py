@@ -7,6 +7,7 @@ models and toolboxes, and builds the GUI layout.
 
 import importlib
 import os
+import sys
 import warnings
 
 # Pre-import pydantic before PySide6/Shiboken is loaded.
@@ -54,6 +55,75 @@ def _ask_data_folder() -> str:
     return ""
 
 
+def _is_compiled() -> bool:
+    """Return True when running as a frozen/compiled binary rather than source.
+
+    Detects a Nuitka standalone build (which injects a ``__compiled__`` global
+    into every compiled module) as well as a PyInstaller build (``sys.frozen``).
+    """
+    return "__compiled__" in globals() or bool(getattr(sys, "frozen", False))
+
+
+def _last_working_directory_file() -> str:
+    """Path of the file that remembers the last-used working directory."""
+    return os.path.join(app.config["delft_dashboard_path"], "last_working_directory.txt")
+
+
+def read_last_working_directory() -> str:
+    """Return the remembered last working directory, or "" if there is none."""
+    fname = _last_working_directory_file()
+    if os.path.exists(fname):
+        try:
+            with open(fname, "r") as f:
+                return f.readline().strip()
+        except OSError:
+            return ""
+    return ""
+
+
+def save_working_directory(path: str) -> None:
+    """Remember *path* as the last-used working directory for the next startup."""
+    try:
+        with open(_last_working_directory_file(), "w") as f:
+            f.write(path + "\n")
+    except OSError:
+        pass
+
+
+def initialize_working_directory() -> None:
+    """Set the working directory where model input files are written.
+
+    When DelftDashboard is launched *directly* (the current directory is the
+    executable's own directory - e.g. a double-click or a Start-menu shortcut),
+    change to the remembered last working directory, or to a default
+    ``working_directory`` folder inside the DelftDashboard folder (next to
+    ``data`` and ``server``) if there is none. When it is launched from another
+    directory (running from source, or started from a project folder on the
+    command line), that directory is respected and simply remembered for next
+    time.
+    """
+    launch_dir = os.path.abspath(os.getcwd())
+
+    # "Launched directly" only applies to a frozen build started from its own
+    # (bin) directory; from source we always respect the current directory.
+    launched_directly = False
+    if _is_compiled():
+        exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+        launched_directly = os.path.normcase(launch_dir) == os.path.normcase(exe_dir)
+
+    if not launched_directly:
+        save_working_directory(launch_dir)
+        return
+
+    workdir = read_last_working_directory()
+    if not workdir or not os.path.isdir(workdir):
+        workdir = os.path.join(app.config["delft_dashboard_path"], "working_directory")
+    os.makedirs(workdir, exist_ok=True)
+    os.chdir(workdir)
+    save_working_directory(workdir)
+    print(f"Working directory: {workdir}")
+
+
 def initialize() -> None:
     """Run the full DelftDashboard initialization sequence.
 
@@ -61,7 +131,8 @@ def initialize() -> None:
     GUI object, set up bathymetry/meteo/tide databases, initialize all
     toolboxes and models, and assemble the GUI configuration.
     """
-    app.server_path = os.path.join(app.main_path, "server")
+    # Note: app.server_path is set later, once the DelftDashboard data folder
+    # (from delftdashboard.pth) is known - see below.
     app.config_path = os.path.join(app.main_path, "config")
 
     # Set default config
@@ -100,25 +171,46 @@ def initialize() -> None:
         app.config[key] = config[key]
     cfgfile.close()
 
-    # First read delftdashboard.pth file. This contains the path to the
-    # delftdashboard folder.
-    # Check working directory first, then package directory
-    pth_file_name = os.path.join(os.getcwd(), "delftdashboard.pth")
-    if not os.path.exists(pth_file_name):
-        pth_file_name = os.path.join(app.main_path, "delftdashboard.pth")
-    if not os.path.exists(pth_file_name):
-        # Ask the user to select a data folder via a native dialog
-        print("No delftdashboard.pth file found. Opening folder dialog...")
-        pth = _ask_data_folder()
+    # Determine the DelftDashboard folder (which holds the data, server folder,
+    # ini file, etc.).
+    if _is_compiled():
+        # Frozen / Nuitka build. Resolve the DelftDashboard folder (which holds
+        # data/, server/ and delftdashboard.ini) in priority order:
+        #   1. DELFTDASHBOARD_DATA environment variable (explicit override).
+        #   2. A delftdashboard.pth pointer file next to the executable
+        #      (written by the installer from the user's chosen location).
+        #   3. The per-user application-data folder (default fallback).
+        exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+        pth = os.environ.get("DELFTDASHBOARD_DATA", "").strip()
         if not pth:
-            print("No data folder selected. Exiting.")
-            raise SystemExit("No data folder selected. Exiting.")
-        # Write pth file in the source directory of delftdashboard, so it can be found next time
-        pth_file_name = os.path.join(app.main_path, "delftdashboard.pth") 
-        with open(pth_file_name, "w") as f:
-            f.write(pth)
-    with open(pth_file_name, "r") as f:
-        pth = f.readline().strip()
+            pointer_file = os.path.join(exe_dir, "delftdashboard.pth")
+            if os.path.exists(pointer_file):
+                with open(pointer_file, "r") as f:
+                    pth = f.readline().strip()
+        if not pth:
+            base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+            pth = os.path.join(base, "DelftDashboard")
+        print(f"Compiled build detected. DelftDashboard folder: {pth}")
+    else:
+        # Source build: read the delftdashboard.pth file, which contains the
+        # path to the DelftDashboard folder.
+        # Check working directory first, then package directory
+        pth_file_name = os.path.join(os.getcwd(), "delftdashboard.pth")
+        if not os.path.exists(pth_file_name):
+            pth_file_name = os.path.join(app.main_path, "delftdashboard.pth")
+        if not os.path.exists(pth_file_name):
+            # Ask the user to select a data folder via a native dialog
+            print("No delftdashboard.pth file found. Opening folder dialog...")
+            pth = _ask_data_folder()
+            if not pth:
+                print("No data folder selected. Exiting.")
+                raise SystemExit("No data folder selected. Exiting.")
+            # Write pth file in the source directory of delftdashboard, so it can be found next time
+            pth_file_name = os.path.join(app.main_path, "delftdashboard.pth")
+            with open(pth_file_name, "w") as f:
+                f.write(pth)
+        with open(pth_file_name, "r") as f:
+            pth = f.readline().strip()
     app.config["delft_dashboard_path"] = pth
     app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
 
@@ -167,6 +259,17 @@ def initialize() -> None:
     # If it does not exist, create it
     if not os.path.exists(app.config["data_path"]):
         os.mkdir(app.config["data_path"])
+
+    # Map server folder. At startup guitares copies its map-engine assets here
+    # (see copy_map_server_folder below), and overlays are written here at
+    # runtime, so this location must be writable. Place it inside the
+    # DelftDashboard folder (the path from delftdashboard.pth), e.g.
+    # c:\work\delftdashboard\server, rather than the package source directory,
+    # so it also works for a read-only / frozen (Nuitka/PyInstaller) install.
+    app.server_path = os.path.join(app.config["delft_dashboard_path"], "server")
+
+    # Set the working directory for model input/output (see function docstring).
+    initialize_working_directory()
 
     # Initialize GUI object
     app.gui = GUI(
@@ -327,6 +430,11 @@ def initialize() -> None:
     app.gui.setvar("menu", "active_toolbox_name", "")
     app.gui.setvar("menu", "active_topography_name", app.background_topography_name)
 
+    # Make datashader reuse its compiled aggregations across calls (broken in
+    # the frozen build), then warm up the JIT compiles in the background so the
+    # warmed results land in the patched cache.
+    _patch_datashader_compile_cache()
+
     # Warm up numba JIT in background (xugrid snap_to_grid etc.)
     # This call can be removed after the numba cell tree teams updates their code
     _warmup_numba()
@@ -347,19 +455,45 @@ def initialize_topography() -> None:
     # Backward-compatible alias for toolboxes that still use cht_bathymetry
     app.bathymetry_database = app.topography_data_catalog
 
+    # Add tiled datasets available on the DDB S3 bucket that are not yet in the
+    # local database (mirrors the tide-models / cyclone-tracks auto-update).
+    # On a fresh data folder this bootstraps the bathymetry database; tiles are
+    # downloaded on demand by the slippy_tile driver.
+    if app.online:
+        try:
+            app.topography_data_catalog.update_from_s3(
+                app.config.get("s3_bucket", "deltares-ddb")
+            )
+        except Exception as e:
+            print(f"Could not update bathymetry database from S3: {e}")
+
     # Selected datasets (list of dicts: {"name": ..., "zmin": ..., "zmax": ...})
     app.selected_bathymetry_datasets = []
 
     # Populate GUI variables for the bathy/topo selector
     source_names, _ = app.topography_data_catalog.sources()
-    dataset_names, _, _ = app.topography_data_catalog.dataset_names(
-        source=source_names[0]
-    )
+    if source_names:
+        dataset_names, _, _ = app.topography_data_catalog.dataset_names(
+            source=source_names[0]
+        )
+        active_source = source_names[0]
+    else:
+        # Fresh / empty bathymetry database (no data_catalog.yml yet). Start with
+        # an empty selector instead of crashing; background topography stays
+        # unavailable until the bathymetry database is populated.
+        print(
+            f"Warning: no bathymetry datasets found in {path}. "
+            "Background topography is unavailable until the bathymetry database "
+            "is populated (point DELFTDASHBOARD_DATA at a folder that has one, "
+            "or add data\\bathymetry\\data_catalog.yml)."
+        )
+        dataset_names = []
+        active_source = ""
     group = "bathy_topo_selector"
     app.gui.setvar(group, "names", [])
     app.gui.setvar(group, "zmin", [])
     app.gui.setvar(group, "bathymetry_source_names", source_names)
-    app.gui.setvar(group, "active_bathymetry_source", source_names[0])
+    app.gui.setvar(group, "active_bathymetry_source", active_source)
     app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
     app.gui.setvar(group, "bathymetry_dataset_index", 0)
     app.gui.setvar(group, "selected_bathymetry_dataset_names", [])
@@ -485,13 +619,101 @@ def initialize_models() -> None:
         app.model[model_name].initialize()
 
 
+def _patch_datashader_compile_cache() -> None:
+    """Give datashader's compile_components a content-keyed cache.
+
+    Datashader memoizes its (numba-jitted) aggregation pipeline with
+    ``toolz.memoize``, keyed on the hash of the reduction/glyph objects. In the
+    frozen (Nuitka) build that cache misses on every call, so every render
+    re-compiles the numba aggregation - which made e.g. every mask update take
+    a long time instead of only the first one. This wraps compile_components
+    with a cache keyed on the *content* of the arguments (via datashader's own
+    ``_hashable_inputs``), which is stable in both source and frozen builds.
+    The original memoized function is still called on a miss, so behaviour is
+    unchanged - results are simply reused across calls.
+    """
+    try:
+        import datashader.compiler as _dsc
+
+        if getattr(_dsc.compile_components, "_ddb_stable_cache", False):
+            return  # already patched
+
+        _orig = _dsc.compile_components
+        _cache: dict = {}
+
+        def _content_key(obj):
+            hashable_inputs = getattr(obj, "_hashable_inputs", None)
+            if callable(hashable_inputs):
+                try:
+                    return (type(obj).__qualname__, hashable_inputs())
+                except Exception:
+                    pass
+            return repr(obj)
+
+        def _stable_compile_components(
+            agg, schema, glyph, *, antialias=False, cuda=False, partitioned=False
+        ):
+            key = (
+                _content_key(agg),
+                str(schema),
+                _content_key(glyph),
+                antialias,
+                cuda,
+                partitioned,
+            )
+            try:
+                if key not in _cache:
+                    _cache[key] = _orig(
+                        agg,
+                        schema,
+                        glyph,
+                        antialias=antialias,
+                        cuda=cuda,
+                        partitioned=partitioned,
+                    )
+                return _cache[key]
+            except TypeError:
+                # Unhashable key component - fall back to the original call.
+                return _orig(
+                    agg,
+                    schema,
+                    glyph,
+                    antialias=antialias,
+                    cuda=cuda,
+                    partitioned=partitioned,
+                )
+
+        _stable_compile_components._ddb_stable_cache = True
+        _dsc.compile_components = _stable_compile_components
+
+        # The data-library modules import compile_components by name, so their
+        # module-level references must be patched as well.
+        for mod_name in (
+            "datashader.data_libraries.pandas",
+            "datashader.data_libraries.xarray",
+            "datashader.data_libraries.dask",
+            "datashader.data_libraries.dask_xarray",
+        ):
+            try:
+                mod = importlib.import_module(mod_name)
+                if hasattr(mod, "compile_components"):
+                    mod.compile_components = _stable_compile_components
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"Datashader compile-cache patch failed (non-critical): {e}")
+
+
 def _warmup_numba() -> None:
     """Trigger numba JIT compilation for xugrid in a background thread.
 
-    The first call to xugrid's snap_to_grid compiles several numba
-    functions which takes ~30 seconds. By running a tiny dummy call
-    during startup, the compilation happens in the background while
-    the user sees the splash screen.
+    The first call to xugrid's ``snap_to_grid`` / ``burn_vector_geometry``
+    compiles several numba functions which takes tens of seconds. By running
+    tiny dummy calls during startup, the compilation happens in the background
+    while the user sees the splash screen, so the first real grid/mask
+    operation is not blocked. ``burn_vector_geometry`` (via numba_celltree) is
+    what the active-cell mask update uses to rasterise include/exclude polygons;
+    without this warmup its first call would compile mid-operation.
     """
     import threading
 
@@ -499,21 +721,82 @@ def _warmup_numba() -> None:
         try:
             import geopandas as gpd
             import numpy as np
+            import pandas as pd
+            import xarray as xr
             import xugrid as xu
-            from shapely.geometry import LineString
+            from shapely.geometry import LineString, Polygon
 
-            # Create a minimal 2x2 grid and snap a line to it.
-            # This triggers compilation of the slow snap_to_edges
-            # numba function (~50s on first call).
+            # Minimal 2x2 unstructured grid used for the xugrid warmups.
             vertices = np.array(
                 [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]], dtype=float
             )
             faces = np.array([[0, 1, 4, 3], [1, 2, 5, 4]])
             grid = xu.Ugrid2d(vertices[:, 0], vertices[:, 1], -1, faces)
+
+            # 1) snap_to_grid - used when snapping boundary polylines to the grid.
             line = gpd.GeoDataFrame(
                 {"geometry": [LineString([(0.5, 0), (0.5, 1)])]},
             )
             xu.snap_to_grid(line, grid, max_snap_distance=0.5)
+
+            # 2) burn_vector_geometry - used to rasterise include/exclude polygons
+            #    when updating the active-cell mask (compiles numba_celltree).
+            uda = xu.UgridDataArray(
+                xr.DataArray(np.zeros(2), dims=[grid.face_dimension]), grid
+            )
+            poly = gpd.GeoDataFrame(
+                {
+                    "geometry": [
+                        Polygon([(0.2, 0.2), (1.8, 0.2), (1.8, 0.8), (0.2, 0.8)])
+                    ]
+                }
+            )
+            xu.burn_vector_geometry(poly, uda, fill=0, all_touched=False)
+
+            # 3) Datashader map-overlay aggregations. Each JIT-compiles a
+            #    different numba aggregation on first use, so all three map
+            #    overlays are warmed here:
+            #      cvs.line    -> grid / mesh-edge overlay
+            #      cvs.points  -> active-cell mask overlay
+            #      cvs.trimesh -> elevation overlay
+            #    Without this, the first render of each freezes mid-operation in
+            #    a frozen build (numba compiling on the GUI thread).
+            import datashader as ds
+            import datashader.transfer_functions as tf
+            from datashader import Canvas
+
+            cvs = Canvas(x_range=[0, 1], y_range=[0, 1], plot_height=16, plot_width=16)
+            cvs.line(
+                pd.DataFrame({"x1": [0.0], "x2": [1.0], "y1": [0.0], "y2": [1.0]}),
+                x=["x1", "x2"],
+                y=["y1", "y2"],
+                axis=1,
+            )
+            # NOTE: tf.spread is intentionally NOT warmed up (and no longer
+            # used by the mask overlays): its numba kernel is compiled per
+            # marker size and takes minutes in a frozen build. The overlays
+            # use a scipy binary dilation instead (see hydromt_sfincs /
+            # hydromt_hurrywave workflows.map_overlay._dilate_bool_agg).
+            pts = pd.DataFrame({"x": [0.1, 0.5, 0.9], "y": [0.1, 0.5, 0.9]})
+            tf.shade(
+                cvs.points(pts, "x", "y", ds.any()),
+                cmap=["#000000", "#ffffff"],
+            )
+            verts = pd.DataFrame(
+                {
+                    "x": [0.0, 1.0, 0.0, 1.0],
+                    "y": [0.0, 0.0, 1.0, 1.0],
+                    "z": [0.0, 1.0, 1.0, 2.0],
+                }
+            )
+            tris = pd.DataFrame({"v0": [0, 1], "v1": [1, 2], "v2": [2, 3]})
+            tf.shade(
+                cvs.trimesh(
+                    verts, tris, mesh=ds.utils.mesh(verts, tris), agg=ds.mean("z")
+                ),
+                cmap=["#000000", "#ffffff"],
+            )
+
             print("Numba JIT warmup complete.")
         except Exception as e:
             print(f"Numba warmup failed (non-critical): {e}")

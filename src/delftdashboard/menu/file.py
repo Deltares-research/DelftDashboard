@@ -67,6 +67,10 @@ def select_working_directory(option: str) -> None:
     )
     if path:
         os.chdir(path)
+        # Remember this choice so the next startup returns to it.
+        from delftdashboard.operations.initialize import save_working_directory
+
+        save_working_directory(path)
         # Set path for all models to new working directory
         for model in app.model:
             try:
