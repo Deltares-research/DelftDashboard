@@ -1,0 +1,5 @@
+# Requirements for building the documentation (used by Read the Docs).
+# Deliberately minimal: conf.py does not import the delftdashboard package,
+# so the full application dependency stack is not needed here.
+sphinx>=7
+sphinx-rtd-theme

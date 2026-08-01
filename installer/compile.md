@@ -148,8 +148,10 @@ resource (read by ``build_delftdashboard.py``), and the installer name/version
 3. Test the exe (see the post-build checklist above).
 4. ``package_ddb.bat``         (installer: ``dist_innosetup\DelftDashboard_Setup_<version>.exe``)
 5. Test the installer on a clean machine / user profile.
-6. Tag the release commit: ``git tag v<version>`` and push the tag. Optionally
-   publish the installer: ``gh release create v<version> dist_innosetup\DelftDashboard_Setup_<version>.exe``
+6. ``release_ddb.bat``         (git tag v<version>, push, GitHub release with the
+   installer attached; ``--dry-run`` shows what it would do). Read the Docs
+   rebuilds automatically on push, and its download link points at the latest
+   GitHub release.
 
 ## Known follow-ups
 

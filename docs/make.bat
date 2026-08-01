@@ -2,26 +2,50 @@
 
 pushd %~dp0
 
-REM Command file for Sphinx documentation
+REM Command file for Sphinx documentation.
+REM
+REM Finds a working sphinx in this order, VERIFYING each candidate actually
+REM runs before using it:
+REM   1. the SPHINXBUILD environment variable, if set and working
+REM   2. sphinx-build from PATH (e.g. delftdashboard_dev activated)
+REM   3. the delftdashboard_dev conda environment directly
+REM so it also works from a plain console:  make.bat html
 
-if "%SPHINXBUILD%" == "" (
+set "DEVPY=%USERPROFILE%\miniforge3\envs\delftdashboard_dev\python.exe"
+
+if "%SPHINXBUILD%" == "" goto try_path
+%SPHINXBUILD% --version >NUL 2>NUL
+if %errorlevel% == 0 goto have_sphinx
+echo WARNING: SPHINXBUILD is set to "%SPHINXBUILD%" but that does not run; ignoring it.
+
+:try_path
+sphinx-build --version >NUL 2>NUL
+if %errorlevel% == 0 (
 	set SPHINXBUILD=sphinx-build
+	goto have_sphinx
 )
+
+if exist "%DEVPY%" (
+	"%DEVPY%" -m sphinx --version >NUL 2>NUL
+	if not errorlevel 1 (
+		set SPHINXBUILD="%DEVPY%" -m sphinx
+		goto have_sphinx
+	)
+)
+
+echo.
+echo.No working Sphinx found. Looked for: the SPHINXBUILD environment
+echo.variable, sphinx-build on PATH, and the delftdashboard_dev conda
+echo.environment. Install Sphinx in delftdashboard_dev with:
+echo.
+echo.    pip install sphinx pydata-sphinx-theme
+echo.
+popd
+exit /b 1
+
+:have_sphinx
 set SOURCEDIR=source
 set BUILDDIR=build
-
-%SPHINXBUILD% >/dev/null 2>/dev/null
-if errorlevel 9009 (
-	echo.
-	echo.The 'sphinx-build' command was not found. Make sure you have Sphinx
-	echo.installed, then set the SPHINXBUILD environment variable to point
-	echo.to the full path of the 'sphinx-build' executable. Alternatively you
-	echo.may add the Sphinx directory to PATH.
-	echo.
-	echo.If you don't have Sphinx installed, grab it from
-	echo.https://www.sphinx-doc.org/
-	exit /b 1
-)
 
 if "%1" == "" goto help
 

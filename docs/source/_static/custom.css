@@ -1,0 +1,51 @@
+h1 {
+    color: #080C80;
+    border-bottom: 2px solid #3498db;
+}
+h2 {
+    color: #34495e;
+    border-bottom: 1px dotted #2ecc71;
+}
+h3 {
+    color: #7f8c8d;
+
+    text-transform: uppercase;
+}
+h4 {
+    color: #95a5a6;
+    font-style: italic;
+    font-weight: bold;
+    border-left: 4px solid #e74c3c;
+    padding-left: 8px;
+}
+
+/* Sidebar background color */
+.wy-side-nav-search {
+    background-color: #080C80; /* Dark blue */
+}
+
+/* Sidebar link text color */
+.wy-menu-vertical a {
+    color: #ffffff; /* White */
+}
+
+/* Sidebar link hover effect */
+.wy-menu-vertical a:hover {
+    color: #ffcc00; /* Yellow */
+}
+
+/* Link color in content */
+.rst-content a {
+    color: #080C80; /* Dodger blue */
+}
+
+/* Link hover color */
+.rst-content a:hover {
+    color: #ffcc00; /* Yellow */
+}
+
+
+.rst-cht_hurrywave {
+    background-color: #f0f0f0; /* Custom background color */
+    font-size: 1.2em; /* Adjust font size */
+}

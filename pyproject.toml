@@ -55,12 +55,8 @@ build = [
     "twine",
 ]
 docs = [
-    "jupyter",
-    "jupyter-cache",
-    "matplotlib",
-    "quartodoc",
-    "regex",
-    "pydata-sphinx-theme"
+    "sphinx",
+    "sphinx-rtd-theme",
 ]
 all = [
     "delftdashboard[build,dev,docs]",

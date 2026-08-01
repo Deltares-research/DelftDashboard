@@ -4,32 +4,40 @@ Installation
 DelftDashboard can be installed either as a standalone end-user application or
 as a development environment.
 
-Requirements
-------------
+End-User Installation (Windows installer)
+------------------------------------------
+
+The easiest way to install DelftDashboard on Windows 10/11 is the standalone
+installer. No Python or conda installation is required.
+
+1. Download the latest installer
+   (``DelftDashboard_Setup_<version>.exe``) from the
+   `release page <https://github.com/Deltares-research/DelftDashboard/releases/latest>`_.
+
+2. Run the installer. Windows SmartScreen may warn about an unrecognised
+   application; choose *More info* > *Run anyway*.
+
+3. Choose the DelftDashboard folder (default ``C:\DelftDashboard``). The
+   program is installed in a ``bin`` sub-folder, and all data the application
+   downloads (bathymetry, tide models, ...) is stored in this same folder -
+   pick a location with sufficient disk space (several GB). Pointing to an
+   existing DelftDashboard folder re-uses the data already in it.
+
+4. Launch DelftDashboard from the Start menu (or the optional desktop
+   shortcut). On first start the application creates the ``data``, ``server``
+   and ``working_directory`` sub-folders and downloads its database catalogs;
+   bathymetry and tide data are downloaded on demand as you use them.
+
+Uninstalling removes only the program (``bin``); downloaded data and your
+model files are left untouched.
+
+Developer Requirements
+----------------------
 
 - Python 3.12 (recommended) or 3.10+
 - `Miniforge3 <https://github.com/conda-forge/miniforge>`_ (recommended conda
   distribution)
 - Windows 10/11 (primary platform)
-
-End-User Installation
----------------------
-
-The end-user installation uses a pre-built conda-pack archive that contains all
-dependencies.
-
-1. Download the installer archive from the release page.
-
-2. Extract the archive to a folder of your choice (e.g.
-   ``C:\Program Files\DelftDashboard``).
-
-3. Run the post-install script to finalise paths::
-
-      post_install.bat
-
-4. Launch the application::
-
-      delftdashboard.bat
 
 Developer Installation
 ----------------------
