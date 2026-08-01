@@ -102,21 +102,39 @@ def initialize_working_directory() -> None:
     command line), that directory is respected and simply remembered for next
     time.
     """
+    def _same_dir(a: str, b: str) -> bool:
+        # realpath also expands Windows 8.3 short names (the frozen exe often
+        # sees short paths, the console long ones - a plain compare misfires)
+        try:
+            return os.path.normcase(os.path.realpath(a)) == os.path.normcase(
+                os.path.realpath(b)
+            )
+        except OSError:
+            return os.path.normcase(os.path.abspath(a)) == os.path.normcase(
+                os.path.abspath(b)
+            )
+
     launch_dir = os.path.abspath(os.getcwd())
 
     # "Launched directly" only applies to a frozen build started from its own
     # (bin) directory; from source we always respect the current directory.
-    launched_directly = False
+    exe_dir = None
     if _is_compiled():
         exe_dir = os.path.dirname(os.path.abspath(sys.executable))
-        launched_directly = os.path.normcase(launch_dir) == os.path.normcase(exe_dir)
+    launched_directly = exe_dir is not None and _same_dir(launch_dir, exe_dir)
 
     if not launched_directly:
         save_working_directory(launch_dir)
         return
 
     workdir = read_last_working_directory()
-    if not workdir or not os.path.isdir(workdir):
+    # Never adopt the executable's own folder as working directory (a stale
+    # remembered value from before the 8.3 short-path fix could contain it).
+    if (
+        not workdir
+        or not os.path.isdir(workdir)
+        or _same_dir(workdir, exe_dir)
+    ):
         workdir = os.path.join(app.config["delft_dashboard_path"], "working_directory")
     os.makedirs(workdir, exist_ok=True)
     os.chdir(workdir)

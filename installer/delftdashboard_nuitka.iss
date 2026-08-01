@@ -49,6 +49,10 @@ AppPublisherURL={#MyAppURL}
 PrivilegesRequired=lowest
 DefaultDirName={localappdata}\Programs\{#MyAppName}
 DefaultGroupName={#MyAppName}
+; Always show the install-location page. The Inno default (auto) silently
+; skips it when the same AppId is already installed (upgrade), which makes it
+; look like the installer "stopped asking" where the program should go.
+DisableDirPage=no
 DisableProgramGroupPage=yes
 OutputDir=dist_innosetup
 OutputBaseFilename={#MyAppName}_Setup_{#MyAppVersion}

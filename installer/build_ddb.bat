@@ -3,10 +3,10 @@ REM ============================================================================
 REM  build_ddb.bat  -  build the standalone DelftDashboard executable (Nuitka)
 REM
 REM  Wraps build_delftdashboard.py using the delftdashboard_dev conda
-REM  environment. Any arguments are passed through, e.g.:
+REM  environment. The exe is always built with --debug (console window shown,
+REM  so errors are visible). Extra arguments are passed through, e.g.:
 REM
-REM      build_ddb.bat            release build (no console window)
-REM      build_ddb.bat --debug    keep a console window (use while testing)
+REM      build_ddb.bat            debug build (console window)
 REM      build_ddb.bat --print    show the nuitka command, don't build
 REM
 REM  Output: dist_nuitka\start_ddb.dist\DelftDashboard.exe
@@ -25,7 +25,7 @@ if not exist "%PYTHON%" (
 )
 
 pushd "%~dp0"
-"%PYTHON%" build_delftdashboard.py %*
+"%PYTHON%" build_delftdashboard.py --debug %*
 set "RC=%errorlevel%"
 popd
 
