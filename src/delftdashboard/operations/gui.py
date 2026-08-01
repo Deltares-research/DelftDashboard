@@ -65,7 +65,12 @@ def build_gui_config() -> None:
 
     # The Delft Dashboard GUI is built up programmatically
     app.gui.config["window"] = {}
-    app.gui.config["window"]["title"] = app.config["title"]
+    # Window title includes the version (single source: delftdashboard.__version__)
+    import delftdashboard
+
+    app.gui.config["window"]["title"] = (
+        f'{app.config["title"]} {getattr(delftdashboard, "__version__", "")}'.strip()
+    )
     app.gui.config["window"]["width"] = app.config["width"]
     app.gui.config["window"]["height"] = app.config["height"]
     app.gui.config["window"]["icon"] = app.config["window_icon"]

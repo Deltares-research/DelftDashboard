@@ -25,7 +25,13 @@
 ; so the (possibly large) data survives uninstall and can sit on any drive.
 
 #define MyAppName "DelftDashboard"
-#define MyAppVersion "0.0.1"
+; The version is passed on the ISCC command line by package_ddb.bat, which
+; reads it from src\delftdashboard\__init__.py (the single source of truth):
+;   iscc /DMyAppVersion=x.y.z delftdashboard_nuitka.iss
+; The fallback below only applies when compiling this script by hand.
+#ifndef MyAppVersion
+  #define MyAppVersion "0.0.0"
+#endif
 #define MyAppPublisher "Deltares"
 #define MyAppURL "https://github.com/Deltares-research/DelftDashboard"
 #define MyAppExeName "DelftDashboard.exe"

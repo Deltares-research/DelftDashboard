@@ -135,6 +135,22 @@ What the installer does (`delftdashboard_nuitka.iss`):
 Remember to bump `#define MyAppVersion` in the `.iss` (and the version of the
 installed `delftdashboard` package, which feeds the exe's version resource).
 
+## Release procedure
+
+The version has a single source of truth: ``__version__`` in
+``src/delftdashboard/__init__.py``. Everything else derives from it: pyproject
+(dynamic attr), the GUI (window title and Help > About), the exe version
+resource (read by ``build_delftdashboard.py``), and the installer name/version
+(``package_ddb.bat`` passes it to ISCC as ``/DMyAppVersion``).
+
+1. Bump ``__version__`` in ``src/delftdashboard/__init__.py`` and commit.
+2. ``build_ddb.bat``           (exe: ``dist_nuitka\start_ddb.dist``)
+3. Test the exe (see the post-build checklist above).
+4. ``package_ddb.bat``         (installer: ``dist_innosetup\DelftDashboard_Setup_<version>.exe``)
+5. Test the installer on a clean machine / user profile.
+6. Tag the release commit: ``git tag v<version>`` and push the tag. Optionally
+   publish the installer: ``gh release create v<version> dist_innosetup\DelftDashboard_Setup_<version>.exe``
+
 ## Known follow-ups
 
 - **Code signing**: the unsigned exe is treated with maximum suspicion by

@@ -250,16 +250,30 @@ NOFOLLOW = [
 ]
 
 
-def _numeric_version(dist: str = "delftdashboard", fallback: str = "0.0.1") -> str:
-    """Return the leading numeric dotted version of ``dist`` (e.g. ``0.0.1``).
+def read_version() -> str:
+    """Return the DelftDashboard version string.
+
+    Reads ``__version__`` from ``src/delftdashboard/__init__.py`` - the single
+    source of truth for the version (pyproject.toml derives from it too). Read
+    from the source file rather than installed metadata so editable installs
+    are never stale.
+    """
+    init_py = (SRC / "__init__.py").read_text()
+    match = re.search(r"^__version__\s*=\s*[\"']([^\"']+)[\"']", init_py, re.M)
+    if not match:
+        raise RuntimeError(f"__version__ not found in {SRC / '__init__.py'}")
+    return match.group(1)
+
+
+def _numeric_version(fallback: str = "0.0.1") -> str:
+    """Return the leading numeric dotted version (e.g. ``0.0.1``).
 
     Windows version resources require a purely numeric, dotted version, so any
-    ``devN`` / ``rcN`` / ``+localtag`` suffix is stripped. Falls back to
-    ``fallback`` if the distribution is not installed or has no numeric prefix.
+    ``devN`` / ``rcN`` / ``+localtag`` suffix is stripped.
     """
     try:
-        raw = importlib.metadata.version(dist)
-    except importlib.metadata.PackageNotFoundError:
+        raw = read_version()
+    except Exception:
         return fallback
     match = re.match(r"\d+(?:\.\d+){0,3}", raw)
     return match.group(0) if match else fallback

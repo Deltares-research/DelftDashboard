@@ -30,7 +30,18 @@ if not exist "dist_nuitka\start_ddb.dist\DelftDashboard.exe" (
   popd & pause & exit /b 1
 )
 
-"%ISCC%" delftdashboard_nuitka.iss
+REM -- Read the version from the single source of truth ------------------------
+set "VERSION="
+for /f "tokens=2 delims==" %%v in ('findstr /b /c:"__version__" "..\src\delftdashboard\__init__.py"') do set "VERSION=%%v"
+set "VERSION=%VERSION:"=%"
+set "VERSION=%VERSION: =%"
+if not defined VERSION (
+  echo ERROR: could not read __version__ from ..\src\delftdashboard\__init__.py
+  popd & pause & exit /b 1
+)
+echo Packaging DelftDashboard version %VERSION% ...
+
+"%ISCC%" /DMyAppVersion=%VERSION% delftdashboard_nuitka.iss
 set "RC=%errorlevel%"
 popd
 
