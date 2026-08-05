@@ -164,17 +164,11 @@ class SetupYamlMixin:
         mmax = int(grid["mmax"])
         rotation = float(grid.get("rotation", 0.0))
 
-        app.gui.setvar(_TB, "x0", x0)
-        app.gui.setvar(_TB, "y0", y0)
-        app.gui.setvar(_TB, "dx", dx)
-        app.gui.setvar(_TB, "dy", dy)
-        app.gui.setvar(_TB, "nmax", nmax)
-        app.gui.setvar(_TB, "mmax", mmax)
-        app.gui.setvar(_TB, "rotation", rotation)
-
         # The HurrywaveModel's CRS is read-only and only set when the grid
         # is built — store the CRS at the app/map level instead. The grid
         # itself picks it up via app.crs.to_epsg() in generate_grid.
+        # NOTE: must happen BEFORE the grid setvars below — a CRS change
+        # propagates to the toolboxes and resets their grid defaults.
         if "epsg" in grid:
             crs_obj = CRS.from_epsg(int(grid["epsg"]))
         elif "crs" in grid:
@@ -182,6 +176,14 @@ class SetupYamlMixin:
         else:
             crs_obj = app.crs
         map.set_crs(crs_obj)
+
+        app.gui.setvar(_TB, "x0", x0)
+        app.gui.setvar(_TB, "y0", y0)
+        app.gui.setvar(_TB, "dx", dx)
+        app.gui.setvar(_TB, "dy", dy)
+        app.gui.setvar(_TB, "nmax", nmax)
+        app.gui.setvar(_TB, "mmax", mmax)
+        app.gui.setvar(_TB, "rotation", rotation)
 
         # Zoom to the model outline.
         x1 = x0 + dx * mmax

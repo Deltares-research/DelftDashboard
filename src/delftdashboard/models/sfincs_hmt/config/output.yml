@@ -42,7 +42,7 @@ element:
     variable: dthisout
     method: set_model_variables
   - style: edit
-    id: his_int
+    id: rst_int
     position:
       x: 120
       y: 55
@@ -64,13 +64,9 @@ element:
     variable: outputformat
     method: set_model_variables
     option_string:
-    - NetCDF
-    - Binary
-    - ASCII
+      variable: output_options_text
     option_value:
-    - net
-    - bin
-    - asc
+      variable: output_options_values
     tooltipstring: Select the output file format
   - style: checkbox
     position:
@@ -88,3 +84,192 @@ element:
     variable: storevel
     method: set_model_variables
     tooltipstring: Check to include velocity data in model output
+  - style: checkbox
+    position:
+      x: 220
+      y: 80
+    text: Store Cumulative Precipitation
+    variable: storecumprcp
+    method: set_model_variables
+    tooltipstring: Check to include cumulative precipitation in model output
+  - style: checkbox
+    position:
+      x: 220
+      y: 55
+    text: Store Max Velocity
+    variable: storevelmax
+    method: set_model_variables
+    tooltipstring: Check to store the maximum velocity
+#  - style: checkbox
+#    position:
+#      x: 220
+#      y: 30
+#    text: Store Max Flux
+#    variable: storefluxmax
+#    method: set_model_variables
+#    tooltipstring: Check to store the maximum flux
+#  - style: checkbox
+#    position:
+#      x: 430
+#      y: 130
+#    text: Store Max Wind
+#    variable: storemaxwind
+#    method: set_model_variables
+#    dependency:
+#    - action: enable
+#      checkfor: all
+#      check:
+#      - variable: storemeteo
+#        operator: eq
+#        value: true
+#    tooltipstring: Check to store the maximum wind speed (requires Store Meteo)
+#  - style: checkbox
+#    position:
+#      x: 430
+#      y: 105
+#    text: Store Wave Forces
+#    variable: storefw
+#    method: set_model_variables
+#    tooltipstring: Check to store the wave-radiation forces
+#  - style: checkbox
+#    position:
+#      x: 430
+#      y: 80
+#    text: Store Wave Direction
+#    variable: storewavdir
+#    method: set_model_variables
+#    tooltipstring: Check to store the wave direction
+#  - style: checkbox
+#    position:
+#      x: 430
+#      y: 55
+#    text: Store Drainage Discharge
+#    variable: storeqdrain
+#    method: set_model_variables
+#    tooltipstring: Check to store per-drainage-structure discharge in the his output
+#  - style: checkbox
+#    position:
+#      x: 430
+#      y: 30
+#    text: Store Wet Duration
+#    variable: storetwet
+#    method: set_model_variables
+#    tooltipstring: Check to store the per-cell wet duration
+#  - style: edit
+#    position:
+#      x: 740
+#      y: 130
+#      width: 50
+#      height: 20
+#    text: Wet threshold (m)
+#    textposition: left
+#    variable: twet_threshold
+#    method: set_model_variables
+#    dependency:
+#    - action: enable
+#      checkfor: all
+#      check:
+#      - variable: storetwet
+#        operator: eq
+#        value: true
+#    tooltipstring: Depth threshold above which a cell counts as wet (m)
+#  - style: checkbox
+#    position:
+#      x: 640
+#      y: 105
+#    text: Store Subgrid Depth
+#    variable: storehsubgrid
+#    method: set_model_variables
+#    tooltipstring: Check to store hmax in subgrid mode (zsmax minus subgrid zmin)
+#  - style: checkbox
+#    position:
+#      x: 640
+#      y: 80
+#    text: Store Mean Subgrid Depth
+#    variable: storehmean
+#    method: set_model_variables
+#    dependency:
+#    - action: enable
+#      checkfor: all
+#      check:
+#      - variable: storehsubgrid
+#        operator: eq
+#        value: true
+#    tooltipstring: Store hmax as the subgrid-mean depth (requires Store Subgrid Depth)
+#  - style: checkbox
+#    position:
+#      x: 640
+#      y: 55
+#    text: Store Cell Volume
+#    variable: storezvolume
+#    method: set_model_variables
+#    tooltipstring: Check to store the subgrid cell volume (subgrid models only)
+#  - style: checkbox
+#    position:
+#      x: 640
+#      y: 30
+#    text: Store Storage Volume
+#    variable: storestoragevolume
+#    method: set_model_variables
+#    tooltipstring: Check to store the remaining depression storage volume (requires a volume file)
+#  - style: checkbox
+#    position:
+#      x: 860
+#      y: 105
+#    text: Store Tsunami Arrival
+#    variable: store_tsunami_arrival_time
+#    method: set_model_variables
+#    tooltipstring: Check to store the tsunami arrival time per cell
+#  - style: edit
+#    position:
+#      x: 1080
+#      y: 105
+#      width: 50
+#      height: 20
+#    text: Arrival threshold (m)
+#    textposition: left
+#    variable: tsunami_arrival_threshold
+#    method: set_model_variables
+#    dependency:
+#    - action: enable
+#      checkfor: all
+#      check:
+#      - variable: store_tsunami_arrival_time
+#        operator: eq
+#        value: true
+#    tooltipstring: Depth threshold for the tsunami arrival time (m)
+#  - style: checkbox
+#    position:
+#      x: 860
+#      y: 80
+#    text: Store Dynamic Bed Level
+#    variable: store_dynamic_bed_level
+#    method: set_model_variables
+#    tooltipstring: Check to store the time-varying bed level (subgrid models)
+#  - style: checkbox
+#    position:
+#      x: 860
+#      y: 55
+#    text: Time Step Analysis
+#    variable: timestep_analysis
+#    method: set_model_variables
+#    tooltipstring: Check to store per-cell time-step limiter diagnostics
+#  - style: checkbox
+#    position:
+#      x: 860
+#      y: 30
+#    text: Debug Output
+#    variable: debug
+#    method: set_model_variables
+#    tooltipstring: Check to write debug output every time step
+#  - style: edit
+#    position:
+#      x: 1080
+#      y: 130
+#      width: 50
+#      height: 20
+#    text: NetCDF deflate level
+#    textposition: left
+#    variable: nc_deflate_level
+#    method: set_model_variables
+#    tooltipstring: NetCDF compression level (0-9)

@@ -76,15 +76,15 @@ element:
   position:
     x: 220
     y: 10
-    width: 400
+    width: -10
     height: 120
   element:  
   - style: popupmenu
     text: Type
     position:
-      x: 50
+      x: 60
       y: 90
-      width: 100
+      width: 80
       height: 20
     variable: drainage_structure_type
     option_value:
@@ -93,10 +93,40 @@ element:
       variable: drainage_structure_type_names
     enable: false
     tooltip: Type of drainage structure
+  - style: popupmenu
+    text: Direction
+    position:
+      x: 230
+      y: 90
+      width: 80
+      height: 20
+    variable: drainage_structure_direction
+    option_value:
+      variable: drainage_structure_directions
+    option_string:
+      variable: drainage_structure_direction_names
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 2
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: 'Flow direction filter: both, positive (endpoint 1 to 2 only) or negative (endpoint 2 to 1 only)'
   - style: edit
     text: Discharge (m3/s)
     position:
-      x: 100
+      x: 90
       y: 60
       width: 50
       height: 20
@@ -119,7 +149,7 @@ element:
   - style: edit
     text: Alpha
     position:
-      x: 100
+      x: 90
       y: 60
       width: 50
       height: 20
@@ -145,7 +175,7 @@ element:
   - style: edit
     text: Width
     position:
-      x: 100
+      x: 90
       y: 60
       width: 50
       height: 20
@@ -168,7 +198,7 @@ element:
   - style: edit
     text: Sill Elevation
     position:
-      x: 100
+      x: 90
       y: 35
       width: 50
       height: 20
@@ -191,7 +221,7 @@ element:
   - style: edit
     text: Manning's n
     position:
-      x: 100
+      x: 90
       y: 10
       width: 50
       height: 20
@@ -212,9 +242,147 @@ element:
         value: 0
     tooltip: Edit gate Manning's n
   - style: edit
+    text: Flow coef
+    position:
+      x: 90
+      y: 60
+      width: 50
+      height: 20
+    variable: drainage_structure_alpha
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit culvert flow coefficient (-)
+  - style: edit
+    text: Width (m)
+    position:
+      x: 90
+      y: 35
+      width: 50
+      height: 20
+    variable: drainage_structure_width
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit culvert width (m)
+  - style: edit
+    text: Height (m)
+    position:
+      x: 90
+      y: 10
+      width: 50
+      height: 20
+    variable: drainage_structure_height
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit culvert pipe height (m)
+  - style: edit
+    text: Invert 1 (m)
+    position:
+      x: 230
+      y: 60
+      width: 50
+      height: 20
+    variable: drainage_structure_invert_1
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit culvert bed elevation at endpoint 1 (m)
+  - style: edit
+    text: Invert 2 (m)
+    position:
+      x: 230
+      y: 35
+      width: 50
+      height: 20
+    variable: drainage_structure_invert_2
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit culvert bed elevation at endpoint 2 (m)
+  - style: edit
+    text: Submergence ratio
+    position:
+      x: 230
+      y: 10
+      width: 50
+      height: 20
+    variable: drainage_structure_submergence_ratio
+    method: edit_drainage_structure_parameter
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Edit culvert submergence threshold h_dn/h_up (-)
+  - style: edit
     text: Closing time (s)
     position:
-      x: 300
+      x: 230
       y: 60
       width: 50
       height: 20
@@ -234,15 +402,100 @@ element:
         operator: gt
         value: 0
     tooltip: Edit time it takes for gate to open or close (s)
-  - style: edit
-    text: Rules open
+  - style: listbox
     position:
-      x: 180
+      x: 380
+      y: 60
+      width: 120
+      height: 50
+    method: select_drainage_structure_rule
+    variable: drainage_structure_rule_index
+    select: index
+    option_string:
+      variable: drainage_structure_rule_strings
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 2
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    tooltip: Ordered gate control rules; the first rule whose "when" expression fires wins
+  - style: pushbutton
+    text: Add Rule
+    position:
+      x: 510
+      y: 90
+      width: 80
+      height: 20
+    method: add_drainage_structure_rule
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 2
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structures
+        operator: gt
+        value: 0
+    tooltip: Add a gate control rule
+  - style: pushbutton
+    text: Delete Rule
+    position:
+      x: 510
+      y: 65
+      width: 80
+      height: 20
+    method: delete_drainage_structure_rule
+    dependency:
+    - action: visible
+      checkfor: any
+      check:
+      - variable: drainage_structure_type
+        operator: eq
+        value: 2
+      - variable: drainage_structure_type
+        operator: eq
+        value: 4
+      - variable: drainage_structure_type
+        operator: eq
+        value: 5
+    - action: enable
+      checkfor: any
+      check:
+      - variable: nr_drainage_structure_rules
+        operator: gt
+        value: 0
+    tooltip: Delete the selected rule
+  - style: popupmenu
+    text: Operation
+    position:
+      x: 420
       y: 35
-      width: 200
+      width: 80
       height: 20
-    variable: drainage_structure_rules_open
-    method: edit_drainage_structure_parameter
+    variable: drainage_structure_rule_operation
+    option_value:
+      variable: drainage_structure_rule_operations
+    option_string:
+      variable: drainage_structure_rule_operation_names
+    method: edit_drainage_structure_rule
     dependency:
     - action: visible
       checkfor: any
@@ -259,19 +512,19 @@ element:
     - action: enable
       checkfor: any
       check:
-      - variable: nr_drainage_structures
+      - variable: nr_drainage_structure_rules
         operator: gt
         value: 0
-    tooltip: Rules_open expression (e.g. "z1<0.5 | z2-z1>0.05"); leave empty for no trigger
+    tooltip: What the gate does when this rule fires (open, close, or hold current position)
   - style: edit
-    text: Rules close
+    text: When
     position:
-      x: 180
+      x: 400
       y: 10
-      width: 200
+      width: 100
       height: 20
-    variable: drainage_structure_rules_close
-    method: edit_drainage_structure_parameter
+    variable: drainage_structure_rule_when
+    method: edit_drainage_structure_rule
     dependency:
     - action: visible
       checkfor: any
@@ -288,7 +541,7 @@ element:
     - action: enable
       checkfor: any
       check:
-      - variable: nr_drainage_structures
+      - variable: nr_drainage_structure_rules
         operator: gt
         value: 0
-    tooltip: Rules_close expression (e.g. "z2>2.0"); leave empty for no trigger
+    tooltip: Trigger expression (e.g. "z1>-0.15 & z1-z2>0.09")

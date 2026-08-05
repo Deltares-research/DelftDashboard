@@ -58,6 +58,7 @@ def save(*args: Any) -> None:
     if rsp[0]:
         app.model[_MODEL].domain.config.set("obsfile", rsp[2])
         app.model[_MODEL].domain.observation_points.write()
+        app.model[_MODEL].observation_points_changed = False
 
 
 def update() -> None:
@@ -95,13 +96,19 @@ def point_clicked(x: float, y: float) -> None:
     gdf = app.model[_MODEL].domain.observation_points.gdf
     app.map.layer[_MODEL].layer["observation_points_regular"].set_data(gdf, index)
     app.gui.setvar(_GROUP, "active_observation_point_regular", index)
+    app.model[_MODEL].observation_points_changed = True
     update()
 
 
 def select_observation_point_from_list(*args: Any) -> None:
     """Sync the map selection when a point is picked from the list."""
     map.reset_cursor()
-    index = app.gui.getvar(_GROUP, "active_observation_point_regular")
+    # Use the index passed by the listbox callback, not getvar (which may
+    # be stale due to async JS updates)
+    if args and isinstance(args[0], int):
+        index = args[0]
+    else:
+        index = app.gui.getvar(_GROUP, "active_observation_point_regular")
     app.map.layer[_MODEL].layer["observation_points_regular"].select_by_index(index)
 
 
@@ -128,4 +135,5 @@ def delete_point_from_list(*args: Any) -> None:
     index = max(min(index, len(gdf) - 1), 0)
     app.map.layer[_MODEL].layer["observation_points_regular"].set_data(gdf, index)
     app.gui.setvar(_GROUP, "active_observation_point_regular", index)
+    app.model[_MODEL].observation_points_changed = True
     update()

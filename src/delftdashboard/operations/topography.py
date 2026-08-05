@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import geopandas as gpd
+import numpy as np
 from hydromt import DataCatalog
 from shapely.geometry import box
 
@@ -32,10 +33,15 @@ class TopographyDataCatalog:
     def __init__(self, path: str) -> None:
         self.path = path
         self.catalog = DataCatalog()
-        # Maps source name → YAML file that provided it. Populated by
-        # :py:meth:`_load` and consumed by :py:meth:`data_libs_for` to
-        # emit an accurate ``global.data_libs`` in the model setup yaml.
+        # Maps source name → YAML file that provided it (first-wins merge).
+        # Populated by :py:meth:`_load` and consumed by
+        # :py:meth:`data_libs_for` to emit an accurate ``global.data_libs``
+        # in the model setup yaml.
         self._source_yaml: Dict[str, str] = {}
+        # Maps source name → every YAML file that defines it (also the ones
+        # that lost the first-wins merge). Lets data_libs_for prefer the
+        # overall catalogs over legacy per-dataset files.
+        self._defined_in: Dict[str, List[str]] = {}
         self._load(path)
 
     def _load(self, path: str) -> None:
@@ -45,7 +51,7 @@ class TopographyDataCatalog:
 
         * ``data_catalog_local.yml`` - optional, maintained by the user (and
           appended to by the bathymetry import toolbox) for local datasets.
-        * ``data_catalog_s3.yml``    - a copy of the catalog on the DDB S3
+        * ``data_catalog_remote.yml`` - a copy of the catalog on the DDB S3
           bucket, refreshed by :py:meth:`update_from_s3` at every online start.
           Do not edit; it is overwritten.
 
@@ -62,6 +68,9 @@ class TopographyDataCatalog:
             (yml, os.path.dirname(yml))
             for yml in sorted(glob.glob(os.path.join(path, "*", "data_catalog.yml")))
         ]
+        candidates.append((os.path.join(path, "data_catalog_remote.yml"), path))
+        # Legacy name of the remote catalog (renamed August 2026); read so
+        # existing data folders keep working until the next online refresh.
         candidates.append((os.path.join(path, "data_catalog_s3.yml"), path))
 
         for yml, root in candidates:
@@ -77,13 +86,13 @@ class TopographyDataCatalog:
 
         Downloads ``<s3_key>/data_catalog.yml`` from the (public, unsigned) S3
         bucket - the hydromt data catalog maintained on the bucket itself - and
-        stores it locally as ``data_catalog_s3.yml``. Its sources are then
+        stores it locally as ``data_catalog_remote.yml``. Its sources are then
         merged into the running catalog; datasets already defined locally
         (imported or customised by the user) take precedence. The actual
         tiles/COGs are downloaded on demand by their drivers.
 
         Failures are logged and never fatal (e.g. offline: a previously
-        downloaded ``data_catalog_s3.yml`` was already loaded by ``_load``).
+        downloaded ``data_catalog_remote.yml`` was already loaded by ``_load``).
 
         Parameters
         ----------
@@ -97,7 +106,9 @@ class TopographyDataCatalog:
         from botocore.client import Config
 
         os.makedirs(self.path, exist_ok=True)
-        catalog_file = os.path.join(self.path, "data_catalog_s3.yml")
+        catalog_file = os.path.join(self.path, "data_catalog_remote.yml")
+        # Remove the legacy-named copy (pre-August 2026) once superseded
+        legacy_file = os.path.join(self.path, "data_catalog_s3.yml")
         print("Updating bathymetry database ...")
         try:
             s3 = boto3.client("s3", config=Config(signature_version=UNSIGNED))
@@ -112,6 +123,12 @@ class TopographyDataCatalog:
                 "Bathymetry database will not be updated."
             )
             return
+
+        if os.path.exists(legacy_file):
+            try:
+                os.remove(legacy_file)
+            except OSError:
+                pass
 
         added = self._merge_catalog_file(catalog_file)
         for name in added:
@@ -130,24 +147,70 @@ class TopographyDataCatalog:
         tmp.from_yml(yml, root=root or self.path)
         added: List[str] = []
         for name, source in tmp._sources.items():
+            defined = self._defined_in.setdefault(name, [])
+            if yml not in defined:
+                defined.append(yml)
             if name not in self.catalog.sources:
                 self.catalog._sources[name] = source
                 self._source_yaml[name] = yml
                 added.append(name)
         return added
 
+    def register_local_entry(self, name: str, entry: Dict[str, Any]) -> None:
+        """Add or update a dataset entry in the user-managed local catalog.
+
+        Writes *entry* under *name* into ``data_catalog_local.yml`` (creating
+        the file if needed) and force-updates the in-memory catalog, so the
+        dataset is immediately usable and survives restarts. This is the single
+        registration point for locally imported/generated datasets.
+        """
+        import yaml
+
+        local_file = os.path.join(self.path, "data_catalog_local.yml")
+        if os.path.exists(local_file):
+            with open(local_file, "r") as f:
+                local_catalog = yaml.safe_load(f) or {}
+        else:
+            local_catalog = {"meta": {"root": "."}}
+        local_catalog[name] = entry
+        with open(local_file, "w") as f:
+            yaml.dump(local_catalog, f, default_flow_style=False, sort_keys=False)
+
+        # Force-update the in-memory catalog (unlike _merge_catalog_file, an
+        # existing same-named source is replaced - e.g. on re-import).
+        tmp = DataCatalog()
+        tmp.from_yml(local_file, root=self.path)
+        if name in tmp._sources:
+            self.catalog._sources[name] = tmp._sources[name]
+            self._source_yaml[name] = local_file
+            defined = self._defined_in.setdefault(name, [])
+            if local_file not in defined:
+                defined.append(local_file)
+
     def data_libs_for(self, names: List[str]) -> List[str]:
         """Return the minimal set of catalog YAML paths covering *names*.
 
         Used when writing a hydromt build YAML so ``global.data_libs``
         lists exactly the catalog files needed to resolve the selected
-        elevation datasets. Duplicates and unknown names are dropped.
+        elevation datasets. For each dataset the overall catalogs are
+        preferred (``data_catalog_local.yml``, then
+        ``data_catalog_remote.yml``); a legacy per-dataset
+        ``<name>/data_catalog.yml`` is only referenced when the dataset is
+        defined nowhere else. Duplicates and unknown names are dropped.
         Paths are normalised to forward-slash form so the emitted YAML
         is the same regardless of OS.
         """
+        preferred = [
+            os.path.join(self.path, "data_catalog_local.yml"),
+            os.path.join(self.path, "data_catalog_remote.yml"),
+            os.path.join(self.path, "data_catalog_s3.yml"),  # legacy name
+        ]
         seen: List[str] = []
         for n in names:
-            path = self._source_yaml.get(n)
+            defined = self._defined_in.get(n, [])
+            path = next((c for c in preferred if c in defined), None)
+            if path is None:
+                path = self._source_yaml.get(n)
             if not path:
                 continue
             normalised = Path(path).as_posix()
@@ -284,7 +347,14 @@ class TopographyDataCatalog:
         except Exception:
             return
         driver = getattr(src, "driver", None)
-        if getattr(driver, "name", "") != "slippy_tile":
+        driver_name = getattr(driver, "name", "")
+        if driver_name == "rasterio":
+            # S3-hosted COG: download on first use. Interactive selection asks
+            # the user first (menu/topography.py); this is the silent fallback
+            # for non-GUI paths (e.g. model building with an undownloaded set).
+            self.download_dataset(name)
+            return
+        if driver_name != "slippy_tile":
             return
         folder = getattr(src, "full_uri", None) or getattr(src, "uri", None)
         if not folder:
@@ -300,6 +370,104 @@ class TopographyDataCatalog:
             return
         # Folder was just created: fetch the local-tile viewer from S3.
         self._download_index_html(driver, folder)
+
+    def _cog_s3_location(self, name: str):
+        """Return (s3_bucket, s3_key, local_path) for an S3-hosted COG source.
+
+        Returns ``None`` when the source is not a rasterio dataset with S3
+        driver options (i.e. nothing to download).
+        """
+        try:
+            source = self.catalog.get_source(name)
+        except Exception:
+            return None
+        driver = getattr(source, "driver", None)
+        if getattr(driver, "name", "") != "rasterio":
+            return None
+        opts = getattr(driver, "options", None)
+        s3_bucket = getattr(opts, "s3_bucket", None)
+        s3_key = getattr(opts, "s3_key", None)
+        if not (s3_bucket and s3_key):
+            return None  # plain local COG dataset
+        local = getattr(source, "full_uri", None) or getattr(source, "uri", None)
+        if not local:
+            return None
+        if not os.path.isabs(local):
+            local = os.path.join(self.path, local)
+        return s3_bucket, f"{s3_key}/{os.path.basename(local)}", local
+
+    def download_required(self, name: str) -> Optional[float]:
+        """Return the download size in MB when *name* must be fetched from S3.
+
+        Returns ``None`` when nothing needs to be downloaded (dataset is local,
+        tiled, or not S3-hosted). Used by the GUI to ask the user for
+        confirmation before starting a potentially large download.
+        """
+        loc = self._cog_s3_location(name)
+        if loc is None:
+            return None
+        s3_bucket, key, local = loc
+        if os.path.exists(local):
+            return None
+        try:
+            import boto3
+            from botocore import UNSIGNED
+            from botocore.client import Config
+
+            s3 = boto3.client("s3", config=Config(signature_version=UNSIGNED))
+            size = s3.head_object(Bucket=s3_bucket, Key=key)["ContentLength"]
+            return size / 1e6
+        except Exception as e:
+            logger.warning("Could not determine size of %s on S3: %s", name, e)
+            return None
+
+    def download_dataset(self, name: str) -> bool:
+        """Download an S3-hosted COG dataset into the local database.
+
+        Returns ``True`` on success (or when nothing needed downloading).
+        A partial file is removed on failure so the next attempt starts clean.
+        """
+        loc = self._cog_s3_location(name)
+        if loc is None:
+            return True
+        s3_bucket, key, local = loc
+        if os.path.exists(local):
+            return True
+
+        import boto3
+        from botocore import UNSIGNED
+        from botocore.client import Config
+
+        try:
+            s3 = boto3.client("s3", config=Config(signature_version=UNSIGNED))
+            size = s3.head_object(Bucket=s3_bucket, Key=key)["ContentLength"]
+            print(
+                f"Downloading dataset {name} ({size / 1e6:.0f} MB) from "
+                f"s3://{s3_bucket}/{key} ... (one-time download)"
+            )
+            os.makedirs(os.path.dirname(local), exist_ok=True)
+
+            progress = {"done": 0, "next": 10}
+
+            def _cb(nbytes):
+                progress["done"] += nbytes
+                pct = 100.0 * progress["done"] / max(size, 1)
+                if pct >= progress["next"]:
+                    print(f"  ... {pct:.0f}%", flush=True)
+                    progress["next"] += 10
+
+            s3.download_file(Bucket=s3_bucket, Key=key, Filename=local, Callback=_cb)
+            print(f"Download complete: {local}")
+            return True
+        except Exception as e:
+            print(f"Could not download {name} from s3://{s3_bucket}/{key}: {e}")
+            # Remove a partial file so the next attempt starts clean
+            if os.path.exists(local):
+                try:
+                    os.remove(local)
+                except OSError:
+                    pass
+            return False
 
     def _download_index_html(self, driver: Any, folder: str) -> None:
         """Download ``index.html`` for a slippy_tile source from its S3 bucket.
@@ -339,7 +507,16 @@ class TopographyDataCatalog:
         """
         # Tile sources download on demand but need their folder to exist first.
         self._ensure_source_dir(name)
-        return self.catalog.get_rasterdataset(name, **kwargs)
+        da = self.catalog.get_rasterdataset(name, **kwargs)
+        # Mask declared nodata to NaN (e.g. float32 sentinel values in COGs);
+        # display and merge code downstream expects NaN for missing data.
+        try:
+            nodata = da.raster.nodata
+            if nodata is not None and not np.isnan(nodata):
+                da = da.raster.mask_nodata()
+        except Exception:
+            pass
+        return da
 
     def resolve_elevation_list(
         self,

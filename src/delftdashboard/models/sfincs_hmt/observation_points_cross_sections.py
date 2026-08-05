@@ -19,6 +19,7 @@ def select(*args: Any) -> None:
     # Activate draw layer
     app.map.layer[_MODEL].layer["cross_sections"].layer["polylines"].activate()
     app.map.layer[_MODEL].layer["cross_sections"].layer["snapped"].activate()
+    update_grid_snapper()
     update()
 
 
@@ -109,9 +110,8 @@ def delete_cross_section(*args: Any) -> None:
     # Delete from app
     app.model[_MODEL].domain.cross_sections.delete(index)
     app.model[_MODEL].cross_sections_changed = True
+    update_grid_snapper()
     update()
-
-    # update_grid_snapper()
 
 
 def select_cross_section_from_list(*args: Any) -> None:
@@ -190,6 +190,7 @@ def cross_section_created(gdf: Any, index: int, id: Any) -> None:
     nrt = len(gdf)
     app.gui.setvar(_GROUP, "active_cross_section", nrt - 1)
     app.model[_MODEL].cross_sections_changed = True
+    update_grid_snapper()
     update()
 
 
@@ -207,6 +208,7 @@ def cross_section_modified(gdf: Any, index: int, id: Any) -> None:
     """
     app.model[_MODEL].domain.cross_sections.set(gdf, merge=False)
     app.model[_MODEL].cross_sections_changed = True
+    update_grid_snapper()
     update()
 
 
@@ -229,11 +231,16 @@ def set_model_variables(*args: Any) -> None:
 
 def update_grid_snapper() -> None:
     """Snap cross sections to the grid and update the snapped layer."""
+    if app.model[_MODEL].domain.cross_sections.nr_lines == 0:
+        app.map.layer[_MODEL].layer["cross_sections"].layer["snapped"].clear()
+        return
     snap_gdf = app.model[_MODEL].domain.cross_sections.snap_to_grid()
     if len(snap_gdf) > 0:
         app.map.layer[_MODEL].layer["cross_sections"].layer["snapped"].set_data(
             snap_gdf
         )
+    else:
+        app.map.layer[_MODEL].layer["cross_sections"].layer["snapped"].clear()
 
 
 def update() -> None:

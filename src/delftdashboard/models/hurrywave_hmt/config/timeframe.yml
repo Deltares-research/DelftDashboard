@@ -43,7 +43,7 @@ element:
       y: 55
       width: 110
       height: 20
-    text: Spin-up Time (s)
-    variable: tspinup
+    text: Time Step (s)
+    variable: dt
     method: set_model_variables
-    tooltipstring: Duration of the spin-up period in seconds
+    tooltipstring: Fixed computational time step (s)

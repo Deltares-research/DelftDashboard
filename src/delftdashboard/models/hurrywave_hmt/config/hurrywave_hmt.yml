@@ -10,7 +10,6 @@ element:
   tab:
   - string: Domain
     module: delftdashboard.models.hurrywave_hmt.domain
-    method: set_model_variables
     element: domain.yml
   - string: Time Frame
     module: delftdashboard.models.hurrywave_hmt.timeframe

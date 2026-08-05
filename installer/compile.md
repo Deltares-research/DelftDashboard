@@ -85,13 +85,14 @@ add a dependency and the frozen exe fails, this table is the debugging guide.
   `<DelftDashboard folder>\working_directory` (next to `data` and `server`);
   when launched from another folder, that folder is respected and remembered.
 - **Bathymetry catalogs**: two files in ``data\bathymetry\`` have a defined
-  role. ``data_catalog_s3.yml`` is a copy of the catalog on the DDB S3 bucket
-  (the source of truth for the S3 datasets), refreshed at every online start -
-  never edit it. ``data_catalog_local.yml`` is optional and user-managed (the
-  bathymetry import toolbox appends to it); its entries always win over
-  same-named S3 datasets. Legacy root/per-dataset ``data_catalog.yml`` files
-  are still read for backward compatibility. Tiles/COGs download on demand,
-  so a fresh data folder gets a working bathymetry list on first run.
+  role. ``data_catalog_remote.yml`` is a copy of the catalog on the DDB S3
+  bucket (the source of truth for the S3 datasets), refreshed at every online
+  start - never edit it. ``data_catalog_local.yml`` is user-managed (the
+  bathymetry import toolbox registers imported/generated datasets here); its
+  entries always win over same-named remote datasets. Legacy root/per-dataset
+  ``data_catalog.yml`` files (and the old ``data_catalog_s3.yml`` name) are
+  still read for backward compatibility. Tiles/COGs download on demand, so a
+  fresh data folder gets a working bathymetry list on first run.
 - **Numba/datashader warmup** (background thread at startup): pre-compiles
   xugrid `snap_to_grid`, `burn_vector_geometry` (mask polygons), and the
   datashader line/points/trimesh aggregations.

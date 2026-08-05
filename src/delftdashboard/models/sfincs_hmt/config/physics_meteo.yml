@@ -138,21 +138,74 @@ element:
     tooltipstring: Edit background air pressure
     textposition: right
 - style: panel
-  title: Infiltration
+  title: Parameters
   position:
     x: 490
     y: 10
-    width: 180
+    width: 330
     height: 120
   element:
   - style: edit
+    text: Update interval (s)
     position:
-      x: 10
+      x: 110
       y: 90
       width: 50
       height: 20
-    text: Infiltration Rate (mm/h)
+    variable: dtwnd
     method: set_model_variables
-    variable: qinf
-    tooltipstring: Edit infiltration rate
-    textposition: right
+    tooltipstring: Update interval of the 2D meteo forcing (s)
+    textposition: left
+  - style: edit
+    text: Factor wind
+    position:
+      x: 110
+      y: 65
+      width: 50
+      height: 20
+    variable: factor_wind
+    method: set_model_variables
+    tooltipstring: Scaling factor on the wind forcing
+    textposition: left
+  - style: edit
+    text: Factor pressure
+    position:
+      x: 110
+      y: 40
+      width: 50
+      height: 20
+    variable: factor_pres
+    method: set_model_variables
+    tooltipstring: Scaling factor on the atmospheric pressure forcing
+    textposition: left
+  - style: edit
+    text: Factor rain
+    position:
+      x: 110
+      y: 15
+      width: 50
+      height: 20
+    variable: factor_prcp
+    method: set_model_variables
+    tooltipstring: Scaling factor on the precipitation forcing
+    textposition: left
+  - style: checkbox
+    position:
+      x: 180
+      y: 90
+      width: 140
+      height: 20
+    text: Spin up meteo
+    variable: spinup_meteo
+    method: set_model_variables
+    tooltipstring: Ramp wind and pressure up from zero during the spin-up interval
+  - style: checkbox
+    position:
+      x: 180
+      y: 65
+      width: 140
+      height: 20
+    text: Block rain
+    variable: amprblock
+    method: set_model_variables
+    tooltipstring: Apply 2D rainfall as block values instead of linear interpolation in time

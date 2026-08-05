@@ -19,6 +19,8 @@ def select(*args: Any) -> None:
     """Activate the Wave Makers sub-tab and show polylines on map."""
     map.update()
     app.map.layer[_MODEL].layer["wave_makers"].activate()
+    app.map.layer[_MODEL].layer["wave_makers_snapped"].activate()
+    update_grid_snapper()
     update()
 
 
@@ -34,6 +36,18 @@ def deselect(*args: Any) -> None:
         )
         if ok:
             save()
+
+
+def update_grid_snapper() -> None:
+    """Snap wave makers to the grid and update the snapped layer."""
+    if app.model[_MODEL].domain.wave_makers.nr_lines == 0:
+        app.map.layer[_MODEL].layer["wave_makers_snapped"].clear()
+        return
+    snap_gdf = app.model[_MODEL].domain.wave_makers.snap_to_grid()
+    if len(snap_gdf) > 0:
+        app.map.layer[_MODEL].layer["wave_makers_snapped"].set_data(snap_gdf)
+    else:
+        app.map.layer[_MODEL].layer["wave_makers_snapped"].clear()
 
 
 def set_model_variables(*args: Any) -> None:
@@ -75,6 +89,7 @@ def delete_from_list(*args: Any) -> None:
     app.map.layer[_MODEL].layer["wave_makers"].set_data(gdf)
     app.gui.setvar(_GROUP, "active_wave_maker", index)
     app.model[_MODEL].wave_makers_changed = True
+    update_grid_snapper()
     update()
 
 
@@ -95,6 +110,7 @@ def wave_maker_created(gdf: Any, index: int, id: Any) -> None:
         nrp = len(app.model[_MODEL].domain.wave_makers.gdf)
         app.gui.setvar(_GROUP, "active_wave_maker", nrp - 1)
         app.model[_MODEL].wave_makers_changed = True
+        update_grid_snapper()
         update()
     except Exception as e:
         app.gui.window.dialog_warning(f"Error creating wave maker: {e}")
@@ -114,6 +130,7 @@ def wave_maker_modified(gdf: Any, index: int, id: Any) -> None:
     """
     app.model[_MODEL].domain.wave_makers.set(gdf, merge=False)
     app.model[_MODEL].wave_makers_changed = True
+    update_grid_snapper()
 
 
 def wave_maker_selected(index: int) -> None:
@@ -150,6 +167,7 @@ def load(*args: Any) -> None:
         app.map.layer[_MODEL].layer["wave_makers"].set_data(gdf)
         app.gui.setvar(_GROUP, "active_wave_maker", 0)
         app.model[_MODEL].wave_makers_changed = False
+        update_grid_snapper()
         update()
 
 
@@ -181,6 +199,7 @@ def import_geojson(*args: Any) -> None:
         app.map.layer[_MODEL].layer["wave_makers"].set_data(gdf)
         app.gui.setvar(_GROUP, "active_wave_maker", 0)
         app.model[_MODEL].wave_makers_changed = True
+        update_grid_snapper()
         update()
 
 

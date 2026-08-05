@@ -56,6 +56,14 @@ def select_import_file(*args: Any) -> None:
         wb.close()
 
 
+def edit(*args: Any) -> None:
+    """Generic callback for edit fields (vertical datum/units/MSL difference).
+
+    The new value is already stored in the GUI variable by guitares' variable
+    binding; nothing else needs to happen on change.
+    """
+
+
 def edit_dataset_name(*args: Any) -> None:
     """Handle dataset name edit events (placeholder)."""
 

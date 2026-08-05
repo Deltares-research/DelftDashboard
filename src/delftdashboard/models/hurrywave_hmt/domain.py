@@ -17,6 +17,15 @@ def select(*args: Any) -> None:
     map.update()
     app.map.layer[_MODEL].layer["grid"].activate()
     app.map.layer[_MODEL].layer["mask"].activate()
+    # Refresh the (read-only) grid attributes and refinement-level counts
+    # from the quadtree grid itself
+    app.model[_MODEL].update_domain_info()
+    app.gui.window.update()
+
+
+def select_refinement_level(*args: Any) -> None:
+    """Selection in the refinement-level list (display only)."""
+    pass
 
 
 def set_model_variables(*args: Any) -> None:

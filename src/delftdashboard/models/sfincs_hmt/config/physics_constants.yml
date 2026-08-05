@@ -19,3 +19,20 @@ element:
   variable: rhow
   method: set_model_variables
   tooltip: Edit water density
+- style: edit
+  position:
+    x: 110
+    y: 60
+    width: 50
+    height: 20
+  text: Latitude
+  variable: latitude
+  method: set_model_variables
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: crs_type
+      operator: ne
+      value: geographic
+  tooltip: Reference latitude for the Coriolis force (projected coordinate systems only)

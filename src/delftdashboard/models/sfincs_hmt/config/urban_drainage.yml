@@ -181,6 +181,29 @@ element:
           value: 0
       tooltip: Outfall y-coordinate (model CRS)
       text_position: left
+    - style: pushbutton
+      text: Click
+      position:
+        x: 185
+        y: 47
+        width: 30
+        height: 20
+      method: click_outfall_location
+      dependency:
+      - action: visible
+        checkfor: all
+        check:
+        - variable: urban_drainage_area_type
+          operator: eq
+          value: piped_drainage
+      - action: enable
+        checkfor: all
+        check:
+        - variable: nr_urban_drainage_areas
+          operator: gt
+          value: 0
+      tooltip: Click the outfall location on the map
+      text_position: left
     - style: popupmenu
       text: Capacity mode
       position:

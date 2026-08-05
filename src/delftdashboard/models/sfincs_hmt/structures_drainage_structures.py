@@ -57,7 +57,7 @@ def load(*args: Any) -> None:
         app.model[_MODEL].domain.drainage_structures.read()
         gdf = app.model[_MODEL].domain.drainage_structures.gdf
         app.map.layer[_MODEL].layer["drainage_structures"].set_data(gdf)
-        app.gui.setvar(_GROUP, "active_drainage_structure", 0)
+        app.gui.setvar(_GROUP, "drainage_structure_index", 0)
         update()
     app.model[_MODEL].drainage_structures_changed = False
 
@@ -95,7 +95,7 @@ def import_geojson(*args: Any) -> None:
                 merge = True
         app.model[_MODEL].domain.drainage_structures.set(gdf, merge=merge)
         app.map.layer[_MODEL].layer["drainage_structures"].set_data(gdf)
-        app.gui.setvar(_GROUP, "active_drainage_structure", 0)
+        app.gui.setvar(_GROUP, "drainage_structure_index", 0)
         app.model[_MODEL].drainage_structures_changed = True
         update()
 
@@ -171,6 +171,10 @@ def delete_drainage_structure(*args: Any) -> None:
 
 def select_drainage_structure(*args: Any) -> None:
     """Handle selection of a drainage structure from the GUI list."""
+    map.reset_cursor()
+    index = app.gui.getvar(_GROUP, "drainage_structure_index")
+    if app.model[_MODEL].domain.drainage_structures.nr_lines > 0:
+        app.map.layer[_MODEL].layer["drainage_structures"].activate_feature(index)
     update()
 
 
@@ -186,6 +190,10 @@ def edit_drainage_structure_parameter(*args: Any) -> None:
     tp = app.gui.getvar(_GROUP, "drainage_structure_type")
     data = app.model[_MODEL].domain.drainage_structures.data
 
+    if tp in (2, 5):
+        data.at[index, "direction"] = app.gui.getvar(
+            _GROUP, "drainage_structure_direction"
+        )
     if tp == 1:
         data.at[index, "q"] = app.gui.getvar(_GROUP, "drainage_structure_discharge")
     elif tp == 2:
@@ -195,6 +203,17 @@ def edit_drainage_structure_parameter(*args: Any) -> None:
     elif tp == 5:
         data.at[index, "flow_coef"] = app.gui.getvar(
             _GROUP, "drainage_structure_alpha"
+        )
+        data.at[index, "width"] = app.gui.getvar(_GROUP, "drainage_structure_width")
+        data.at[index, "height"] = app.gui.getvar(_GROUP, "drainage_structure_height")
+        data.at[index, "invert_1"] = app.gui.getvar(
+            _GROUP, "drainage_structure_invert_1"
+        )
+        data.at[index, "invert_2"] = app.gui.getvar(
+            _GROUP, "drainage_structure_invert_2"
+        )
+        data.at[index, "submergence_ratio"] = app.gui.getvar(
+            _GROUP, "drainage_structure_submergence_ratio"
         )
     elif tp == 4:
         data.at[index, "width"] = app.gui.getvar(_GROUP, "drainage_structure_width")
@@ -206,14 +225,6 @@ def edit_drainage_structure_parameter(*args: Any) -> None:
         )
         data.at[index, "closing_duration"] = app.gui.getvar(
             _GROUP, "drainage_structure_closing_time"
-        )
-
-    if tp != 1:
-        data.at[index, "rules_open"] = app.gui.getvar(
-            _GROUP, "drainage_structure_rules_open"
-        )
-        data.at[index, "rules_close"] = app.gui.getvar(
-            _GROUP, "drainage_structure_rules_close"
         )
 
     app.model[_MODEL].drainage_structures_changed = True
@@ -243,8 +254,6 @@ def drainage_structure_created(gdf: Any, index: int, id: Any) -> None:
     elev = app.gui.getvar(_GROUP, "drainage_structure_sill_elevation")
     manning_n = app.gui.getvar(_GROUP, "drainage_structure_manning_n")
     closing_time = app.gui.getvar(_GROUP, "drainage_structure_closing_time")
-    rules_open = app.gui.getvar(_GROUP, "drainage_structure_rules_open")
-    rules_close = app.gui.getvar(_GROUP, "drainage_structure_rules_close")
 
     tp = app.gui.getvar(_GROUP, "drainage_structure_type_to_add")
 
@@ -257,8 +266,6 @@ def drainage_structure_created(gdf: Any, index: int, id: Any) -> None:
             gdf_new,
             stype="culvert_simple",
             flow_coef=alpha,
-            rules_open=rules_open,
-            rules_close=rules_close,
             merge=True,
         )
     elif tp == 5:
@@ -267,8 +274,12 @@ def drainage_structure_created(gdf: Any, index: int, id: Any) -> None:
             stype="culvert",
             flow_coef=alpha,
             width=width,
-            rules_open=rules_open,
-            rules_close=rules_close,
+            height=app.gui.getvar(_GROUP, "drainage_structure_height"),
+            invert_1=app.gui.getvar(_GROUP, "drainage_structure_invert_1"),
+            invert_2=app.gui.getvar(_GROUP, "drainage_structure_invert_2"),
+            submergence_ratio=app.gui.getvar(
+                _GROUP, "drainage_structure_submergence_ratio"
+            ),
             merge=True,
         )
     elif tp == 4:
@@ -280,8 +291,6 @@ def drainage_structure_created(gdf: Any, index: int, id: Any) -> None:
             mannings_n=manning_n,
             closing_duration=closing_time,
             opening_duration=closing_time,
-            rules_open=rules_open,
-            rules_close=rules_close,
             merge=True,
         )
 
@@ -313,9 +322,11 @@ def drainage_structure_modified(gdf: Any, index: int, id: Any) -> None:
     """
     app.model[_MODEL].domain.drainage_structures.create(gdf, merge=False)
     app.model[_MODEL].drainage_structures_changed = True
-    # # The gdf may have been modified in other ways than just the geometry, so update the gdf in the app
-    # gdf = app.model[_MODEL].domain.drainage_structures.gdf
-    # app.map.layer[_MODEL].layer["drainage_structures"].set_data(gdf)
+    # create() cuts the polyline back to its first and last point, so
+    # refresh the map layer with what the model actually stores
+    gdf = app.model[_MODEL].domain.drainage_structures.gdf
+    app.map.layer[_MODEL].layer["drainage_structures"].set_data(gdf)
+    update()
 
 
 def drainage_structure_selected(index: int) -> None:
@@ -349,12 +360,22 @@ def update() -> None:
     index = app.gui.getvar(_GROUP, "drainage_structure_index")
     if nrt == 0:
         app.gui.setvar(_GROUP, "drainage_structure_type", 1)
-        app.gui.setvar(_GROUP, "drainage_structure_rules_open", "")
-        app.gui.setvar(_GROUP, "drainage_structure_rules_close", "")
+        app.gui.setvar(_GROUP, "drainage_structure_rule_strings", [])
+        app.gui.setvar(_GROUP, "nr_drainage_structure_rules", 0)
+        app.gui.setvar(_GROUP, "drainage_structure_rule_index", 0)
+        app.gui.setvar(_GROUP, "drainage_structure_rule_operation", "open")
+        app.gui.setvar(_GROUP, "drainage_structure_rule_when", "")
     else:
         row = app.model[_MODEL].domain.drainage_structures.gdf.iloc[index]
         drainage_structure_type = int(row["type"])
         app.gui.setvar(_GROUP, "drainage_structure_type", drainage_structure_type)
+
+        if drainage_structure_type in (2, 5):
+            app.gui.setvar(
+                _GROUP,
+                "drainage_structure_direction",
+                str(row.get("direction", "both") or "both"),
+            )
 
         if drainage_structure_type == 1:
             app.gui.setvar(_GROUP, "drainage_structure_discharge", row["q"])
@@ -362,6 +383,15 @@ def update() -> None:
             app.gui.setvar(_GROUP, "drainage_structure_alpha", row["flow_coef"])
         elif drainage_structure_type == 5:
             app.gui.setvar(_GROUP, "drainage_structure_alpha", row["flow_coef"])
+            app.gui.setvar(_GROUP, "drainage_structure_width", row["width"])
+            app.gui.setvar(_GROUP, "drainage_structure_height", row["height"])
+            app.gui.setvar(_GROUP, "drainage_structure_invert_1", row["invert_1"])
+            app.gui.setvar(_GROUP, "drainage_structure_invert_2", row["invert_2"])
+            app.gui.setvar(
+                _GROUP,
+                "drainage_structure_submergence_ratio",
+                row["submergence_ratio"],
+            )
         elif drainage_structure_type == 4:
             app.gui.setvar(_GROUP, "drainage_structure_width", row["width"])
             app.gui.setvar(
@@ -372,20 +402,95 @@ def update() -> None:
                 _GROUP, "drainage_structure_closing_time", row["closing_duration"]
             )
 
-        # Rules (non-pump types only; pumps show empty strings).
-        if drainage_structure_type == 1:
-            app.gui.setvar(_GROUP, "drainage_structure_rules_open", "")
-            app.gui.setvar(_GROUP, "drainage_structure_rules_close", "")
+        # Gate control rules (non-pump types only): ordered list of
+        # {"operation", "when"} dicts. The listbox shows one line per
+        # rule; the operation/when fields edit the selected rule.
+        rules = _get_rules(row) if drainage_structure_type != 1 else []
+        rule_index = app.gui.getvar(_GROUP, "drainage_structure_rule_index")
+        rule_index = max(min(rule_index, len(rules) - 1), 0)
+        app.gui.setvar(_GROUP, "drainage_structure_rule_index", rule_index)
+        app.gui.setvar(_GROUP, "nr_drainage_structure_rules", len(rules))
+        app.gui.setvar(
+            _GROUP,
+            "drainage_structure_rule_strings",
+            [f"{r['operation']}: {r['when']}" for r in rules],
+        )
+        if rules:
+            app.gui.setvar(
+                _GROUP,
+                "drainage_structure_rule_operation",
+                rules[rule_index]["operation"],
+            )
+            app.gui.setvar(
+                _GROUP, "drainage_structure_rule_when", rules[rule_index]["when"]
+            )
         else:
-            app.gui.setvar(
-                _GROUP,
-                "drainage_structure_rules_open",
-                str(row.get("rules_open", "") or ""),
-            )
-            app.gui.setvar(
-                _GROUP,
-                "drainage_structure_rules_close",
-                str(row.get("rules_close", "") or ""),
-            )
+            app.gui.setvar(_GROUP, "drainage_structure_rule_operation", "open")
+            app.gui.setvar(_GROUP, "drainage_structure_rule_when", "")
 
     app.gui.window.update()
+
+
+def _get_rules(row: Any) -> list:
+    """Return the rules list of a structure row (always a list)."""
+    rules = row.get("rules")
+    return rules if isinstance(rules, list) else []
+
+
+def select_drainage_structure_rule(*args: Any) -> None:
+    """Handle selection of a rule from the rules listbox."""
+    update()
+
+
+def add_drainage_structure_rule(*args: Any) -> None:
+    """Append a new (empty) rule to the selected drainage structure."""
+    data = app.model[_MODEL].domain.drainage_structures.data
+    if len(data) == 0:
+        return
+    index = app.gui.getvar(_GROUP, "drainage_structure_index")
+    if int(data.iloc[index]["type"]) == 1:
+        return  # pumps have no rules
+    rules = _get_rules(data.iloc[index])
+    rules = rules + [{"operation": "open", "when": ""}]
+    data.at[index, "rules"] = rules
+    app.gui.setvar(_GROUP, "drainage_structure_rule_index", len(rules) - 1)
+    app.model[_MODEL].drainage_structures_changed = True
+    update()
+
+
+def delete_drainage_structure_rule(*args: Any) -> None:
+    """Delete the selected rule of the selected drainage structure."""
+    data = app.model[_MODEL].domain.drainage_structures.data
+    if len(data) == 0:
+        return
+    index = app.gui.getvar(_GROUP, "drainage_structure_index")
+    rules = _get_rules(data.iloc[index])
+    rule_index = app.gui.getvar(_GROUP, "drainage_structure_rule_index")
+    if not rules or rule_index >= len(rules):
+        return
+    rules = rules[:rule_index] + rules[rule_index + 1 :]
+    data.at[index, "rules"] = rules
+    app.gui.setvar(
+        _GROUP, "drainage_structure_rule_index", max(min(rule_index, len(rules) - 1), 0)
+    )
+    app.model[_MODEL].drainage_structures_changed = True
+    update()
+
+
+def edit_drainage_structure_rule(*args: Any) -> None:
+    """Write the operation/when fields back to the selected rule."""
+    data = app.model[_MODEL].domain.drainage_structures.data
+    if len(data) == 0:
+        return
+    index = app.gui.getvar(_GROUP, "drainage_structure_index")
+    rules = _get_rules(data.iloc[index])
+    rule_index = app.gui.getvar(_GROUP, "drainage_structure_rule_index")
+    if not rules or rule_index >= len(rules):
+        return
+    rules[rule_index] = {
+        "operation": app.gui.getvar(_GROUP, "drainage_structure_rule_operation"),
+        "when": str(app.gui.getvar(_GROUP, "drainage_structure_rule_when")),
+    }
+    data.at[index, "rules"] = rules
+    app.model[_MODEL].drainage_structures_changed = True
+    update()

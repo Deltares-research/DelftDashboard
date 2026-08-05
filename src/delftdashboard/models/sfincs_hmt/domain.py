@@ -1,7 +1,7 @@
 """GUI callbacks for the SFINCS HydroMT Domain tab.
 
-Handles tab selection and propagation of domain-related GUI variables
-back to the SFINCS model configuration.
+The tab is read-only: the grid attributes and refinement-level cell counts
+are gathered from the quadtree grid itself (sfincs.nc), never from the GUI.
 """
 
 from typing import Any
@@ -15,8 +15,14 @@ _MODEL = "sfincs_hmt"
 def select(*args: Any) -> None:
     """Activate the Domain tab and update map layers."""
     map.update()
+    app.map.layer[_MODEL].layer["grid"].activate()
+    app.map.layer[_MODEL].layer["mask"].activate()
+    # Refresh the (read-only) grid attributes and refinement-level counts
+    # from the quadtree grid itself
+    app.model[_MODEL].update_domain_info()
+    app.gui.window.update()
 
 
-def set_model_variables(*args: Any) -> None:
-    """Copy current GUI variables back to the model config."""
-    app.model[_MODEL].set_model_variables()
+def select_refinement_level(*args: Any) -> None:
+    """Selection in the refinement-level list (display only)."""
+    pass

@@ -1,0 +1,92 @@
+element:
+- style: popupmenu
+  text: Physics Package
+  position:
+    x: 90
+    y: 110
+    width: 80
+    height: 20
+  variable: physics
+  method: set_model_variables
+  option_string:
+  - ST1
+  - ST6
+  option_value:
+  - st1
+  - st6
+  tooltipstring: Wind input / dissipation physics package
+- style: panel
+  text: Wind Drag
+  position:
+    x: 180
+    y: 10
+    width: 240
+    height: 120
+  dependency:
+  - action: visible
+    checkfor: all
+    check:
+    - variable: physics
+      operator: eq
+      value: st1
+  element:
+  - style: popupmenu
+    position:
+      x: 100
+      y: 80
+      width: 130
+      height: 20
+    text: Wind Drag
+    variable: winddrag
+    method: set_model_variables
+    tooltipstring: Wind drag coefficient formulation
+    option_string:
+    - Zijlema (2012)
+    - Wu (1982)
+    option_value:
+    - zijlema
+    - wu
+  - style: edit
+    position:
+      x: 100
+      y: 55
+      width: 60
+      height: 20
+    text: Cd Cap
+    variable: cdcap
+    method: set_model_variables
+    tooltipstring: Maximum wind drag coefficient (Wu formulation only)
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: winddrag
+        operator: eq
+        value: wu
+  - style: edit
+    position:
+      x: 100
+      y: 55
+      width: 60
+      height: 20
+    text: Max wind (m/s)
+    variable: vmax_zijlema
+    method: set_model_variables
+    tooltipstring: Cap on the wind speed feeding the Zijlema drag relation (m/s)
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: winddrag
+        operator: eq
+        value: zijlema
+  - style: edit
+    position:
+      x: 100
+      y: 30
+      width: 60
+      height: 20
+    text: Drag factor
+    variable: cdfac
+    method: set_model_variables
+    tooltipstring: Multiplier on the wind drag coefficient

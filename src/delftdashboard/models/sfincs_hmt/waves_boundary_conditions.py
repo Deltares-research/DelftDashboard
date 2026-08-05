@@ -240,6 +240,9 @@ def select_boundary_point_from_map_snapwave(*args: Any) -> None:
     index = args[0]["id"]
     app.gui.setvar(_GROUP, "active_boundary_point_snapwave", index)
     app.gui.window.update()
+    # Same behaviour as the water-level boundary points: clicking a point
+    # on the map also shows its time series
+    _show_timeseries_popup_snapwave(index)
 
 
 def delete_point_from_list_snapwave(*args: Any) -> None:
@@ -295,8 +298,50 @@ def set_uniform_conditions(index: Optional[int] = None) -> None:
 
 
 def view_boundary_conditions_snapwave(*args: Any) -> None:
-    """Display SnapWave boundary conditions (not yet implemented)."""
-    print("Viewing boundary conditions not implemented yet")
+    """Show the wave time series of the selected SnapWave boundary point."""
+    index = app.gui.getvar(_GROUP, "active_boundary_point_snapwave")
+    _show_timeseries_popup_snapwave(index)
+
+
+def _show_timeseries_popup_snapwave(index: int) -> None:
+    """Generate a plotly time series plot and show it as a map popup.
+
+    Parameters
+    ----------
+    index : int
+        Index of the SnapWave boundary point in the GeoDataFrame.
+    """
+    import pandas as pd
+
+    gdf = app.model[_MODEL].domain.snapwave_boundary_conditions.gdf
+    if gdf is None or len(gdf) == 0 or index >= len(gdf):
+        return
+    data = app.model[_MODEL].domain.snapwave_boundary_conditions.data
+    if data is None or "hs" not in data:
+        return
+
+    ts = data.sel(index=index).to_dataframe().reset_index()
+    columns = [c for c in ["hs", "tp"] if c in ts.columns]
+    if not columns:
+        return
+    ts = ts[["time"] + columns].rename(
+        columns={"hs": "Hm0 (m)", "tp": "Tp (s)"}
+    )
+    ts.set_index("time", inplace=True)
+    if not isinstance(ts, pd.DataFrame) or ts.empty:
+        return
+
+    name = gdf.iloc[index].get("name", f"Point {index}")
+    # Popup anchors are lon/lat regardless of the model CRS
+    geom = (gdf.to_crs(4326) if gdf.crs else gdf).iloc[index].geometry
+    map.show_timeseries_popup(
+        ts,
+        lon=geom.x,
+        lat=geom.y,
+        title=f"Wave conditions {name}",
+        y_label="Hm0 (m) / Tp (s)",
+        html_name="snapwave_boundary_point_time_series.html",
+    )
 
 
 def create_boundary_points_snapwave(*args: Any) -> None:

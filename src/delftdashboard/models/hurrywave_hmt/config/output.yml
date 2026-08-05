@@ -62,19 +62,3 @@ element:
     textposition: left
     variable: dtrstout
     method: set_model_variables
-  # - style: popupmenu
-  #   position:
-  #     x: 120
-  #     y: 30
-  #     width: 80
-  #     height: 20
-  #   text: Output Format
-  #   variable_group: sfincs
-  #   variable: outputformat
-  #   method: set_model_variables
-  #   option_string:
-  #   - NetCDF
-  #   - ASCII
-  #   option_value:
-  #   - net
-  #   - asc

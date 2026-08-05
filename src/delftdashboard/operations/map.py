@@ -266,13 +266,25 @@ def reset_cursor() -> None:
 def set_crs(crs: CRS) -> None:
     """Set the application and map coordinate reference system.
 
+    When the CRS actually changes (e.g. opening a UTM model while the
+    application is in WGS 84), the change is propagated to all models and
+    toolboxes — same as switching via the Coordinate System menu — so
+    CRS-dependent state such as the model-maker grid resolution defaults
+    is updated.
+
     Parameters
     ----------
     crs : CRS
         The new coordinate reference system to apply.
     """
+    crs_changed = app.crs is None or crs != app.crs
     app.crs = crs
     app.map.crs = crs
+    if crs_changed:
+        for model in app.model.values():
+            model.set_crs()
+        for toolbox in app.toolbox.values():
+            toolbox.set_crs()
     update_statusbar()
 
 

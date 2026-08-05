@@ -757,6 +757,12 @@ def _warmup_numba() -> None:
             )
             xu.snap_to_grid(line, grid, max_snap_distance=0.5)
 
+            # 1b) grid connectivity - numba kernels behind exterior_edges /
+            #     edge_node_connectivity, used by model.region (e.g. the
+            #     domain check when drawing urban drainage areas).
+            _ = grid.edge_node_connectivity
+            _ = grid.exterior_edges
+
             # 2) burn_vector_geometry - used to rasterise include/exclude polygons
             #    when updating the active-cell mask (compiles numba_celltree).
             uda = xu.UgridDataArray(

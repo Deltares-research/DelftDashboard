@@ -6,12 +6,12 @@ element:
     width: -10
     height: 160
   tab:
+  - string: Source Terms
+    module: delftdashboard.models.hurrywave_hmt.physics_source_terms
+    element: physics_source_terms.yml
   - string: Constants
     module: delftdashboard.models.hurrywave_hmt.physics_constants
     element: physics_constants.yml
   - string: Roughness
     module: delftdashboard.models.hurrywave_hmt.physics_roughness
     element: physics_roughness.yml
-  - string: Meteo
-    module: delftdashboard.models.hurrywave_hmt.physics_meteo
-    element: physics_meteo.yml

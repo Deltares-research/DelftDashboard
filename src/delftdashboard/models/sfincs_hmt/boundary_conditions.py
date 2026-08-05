@@ -324,14 +324,23 @@ def set_boundary_conditions(*args: Any) -> None:
     )
     dlg.close()
 
+    # A synthetic time series replaces any astronomic forcing; the
+    # component then clears bcafile from the config. Mirror the config in
+    # the GUI variable (otherwise the next full resync would restore the
+    # stale value).
+    app.gui.setvar(
+        _GROUP, "bcafile", app.model[_MODEL].domain.config.get("bcafile")
+    )
+
     # Save the bzs file
     app.model[_MODEL].domain.water_level.write_boundary_conditions_timeseries()
     app.model[_MODEL].boundaries_changed = False
 
 
 def view_boundary_conditions(*args: Any) -> None:
-    """Display boundary conditions (not yet implemented)."""
-    print("Viewing boundary conditions not implemented yet")
+    """Show the time series of the selected boundary point in a map popup."""
+    index = app.gui.getvar(_GROUP, "active_boundary_point")
+    _show_timeseries_popup(index)
 
 
 def create_boundary_points(*args: Any) -> None:
@@ -438,7 +447,8 @@ def _show_timeseries_popup(index: int) -> None:
         return
 
     name = gdf.iloc[index].get("name", f"Point {index}")
-    geom = gdf.iloc[index].geometry
+    # Popup anchors are lon/lat regardless of the model CRS
+    geom = (gdf.to_crs(4326) if gdf.crs else gdf).iloc[index].geometry
     map.show_timeseries_popup(
         ts,
         lon=geom.x,

@@ -44,6 +44,10 @@ class Model(GenericModel):
         if hasattr(app, "topography_data_catalog"):
             app.topography_data_catalog.add_to_model_catalog(self.domain.data_catalog)
         self.domain.config.set("epsg", app.crs.to_epsg())
+        # Establish the grid type now (while still in write mode) so that the
+        # grid_type getter never tries to read a (possibly absent or stale)
+        # sfincs.inp from the working directory later on.
+        self.domain.config.update_grid_from_config()
         # Set to "r+" to allow explicit reads without auto-reading on init
         self.domain.root.mode = "r+"
         self.set_gui_variables()
@@ -445,6 +449,15 @@ class Model(GenericModel):
             show_endpoints=True,
             legend_label="wave maker",
         )
+        layer.add_layer(
+            "wave_makers_snapped",
+            type="line",
+            line_color="white",
+            line_opacity=1.0,
+            circle_radius=0,
+            line_color_inactive="lightgrey",
+            legend_label="wave maker (snapped)",
+        )
 
     def set_layer_mode(self, mode: str) -> None:
         """Set the visibility/activation mode for all model layers.
@@ -474,26 +487,54 @@ class Model(GenericModel):
             layer.layer["discharge_points"].deactivate()
             layer.layer["thin_dams"].layer["polylines"].deactivate()
             layer.layer["thin_dams"].layer["snapped"].hide()
+            layer.layer["weirs"].layer["polylines"].deactivate()
+            layer.layer["weirs"].layer["snapped"].hide()
             layer.layer["drainage_structures"].deactivate()
+            # Grey out the drawn areas like the other geometry layers; only
+            # the derived outfall circles are hidden (like the snapped layers)
             layer.layer["urban_drainage"].layer["urban_drainage_areas"].deactivate()
-            layer.layer["urban_drainage"].hide()
+            layer.layer["urban_drainage"].layer["outfall_locations"].hide()
             layer.layer["boundary_points_snapwave"].deactivate()
-            layer.layer["wave_makers"].hide()
+            layer.layer["wave_makers"].deactivate()
+            layer.layer["wave_makers_snapped"].hide()
         elif mode == "invisible":
             layer.hide()
 
     def set_crs(self) -> None:
-        """Update the model CRS to match the application CRS and re-plot."""
+        """Update the model CRS to match the application CRS.
+
+        Existing spatial data (grid, mask, geometries, forcing) is invalid in
+        the new CRS and is cleared. The model CRS itself is derived from the
+        ``epsg`` entry in the SFINCS config (``SfincsModel.crs`` is
+        read-only), so store the new EPSG code there.
+        """
         crs = app.crs
         try:
             old_crs = self.domain.crs
-        except (KeyError, AttributeError):
+        except (KeyError, AttributeError, ValueError, FileNotFoundError):
             # Model not yet initialized — no CRS to update
             return
         if old_crs != crs:
-            self.domain.crs = crs
-            self.domain.clear_spatial_attributes()
-            self.plot()
+            # Set the new EPSG first: clearing re-derives the grid properties
+            # from the config, so it must already hold the new CRS.
+            self.domain.config.set("epsg", crs.to_epsg(), skip_validation=True)
+            self.clear_spatial_attributes()
+            self.set_gui_variables()
+
+    def clear_spatial_attributes(self) -> None:
+        """Clear all spatial model data and its map layers, keeping the config."""
+        self.domain.clear_spatial_attributes()
+        self.clear_layers()
+        self.observation_points_changed = False
+        self.cross_sections_changed = False
+        self.discharge_points_changed = False
+        self.boundaries_changed = False
+        self.thin_dams_changed = False
+        self.weirs_changed = False
+        self.drainage_structures_changed = False
+        self.urban_drainage_changed = False
+        self.wave_boundaries_changed = False
+        self.wave_makers_changed = False
 
     def open(self, filename: Optional[str] = None) -> None:
         """Open an existing SFINCS model from an input file.
@@ -560,6 +601,31 @@ class Model(GenericModel):
         exe_path = app.config.get("sfincs_exe_path")
         if exe_path:
             domain.exe_path = exe_path
+        # Write every component with unsaved changes, so that File > Save
+        # captures everything without requiring a separate save from each
+        # tab. Must happen before the config write so the file entries
+        # (obsfile, thdfile, urbfile, ...) end up in sfincs.inp. Each
+        # component's write() is a no-op when it holds no data.
+        pending = [
+            ("observation_points_changed", "observation_points"),
+            ("cross_sections_changed", "cross_sections"),
+            ("discharge_points_changed", "discharge_points"),
+            ("boundaries_changed", "water_level"),
+            ("thin_dams_changed", "thin_dams"),
+            ("weirs_changed", "weirs"),
+            ("drainage_structures_changed", "drainage_structures"),
+            ("urban_drainage_changed", "urban_drainage_areas"),
+            ("wave_boundaries_changed", "snapwave_boundary_conditions"),
+            ("wave_makers_changed", "wave_makers"),
+        ]
+        for flag, name in pending:
+            component = domain.components.get(name)
+            if component is not None and getattr(self, flag, False):
+                try:
+                    component.write()
+                    setattr(self, flag, False)
+                except Exception as e:
+                    print(f"Could not write {name}: {e}")
         # DDB always wants the launcher; the hydromt default is False so
         # script callers don't get a surprise batch file.
         domain.config.write(write_description=True)
@@ -602,13 +668,15 @@ class Model(GenericModel):
         )
 
 
-        # # Urban drainage areas (under the urban_drainage container) and
-        # # their derived outfall-location circles.
-        # app.map.layer[_MODEL].layer["urban_drainage"].layer[
-        #     "urban_drainage_areas"
-        # ].set_data(app.model[_MODEL].domain.urban_drainage_areas.gdf)
-        # from .urban_drainage import plot_outfall_layer
-        # plot_outfall_layer()
+        # Urban drainage areas (under the urban_drainage container) and
+        # their derived outfall-location circles. Only available on the
+        # urban_drainage branch of hydromt_sfincs.
+        if "urban_drainage_areas" in app.model[_MODEL].domain.components:
+            app.map.layer[_MODEL].layer["urban_drainage"].layer[
+                "urban_drainage_areas"
+            ].set_data(app.model[_MODEL].domain.urban_drainage_areas.gdf)
+            from .urban_drainage import plot_outfall_layer
+            plot_outfall_layer()
 
         # Observation points
         app.map.layer[_MODEL].layer["observation_points"].set_data(
@@ -640,6 +708,22 @@ class Model(GenericModel):
         app.map.layer[_MODEL].layer["wave_makers"].set_data(
             app.model[_MODEL].domain.wave_makers.data
         )
+        # Snapped-to-grid overlays. Normally refreshed on tab select, but
+        # fill them here too so they are correct right after opening a model.
+        from .observation_points_cross_sections import (
+            update_grid_snapper as update_cross_section_snapper,
+        )
+        from .structures_thin_dams import (
+            update_grid_snapper as update_thin_dam_snapper,
+        )
+        from .structures_weirs import update_grid_snapper as update_weir_snapper
+        from .waves_wave_makers import (
+            update_grid_snapper as update_wave_maker_snapper,
+        )
+        update_thin_dam_snapper()
+        update_weir_snapper()
+        update_cross_section_snapper()
+        update_wave_maker_snapper()
 
     def set_gui_variables(self) -> None:
         """Populate GUI variables from the current model configuration."""
@@ -657,22 +741,69 @@ class Model(GenericModel):
 
         # Now set some extra variables needed for SFINCS GUI
 
-        app.gui.setvar(group, "grid_type", "regular")
-        app.gui.setvar(group, "bathymetry_type", "regular")
+        # Subgrid models get their own dependency branches in the GUI
+        # (wiggle suppression, roughness tab)
+        app.gui.setvar(
+            group,
+            "bathymetry_type",
+            "subgrid" if self.domain.config.get("sbgfile") else "regular",
+        )
         app.gui.setvar(group, "roughness_type", "landsea")
-        app.gui.setvar(group, "input_options_text", ["Binary", "ASCII"])
-        app.gui.setvar(group, "input_options_values", ["bin", "asc"])
         app.gui.setvar(group, "output_options_text", ["NetCDF", "Binary", "ASCII"])
         app.gui.setvar(group, "output_options_values", ["net", "bin", "asc"])
-        app.gui.setvar(group, "meteo_forcing_type", "uniform")
-        app.gui.setvar(group, "crs_type", "geographic")
+        # Meteo source selectors (re-derived from the config file entries in
+        # meteo.update_sources whenever the Meteo tab is selected)
+        app.gui.setvar(group, "wind_source", "none")
+        app.gui.setvar(
+            group,
+            "wind_source_values",
+            ["none", "uniform", "gridded", "netcdf", "spiderweb"],
+        )
+        app.gui.setvar(
+            group,
+            "wind_source_names",
+            ["None", "Uniform", "Gridded (Delft3D)", "Gridded (NetCDF)", "Spiderweb"],
+        )
+        app.gui.setvar(group, "pressure_source", "none")
+        app.gui.setvar(
+            group,
+            "pressure_source_values",
+            ["none", "gridded", "netcdf", "spiderweb"],
+        )
+        app.gui.setvar(
+            group,
+            "pressure_source_names",
+            ["None", "Gridded (Delft3D)", "Gridded (NetCDF)", "Spiderweb"],
+        )
+        app.gui.setvar(group, "rain_source", "none")
+        app.gui.setvar(
+            group,
+            "rain_source_values",
+            ["none", "uniform", "gridded", "netcdf", "spiderweb"],
+        )
+        app.gui.setvar(
+            group,
+            "rain_source_names",
+            ["None", "Uniform", "Gridded (Delft3D)", "Gridded (NetCDF)", "Spiderweb"],
+        )
+        app.gui.setvar(
+            group,
+            "crs_type",
+            "geographic" if app.crs.is_geographic else "projected",
+        )
 
-        # Wind drag
-        cdwnd = self.domain.config.get("cdwnd", [0.0, 25.0, 50.0])
+        # Wind drag. Fallbacks match the config-model defaults (the
+        # built-in Smith & Banke 3-point curve); pad short lists so a
+        # 2-breakpoint model does not crash the GUI.
+        cdwnd = list(self.domain.config.get("cdwnd") or [0.0, 28.0, 50.0])
+        cdval = list(self.domain.config.get("cdval") or [0.001, 0.0025, 0.0025])
+        while len(cdwnd) < 3:
+            cdwnd.append(cdwnd[-1] if cdwnd else 0.0)
+        while len(cdval) < 3:
+            cdval.append(cdval[-1] if cdval else 0.0)
         app.gui.setvar(group, "wind_speed_1", cdwnd[0])
         app.gui.setvar(group, "wind_speed_2", cdwnd[1])
         app.gui.setvar(group, "wind_speed_3", cdwnd[2])
-        cdval = self.domain.config.get("cdval", [0.0, 0.0, 0.0])
         app.gui.setvar(group, "cd_1", cdval[0])
         app.gui.setvar(group, "cd_2", cdval[1])
         app.gui.setvar(group, "cd_3", cdval[2])
@@ -692,10 +823,11 @@ class Model(GenericModel):
         app.gui.setvar(group, "boundary_conditions_timeseries_peak", 1.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_tpeak", 86400.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_duration", 43200.0)
+        tide_model_names = app.gui.getvar("tide_models", "names")
         app.gui.setvar(
             group,
             "boundary_conditions_tide_model",
-            app.gui.getvar("tide_models", "names")[0],
+            tide_model_names[0] if tide_model_names else "",
         )
 
         # Observation points
@@ -726,7 +858,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "weir_index", 0)
         app.gui.setvar(group, "weir_elevation", 0.0)
         app.gui.setvar(group, "weir_par1", 0.5)
-        app.gui.setvar(group, "weir_elevation", 0.0)
         app.gui.setvar(group, "weir_enable_editing_elevation", False)
         app.gui.setvar(group, "weir_enable_editing_par1", False)
 
@@ -740,9 +871,36 @@ class Model(GenericModel):
         app.gui.setvar(group, "drainage_structure_sill_elevation", 0.0)
         app.gui.setvar(group, "drainage_structure_manning_n", 0.024)
         app.gui.setvar(group, "drainage_structure_closing_time", 600.0)
-        app.gui.setvar(group, "drainage_structure_rules_open", "")
-        app.gui.setvar(group, "drainage_structure_rules_close", "")
+        # Detailed culvert (type 5) parameters
+        app.gui.setvar(group, "drainage_structure_height", 2.0)
+        app.gui.setvar(group, "drainage_structure_invert_1", 0.0)
+        app.gui.setvar(group, "drainage_structure_invert_2", 0.0)
+        app.gui.setvar(group, "drainage_structure_submergence_ratio", 0.67)
+        # Gate control rules: ordered list of (operation, when) per structure
+        app.gui.setvar(group, "drainage_structure_rule_strings", [])
+        app.gui.setvar(group, "nr_drainage_structure_rules", 0)
+        app.gui.setvar(group, "drainage_structure_rule_index", 0)
+        app.gui.setvar(group, "drainage_structure_rule_operation", "open")
+        app.gui.setvar(
+            group, "drainage_structure_rule_operations", ["open", "close", "hold"]
+        )
+        app.gui.setvar(
+            group,
+            "drainage_structure_rule_operation_names",
+            ["Open", "Close", "Hold"],
+        )
+        app.gui.setvar(group, "drainage_structure_rule_when", "")
         app.gui.setvar(group, "drainage_structure_type", 1)
+        app.gui.setvar(group, "drainage_structure_type_to_add", 1)
+        app.gui.setvar(group, "drainage_structure_direction", "both")
+        app.gui.setvar(
+            group, "drainage_structure_directions", ["both", "positive", "negative"]
+        )
+        app.gui.setvar(
+            group,
+            "drainage_structure_direction_names",
+            ["Both", "Positive", "Negative"],
+        )
         # Integer codes used internally: 1=pump, 2=culvert_simple,
         # 5=culvert (detailed), 4=gate.
         app.gui.setvar(group, "drainage_structure_types", [1, 2, 5, 4])
@@ -801,12 +959,6 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_boundary_points_snapwave", 0)
         app.gui.setvar(group, "active_boundary_point_snapwave", 0)
         app.gui.setvar(group, "boundary_dx_snapwave", 10000.0)
-        app.gui.setvar(
-            group, "boundary_conditions_timeseries_shape_snapwave", "constant"
-        )
-        app.gui.setvar(
-            group, "boundary_conditions_timeseries_time_step_snapwave", 600.0
-        )
         app.gui.setvar(group, "boundary_conditions_timeseries_hm0_snapwave", 1.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_tp_snapwave", 8.0)
         app.gui.setvar(group, "boundary_conditions_timeseries_wd_snapwave", 0.0)
@@ -817,12 +969,56 @@ class Model(GenericModel):
         app.gui.setvar(group, "nr_wave_makers", 0)
         app.gui.setvar(group, "active_wave_maker", 0)
 
-        app.gui.setvar(group, "wind", False)
-        app.gui.setvar(group, "baro", False)
-        app.gui.setvar(group, "rain", False)
+        # NOTE: "baro" must NOT be set here — it is a real SFINCS config key
+        # already copied from the config in the loop above; overwriting it
+        # would silently reset baro=1 models to 0 on the next edit.
 
-        # Turning off weirs for now
         app.gui.setvar(group, "enable_weirs", True)
+
+        # Domain tab (read-only, filled from the quadtree grid itself)
+        app.gui.setvar(group, "refinement_level_index", 0)
+        self.update_domain_info()
+
+    def update_domain_info(self) -> None:
+        """Fill the Domain-tab variables from the quadtree grid itself.
+
+        The grid attributes (x0, y0, mmax, nmax, dx, dy, rotation) and the
+        per-refinement-level active cell counts come straight from the
+        quadtree dataset (sfincs.nc), never from the model-maker GUI.
+        """
+        import numpy as np
+
+        group = _GROUP
+        attrs: dict = {}
+        levels = None
+        mask = None
+        try:
+            data = self.domain.quadtree_grid.data
+            if data is not None and "level" in data:
+                attrs = dict(data.attrs)
+                levels = data["level"].to_numpy()
+                if "mask" in data:
+                    mask = data["mask"].to_numpy()
+        except Exception:
+            pass
+
+        app.gui.setvar(group, "x0", float(attrs.get("x0", 0.0)))
+        app.gui.setvar(group, "y0", float(attrs.get("y0", 0.0)))
+        app.gui.setvar(group, "mmax", int(attrs.get("mmax", 0)))
+        app.gui.setvar(group, "nmax", int(attrs.get("nmax", 0)))
+        app.gui.setvar(group, "dx", float(attrs.get("dx", 0.0)))
+        app.gui.setvar(group, "dy", float(attrs.get("dy", 0.0)))
+        app.gui.setvar(group, "rotation", float(attrs.get("rotation", 0.0)))
+
+        info = []
+        if levels is not None and len(levels) > 0:
+            active = levels if mask is None else levels[mask > 0]
+            nr_levels = int(attrs.get("nr_levels", int(levels.max())))
+            for ilev in range(nr_levels):
+                count = int(np.sum(active == ilev + 1))
+                info.append(f"Level {ilev + 1}: {count} active cells")
+            info.append(f"Total: {len(active)} active cells")
+        app.gui.setvar(group, "refinement_level_info", info)
 
     def set_model_variables(
         self, varid: Optional[str] = None, value: Any = None
@@ -852,12 +1048,15 @@ class Model(GenericModel):
         cdwnd.append(app.gui.getvar(group, "wind_speed_1"))
         cdwnd.append(app.gui.getvar(group, "wind_speed_2"))
         cdwnd.append(app.gui.getvar(group, "wind_speed_3"))
-        self.domain.config.set("cdwnd", cdwnd)
         cdval = []
         cdval.append(app.gui.getvar(group, "cd_1"))
         cdval.append(app.gui.getvar(group, "cd_2"))
         cdval.append(app.gui.getvar(group, "cd_3"))
-        self.domain.config.set("cdval", cdval)
+        # Honour the number of breakpoints selected in the GUI (2 or 3)
+        nrb = int(app.gui.getvar(group, "cdnrb") or 3)
+        nrb = max(min(nrb, 3), 2)
+        self.domain.config.set("cdwnd", cdwnd[:nrb])
+        self.domain.config.set("cdval", cdval[:nrb])
 
     def set_input_variable(self, gui_variable: str, value: Any) -> None:
         """Set a single input variable (currently a no-op placeholder).
@@ -881,14 +1080,24 @@ class Model(GenericModel):
         naming_option : str
             Column to use for station names (default ``"id"``).
         """
-        self.domain.observation_points.add_points(
-            gdf_stations_to_add, name=naming_option
-        )
+        gdf = gdf_stations_to_add.copy()
+        # The observation_points component expects a "name" column; fill it
+        # from the requested naming column of the stations source.
+        if naming_option in gdf.columns:
+            gdf["name"] = gdf[naming_option].astype(str)
+        elif "name" not in gdf.columns:
+            gdf["name"] = [str(i + 1) for i in range(len(gdf))]
+        try:
+            # create() reprojects to the model CRS, clips to the model
+            # region, merges with existing points and sets obsfile in the
+            # config.
+            self.domain.observation_points.create(gdf, merge=True)
+        except ValueError as e:
+            app.gui.window.dialog_warning(f"Cannot add stations:\n{e}")
+            return
         gdf = self.domain.observation_points.gdf
         app.map.layer[_MODEL].layer["observation_points"].set_data(gdf, 0)
-        if not self.domain.input.variables.obsfile:
-            self.domain.input.variables.obsfile = "sfincs.obs"
-            app.gui.setvar(_GROUP, "obsfile", self.domain.input.variables.obsfile)
+        app.gui.setvar(_GROUP, "obsfile", self.domain.config.get("obsfile"))
         self.domain.observation_points.write()
 
     def check_times(self) -> None:

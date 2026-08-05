@@ -1,72 +1,30 @@
 element:
 - style: panel
-  text: Forcing
+  text: Wind
   position:
     x: 10
     y: 10
-    width: 170
+    width: 120
     height: 160
   element:
   - style: popupmenu
     position:
       x: 10
       y: 130
-      width: 150
+      width: 100
       height: 20
-    variable: meteo_forcing_type
-    option_string:
-    - Uniform
-    - Spider web
-    - Regular Grid
-    - Regular Grid + Spider web
+    variable: wind_source
     option_value:
-    - uniform
-    - spiderweb
-    - rectangular
-    - rectangular_and_spiderweb
-    tooltip: Select the type of meteorological forcing
-  - style: checkbox
-    position:
-      x: 10
-      y: 100
-      width: 100
-      height: 20
-    text: Wind
-    variable: wind
-    method: set_model_variables
-    tooltip: Enable or disable wind forcing
-  - style: checkbox
-    position:
-      x: 10
-      y: 75
-      width: 100
-      height: 20
-    text: Barometric Pressure
-    variable: baro
-    method: set_model_variables
-    tooltip: Enable or disable barometric pressure forcing
-  - style: checkbox
-    position:
-      x: 10
-      y: 50
-      width: 100
-      height: 20
-    text: Rain
-    variable: rain
-    method: set_model_variables
-    tooltip: Enable or disable rainfall forcing
-- style: panel
-  text: Wind
-  position:
-    x: 190
-    y: 10
-    width: 120
-    height: 160
-  element:
+      variable: wind_source_values
+    option_string:
+      variable: wind_source_names
+    method: select_wind_source
+    tooltip: Source of the wind forcing
+    text_position: left
   - style: pushselectfile
     position:
       x: 10
-      y: 130
+      y: 95
       width: 100
       height: 20
     text: Wind File
@@ -74,13 +32,13 @@ element:
     showfilename: True
     filter: "Wind file (*.wnd)"
     title: Select wind file
-    tooltipstring: Select wind file
+    tooltipstring: Uniform wind time series (magnitude and direction)
     method: set_model_variables
     dependency:
-    - action: enable
+    - action: visible
       checkfor: all
       check:
-      - variable: meteo_forcing_type
+      - variable: wind_source
         operator: eq
         value: uniform
   - style: pushselectfile
@@ -94,99 +52,173 @@ element:
     showfilename: True
     extension: "*.amu"
     title: Select AMU file
-    tooltipstring: Select AMU file
+    tooltipstring: Gridded wind u-component (Delft3D ASCII)
     filter: "AMU file (*.amu)"
     method: set_model_variables
     dependency:
-    - action: enable
-      checkfor: any
+    - action: visible
+      checkfor: all
       check:
-      - variable: meteo_forcing_type
+      - variable: wind_source
         operator: eq
-        value: rectangular
-      - variable: meteo_forcing_type
-        operator: eq
-        value: rectangular_and_spiderweb
+        value: gridded
   - style: pushselectfile
     position:
       x: 10
-      y: 70
+      y: 60
       width: 100
       height: 20
     text: AMV File
     variable: amvfile
     showfilename: True
-    filter: "AMV file (*.amv)"
+    extension: "*.amv"
     title: Select AMV file
-    tooltipstring: Select AMV file
+    tooltipstring: Gridded wind v-component (Delft3D ASCII)
+    filter: "AMV file (*.amv)"
     method: set_model_variables
     dependency:
-    - action: enable
-      checkfor: any
+    - action: visible
+      checkfor: all
       check:
-      - variable: meteo_forcing_type
+      - variable: wind_source
         operator: eq
-        value: rectangular
-      - variable: meteo_forcing_type
+        value: gridded
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 95
+      width: 100
+      height: 20
+    text: NetCDF File
+    variable: netamuamvfile
+    showfilename: True
+    extension: "*.nc"
+    title: Select NetCDF wind file
+    tooltipstring: Combined gridded wind u/v components (NetCDF)
+    filter: "NetCDF file (*.nc)"
+    method: set_model_variables
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: wind_source
         operator: eq
-        value: rectangular_and_spiderweb
+        value: netcdf
 - style: panel
-  text: Barometric Pressure
+  text: Atmospheric Pressure
   position:
-    x: 320
+    x: 140
     y: 10
     width: 120
     height: 160
   element:
-  - style: pushselectfile
+  - style: popupmenu
     position:
       x: 10
       y: 130
+      width: 100
+      height: 20
+    variable: pressure_source
+    option_value:
+      variable: pressure_source_values
+    option_string:
+      variable: pressure_source_names
+    method: select_pressure_source
+    tooltip: Source of the atmospheric pressure forcing
+    text_position: left
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 95
       width: 100
       height: 20
     text: AMP File
     variable: ampfile
     showfilename: True
+    extension: "*.amp"
     title: Select AMP file
-    tooltipstring: Select AMP file
+    tooltipstring: Gridded atmospheric pressure (Delft3D ASCII)
     filter: "AMP file (*.amp)"
     method: set_model_variables
     dependency:
-    - action: enable
-      checkfor: any
+    - action: visible
+      checkfor: all
       check:
-      - variable: meteo_forcing_type
+      - variable: pressure_source
         operator: eq
-        value: rectangular
-      - variable: meteo_forcing_type
+        value: gridded
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 95
+      width: 100
+      height: 20
+    text: NetCDF File
+    variable: netampfile
+    showfilename: True
+    extension: "*.nc"
+    title: Select NetCDF pressure file
+    tooltipstring: Gridded atmospheric pressure (NetCDF)
+    filter: "NetCDF file (*.nc)"
+    method: set_model_variables
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: pressure_source
         operator: eq
-        value: rectangular_and_spiderweb
+        value: netcdf
+  - style: checkbox
+    position:
+      x: 10
+      y: 15
+      width: 100
+      height: 20
+    text: Pressure gradient
+    variable: baro
+    method: set_model_variables
+    tooltip: Include the atmospheric-pressure gradient in the momentum equation
 - style: panel
   text: Rain
   position:
-    x: 450
+    x: 270
     y: 10
     width: 120
     height: 160
   element:
-  - style: pushselectfile
+  - style: popupmenu
     position:
       x: 10
       y: 130
       width: 100
       height: 20
+    variable: rain_source
+    option_value:
+      variable: rain_source_values
+    option_string:
+      variable: rain_source_names
+    method: select_rain_source
+    tooltip: Source of the precipitation forcing
+    text_position: left
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 95
+      width: 100
+      height: 20
     text: Precip File
-    variable: precipfile
+    variable: prcfile
     showfilename: True
-    filter: "Precip file (*.prc)"
-    selectiontext: Select precipitation file
-    tooltipstring: Select precipitation file
+    extension: "*.prc"
+    title: Select precipitation file
+    tooltipstring: Uniform precipitation time series
+    filter: "Precipitation file (*.prc *.precip)"
     method: set_model_variables
     dependency:
-    - action: enable
+    - action: visible
       checkfor: all
       check:
-      - variable: meteo_forcing_type
+      - variable: rain_source
         operator: eq
         value: uniform
   - style: pushselectfile
@@ -198,24 +230,43 @@ element:
     text: AMPR File
     variable: amprfile
     showfilename: True
+    extension: "*.ampr"
+    title: Select AMPR file
+    tooltipstring: Gridded precipitation (Delft3D ASCII)
     filter: "AMPR file (*.ampr)"
-    selectiontext: Select AMPR file
-    tooltipstring: Select AMPR file
     method: set_model_variables
     dependency:
-    - action: enable
-      checkfor: any
+    - action: visible
+      checkfor: all
       check:
-      - variable: meteo_forcing_type
+      - variable: rain_source
         operator: eq
-        value: rectangular
-      - variable: meteo_forcing_type
+        value: gridded
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 95
+      width: 100
+      height: 20
+    text: NetCDF File
+    variable: netamprfile
+    showfilename: True
+    extension: "*.nc"
+    title: Select NetCDF precipitation file
+    tooltipstring: Gridded precipitation (NetCDF)
+    filter: "NetCDF file (*.nc)"
+    method: set_model_variables
+    dependency:
+    - action: visible
+      checkfor: all
+      check:
+      - variable: rain_source
         operator: eq
-        value: rectangular_and_spiderweb
+        value: netcdf
 - style: panel
   text: Spiderweb
   position:
-    x: 580
+    x: 400
     y: 10
     width: 120
     height: 160
@@ -226,20 +277,57 @@ element:
       y: 130
       width: 100
       height: 20
-    text: Spiderweb File
+    text: SPW File
     variable: spwfile
     showfilename: True
+    extension: "*.spw"
+    title: Select spiderweb file
+    tooltipstring: Tropical cyclone spiderweb file (wind, pressure and optionally rain)
     filter: "Spiderweb file (*.spw)"
-    selectiontext: Select spiderweb file
-    tooltipstring: Select spiderweb file
     method: set_model_variables
-    dependency:
-    - action: enable
-      checkfor: any
-      check:
-      - variable: meteo_forcing_type
-        operator: eq
-        value: spiderweb
-      - variable: meteo_forcing_type
-        operator: eq
-        value: rectangular_and_spiderweb
+  - style: pushselectfile
+    position:
+      x: 10
+      y: 95
+      width: 100
+      height: 20
+    text: NetCDF SPW File
+    variable: netspwfile
+    showfilename: True
+    extension: "*.nc"
+    title: Select NetCDF spiderweb file
+    tooltipstring: Tropical cyclone spiderweb file (NetCDF)
+    filter: "NetCDF file (*.nc)"
+    method: set_model_variables
+  - style: edit
+    text: Merge fraction
+    position:
+      x: 80
+      y: 60
+      width: 30
+      height: 20
+    variable: spwmergefrac
+    method: set_model_variables
+    tooltip: Merge factor between the spiderweb and the background wind field
+    text_position: left
+  - style: edit
+    text: Size factor
+    position:
+      x: 80
+      y: 35
+      width: 30
+      height: 20
+    variable: factor_spw_size
+    method: set_model_variables
+    tooltip: Scaling factor on the spiderweb radius
+    text_position: left
+  - style: checkbox
+    position:
+      x: 10
+      y: 10
+      width: 100
+      height: 20
+    text: Use precipitation
+    variable: usespwprecip
+    method: set_model_variables
+    tooltip: Use the precipitation field from the spiderweb file

@@ -77,3 +77,23 @@ element:
     variable: rotation
     enable: False
     tooltipstring: Grid rotation angle in degrees
+  - style: panel
+    text: Refinement Levels
+    position:
+      x: 280
+      y: 10
+      width: 220
+      height: 140
+    element:
+    - style: listbox
+      position:
+        x: 10
+        y: 10
+        width: 200
+        height: 105
+      variable: refinement_level_index
+      select: index
+      method: select_refinement_level
+      option_string:
+        variable: refinement_level_info
+      tooltip: Number of active cells per refinement level

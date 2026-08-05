@@ -21,6 +21,7 @@ def select(*args: Any) -> None:
     # Activate draw layer
     app.map.layer[_MODEL].layer["weirs"].layer["polylines"].activate()
     app.map.layer[_MODEL].layer["weirs"].layer["snapped"].activate()
+    update_grid_snapper()
     update()
 
 
@@ -250,8 +251,10 @@ def set_model_variables(*args: Any) -> None:
 
 
 def update_grid_snapper() -> None:
-    """Snap weirs to the grid and update the snapped layer (currently disabled)."""
-    return  # Weirs are not snapped to grid for now, so just return
+    """Snap weirs to the grid and update the snapped layer."""
+    if app.model[_MODEL].domain.weirs.nr_lines == 0:
+        app.map.layer[_MODEL].layer["weirs"].layer["snapped"].clear()
+        return
     snap_gdf = app.model[_MODEL].domain.weirs.snap_to_grid()
     if len(snap_gdf) > 0:
         app.map.layer[_MODEL].layer["weirs"].layer["snapped"].set_data(snap_gdf)

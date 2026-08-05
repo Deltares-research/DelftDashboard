@@ -1,4 +1,4 @@
-"""GUI callbacks for the HurryWave Physics > Meteo sub-tab."""
+"""GUI callbacks for the HurryWave Physics - Source Terms sub-tab."""
 
 from typing import Any
 
@@ -9,7 +9,7 @@ _MODEL = "hurrywave_hmt"
 
 
 def select(*args: Any) -> None:
-    """Activate the Physics Meteo sub-tab."""
+    """Activate the Source Terms sub-tab and update map layers."""
     map.update()
 
 

@@ -21,3 +21,6 @@ element:
   - string: Meteo
     module: delftdashboard.models.sfincs_hmt.physics_meteo
     element: physics_meteo.yml
+  - string: Infiltration
+    module: delftdashboard.models.sfincs_hmt.physics_infiltration
+    element: physics_infiltration.yml

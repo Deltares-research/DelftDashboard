@@ -16,7 +16,7 @@ element:
     text: X0
     variable: x0
     enable: False
-    tooltip: X-coordinate of the grid origin
+    tooltipstring: X-coordinate of the grid origin
   - style: edit
     position:
       x: 160
@@ -26,7 +26,7 @@ element:
     text: Y0
     variable: y0
     enable: False
-    tooltip: Y-coordinate of the grid origin
+    tooltipstring: Y-coordinate of the grid origin
   - style: edit
     position:
       x: 60
@@ -36,7 +36,7 @@ element:
     text: MMax
     variable: mmax
     enable: False
-    tooltip: Number of grid cells in M-direction
+    tooltipstring: Number of grid cells in the x-direction
   - style: edit
     position:
       x: 160
@@ -46,7 +46,7 @@ element:
     text: NMax
     variable: nmax
     enable: False
-    tooltip: Number of grid cells in N-direction
+    tooltipstring: Number of grid cells in the y-direction
   - style: edit
     position:
       x: 60
@@ -56,7 +56,7 @@ element:
     text: dX
     variable: dx
     enable: False
-    tooltip: Grid cell size in X-direction
+    tooltipstring: Grid cell size in the x-direction
   - style: edit
     position:
       x: 160
@@ -66,7 +66,7 @@ element:
     text: dY
     variable: dy
     enable: False
-    tooltip: Grid cell size in Y-direction
+    tooltipstring: Grid cell size in the y-direction
   - style: edit
     position:
       x: 60
@@ -76,20 +76,24 @@ element:
     text: Rotation
     variable: rotation
     enable: False
-    tooltip: Grid rotation angle in degrees
-  - style: edit
+    tooltipstring: Grid rotation angle in degrees
+  - style: panel
+    text: Refinement Levels
     position:
-      x: 60
+      x: 280
       y: 10
-      width: 60
-      height: 20
-    text: Latitude
-    variable: latitude
-    tooltip: Edit latitude for Coriolis force
-    dependency:
-    - action: enable
-      checkfor: any
-      check:
-      - variable: crs_type
-        operator: ne
-        value: geographic
+      width: 220
+      height: 140
+    element:
+    - style: listbox
+      position:
+        x: 10
+        y: 10
+        width: 200
+        height: 105
+      variable: refinement_level_index
+      select: index
+      method: select_refinement_level
+      option_string:
+        variable: refinement_level_info
+      tooltip: Number of active cells per refinement level

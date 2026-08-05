@@ -65,13 +65,47 @@ element:
     variable: dmx1
     method: set_model_variables
     tooltipstring: Edit DMX1
+- style: panel
+  title: Time Integration
+  position:
+    x: 290
+    y: 10
+    width: 180
+    height: 160
+  element:
   - style: edit
     position:
-      x: 60
-      y: 105
-      width: 50
+      x: 110
+      y: 130
+      width: 60
       height: 20
-    text: Dmx2 (-)
-    variable: dmx2
+    text: Spin-up Time (s)
+    variable: tspinup
     method: set_model_variables
-    tooltipstring: Edit DMX2
+    tooltipstring: Duration of the spin-up period in seconds
+  - style: edit
+    position:
+      x: 110
+      y: 105
+      width: 60
+      height: 20
+    text: Alpha (-)
+    variable: alpha
+    method: set_model_variables
+    tooltipstring: CFL Courant factor for the propagation time step
+  - style: popupmenu
+    position:
+      x: 110
+      y: 80
+      width: 60
+      height: 20
+    text: Scheme
+    variable: propagation_scheme
+    method: set_model_variables
+    option_string:
+    - Upwind 1
+    - Upwind 2
+    option_value:
+    - 1
+    - 2
+    tooltipstring: 'Propagation scheme: 1st or 2nd order upwind'

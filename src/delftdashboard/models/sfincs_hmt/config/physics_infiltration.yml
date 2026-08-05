@@ -1,0 +1,61 @@
+element:
+- style: panel
+  title: Uniform Infiltration
+  position:
+    x: 10
+    y: 10
+    width: 220
+    height: 120
+  element:
+  - style: edit
+    text: Infiltration rate (mm/hr)
+    position:
+      x: 150
+      y: 90
+      width: 50
+      height: 20
+    variable: qinf
+    method: set_model_variables
+    tooltipstring: Uniform infiltration rate (mm/hr)
+    textposition: left
+  - style: edit
+    text: Minimum bed level (m)
+    position:
+      x: 150
+      y: 65
+      width: 50
+      height: 20
+    variable: qinf_zmin
+    method: set_model_variables
+    tooltipstring: Minimum bed level above which infiltration is applied (m)
+    textposition: left
+- style: panel
+  title: Curve Number / Horton
+  position:
+    x: 240
+    y: 10
+    width: 240
+    height: 120
+  element:
+  - style: edit
+    text: Initial abstraction fraction
+    position:
+      x: 170
+      y: 90
+      width: 50
+      height: 20
+    variable: sfacinf
+    method: set_model_variables
+    tooltipstring: SCS curve-number initial-abstraction fraction (default 0.2)
+    textposition: left
+  - style: edit
+    text: Horton recovery/decay ratio
+    position:
+      x: 170
+      y: 65
+      width: 50
+      height: 20
+    variable: horton_kr_kd
+    method: set_model_variables
+    tooltipstring: Ratio between the Horton recovery and decay rates
+    textposition: left

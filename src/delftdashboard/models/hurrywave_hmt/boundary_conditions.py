@@ -61,7 +61,13 @@ def point_clicked(x: float, y: float) -> None:
 
 def select_boundary_point_from_list(*args: Any) -> None:
     """Sync the map selection when a boundary point is picked from the list."""
-    index = app.gui.getvar(_GROUP, "active_boundary_point")
+    # Use the index passed by the listbox callback, not getvar (which may
+    # be stale due to async JS updates)
+    if args and isinstance(args[0], int):
+        index = args[0]
+        app.gui.setvar(_GROUP, "active_boundary_point", index)
+    else:
+        index = app.gui.getvar(_GROUP, "active_boundary_point")
     app.map.layer[_MODEL].layer["boundary_points"].select_by_index(index)
     update_conditions()
 
@@ -96,7 +102,24 @@ def delete_point_from_list(*args: Any) -> None:
 
 def create_boundary_points(*args: Any) -> None:
     """Auto-generate equally spaced boundary points along the open boundary."""
-    dlg = app.gui.window.dialog_wait("Making boundary points ...")
+    # Pre-flight checks (before any dialog appears)
+    mask = app.model[_MODEL].domain.quadtree_mask
+    try:
+        has_mask = mask.data is not None and "mask" in mask.data
+    except Exception:
+        has_mask = False
+    if not has_mask:
+        app.gui.window.dialog_warning(
+            "Please first generate a grid and mask before creating "
+            "boundary points."
+        )
+        return
+    if not mask.has_open_boundaries():
+        app.gui.window.dialog_warning(
+            "The mask contains no open boundary cells. Please update the "
+            "mask first."
+        )
+        return
 
     if _bc().nr_points > 0:
         ok = app.gui.window.dialog_ok_cancel(
@@ -104,18 +127,28 @@ def create_boundary_points(*args: Any) -> None:
             title="Warning",
         )
         if not ok:
-            dlg.close()
             return
 
-    bnd_dist = app.gui.getvar(_GROUP, "boundary_dx")
-    _bc().get_boundary_points_from_mask(bnd_dist=bnd_dist)
-    gdf = _bc().gdf
-    app.map.layer[_MODEL].layer["boundary_points"].set_data(gdf, 0)
+    dlg = app.gui.window.dialog_wait("Making boundary points ...")
+    try:
+        bnd_dist = app.gui.getvar(_GROUP, "boundary_dx")
+        _bc().get_boundary_points_from_mask(bnd_dist=bnd_dist)
+        gdf = _bc().gdf
+        app.map.layer[_MODEL].layer["boundary_points"].set_data(gdf, 0)
 
-    _bc().set_uniform(hs=1.0, tp=8.0, wd=45.0, ds=20.0)
-    write()
-
-    dlg.close()
+        # Apply the wave parameters currently set in the GUI
+        _bc().set_uniform(
+            hs=app.gui.getvar(_GROUP, "boundary_hm0"),
+            tp=app.gui.getvar(_GROUP, "boundary_tp"),
+            wd=app.gui.getvar(_GROUP, "boundary_wd"),
+            ds=app.gui.getvar(_GROUP, "boundary_ds"),
+        )
+        write()
+    except Exception as e:
+        app.gui.window.dialog_warning(f"Could not create boundary points:\n{e}")
+        return
+    finally:
+        dlg.close()
     update_conditions()
     update_list()
 
@@ -150,6 +183,11 @@ def update_conditions() -> None:
 def select_boundary_forcing(*args: Any) -> None:
     """Switch between time-series and spectral boundary forcing."""
     _bc().forcing = args[0]
+    # The point count and parameter fields depend on the forcing type —
+    # refresh them so the GUI stays consistent with the component
+    update_list()
+    update_conditions()
+    app.gui.window.update()
 
 
 def _set_parameter_at_point(var: str, index: int, value: float) -> None:

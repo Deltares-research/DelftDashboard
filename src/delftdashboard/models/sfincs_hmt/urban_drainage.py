@@ -124,6 +124,12 @@ def delete_urban_drainage_area(*args: Any) -> None:
 
 def select_urban_drainage_area(*args: Any) -> None:
     """Handle list-box selection of an urban drainage area."""
+    map.reset_cursor()
+    index = app.gui.getvar(_GROUP, "urban_drainage_area_index")
+    if app.model[_MODEL].domain.urban_drainage_areas.nr_areas > 0:
+        app.map.layer[_MODEL].layer["urban_drainage"].layer[
+            "urban_drainage_areas"
+        ].activate_feature(index)
     update()
 
 
@@ -192,6 +198,39 @@ def edit_urban_drainage_area_parameter(*args: Any) -> None:
     plot_outfall_layer()
 
 
+def click_outfall_location(*args: Any) -> None:
+    """Start map click interaction to set the outfall of the selected area."""
+    app.map.click_point(outfall_location_clicked)
+
+
+def outfall_location_clicked(x: float, y: float) -> None:
+    """Set the outfall of the selected area to the clicked map location.
+
+    Parameters
+    ----------
+    x, y : float
+        Coordinates of the clicked location (model CRS).
+    """
+    if app.model[_MODEL].domain.urban_drainage_areas.nr_areas == 0:
+        return
+    index = app.gui.getvar(_GROUP, "urban_drainage_area_index")
+    gdf = app.model[_MODEL].domain.urban_drainage_areas.data
+    if str(gdf.iloc[index]["type"]) != "piped_drainage":
+        return
+    # Round to the nearest cm (~1e-7 degrees for geographic model CRS)
+    crs = app.model[_MODEL].domain.crs
+    decimals = 7 if crs is not None and crs.is_geographic else 2
+    x = round(x, decimals)
+    y = round(y, decimals)
+    gdf.at[index, "outfall_x"] = x
+    gdf.at[index, "outfall_y"] = y
+    app.gui.setvar(_GROUP, "urban_drainage_area_outfall_x", x)
+    app.gui.setvar(_GROUP, "urban_drainage_area_outfall_y", y)
+    app.model[_MODEL].urban_drainage_changed = True
+    plot_outfall_layer()
+    app.gui.window.update()
+
+
 # ---------------------------------------------------------------------------
 # Draw-layer callbacks
 # ---------------------------------------------------------------------------
@@ -255,7 +294,17 @@ def urban_drainage_area_created(gdf: Any, index: int, id: Any) -> None:
             _GROUP, "urban_drainage_area_maximum_capacity"
         )
 
-    app.model[_MODEL].domain.urban_drainage_areas.set(gdf_new, merge=True)
+    try:
+        app.model[_MODEL].domain.urban_drainage_areas.set(gdf_new, merge=True)
+    except ValueError as e:
+        # E.g. the polygon lies entirely outside the model domain, or there is
+        # no model domain yet. Remove the just-drawn polygon from the map and
+        # tell the user instead of leaving an orphaned shape behind.
+        app.map.layer[_MODEL].layer["urban_drainage"].layer[
+            "urban_drainage_areas"
+        ].delete_feature(id)
+        app.gui.window.dialog_warning(f"Cannot add urban drainage area:\n{e}")
+        return
 
     nrt = app.model[_MODEL].domain.urban_drainage_areas.nr_areas
     app.gui.setvar(_GROUP, "urban_drainage_area_type", ztype)
