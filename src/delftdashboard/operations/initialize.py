@@ -271,8 +271,15 @@ def initialize() -> None:
     # The data path always sits in the delftdashboard folder
     app.config["data_path"] = os.path.join(app.config["delft_dashboard_path"], "data")
 
-    # Set S3 bucket name
-    app.config["s3_bucket"] = "deltares-ddb"
+    # Remote data store (S3 or S3-compatible). setdefault so all three can
+    # be overridden in delftdashboard.ini. To switch back to the old AWS
+    # bucket, put this in delftdashboard.ini:
+    #   s3_bucket=deltares-ddb
+    #   s3_endpoint=
+    # (an empty endpoint means AWS S3; s3_region is only used for AWS URLs)
+    app.config.setdefault("s3_bucket", "delftdashboard")
+    app.config.setdefault("s3_endpoint", "https://s3.deltares.nl")
+    app.config.setdefault("s3_region", "eu-west-1")
 
     # If it does not exist, create it
     if not os.path.exists(app.config["data_path"]):
@@ -351,14 +358,14 @@ def initialize() -> None:
     initialize_topography()
 
     # 3D terrain sources for the map terrain control
-    s3_bucket = app.config.get("s3_bucket", "deltares-ddb")
+    from delftdashboard.operations.s3_store import s3_http_url
+
     app.terrain_sources = [
         {
             "id": "gebco_2024",
             "name": "GEBCO 2024",
             "tiles": [
-                f"https://{s3_bucket}.s3.eu-west-1.amazonaws.com"
-                f"/data/bathymetry/gebco_2024/{{z}}/{{x}}/{{y}}.png"
+                s3_http_url("data/bathymetry/gebco_2024/{z}/{x}/{y}.png")
             ],
             "encoding": "terrarium",
             "tileSize": 256,
@@ -390,6 +397,7 @@ def initialize() -> None:
         path=app.config["tide_model_database_path"],
         s3_bucket=s3_bucket,
         s3_key=s3_key,
+        s3_endpoint=app.config.get("s3_endpoint") or None,
         check_online=app.online,
     )
     short_names, long_names = app.tide_model_database.dataset_names()

@@ -78,7 +78,11 @@ class Toolbox(GenericToolbox):
         s3_key = "data/tropical_cyclones"
         path = os.path.join(app.config["data_path"], "tropical_cyclones")
         self.cyclone_track_database = CycloneTrackDatabase(
-            path, s3_bucket=s3_bucket, s3_key=s3_key, check_online=app.online
+            path,
+            s3_bucket=s3_bucket,
+            s3_key=s3_key,
+            s3_endpoint=app.config.get("s3_endpoint") or None,
+            check_online=app.online,
         )
         short_names, long_names = self.cyclone_track_database.dataset_names()
         app.gui.setvar("tropical_cyclone", "track_dataset_long_names", long_names)

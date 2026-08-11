@@ -101,9 +101,7 @@ class TopographyDataCatalog:
         s3_key : str, optional
             Key prefix of the bathymetry database on the bucket.
         """
-        import boto3
-        from botocore import UNSIGNED
-        from botocore.client import Config
+        from delftdashboard.operations.s3_store import s3_client
 
         os.makedirs(self.path, exist_ok=True)
         catalog_file = os.path.join(self.path, "data_catalog_remote.yml")
@@ -111,7 +109,7 @@ class TopographyDataCatalog:
         legacy_file = os.path.join(self.path, "data_catalog_s3.yml")
         print("Updating bathymetry database ...")
         try:
-            s3 = boto3.client("s3", config=Config(signature_version=UNSIGNED))
+            s3 = s3_client()
             s3.download_file(
                 Bucket=s3_bucket,
                 Key=f"{s3_key}/data_catalog.yml",
@@ -410,11 +408,9 @@ class TopographyDataCatalog:
         if os.path.exists(local):
             return None
         try:
-            import boto3
-            from botocore import UNSIGNED
-            from botocore.client import Config
+            from delftdashboard.operations.s3_store import s3_client
 
-            s3 = boto3.client("s3", config=Config(signature_version=UNSIGNED))
+            s3 = s3_client()
             size = s3.head_object(Bucket=s3_bucket, Key=key)["ContentLength"]
             return size / 1e6
         except Exception as e:
@@ -434,12 +430,10 @@ class TopographyDataCatalog:
         if os.path.exists(local):
             return True
 
-        import boto3
-        from botocore import UNSIGNED
-        from botocore.client import Config
+        from delftdashboard.operations.s3_store import s3_client
 
         try:
-            s3 = boto3.client("s3", config=Config(signature_version=UNSIGNED))
+            s3 = s3_client()
             size = s3.head_object(Bucket=s3_bucket, Key=key)["ContentLength"]
             print(
                 f"Downloading dataset {name} ({size / 1e6:.0f} MB) from "
@@ -483,9 +477,17 @@ class TopographyDataCatalog:
         if not (s3_bucket and s3_key):
             return
         try:
-            import s3fs
+            # Prefer the endpoint declared on the catalog entry itself;
+            # fall back to the application-level store configuration
+            entry_endpoint = getattr(opts, "s3_endpoint", None)
+            if entry_endpoint:
+                import s3fs
 
-            fs = s3fs.S3FileSystem(anon=True)
+                fs = s3fs.S3FileSystem(anon=True, endpoint_url=entry_endpoint)
+            else:
+                from delftdashboard.operations.s3_store import s3_filesystem
+
+                fs = s3_filesystem()
             remote = f"{s3_bucket}/{s3_key}/index.html"
             fs.get_file(remote, os.path.join(folder, "index.html"))
         except Exception as e:
