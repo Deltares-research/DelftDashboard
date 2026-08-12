@@ -288,13 +288,14 @@ def set_uniform_conditions(index: Optional[int] = None) -> None:
     index : int or None
         Index of a specific point to update. If ``None``, update all points.
     """
+    bc = app.model[_MODEL].domain.snapwave_boundary_conditions
+    if bc.nr_points == 0:
+        return
     hm0 = app.gui.getvar(_GROUP, "boundary_conditions_timeseries_hm0_snapwave")
     tp = app.gui.getvar(_GROUP, "boundary_conditions_timeseries_tp_snapwave")
     wd = app.gui.getvar(_GROUP, "boundary_conditions_timeseries_wd_snapwave")
     ds = app.gui.getvar(_GROUP, "boundary_conditions_timeseries_ds_snapwave")
-    app.model[_MODEL].domain.snapwave_boundary_conditions.set_uniform_conditions(
-        hm0, tp, wd, ds, index=index
-    )
+    bc.create_timeseries(index=index, shape="constant", hs=hm0, tp=tp, wd=wd, ds=ds)
 
 
 def view_boundary_conditions_snapwave(*args: Any) -> None:

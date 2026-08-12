@@ -669,7 +669,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
                 global_zmin = 10.0
                 global_zmax = -10.0
 
-            mask.build(
+            mask.create(
                 zmin=global_zmin,
                 zmax=global_zmax,
                 include_polygon=app.toolbox[_TB].include_polygon_snapwave,
