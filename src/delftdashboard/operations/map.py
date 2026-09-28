@@ -299,6 +299,7 @@ def show_timeseries_popup(
     html_name: str = "timeseries_popup.html",
     width: int = 520,
     height: int = 320,
+    show_legend: bool = False,
 ) -> None:
     """Render a styled plotly line chart and show it as a map popup.
 
@@ -313,17 +314,22 @@ def show_timeseries_popup(
     y_label, x_label : str
         Axis labels.
     line_color : str
-        Colour of the (first) line. Extra columns use plotly defaults.
+        Colour of the single line. Ignored when there is more than one
+        column (plotly's default colour cycle is used instead).
     html_name : str
         File name written to ``<map_server>/overlays/``.
     width, height : int
         Popup size in pixels.
+    show_legend : bool
+        Show the legend. Forced on when *ts* has more than one column
+        (e.g. comparing several datasets at the same location).
     """
-    fig = px.line(
-        ts,
-        title=title,
-        color_discrete_sequence=[line_color],
-    )
+    ncols = ts.shape[1] if getattr(ts, "ndim", 1) > 1 else 1
+    show_legend = show_legend or ncols > 1
+    # A single line keeps its fixed colour; multiple lines use the default cycle.
+    color_kwargs = {} if ncols > 1 else {"color_discrete_sequence": [line_color]}
+
+    fig = px.line(ts, title=title, **color_kwargs)
     fig.update_traces(line=dict(width=2))
     fig.update_layout(
         margin=dict(l=50, r=20, t=50, b=40),
@@ -332,7 +338,12 @@ def show_timeseries_popup(
         title=dict(x=0.5, xanchor="center", font=dict(size=14, color="#333")),
         plot_bgcolor="#d9ecf7",
         paper_bgcolor="white",
-        showlegend=False,
+        showlegend=show_legend,
+        legend=dict(
+            x=0.01, y=0.99, xanchor="left", yanchor="top",
+            bgcolor="rgba(255,255,255,0.6)", font=dict(size=10),
+            title_text="",
+        ),
         yaxis_title=y_label,
         xaxis_title=x_label,
         font=dict(family="Arial, sans-serif", size=11, color="#333"),

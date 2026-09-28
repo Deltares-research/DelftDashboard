@@ -34,6 +34,7 @@ are tied to a specific model are only shown when that model is active.
    :caption: Visualization and Post-Processing
 
    flood_map
+   observation_timeseries
    tiling
 
 .. toctree::

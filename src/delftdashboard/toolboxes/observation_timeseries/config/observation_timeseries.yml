@@ -1,0 +1,77 @@
+element:
+- style: panel
+  position:
+    x: 10
+    y: 10
+    width: -10
+    height: 160
+  element:
+  - style: pushbutton
+    position:
+      x: 10
+      y: 130
+      width: 140
+      height: 20
+    text: Load His File
+    method: load_his_file
+    enable: true
+    tooltip: Load a SFINCS his (point output) netCDF file. Load several to compare.
+  - style: pushbutton
+    position:
+      x: 160
+      y: 130
+      width: 80
+      height: 20
+    text: Clear
+    method: clear_his_files
+    tooltip: Unload all his files and clear the map
+  - style: listbox
+    position:
+      x: 10
+      y: 10
+      width: 220
+      height: 105
+    text: His files
+    text_position: above
+    method: select_his_file
+    variable: active_his_index
+    select: index
+    option_string:
+      variable: his_file_labels
+    tooltip: Loaded his files - each is drawn as a separate line
+  - style: listbox
+    position:
+      x: 250
+      y: 10
+      width: 200
+      height: 105
+    text: Stations
+    text_position: above
+    method: select_station_from_list
+    variable: active_station_index
+    select: index
+    option_string:
+      variable: station_names
+    tooltip: Select an observation point (or click it on the map)
+  - style: popupmenu
+    position:
+      x: 470
+      y: 90
+      width: 150
+      height: 20
+    text: Variable
+    variable: variable
+    select: item
+    method: select_variable
+    option_string:
+      variable: variable_strings
+    option_value:
+      variable: variable_values
+    tooltip: Choose which variable to plot
+  - style: text
+    position:
+      x: 470
+      y: 10
+      width: 170
+      height: 60
+    text: "Click an observation point on the map to view its timeseries. Load several his files to compare."
