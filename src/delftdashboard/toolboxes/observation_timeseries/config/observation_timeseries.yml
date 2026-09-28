@@ -6,11 +6,13 @@ element:
     width: -10
     height: 160
   element:
+
+  # --- Left column: his files ---------------------------------------
   - style: pushbutton
     position:
       x: 10
-      y: 130
-      width: 140
+      y: 132
+      width: 105
       height: 20
     text: Load His File
     method: load_his_file
@@ -18,9 +20,18 @@ element:
     tooltip: Load a SFINCS his (point output) netCDF file. Load several to compare.
   - style: pushbutton
     position:
-      x: 160
-      y: 130
-      width: 80
+      x: 125
+      y: 132
+      width: 60
+      height: 20
+    text: Delete
+    method: delete_his_file
+    tooltip: Delete the selected his file from the comparison
+  - style: pushbutton
+    position:
+      x: 195
+      y: 132
+      width: 60
       height: 20
     text: Clear
     method: clear_his_files
@@ -28,23 +39,48 @@ element:
   - style: listbox
     position:
       x: 10
-      y: 10
-      width: 220
-      height: 105
-    text: His files
-    text_position: above
+      y: 45
+      width: 215
+      height: 80
     method: select_his_file
     variable: active_his_index
     select: index
     option_string:
       variable: his_file_labels
     tooltip: Loaded his files - each is drawn as a separate line
+  - style: text
+    position:
+      x: 10
+      y: 12
+      width: 40
+      height: 18
+    text: "Label"
+  - style: edit
+    position:
+      x: 52
+      y: 12
+      width: 105
+      height: 20
+    variable: his_file_label
+    method: rename_his_file
+    tooltip: Legend label for the selected his file (used when comparing)
+  - style: pushbutton
+    position:
+      x: 162
+      y: 12
+      width: 63
+      height: 20
+    text: Rename
+    method: rename_his_file
+    tooltip: Apply the label to the selected his file
+
+  # --- Middle column: stations --------------------------------------
   - style: listbox
     position:
-      x: 250
-      y: 10
-      width: 200
-      height: 105
+      x: 300
+      y: 45
+      width: 190
+      height: 80
     text: Stations
     text_position: above
     method: select_station_from_list
@@ -53,11 +89,40 @@ element:
     option_string:
       variable: station_names
     tooltip: Select an observation point (or click it on the map)
+  - style: pushbutton
+    position:
+      x: 300
+      y: 12
+      width: 95
+      height: 20
+    text: Create Plot
+    method: create_plot
+    tooltip: Open a new, empty comparison plot window
+  - style: pushbutton
+    position:
+      x: 400
+      y: 12
+      width: 95
+      height: 20
+    text: Add to Plot
+    method: add_to_plot
+    tooltip: Add the selected station's timeseries to the open plot window
+  - style: pushbutton
+    position:
+      x: 500
+      y: 12
+      width: 95
+      height: 20
+    text: Clear Plot
+    method: clear_plot
+    tooltip: Empty the plot window (closing the window also clears it)
+
+  # --- Right column: variable + help --------------------------------
   - style: popupmenu
     position:
-      x: 470
-      y: 90
-      width: 150
+      x: 590
+      y: 120
+      width: 180
       height: 20
     text: Variable
     variable: variable
@@ -70,8 +135,8 @@ element:
     tooltip: Choose which variable to plot
   - style: text
     position:
-      x: 470
-      y: 10
-      width: 170
-      height: 60
-    text: "Click an observation point on the map to view its timeseries. Load several his files to compare."
+      x: 620
+      y: 45
+      width: 220
+      height: 75
+    text: "Click a point on the map for its timeseries. Create Plot opens a window; Add to Plot adds the selected station to it; Clear Plot empties it."

@@ -2,12 +2,10 @@ rem Script to create the editable delftdashboard environment
 rem The delftdashboard_dev environment only needs to be created and used if you are interested in editing the source code!
 
 rem CHANGE GITDIR to point to you local repos folder !!!
-set GITDIR=c:\work\checkouts\git
-rem  set ENVNAME=delftdashboard_dev
+set GITDIR=c:\git
+set ENVNAME=delftdashboard_dev
 
-rem call mamba env remove -n delftdashboard_dev
-rem call mamba create -n delftdashboard_dev python=3.12
-rem call mamba activate delftdashboard_dev
+call mamba activate delftdashboard_dev
 
 rem We first install delftdashboard, which also installs some cht packages directly from git server (no Pypi).
 rem Then we override with editable packages.
