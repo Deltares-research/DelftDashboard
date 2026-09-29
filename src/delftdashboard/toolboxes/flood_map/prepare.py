@@ -37,5 +37,14 @@ def load_map_output(*args: Any) -> None:
     app.gui.setvar("flood_map", "map_file_string", f"File : {fname}")
 
 
+def load_subgrid_file(*args: Any) -> None:
+    """Load a subgrid file (residual tables) and update the file label."""
+    app.toolbox["flood_map"].load_subgrid_file()
+    subgrid_file = app.toolbox["flood_map"].subgrid_file
+    if subgrid_file:
+        fname = os.path.basename(subgrid_file)
+        app.gui.setvar("flood_map", "subgrid_file_string", f"File : {fname}")
+
+
 def edit_table(*args: Any) -> None:
     """Handle table edit events (placeholder)."""

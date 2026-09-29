@@ -95,10 +95,18 @@ def import_geojson(*args: Any) -> None:
             )
             if ok:
                 merge = True
-        app.model[_MODEL].domain.weirs.set(gdf, merge=merge)
-        app.map.layer[_MODEL].layer["weirs"].set_data(gdf)
+        gdf = gdf.to_crs(app.model[_MODEL].domain.crs)
+        try:
+            app.model[_MODEL].domain.weirs.set(gdf, merge=merge)
+        except ValueError as e:
+            app.gui.window.dialog_warning(f"Cannot import weirs:\n{e}")
+            return
+        # Show what the component now holds (imported + possibly merged)
+        gdf = app.model[_MODEL].domain.weirs.gdf
+        app.map.layer[_MODEL].layer["weirs"].layer["polylines"].set_data(gdf)
         app.gui.setvar(_GROUP, "active_weir", 0)
         app.model[_MODEL].weirs_changed = True
+        update_grid_snapper()
         update()
 
 

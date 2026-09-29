@@ -22,6 +22,21 @@ def select_instantaneous_or_maximum(*args: Any) -> None:
     update()
 
 
+def select_method(*args: Any) -> None:
+    """Switch between the level and slope flood map methods."""
+    update()
+
+
+def edit_max_jump(*args: Any) -> None:
+    """Apply the step tolerance for blending neighbouring cell surfaces."""
+    update()
+
+
+def edit_max_residual_relief(*args: Any) -> None:
+    """Apply the residual-relief limit above which a cell keeps a horizontal surface."""
+    update()
+
+
 def select_time(*args: Any) -> None:
     """Update the flood map for the newly selected time step."""
     update()

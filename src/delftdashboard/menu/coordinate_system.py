@@ -1,6 +1,7 @@
 """Menu callbacks for changing the application coordinate reference system."""
 
 import os
+import traceback
 
 from pyproj import CRS
 
@@ -232,12 +233,23 @@ def other_geographic(option: str) -> None:
 def update_crs() -> None:
     """Propagate the current CRS to the map, all models, and all toolboxes."""
     app.map.crs = app.crs
+    # Update the CRS label straight away, so it cannot be left stale by an
+    # error further down in one of the model / toolbox handlers.
+    map.update_statusbar()
 
-    # Also change the model crs
+    # Also change the model crs. One failing handler must not stop the
+    # others from being updated, so report and continue.
     for model in app.model:
-        app.model[model].set_crs()
+        try:
+            app.model[model].set_crs()
+        except Exception:
+            print(f"Error updating CRS for model '{model}':")
+            traceback.print_exc()
     # Also change the toolbox crs
     for toolbox in app.toolbox:
-        app.toolbox[toolbox].set_crs()
+        try:
+            app.toolbox[toolbox].set_crs()
+        except Exception:
+            print(f"Error updating CRS for toolbox '{toolbox}':")
+            traceback.print_exc()
     app.gui.window.update()
-    map.update_statusbar()  # Update crs in statusbar

@@ -10,6 +10,51 @@ element:
   option_value: ["instantaneous", "maximum"]
   method: select_instantaneous_or_maximum
   tooltip: Select whether to view instantaneous or maximum flood maps
+- style: radiobuttongroup
+  position:
+    x: 10
+    y: 20
+    width: 100
+    height: 50
+  variable: flood_map_method
+  option_string: ["Level", "Slope"]
+  option_value: ["level", "slope"]
+  method: select_method
+  tooltip: "Level: horizontal water surface per cell. Slope: bed-parallel surface from the subgrid residual tables and the cell volume (needs a subgrid file and storezvolume output)"
+- style: edit
+  position:
+    x: 400
+    y: 5
+    width: 50
+    height: 20
+  text: "Max jump (m)"
+  variable: max_jump
+  method: edit_max_jump
+  tooltip: "Step tolerance for blending the tilted water surfaces of neighbouring cells: a neighbouring cell joins the average at a pixel only if its surface there lies within this distance of the pixel's own cell surface; larger values smooth more, smaller values keep more steps"
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: flood_map_method
+      operator: eq
+      value: slope
+- style: edit
+  position:
+    x: 400
+    y: 30
+    width: 50
+    height: 20
+  text: "Max relief (m)"
+  variable: max_residual_relief
+  method: edit_max_residual_relief
+  tooltip: "Cells whose residual relief (highest minus lowest pixel after removing the fitted plane) exceeds this keep a horizontal water surface; catches cliff and gully cells where a tilted sheet makes no sense"
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable: flood_map_method
+      operator: eq
+      value: slope
 - style: listbox
   position:
     x: 130

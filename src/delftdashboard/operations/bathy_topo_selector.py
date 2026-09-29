@@ -9,6 +9,44 @@ from typing import Any
 from delftdashboard.app import app
 
 
+def refresh_available_datasets(source: str | None = None) -> None:
+    """Re-read the source and dataset lists from the topography catalog.
+
+    Call this after the catalog changes at runtime (e.g. a dataset imported
+    with the Bathymetry toolbox), so that every panel showing the available
+    DEMs picks up the new entry. All GUI variable groups that hold a
+    ``bathymetry_source_names`` list are updated: the shared
+    ``bathy_topo_selector`` group used by most model makers, and any
+    toolbox-specific group (e.g. ``modelmaker_delft3dfm``).
+
+    Parameters
+    ----------
+    source : str, optional
+        Source to make active. If omitted, each group keeps its current
+        active source (falling back to the first one if that no longer
+        exists).
+    """
+    source_names, _ = app.topography_data_catalog.sources()
+    for group, variables in app.gui.variables.items():
+        if "bathymetry_source_names" not in variables:
+            continue
+        app.gui.setvar(group, "bathymetry_source_names", source_names)
+        active = source if source is not None else app.gui.getvar(
+            group, "active_bathymetry_source"
+        )
+        if active not in source_names:
+            active = source_names[0] if source_names else ""
+        app.gui.setvar(group, "active_bathymetry_source", active)
+        if active:
+            dataset_names, _, _ = app.topography_data_catalog.dataset_names(
+                source=active
+            )
+        else:
+            dataset_names = []
+        app.gui.setvar(group, "bathymetry_dataset_names", dataset_names)
+        app.gui.setvar(group, "bathymetry_dataset_index", 0)
+
+
 def select_bathymetry_source(*args: Any) -> None:
     """Update the dataset list when the user selects a different source.
 

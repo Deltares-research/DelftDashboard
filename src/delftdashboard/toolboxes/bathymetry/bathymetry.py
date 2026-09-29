@@ -347,6 +347,14 @@ class Toolbox(GenericToolbox):
         # Entries here take precedence over the remote catalog (data_catalog_remote.yml).
         app.topography_data_catalog.register_local_entry(name, local_entry)
 
+        # Refresh the "available datasets" lists of the model makers so the
+        # new dataset can be used for model bathymetry right away.
+        from delftdashboard.operations.bathy_topo_selector import (
+            refresh_available_datasets,
+        )
+
+        refresh_available_datasets(source=src)
+
         # Add to topography menu
         source_menu = app.gui.window.find_menu_item_by_id(f"topography.{src}")
         if source_menu is None:
@@ -386,7 +394,8 @@ class Toolbox(GenericToolbox):
         )
 
         app.gui.window.dialog_info(
-            "Dataset imported successfully! It has been added to the Topography menu.",
+            "Dataset imported successfully! It has been added to the Topography "
+            "menu and to the available datasets for model bathymetry.",
             "Success",
         )
 
