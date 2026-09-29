@@ -24,3 +24,7 @@ run/_start_ddb.py
 /docs/build
 /installer/dist_innosetup
 /installer/dist_nuitka
+include.geojson
+.gitignore
+sfincs.nc
+quadtree.geojson
