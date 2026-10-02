@@ -18,26 +18,55 @@ To switch back to the old AWS bucket, put this in ``delftdashboard.ini``::
 from delftdashboard.app import app
 
 
+def have_aws_credentials() -> bool:
+    """Return True when AWS credentials are resolvable from the environment.
+
+    Uses the standard boto3/botocore credential chain: ``AWS_ACCESS_KEY_ID`` /
+    ``AWS_SECRET_ACCESS_KEY`` environment variables, a shared credentials file
+    (``~/.aws/credentials``), an ``AWS_PROFILE``, etc. When credentials are
+    present, requests are signed; otherwise the store is accessed anonymously
+    (which only works for public buckets/prefixes).
+    """
+    import botocore.session
+
+    try:
+        return botocore.session.get_session().get_credentials() is not None
+    except Exception:
+        return False
+
+
 def s3_client():
-    """Return an unsigned boto3 client for the configured store."""
+    """Return a boto3 client for the configured store.
+
+    Signs requests when AWS credentials are available (see
+    :func:`have_aws_credentials`), otherwise falls back to unsigned/anonymous
+    access for public data.
+    """
     import boto3
     from botocore import UNSIGNED
     from botocore.config import Config
 
     endpoint = app.config.get("s3_endpoint") or None
+    if have_aws_credentials():
+        return boto3.client("s3", endpoint_url=endpoint)
     return boto3.client(
         "s3", endpoint_url=endpoint, config=Config(signature_version=UNSIGNED)
     )
 
 
 def s3_filesystem():
-    """Return an anonymous s3fs filesystem for the configured store."""
+    """Return an s3fs filesystem for the configured store.
+
+    Uses credentials when available, otherwise anonymous access.
+    """
     import s3fs
 
     endpoint = app.config.get("s3_endpoint") or None
+    anon = not have_aws_credentials()
+    kwargs = {"anon": anon}
     if endpoint:
-        return s3fs.S3FileSystem(anon=True, endpoint_url=endpoint)
-    return s3fs.S3FileSystem(anon=True)
+        kwargs["endpoint_url"] = endpoint
+    return s3fs.S3FileSystem(**kwargs)
 
 
 def s3_http_url(key: str) -> str:

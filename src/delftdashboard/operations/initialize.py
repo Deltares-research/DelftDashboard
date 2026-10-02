@@ -331,6 +331,7 @@ def initialize() -> None:
         "bathymetry": f"{docs_base_url}/toolboxes/bathymetry.html",
         "drawing": f"{docs_base_url}/toolboxes/drawing.html",
         "flood_map": f"{docs_base_url}/toolboxes/flood_map.html",
+        "observation_timeseries": f"{docs_base_url}/toolboxes/observation_timeseries.html",
         "nesting": f"{docs_base_url}/toolboxes/nesting.html",
         "observation_stations": f"{docs_base_url}/toolboxes/observation_stations.html",
         "tide_stations": f"{docs_base_url}/toolboxes/tide_stations.html",

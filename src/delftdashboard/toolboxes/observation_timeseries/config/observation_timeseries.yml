@@ -1,0 +1,14 @@
+element:
+- style: tabpanel
+  position:
+    x: 5
+    y: 2
+    width: -5
+    height: 175
+  tab:
+  - string: Timeseries output
+    module: delftdashboard.toolboxes.observation_timeseries.observation_timeseries
+    element: timeseries.yml
+  - string: Spatial output
+    module: delftdashboard.toolboxes.observation_timeseries.spatial
+    element: spatial.yml
