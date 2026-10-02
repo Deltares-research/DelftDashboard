@@ -128,13 +128,14 @@ def mouse_moved(x: float, y: float, lon: float, lat: float) -> None:
         app.gui.window.statusbar.set_text("x", f"X : {x:.1f}")
         app.gui.window.statusbar.set_text("y", f"Y : {y:.1f}")
 
-    x3857, y3857 = transformer_4326_to_3857.transform(lon, lat)
-
     z = np.nan
     if hasattr(app, "background_topography") and app.background_topography is not None:
-        # Get the z value at the mouse position
+        # Get the z value at the mouse position. The DataArray comes from the
+        # hydromt catalog in the dataset's own CRS (e.g. EPSG:4326 for GEBCO,
+        # EPSG:3857 for tiled sources), so transform the cursor position into
+        # that CRS before sampling.
         try:
-            z = app.background_topography.sel(x=x3857, y=y3857, method="nearest").item()
+            z = _sample_background_topography(lon, lat)
         except Exception as e:
             z = np.nan
             print(f"Error getting z value: {e}")
@@ -143,6 +144,52 @@ def mouse_moved(x: float, y: float, lon: float, lat: float) -> None:
         app.gui.window.statusbar.set_text("z", "Z : N/A")
     else:
         app.gui.window.statusbar.set_text("z", f"Z : {z:.2f} m")
+
+
+_topo_transformer_cache: dict = {}
+
+
+def _sample_background_topography(lon: float, lat: float) -> float:
+    """Return the background topography value nearest to (lon, lat).
+
+    Returns NaN when the cursor is outside the loaded raster or over a
+    nodata pixel.
+    """
+    da = app.background_topography
+    if "band" in da.dims and da.sizes["band"] == 1:
+        da = da.squeeze("band", drop=True)
+
+    try:
+        da_crs = da.rio.crs
+    except Exception:
+        da_crs = None
+    if da_crs is None:
+        da_crs = getattr(getattr(da, "raster", None), "crs", None)
+    if da_crs is None:
+        da_crs = CRS(3857)
+
+    key = da_crs.to_wkt() if hasattr(da_crs, "to_wkt") else str(da_crs)
+    transformer = _topo_transformer_cache.get(key)
+    if transformer is None:
+        transformer = Transformer.from_crs(CRS(4326), CRS(da_crs), always_xy=True)
+        _topo_transformer_cache.clear()
+        _topo_transformer_cache[key] = transformer
+    x, y = transformer.transform(lon, lat)
+
+    # Nearest selection would happily return the edge pixel for a cursor far
+    # outside the raster, so check the extent first.
+    xs = da["x"].values
+    ys = da["y"].values
+    if not (min(xs[0], xs[-1]) <= x <= max(xs[0], xs[-1])):
+        return np.nan
+    if not (min(ys[0], ys[-1]) <= y <= max(ys[0], ys[-1])):
+        return np.nan
+
+    z = float(da.sel(x=x, y=y, method="nearest").item())
+    nodata = getattr(getattr(da, "rio", None), "nodata", None)
+    if nodata is not None and not np.isnan(nodata) and z == nodata:
+        return np.nan
+    return z
 
 
 def update_background_topography_data() -> Optional[xr.DataArray]:
@@ -280,12 +327,21 @@ def set_crs(crs: CRS) -> None:
     crs_changed = app.crs is None or crs != app.crs
     app.crs = crs
     app.map.crs = crs
-    if crs_changed:
-        for model in app.model.values():
-            model.set_crs()
-        for toolbox in app.toolbox.values():
-            toolbox.set_crs()
+    # Label first, so an error in a handler below cannot leave it stale.
     update_statusbar()
+    if crs_changed:
+        for name, model in app.model.items():
+            try:
+                model.set_crs()
+            except Exception:
+                print(f"Error updating CRS for model '{name}':")
+                traceback.print_exc()
+        for name, toolbox in app.toolbox.items():
+            try:
+                toolbox.set_crs()
+            except Exception:
+                print(f"Error updating CRS for toolbox '{name}':")
+                traceback.print_exc()
 
 
 def show_timeseries_popup(

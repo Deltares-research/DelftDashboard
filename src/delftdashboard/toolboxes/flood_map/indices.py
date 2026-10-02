@@ -15,3 +15,8 @@ def select(*args: Any) -> None:
 def generate_index_geotiff(*args: Any) -> None:
     """Generate an index GeoTIFF for the active model grid."""
     app.toolbox["flood_map"].generate_index_geotiff()
+
+
+def apply_structures_to_index(*args: Any) -> None:
+    """Reassign pixels across the model's thin dams and weirs in the index GeoTIFF."""
+    app.toolbox["flood_map"].apply_structures_to_index()

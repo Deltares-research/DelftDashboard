@@ -8,3 +8,12 @@ element:
     height: 20
   method: generate_index_geotiff
   tooltip: Generate an index GeoTiff file for the flood map tiles
+- style: pushbutton
+  text: Apply Structures to Index
+  position:
+    x: 10
+    y: 85
+    width: 150
+    height: 20
+  method: apply_structures_to_index
+  tooltip: "Write a copy of the loaded index GeoTiff in which pixels separated from their cell centre by a thin dam or weir of the active model take the nearest cell on their own side, so the flood map follows the real structure instead of the grid-snapped one"

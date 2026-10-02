@@ -47,3 +47,19 @@ element:
     y: 60
     width: 150
     height: 20
+- style: pushbutton
+  text: Load Subgrid File
+  position:
+    x: 20
+    y: 35
+    width: 150
+    height: 20
+  method: load_subgrid_file
+  tooltip: Load a SFINCS subgrid (netCDF) file with z_level_res tables, needed for the slope method
+- style: text
+  variable: subgrid_file_string
+  position:
+    x: 180
+    y: 35
+    width: 150
+    height: 20
