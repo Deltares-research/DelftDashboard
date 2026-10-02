@@ -3,50 +3,63 @@ Observation Timeseries
 
 The Observation Timeseries toolbox (``observation_timeseries``) loads one or
 more SFINCS his (point output) netCDF files, plots the observation-point
-locations on the map, and shows the timeseries for a point when you click it.
-Several his files can be loaded at once to compare output for the same
+locations on the map, and lets you build a comparison of station timeseries in
+a standalone plot window. Timeseries are shown only in that window (never on
+the map). Several his files can be loaded to compare output for the same
 (identical) observation points.
 
-Loading data
-------------
+The toolbox has three panels.
+
+His files
+---------
 
 Load His File
    Open a SFINCS his (``*.nc``) file. The first file loaded defines the
-   reference set of observation points, which are drawn on the map. Load
-   additional files to compare runs; each additional file must have the same
-   number of observation points as the first.
+   reference set of observation points, which are drawn on the map. Additional
+   files must have the same number of observation points.
 
-Clear
-   Unload all his files and remove the points and popup from the map.
+Delete / Clear
+   Delete removes the selected his file; Clear unloads all files and empties
+   the plot.
 
-His files (list)
-   The currently loaded files. Each file is drawn as a separate line in the
-   timeseries plot.
+Label / Rename
+   Give the selected file a custom legend label used when it is plotted.
 
-Viewing timeseries
-------------------
+Select station
+--------------
 
 Stations (list)
-   Select an observation point by name. This highlights it on the map and
-   opens its timeseries popup.
-
-Clicking a point
-   Click any observation point on the map to open a timeseries popup anchored
-   at that location. When several his files are loaded, one line is drawn per
-   file (labelled by file name) so the runs can be compared directly.
+   Select an observation point by name. You can also click a point on the map
+   to select it (this only highlights it - it does not plot).
 
 Variable
-   Choose which variable to plot:
+   Choose which variable is used when adding a station to the plot:
 
-   - **Water level** -- ``point_zs`` (sea surface height above reference).
+   - **Water level** -- ``point_zs``.
    - **Water depth** -- ``point_h``.
+
+Add to Plot
+   Copy the selected station's timeseries (for the selected file and variable)
+   into the plot window. The series is listed in the Plotted panel and drawn in
+   the window. Re-adding the same station/file/variable refreshes its line.
+
+Plotted
+-------
+
+Plotted (list)
+   The series currently drawn in the plot window.
+
+Remove
+   Remove the selected series from the plot.
+
+New Plot
+   Start a fresh, empty plot window. Closing the window also clears the plot.
 
 Expected file format
 -------------------
 
-The toolbox reads standard SFINCS his output, which contains:
-
-- ``point_zs`` / ``point_h`` with dimensions ``(time, stations)``,
-- ``point_x`` / ``point_y`` station coordinates and a ``crs`` variable with an
-  ``epsg_code`` attribute (coordinates are reprojected to lon/lat for display),
-- ``station_name`` and ``time``.
+The toolbox reads standard SFINCS his output, which contains ``point_zs`` /
+``point_h`` with dimensions ``(time, stations)``, ``point_x`` / ``point_y``
+station coordinates and a ``crs`` variable with an ``epsg_code`` attribute
+(coordinates are reprojected to lon/lat for display), ``station_name`` and
+``time``.

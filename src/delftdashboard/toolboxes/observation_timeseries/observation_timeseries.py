@@ -1,10 +1,15 @@
 """Observation timeseries toolbox for DelftDashboard.
 
-Loads one or more SFINCS his (point output) netCDF files, plots the
-observation-point locations on the map, and lets the user click a point (or
-pick it from the list) to view its timeseries as an on-map popup. Several his
-files can be loaded at once to compare output for the same (identical)
-observation points - each file is drawn as a separate line.
+Loads one or more SFINCS his (point output) netCDF files and plots the
+observation-point locations on the map. Timeseries are shown only in a
+standalone plot window (never on the map):
+
+* Select a station (from the list or by clicking it on the map) and add it to
+  the plot. Added series are listed in the "Plotted" panel and drawn in the
+  window.
+* Several his files can be loaded to compare output for the same (identical)
+  observation points - each added series is one line.
+* "New Plot" starts a fresh, empty window; closing the window clears it too.
 """
 
 from __future__ import annotations
@@ -38,19 +43,20 @@ class Toolbox(GenericToolbox):
     def __init__(self, name: str) -> None:
         super().__init__()
         self.name = name
-        self.long_name = "Observation Timeseries"
+        self.long_name = "Output Visualization"
 
     def initialize(self) -> None:
-        """Register GUI defaults and reset the loaded-file state."""
-        # State: one entry per loaded his file.
-        self.datasets: List[dict] = []  # {"label", "path", "ds"}
+        """Register GUI defaults and reset all state."""
+        # Loaded his files: one entry per file {"label", "path", "ds"}.
+        self.datasets: List[dict] = []
         # Reference stations (from the first loaded file), in EPSG:4326.
         self.gdf = gpd.GeoDataFrame()
         self.station_names: List[str] = []
-        # Standalone comparison plot window (matplotlib) and its lines by key.
+        # Series currently plotted: {"key", "time", "values", "var_label"}.
+        self.plot_items: List[dict] = []
+        # Standalone matplotlib plot window.
         self.fig = None
         self.ax = None
-        self._plot_lines: dict = {}
 
         var_values = [v[0] for v in _VARIABLES]
         var_strings = [v[1] for v in _VARIABLES]
@@ -61,17 +67,24 @@ class Toolbox(GenericToolbox):
         app.gui.setvar(_GROUP, "his_file_labels", [])
         app.gui.setvar(_GROUP, "active_his_index", 0)
         app.gui.setvar(_GROUP, "his_file_label", "")
+
         app.gui.setvar(_GROUP, "station_names", [])
         app.gui.setvar(_GROUP, "active_station_index", 0)
-        app.gui.setvar(_GROUP, "nr_his_files", 0)
-        app.gui.setvar(_GROUP, "nr_stations", 0)
+
+        app.gui.setvar(_GROUP, "plot_item_labels", [])
+        app.gui.setvar(_GROUP, "active_plot_item_index", 0)
+
+        # Spatial output tab state + GUI variables.
+        from . import spatial
+
+        spatial.initialize(self)
 
     # ------------------------------------------------------------------
     # Map layers
     # ------------------------------------------------------------------
 
     def add_layers(self) -> None:
-        """Register the clickable observation-point layer."""
+        """Register the observation-point and spatial-overlay layers."""
         layer = app.map.add_layer(self.name)
         layer.add_layer(
             "points",
@@ -88,6 +101,10 @@ class Toolbox(GenericToolbox):
             fill_color_selected="red",
             legend_label="observation point",
         )
+        # Spatial output overlay (map result as datashader trimesh).
+        from . import spatial
+
+        spatial.add_layer(layer)
 
     def set_layer_mode(self, mode: str) -> None:
         """Show/hide the observation-point layer for this toolbox."""
@@ -97,12 +114,31 @@ class Toolbox(GenericToolbox):
         elif mode in ("inactive", "invisible"):
             app.map.layer[self.name].hide()
 
+    def zoom_to_points(self, buffer: float = 0.1) -> None:
+        """Zoom the map to the extent of the loaded observation points.
+
+        Parameters
+        ----------
+        buffer : float, optional
+            Fractional padding around the extent (a minimum padding is applied
+            for a single point or a degenerate extent), by default 0.1 (10 %).
+        """
+        if self.gdf.empty:
+            return
+        x0, y0, x1, y1 = (float(v) for v in self.gdf.total_bounds)
+        dx = x1 - x0
+        dy = y1 - y0
+        # Pad; fall back to a small fixed margin for a single point / no spread.
+        px = buffer * dx if dx > 0 else 0.05
+        py = buffer * dy if dy > 0 else 0.05
+        app.map.fit_bounds(x0 - px, y0 - py, x1 + px, y1 + py)
+
     # ------------------------------------------------------------------
     # File handling
     # ------------------------------------------------------------------
 
     def load_his_file(self) -> None:
-        """Load a SFINCS his file, adding its points/series to the comparison."""
+        """Load a SFINCS his file, adding its points to the map."""
         full_name, path, name, ext, fltr = app.gui.window.dialog_open_file(
             "Select SFINCS his file", filter="*.nc"
         )
@@ -126,7 +162,6 @@ class Toolbox(GenericToolbox):
         names = _station_names(ds)
 
         if self.datasets:
-            # Additional file: station set must match the reference file.
             if len(names) != len(self.station_names):
                 ds.close()
                 app.gui.window.dialog_warning(
@@ -136,25 +171,24 @@ class Toolbox(GenericToolbox):
                 )
                 return
         else:
-            # First file defines the reference stations and the map points.
             self.station_names = names
             self.gdf = _points_gdf(ds, names)
             app.map.layer[self.name].layer["points"].set_data(self.gdf, 0)
             app.gui.setvar(_GROUP, "station_names", names)
-            app.gui.setvar(_GROUP, "nr_stations", len(names))
+            # Zoom the map to the observation points of the first loaded file.
+            self.zoom_to_points()
 
         label = _unique_label(os.path.splitext(name)[0], self.datasets)
         self.datasets.append({"label": label, "path": full_name, "ds": ds})
 
         labels = [d["label"] for d in self.datasets]
         app.gui.setvar(_GROUP, "his_file_labels", labels)
-        app.gui.setvar(_GROUP, "nr_his_files", len(labels))
         app.gui.setvar(_GROUP, "active_his_index", len(labels) - 1)
         app.gui.setvar(_GROUP, "his_file_label", label)
         app.gui.window.update()
 
     def delete_his_file(self) -> None:
-        """Delete the currently selected his file from the comparison."""
+        """Delete the currently selected his file."""
         if not self.datasets:
             return
         index = app.gui.getvar(_GROUP, "active_his_index")
@@ -168,19 +202,15 @@ class Toolbox(GenericToolbox):
             pass
 
         if not self.datasets:
-            # Nothing left: also drop the reference points and popup.
             self.station_names = []
             self.gdf = gpd.GeoDataFrame()
             if self.name in app.map.layer:
                 app.map.layer[self.name].layer["points"].clear()
-            app.map.close_popup()
             app.gui.setvar(_GROUP, "station_names", [])
-            app.gui.setvar(_GROUP, "nr_stations", 0)
 
         labels = [x["label"] for x in self.datasets]
         new_index = max(0, min(index, len(labels) - 1))
         app.gui.setvar(_GROUP, "his_file_labels", labels)
-        app.gui.setvar(_GROUP, "nr_his_files", len(labels))
         app.gui.setvar(_GROUP, "active_his_index", new_index)
         app.gui.setvar(_GROUP, "his_file_label", labels[new_index] if labels else "")
         app.gui.window.update()
@@ -194,21 +224,17 @@ class Toolbox(GenericToolbox):
             return
         new = (app.gui.getvar(_GROUP, "his_file_label") or "").strip()
         if not new:
-            # Empty input: restore the current label in the edit box.
             app.gui.setvar(_GROUP, "his_file_label", self.datasets[index]["label"])
             return
-        # Keep labels unique across the other loaded files.
         others = [d for i, d in enumerate(self.datasets) if i != index]
         new = _unique_label(new, others)
         self.datasets[index]["label"] = new
-
-        labels = [x["label"] for x in self.datasets]
-        app.gui.setvar(_GROUP, "his_file_labels", labels)
+        app.gui.setvar(_GROUP, "his_file_labels", [x["label"] for x in self.datasets])
         app.gui.setvar(_GROUP, "his_file_label", new)
         app.gui.window.update()
 
     def clear(self) -> None:
-        """Unload all his files and clear the map points and popup."""
+        """Unload all his files, clear the map points and the plot."""
         for d in self.datasets:
             try:
                 d["ds"].close()
@@ -217,96 +243,39 @@ class Toolbox(GenericToolbox):
         self.datasets = []
         self.station_names = []
         self.gdf = gpd.GeoDataFrame()
-        # Empty the comparison plot too (window stays open if it was).
-        self.clear_plot()
 
         if self.name in app.map.layer:
             app.map.layer[self.name].layer["points"].clear()
-        app.map.close_popup()
+
+        self.plot_items = []
+        app.gui.setvar(_GROUP, "plot_item_labels", [])
+        self._redraw_window()
 
         app.gui.setvar(_GROUP, "his_file_labels", [])
         app.gui.setvar(_GROUP, "his_file_label", "")
         app.gui.setvar(_GROUP, "station_names", [])
         app.gui.setvar(_GROUP, "active_his_index", 0)
         app.gui.setvar(_GROUP, "active_station_index", 0)
-        app.gui.setvar(_GROUP, "nr_his_files", 0)
-        app.gui.setvar(_GROUP, "nr_stations", 0)
         app.gui.window.update()
 
     # ------------------------------------------------------------------
-    # Plotting
+    # Selection (map / list) - selection only, no plotting
     # ------------------------------------------------------------------
 
-    def plot_station(self, index: int) -> None:
-        """Show a timeseries popup for station *index* across all loaded files."""
-        if not self.datasets or self.gdf.empty:
+    def select_station(self, index: int) -> None:
+        """Set and highlight the active station (does not plot)."""
+        if self.gdf.empty or index < 0 or index >= len(self.station_names):
             return
-        if index < 0 or index >= len(self.station_names):
-            return
+        app.gui.setvar(_GROUP, "active_station_index", index)
+        if self.name in app.map.layer:
+            app.map.layer[self.name].layer["points"].select_by_index(index)
 
-        variable = app.gui.getvar(_GROUP, "variable")
-        var_label = dict(_VARIABLES).get(variable, variable)
-
-        # One column per loaded his file.
-        series: dict[str, pd.Series] = {}
-        for d in self.datasets:
-            ds = d["ds"]
-            if variable not in ds:
-                continue
-            da = ds[variable].isel(stations=index)
-            series[d["label"]] = pd.Series(
-                np.asarray(da.values, dtype=float),
-                index=pd.to_datetime(ds["time"].values),
-            )
-        if not series:
-            app.gui.window.dialog_info(
-                f"None of the loaded files contain '{variable}'."
-            )
-            return
-
-        df = pd.DataFrame(series)
-        station_label = self.station_names[index]
-        geom = self.gdf.iloc[index].geometry
-        map.show_timeseries_popup(
-            df,
-            lon=geom.x,
-            lat=geom.y,
-            title=f"{station_label} - {var_label}",
-            y_label=f"{var_label} (m)",
-            show_legend=len(series) > 1,
-            html_name="obs_timeseries_popup.html",
-        )
-
-    def create_plot(self) -> None:
-        """Open a new, empty comparison plot window.
-
-        If a plot window is already open it is simply raised (a new one is not
-        created), so there is at most one comparison window at a time.
-        """
-        import matplotlib.pyplot as plt
-
-        if self.fig is not None and plt.fignum_exists(self.fig.number):
-            try:
-                self.fig.canvas.manager.window.raise_()
-            except Exception:
-                pass
-            return
-
-        self.fig, self.ax = plt.subplots(num="Observation timeseries")
-        self._plot_lines = {}
-        self._reset_axes()
-        # Closing the window is equivalent to clearing the plot.
-        self.fig.canvas.mpl_connect("close_event", self._on_plot_closed)
-        self.fig.show()
+    # ------------------------------------------------------------------
+    # Plot (standalone window only)
+    # ------------------------------------------------------------------
 
     def add_to_plot(self) -> None:
-        """Add the selected station's timeseries to the open plot window.
-
-        A window is created automatically if none is open yet. Re-adding the
-        same station/run refreshes its line instead of duplicating it.
-        """
-        import matplotlib.pyplot as plt
-
+        """Copy the selected station's timeseries into the plot window."""
         if not self.datasets or self.gdf.empty:
             return
         his_index = app.gui.getvar(_GROUP, "active_his_index")
@@ -327,28 +296,91 @@ class Toolbox(GenericToolbox):
             )
             return
 
-        # Make sure a plot window exists (auto-create on first Add).
-        if self.fig is None or not plt.fignum_exists(self.fig.number):
-            self.create_plot()
-
         station = self.station_names[station_index]
         # Disambiguate by file only when more than one file is loaded.
         key = station if len(self.datasets) == 1 else f"{station} [{d['label']}]"
-        time = pd.to_datetime(ds["time"].values)
-        vals = np.asarray(ds[variable].isel(stations=station_index).values, dtype=float)
+        # Include the variable in the key when mixing variables.
+        key = f"{key} - {var_label}"
 
-        # Replace an existing line with the same key (re-adding = refresh).
-        old = self._plot_lines.pop(key, None)
-        if old is not None:
-            try:
-                old.remove()
-            except Exception:
-                pass
-        (line,) = self.ax.plot(time, vals, label=key)
-        self._plot_lines[key] = line
+        item = {
+            "key": key,
+            "time": pd.to_datetime(ds["time"].values),
+            "values": np.asarray(
+                ds[variable].isel(stations=station_index).values, dtype=float
+            ),
+            "var_label": var_label,
+        }
+        # Replace an existing entry with the same key (re-adding = refresh).
+        self.plot_items = [p for p in self.plot_items if p["key"] != key]
+        self.plot_items.append(item)
 
-        self.ax.set_ylabel(f"{var_label} (m)")
-        self.ax.legend(loc="best", fontsize=8)
+        app.gui.setvar(
+            _GROUP, "plot_item_labels", [p["key"] for p in self.plot_items]
+        )
+        app.gui.setvar(_GROUP, "active_plot_item_index", len(self.plot_items) - 1)
+        self._ensure_window()
+        self._redraw_window()
+        app.gui.window.update()
+
+    def remove_from_plot(self) -> None:
+        """Remove the selected series from the plot."""
+        if not self.plot_items:
+            return
+        index = app.gui.getvar(_GROUP, "active_plot_item_index")
+        if index < 0 or index >= len(self.plot_items):
+            return
+        self.plot_items.pop(index)
+        labels = [p["key"] for p in self.plot_items]
+        app.gui.setvar(_GROUP, "plot_item_labels", labels)
+        app.gui.setvar(
+            _GROUP, "active_plot_item_index", max(0, min(index, len(labels) - 1))
+        )
+        self._redraw_window()
+        app.gui.window.update()
+
+    def new_plot(self) -> None:
+        """Start a fresh, empty plot window."""
+        self.plot_items = []
+        app.gui.setvar(_GROUP, "plot_item_labels", [])
+        app.gui.setvar(_GROUP, "active_plot_item_index", 0)
+        self._ensure_window()
+        self._redraw_window()
+        app.gui.window.update()
+
+    # ------------------------------------------------------------------
+    # Matplotlib window helpers
+    # ------------------------------------------------------------------
+
+    def _ensure_window(self) -> None:
+        """Create the plot window if it is not open."""
+        import matplotlib.pyplot as plt
+
+        if self.fig is not None and plt.fignum_exists(self.fig.number):
+            return
+        self.fig, self.ax = plt.subplots(num="Observation timeseries")
+        self.fig.canvas.mpl_connect("close_event", self._on_plot_closed)
+        self.fig.show()
+
+    def _redraw_window(self) -> None:
+        """Redraw the plot window from the current plot items."""
+        import matplotlib.pyplot as plt
+
+        if self.fig is None or not plt.fignum_exists(self.fig.number):
+            return
+        self.ax.clear()
+        self.ax.set_title("Observation timeseries")
+        self.ax.set_xlabel("Time (UTC)")
+        self.ax.grid(True, alpha=0.3)
+
+        y_labels = set()
+        for p in self.plot_items:
+            self.ax.plot(p["time"], p["values"], label=p["key"])
+            y_labels.add(p["var_label"])
+        if self.plot_items:
+            self.ax.set_ylabel(
+                f"{y_labels.pop()} (m)" if len(y_labels) == 1 else "Value"
+            )
+            self.ax.legend(loc="best", fontsize=8)
         self.ax.relim()
         self.ax.autoscale_view()
         self.fig.canvas.draw_idle()
@@ -357,27 +389,12 @@ class Toolbox(GenericToolbox):
         except Exception:
             pass
 
-    def clear_plot(self) -> None:
-        """Empty the open plot window (keeps the window open)."""
-        import matplotlib.pyplot as plt
-
-        if self.fig is not None and plt.fignum_exists(self.fig.number):
-            self.ax.clear()
-            self._plot_lines = {}
-            self._reset_axes()
-            self.fig.canvas.draw_idle()
-
-    def _reset_axes(self) -> None:
-        """Apply the default title/labels/grid to an empty axes."""
-        self.ax.set_title("Observation timeseries")
-        self.ax.set_xlabel("Time (UTC)")
-        self.ax.grid(True, alpha=0.3)
-
     def _on_plot_closed(self, event: Any) -> None:
         """Reset plot state when the user closes the window."""
         self.fig = None
         self.ax = None
-        self._plot_lines = {}
+        self.plot_items = []
+        app.gui.setvar(_GROUP, "plot_item_labels", [])
 
 
 # ----------------------------------------------------------------------
@@ -421,7 +438,6 @@ def _points_gdf(ds: xr.Dataset, names: List[str]) -> gpd.GeoDataFrame:
         geometry=[Point(xi, yi) for xi, yi in zip(x, y)],
         crs=crs,
     )
-    # The map and the timeseries popup work in lon/lat (EPSG:4326).
     return gdf.to_crs(4326)
 
 
@@ -442,10 +458,12 @@ def _unique_label(base: str, datasets: List[dict]) -> str:
 
 
 def select(*args: Any) -> None:
-    """Activate the toolbox tab: show the points layer."""
+    """Activate the Timeseries output tab: show points, hide spatial overlay."""
     map.update()
     tb = app.toolbox[_GROUP]
     tb.set_layer_mode("active")
+    if "spatial" in app.map.layer[_GROUP].layer:
+        app.map.layer[_GROUP].layer["spatial"].hide()
     if not tb.gdf.empty:
         index = app.gui.getvar(_GROUP, "active_station_index")
         app.map.layer[_GROUP].layer["points"].set_data(tb.gdf, index)
@@ -453,10 +471,6 @@ def select(*args: Any) -> None:
 
 def load_his_file(*args: Any) -> None:
     app.toolbox[_GROUP].load_his_file()
-
-
-def clear_his_files(*args: Any) -> None:
-    app.toolbox[_GROUP].clear()
 
 
 def delete_his_file(*args: Any) -> None:
@@ -467,25 +481,8 @@ def rename_his_file(*args: Any) -> None:
     app.toolbox[_GROUP].rename_his_file()
 
 
-def create_plot(*args: Any) -> None:
-    """Open a new, empty comparison plot window."""
-    app.toolbox[_GROUP].create_plot()
-
-
-def add_to_plot(*args: Any) -> None:
-    """Add the selected station's timeseries to the comparison plot."""
-    app.toolbox[_GROUP].add_to_plot()
-
-
-def clear_plot(*args: Any) -> None:
-    """Empty the comparison plot."""
-    app.toolbox[_GROUP].clear_plot()
-
-
-def select_variable(*args: Any) -> None:
-    """Re-plot the active station with the newly selected variable."""
-    index = app.gui.getvar(_GROUP, "active_station_index")
-    app.toolbox[_GROUP].plot_station(index)
+def clear_his_files(*args: Any) -> None:
+    app.toolbox[_GROUP].clear()
 
 
 def select_his_file(*args: Any) -> None:
@@ -497,15 +494,18 @@ def select_his_file(*args: Any) -> None:
     app.gui.window.update()
 
 
+def select_variable(*args: Any) -> None:
+    """Variable selection only affects the next Add (no immediate plotting)."""
+
+
 def select_station_from_list(*args: Any) -> None:
-    """Highlight the station on the map and plot it."""
+    """Highlight the station selected in the list on the map."""
     index = app.gui.getvar(_GROUP, "active_station_index")
-    app.map.layer[_GROUP].layer["points"].select_by_index(index)
-    app.toolbox[_GROUP].plot_station(index)
+    app.toolbox[_GROUP].select_station(index)
 
 
 def select_point_from_map(*args: Any) -> None:
-    """Handle a click on an observation point on the map."""
+    """Handle a click on an observation point: select/highlight it."""
     a = args[0] if args else {}
     index = None
     if isinstance(a, dict):
@@ -518,7 +518,21 @@ def select_point_from_map(*args: Any) -> None:
         index = a
     if index is None:
         index = app.gui.getvar(_GROUP, "active_station_index")
-
-    app.gui.setvar(_GROUP, "active_station_index", index)
-    app.toolbox[_GROUP].plot_station(index)
+    app.toolbox[_GROUP].select_station(index)
     app.gui.window.update()
+
+
+def add_to_plot(*args: Any) -> None:
+    app.toolbox[_GROUP].add_to_plot()
+
+
+def remove_from_plot(*args: Any) -> None:
+    app.toolbox[_GROUP].remove_from_plot()
+
+
+def new_plot(*args: Any) -> None:
+    app.toolbox[_GROUP].new_plot()
+
+
+def select_plot_item(*args: Any) -> None:
+    """Selecting an item in the Plotted list has no side effect."""

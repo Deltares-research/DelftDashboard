@@ -28,3 +28,5 @@ include.geojson
 .gitignore
 sfincs.nc
 quadtree.geojson
+run.bat
+sfincs.inp
