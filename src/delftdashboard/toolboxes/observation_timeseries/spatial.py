@@ -31,7 +31,11 @@ _MAP_VARIABLES: List[tuple[str, str, Optional[str]]] = [
     ("zs", "Water level", "time"),
     ("h", "Water depth", "time"),
     ("zb", "Bed level", None),
+    ("msk", "Mask", None),
 ]
+
+# Variables that are not in metres (skip the "(m)" unit in labels).
+_UNITLESS = {"msk"}
 
 _CMAPS = ["viridis", "Blues", "turbo", "jet", "RdBu_r", "gist_earth"]
 
@@ -582,7 +586,8 @@ def animate(*args: Any) -> None:
     )
     if basemap != "none":
         _add_basemap(ax, tb.spatial_crs, basemap)
-    fig.colorbar(tpc, ax=ax, shrink=0.7, label=f"{var_label} (m)")
+    unit = "" if variable in _UNITLESS else " (m)"
+    fig.colorbar(tpc, ax=ax, shrink=0.7, label=f"{var_label}{unit}")
     title = ax.set_title(tstrings[0])
 
     # Choose writer by extension; fall back to GIF when ffmpeg is unavailable.
