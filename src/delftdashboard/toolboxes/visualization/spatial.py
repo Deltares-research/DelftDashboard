@@ -25,7 +25,7 @@ from delftdashboard.operations import map
 
 logger = logging.getLogger(__name__)
 
-_G = "observation_timeseries"
+_G = "visualization"
 
 # (netCDF variable, GUI label, time dimension or None). First is the default.
 _MAP_VARIABLES: List[tuple[str, str, Optional[str]]] = [
@@ -114,9 +114,13 @@ def initialize(tb) -> None:
     app.gui.setvar(_G, "spatial_cmin", 0.0)
     app.gui.setvar(_G, "spatial_cmax", 2.0)
     app.gui.setvar(_G, "spatial_opacity", 0.7)
-    app.gui.setvar(_G, "spatial_basemap_values", ["none", "sat", "osm", "light"])
     app.gui.setvar(
-        _G, "spatial_basemap_strings", ["None", "Satellite", "Street map", "Light"]
+        _G, "spatial_basemap_values", ["none", "sat", "street", "topo", "gray"]
+    )
+    app.gui.setvar(
+        _G,
+        "spatial_basemap_strings",
+        ["None", "Satellite", "Street map", "Topographic", "Light gray"],
     )
     app.gui.setvar(_G, "spatial_basemap", "none")
     app.gui.setvar(_G, "spatial_map_file_string", "File : ")
@@ -263,6 +267,33 @@ def _native_vertices(ds: xr.Dataset, quadtree: bool):
     return vx, vy, ncell
 
 
+def _configure_ffmpeg() -> None:
+    """Point matplotlib at an ffmpeg binary if one exists but is not on PATH.
+
+    Conda installs ffmpeg in ``<env>\\Library\\bin`` (Windows) or ``<env>/bin``,
+    which is often not on PATH when DelftDashboard is started from an IDE or
+    shortcut, so matplotlib's FFMpegWriter would report it as unavailable.
+    """
+    import shutil
+    import sys
+
+    import matplotlib
+
+    current = matplotlib.rcParams.get("animation.ffmpeg_path", "ffmpeg")
+    if shutil.which(current):
+        return
+    exe = "ffmpeg.exe" if os.name == "nt" else "ffmpeg"
+    for folder in (
+        os.path.join(sys.prefix, "Library", "bin"),
+        os.path.join(sys.prefix, "bin"),
+        os.path.dirname(sys.executable),
+    ):
+        candidate = os.path.join(folder, exe)
+        if os.path.isfile(candidate):
+            matplotlib.rcParams["animation.ffmpeg_path"] = candidate
+            return
+
+
 def _add_basemap(ax, crs, basemap: str) -> Optional[str]:
     """Add a contextily basemap behind the plot (best-effort; needs internet).
 
@@ -274,13 +305,14 @@ def _add_basemap(ax, crs, basemap: str) -> Optional[str]:
         import contextily as ctx
     except Exception as e:
         return f"contextily not available ({e})"
+    # All basemaps come from Esri: OpenStreetMap's tile servers return
+    # "403 Access blocked" tiles for programmatic use, and CARTO now serves
+    # "API key required" placeholder tiles.
     sources = {
         "sat": ctx.providers.Esri.WorldImagery,
-        # OSM's own tile servers return "403 Access blocked" tiles for
-        # programmatic use (tile usage policy); CARTO Voyager is an
-        # OSM-based street map that allows it.
-        "osm": ctx.providers.CartoDB.Voyager,
-        "light": ctx.providers.CartoDB.Positron,
+        "street": ctx.providers.Esri.WorldStreetMap,
+        "topo": ctx.providers.Esri.WorldTopoMap,
+        "gray": ctx.providers.Esri.WorldGrayCanvas,
     }
     source = sources.get(basemap)
     if source is None:
@@ -625,6 +657,8 @@ def animate(*args: Any) -> None:
 
     # Choose writer by extension; fall back to GIF when ffmpeg is unavailable.
     want_mp4 = os.path.splitext(full_name)[1].lower() == ".mp4"
+    if want_mp4:
+        _configure_ffmpeg()
     if want_mp4 and FFMpegWriter.isAvailable():
         writer = FFMpegWriter(fps=5)
     else:

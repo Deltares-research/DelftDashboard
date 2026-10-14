@@ -28,7 +28,7 @@ from delftdashboard.app import app
 from delftdashboard.operations import map
 from delftdashboard.operations.toolbox import GenericToolbox
 
-_GROUP = "observation_timeseries"
+_GROUP = "visualization"
 
 # (netCDF variable, GUI label). First entry is the default.
 _VARIABLES: List[tuple[str, str]] = [

@@ -7,8 +7,8 @@ element:
     height: 175
   tab:
   - string: Timeseries output
-    module: delftdashboard.toolboxes.observation_timeseries.observation_timeseries
+    module: delftdashboard.toolboxes.visualization.visualization
     element: timeseries.yml
   - string: Spatial output
-    module: delftdashboard.toolboxes.observation_timeseries.spatial
+    module: delftdashboard.toolboxes.visualization.spatial
     element: spatial.yml
