@@ -11,6 +11,7 @@ Supports both quadtree (UGRID ``mesh2d_*``) and regular (``n``/``m`` with
 
 from __future__ import annotations
 
+import logging
 import os
 from typing import Any, List, Optional
 
@@ -21,6 +22,8 @@ from pyproj import CRS, Transformer
 
 from delftdashboard.app import app
 from delftdashboard.operations import map
+
+logger = logging.getLogger(__name__)
 
 _G = "observation_timeseries"
 
@@ -113,7 +116,7 @@ def initialize(tb) -> None:
     app.gui.setvar(_G, "spatial_opacity", 0.7)
     app.gui.setvar(_G, "spatial_basemap_values", ["none", "sat", "osm", "light"])
     app.gui.setvar(
-        _G, "spatial_basemap_strings", ["None", "Satellite", "OpenStreetMap", "Light"]
+        _G, "spatial_basemap_strings", ["None", "Satellite", "Street map", "Light"]
     )
     app.gui.setvar(_G, "spatial_basemap", "none")
     app.gui.setvar(_G, "spatial_map_file_string", "File : ")
@@ -260,30 +263,44 @@ def _native_vertices(ds: xr.Dataset, quadtree: bool):
     return vx, vy, ncell
 
 
-def _add_basemap(ax, crs, basemap: str) -> None:
-    """Add a contextily basemap behind the plot (best-effort; needs internet)."""
+def _add_basemap(ax, crs, basemap: str) -> Optional[str]:
+    """Add a contextily basemap behind the plot (best-effort; needs internet).
+
+    Returns ``None`` on success (or when no basemap is requested), or a short
+    error message when the basemap could not be fetched. Never raises - the
+    axis limits are always restored so the animation renders either way.
+    """
     try:
         import contextily as ctx
-    except Exception:
-        return
+    except Exception as e:
+        return f"contextily not available ({e})"
     sources = {
         "sat": ctx.providers.Esri.WorldImagery,
-        "osm": ctx.providers.OpenStreetMap.Mapnik,
+        # OSM's own tile servers return "403 Access blocked" tiles for
+        # programmatic use (tile usage policy); CARTO Voyager is an
+        # OSM-based street map that allows it.
+        "osm": ctx.providers.CartoDB.Voyager,
         "light": ctx.providers.CartoDB.Positron,
     }
     source = sources.get(basemap)
     if source is None:
-        return
-    epsg = crs.to_epsg() if crs is not None else None
-    crs_arg = f"EPSG:{epsg}" if epsg else (crs.to_string() if crs else "EPSG:3857")
+        return None
+    try:
+        epsg = crs.to_epsg() if crs is not None else None
+        crs_arg = f"EPSG:{epsg}" if epsg else (crs.to_string() if crs else "EPSG:3857")
+    except Exception:
+        crs_arg = "EPSG:3857"
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
+    error: Optional[str] = None
     try:
         ctx.add_basemap(ax, crs=crs_arg, source=source, attribution=False, zorder=1)
     except Exception as e:
+        error = str(e) or type(e).__name__
         logger.info("Could not add basemap: %s", e)
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
+    return error
 
 
 def _face_values(ds: xr.Dataset, variable: str, tdim: Optional[str], itime: int):
@@ -423,6 +440,21 @@ def load_map_file(*args: Any) -> None:
             "'mesh2d_*') or a regular grid ('corner_x' / 'corner_y')."
         )
         return
+
+    # Offer only the variables actually present in this file (subgrid/non-subgrid
+    # runs, or older SFINCS versions, may omit some).
+    present = [(v, lbl, t) for (v, lbl, t) in _MAP_VARIABLES if v in ds.variables]
+    if not present:
+        ds.close()
+        app.gui.window.dialog_warning(
+            "This map file contains none of the supported variables "
+            "(zsmax, hmax, zs, h, zb, msk)."
+        )
+        return
+    app.gui.setvar(_G, "spatial_variable_values", [v[0] for v in present])
+    app.gui.setvar(_G, "spatial_variable_strings", [v[1] for v in present])
+    if app.gui.getvar(_G, "spatial_variable") not in [v[0] for v in present]:
+        app.gui.setvar(_G, "spatial_variable", present[0][0])
 
     crs = _file_crs(ds)
     if crs is None:
@@ -584,8 +616,9 @@ def animate(*args: Any) -> None:
         alpha=alpha,
         zorder=2,
     )
+    basemap_error = None
     if basemap != "none":
-        _add_basemap(ax, tb.spatial_crs, basemap)
+        basemap_error = _add_basemap(ax, tb.spatial_crs, basemap)
     unit = "" if variable in _UNITLESS else " (m)"
     fig.colorbar(tpc, ax=ax, shrink=0.7, label=f"{var_label}{unit}")
     title = ax.set_title(tstrings[0])
@@ -627,7 +660,14 @@ def animate(*args: Any) -> None:
             pass
         app.gui.window.dialog_info("Animation canceled.")
         return
-    app.gui.window.dialog_info(f"Animation saved:\n{full_name}")
+
+    msg = f"Animation saved:\n{full_name}"
+    if basemap_error:
+        msg += (
+            "\n\nNote: the basemap could not be loaded (saved without it). "
+            f"This is usually a network issue.\nDetails: {basemap_error}"
+        )
+    app.gui.window.dialog_info(msg)
 
 
 def _zoom_to_bounds(tb, buffer: float = 0.05) -> None:
