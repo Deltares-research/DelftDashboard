@@ -311,6 +311,10 @@ def initialize() -> None:
         copy_map_server_folder=True,
     )
 
+    disabled_features = set(app.config.get("disabled_features") or [])
+    for feature in ("snapwave", "urban_drainage", "waves"):
+        app.gui.setvar("features", f"{feature}_enabled", feature not in disabled_features)
+
     # Documentation URLs (local Sphinx build)
     # app.main_path = .../DelftDashboard/src/delftdashboard/
     docs_base = os.path.join(

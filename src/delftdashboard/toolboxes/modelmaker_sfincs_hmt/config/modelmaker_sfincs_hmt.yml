@@ -34,6 +34,10 @@ element:
       - variable: use_snapwave
         operator: eq
         value: true
+      - variable_group: features
+        variable: snapwave_enabled
+        operator: eq
+        value: true
   - string: Mask Boundary SnapWave
     module: delftdashboard.toolboxes.modelmaker_sfincs_hmt.mask_boundary_cells_snapwave
     element: mask_boundary_cells_snapwave.yml
@@ -42,6 +46,10 @@ element:
       checkfor: all
       check:
       - variable: use_snapwave
+        operator: eq
+        value: true
+      - variable_group: features
+        variable: snapwave_enabled
         operator: eq
         value: true
   - string: Sub Grid

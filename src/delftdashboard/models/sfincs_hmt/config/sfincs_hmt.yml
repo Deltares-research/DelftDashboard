@@ -30,8 +30,24 @@ element:
   - string: Urban Drainage
     module: delftdashboard.models.sfincs_hmt.urban_drainage
     element: urban_drainage.yml
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable_group: features
+        variable: urban_drainage_enabled
+        operator: eq
+        value: true
   - string: Waves
     element: waves.yml
+    dependency:
+    - action: enable
+      checkfor: all
+      check:
+      - variable_group: features
+        variable: waves_enabled
+        operator: eq
+        value: true
   - string: Meteo
     module: delftdashboard.models.sfincs_hmt.meteo
     element: meteo.yml

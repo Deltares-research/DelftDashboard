@@ -97,6 +97,14 @@ element:
   variable: use_snapwave
   method: use_snapwave
   tooltip: Enable SnapWave spectral wave model
+  dependency:
+  - action: enable
+    checkfor: all
+    check:
+    - variable_group: features
+      variable: snapwave_enabled
+      operator: eq
+      value: true
 - style: checkbox
   id: sbg
   position:
