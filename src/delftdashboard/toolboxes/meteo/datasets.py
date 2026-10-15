@@ -17,6 +17,11 @@ def select_dataset(*args: Any) -> None:
     pass
 
 
+def draw_bounding_box(*args: Any) -> None:
+    """Handle drawing a bounding box for a new dataset."""
+    pass
+
+
 def add_dataset(*args: Any) -> None:
     """Handle adding a new dataset."""
     pass
