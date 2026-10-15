@@ -94,6 +94,13 @@ INCLUDE_PACKAGES = [
     "pyproj",
     "xugrid",
     "datashader",
+    # contextily provides the optional basemap behind the Output Visualization
+    # animation. Its provider registry is driven by xyzservices (which loads
+    # data/providers.json lazily), and it uses mercantile for tile maths - both
+    # are missed by Nuitka's import-following, so force-include them.
+    "contextily",
+    "xyzservices",
+    "mercantile",
     # netCDF4's Cython extension (_netCDF4) imports netCDF4.utils internally at
     # init; Nuitka cannot see imports made from compiled .pyx code, so the whole
     # package must be force-included (else: "No module named 'netCDF4.utils'").
@@ -159,6 +166,9 @@ INCLUDE_PACKAGE_DATA = [
     "branca",
     "plotly",
     "datashader",
+    # xyzservices ships data/providers.json (the basemap provider registry used
+    # by contextily); without the data file the animation basemap fails.
+    "xyzservices",
     "netCDF4",
     "scipy",
     "numba",

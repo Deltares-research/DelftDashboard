@@ -1,0 +1,173 @@
+element:
+
+# ===================== Panel 1: His files =============================
+# Panels fill vertically (y>0 with height<0): top margin = |height|,
+# bottom margin = y. Listboxes fill too; buttons are pinned to the bottom.
+- style: panel
+  position:
+    x: 10
+    y: 2
+    width: 250
+    height: -2
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 62
+      width: 225
+      height: -26
+    text: "His files"
+    text_position: above
+    method: select_his_file
+    variable: active_his_index
+    select: index
+    option_string:
+      variable: his_file_labels
+    tooltip: Loaded his files
+  - style: pushbutton
+    position:
+      x: 10
+      y: 36
+      width: 105
+      height: 20
+    text: Load His File
+    method: load_his_file
+    enable: true
+    tooltip: Load a SFINCS his (point output) netCDF file. Load several to compare.
+  - style: pushbutton
+    position:
+      x: 120
+      y: 36
+      width: 55
+      height: 20
+    text: Delete
+    method: delete_his_file
+    tooltip: Delete the selected his file
+  - style: pushbutton
+    position:
+      x: 180
+      y: 36
+      width: 55
+      height: 20
+    text: Clear
+    method: clear_his_files
+    tooltip: Unload all his files and clear the plot
+  - style: text
+    position:
+      x: 10
+      y: 10
+      width: 40
+      height: 18
+    text: "Label"
+  - style: edit
+    position:
+      x: 50
+      y: 8
+      width: 105
+      height: 20
+    variable: his_file_label
+    method: rename_his_file
+    tooltip: Legend label for the selected his file
+  - style: pushbutton
+    position:
+      x: 160
+      y: 8
+      width: 75
+      height: 20
+    text: Rename
+    method: rename_his_file
+    tooltip: Apply the label to the selected his file
+
+# ===================== Panel 2: Select station ========================
+- style: panel
+  position:
+    x: 270
+    y: 2
+    width: 250
+    height: -2
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 64
+      width: 230
+      height: -26
+    text: "Select station"
+    text_position: above
+    method: select_station_from_list
+    variable: active_station_index
+    select: index
+    option_string:
+      variable: station_names
+    tooltip: Select an observation point (or click it on the map)
+  - style: text
+    position:
+      x: 10
+      y: 38
+      width: 55
+      height: 18
+    text: "Variable"
+  - style: popupmenu
+    position:
+      x: 70
+      y: 37
+      width: 165
+      height: 20
+    variable: variable
+    select: item
+    method: select_variable
+    option_string:
+      variable: variable_strings
+    option_value:
+      variable: variable_values
+    tooltip: Variable used when adding a station to the plot
+  - style: pushbutton
+    position:
+      x: 10
+      y: 8
+      width: 230
+      height: 24
+    text: Add to Plot
+    method: add_to_plot
+    tooltip: Copy the selected station's timeseries into the plot window
+
+# ===================== Panel 3: Plotted ===============================
+- style: panel
+  position:
+    x: 530
+    y: 2
+    width: 250
+    height: -2
+  element:
+  - style: listbox
+    position:
+      x: 10
+      y: 64
+      width: 230
+      height: -26
+    text: "Plotted (shown in window)"
+    text_position: above
+    method: select_plot_item
+    variable: active_plot_item_index
+    select: index
+    option_string:
+      variable: plot_item_labels
+    tooltip: Series currently drawn in the plot window
+  - style: pushbutton
+    position:
+      x: 10
+      y: 36
+      width: 230
+      height: 22
+    text: Remove
+    method: remove_from_plot
+    tooltip: Remove the selected series from the plot
+  - style: pushbutton
+    position:
+      x: 10
+      y: 8
+      width: 230
+      height: 24
+    text: New Plot
+    method: new_plot
+    tooltip: Start a fresh, empty plot window

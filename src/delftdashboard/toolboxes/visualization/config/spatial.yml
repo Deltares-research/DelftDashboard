@@ -1,0 +1,151 @@
+element:
+
+# The Time listbox and info text fill vertically (y>0 with height<0);
+# all buttons/dropdowns are pinned to the bottom so nothing clips.
+
+# --- Left column: file, variable, time --------------------------------
+- style: listbox
+  position:
+    x: 10
+    y: 66
+    width: 210
+    height: -26
+  text: "Time"
+  text_position: above
+  variable: spatial_time_index
+  select: index
+  method: select_time
+  option_string:
+    variable: spatial_time_strings
+  tooltip: Time step to display
+- style: text
+  position:
+    x: 10
+    y: 40
+    width: 55
+    height: 18
+  text: "Variable"
+- style: popupmenu
+  position:
+    x: 70
+    y: 39
+    width: 150
+    height: 20
+  variable: spatial_variable
+  select: item
+  method: select_variable
+  option_string:
+    variable: spatial_variable_strings
+  option_value:
+    variable: spatial_variable_values
+  tooltip: Variable to display on the map
+- style: pushbutton
+  position:
+    x: 10
+    y: 10
+    width: 140
+    height: 20
+  text: Load Map File
+  method: load_map_file
+  enable: true
+  tooltip: Load a SFINCS map (sfincs_map.nc) file
+- style: pushbutton
+  position:
+    x: 158
+    y: 10
+    width: 90
+    height: 20
+  text: Close File
+  method: close_map_file
+  tooltip: Close the map file so it is no longer locked (e.g. to re-run SFINCS)
+- style: text
+  position:
+    x: 254
+    y: 10
+    width: 90
+    height: 18
+  variable: spatial_map_file_string
+
+# --- Middle: help text ------------------------------------------------
+- style: text
+  position:
+    x: 300
+    y: 66
+    width: 300
+    height: -26
+  text: "Loads SFINCS map output (quadtree or regular grid) and colours each cell by the selected variable and time."
+
+# --- Right controls: colormap / opacity / basemap (row 1) -------------
+- style: popupmenu
+  position:
+    x: 360
+    y: 39
+    width: 150
+    height: 20
+  text: Colormap
+  variable: spatial_cmap
+  select: item
+  method: select_colormap
+  option_string:
+    variable: spatial_cmap_strings
+  option_value:
+    variable: spatial_cmap_values
+  tooltip: Colormap for the overlay
+- style: popupmenu
+  position:
+    x: 590
+    y: 39
+    width: 55
+    height: 20
+  text: "Opacity"
+  variable: spatial_opacity
+  select: item
+  method: select_opacity
+  option_string: ["0 %", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %", "100 %"]
+  option_value: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+  tooltip: Transparency of the overlay (on the map and in the animation basemap)
+- style: popupmenu
+  position:
+    x: -10
+    y: 39
+    width: 150
+    height: 20
+  text: "Animation basemaps"
+  variable: spatial_basemap
+  select: item
+  option_string:
+    variable: spatial_basemap_strings
+  option_value:
+    variable: spatial_basemap_values
+  tooltip: Background map drawn behind the exported animation
+
+# --- Right controls: min / max / animate (row 2) ----------------------
+- style: edit
+  position:
+    x: 360
+    y: 10
+    width: 70
+    height: 20
+  text: "Min (m)"
+  variable: spatial_cmin
+  method: edit_cmin_cmax
+  tooltip: Lower bound of the color scale
+- style: edit
+  position:
+    x: 490
+    y: 10
+    width: 70
+    height: 20
+  text: "Max (m)"
+  variable: spatial_cmax
+  method: edit_cmin_cmax
+  tooltip: Upper bound of the color scale
+- style: pushbutton
+  position:
+    x: -10
+    y: 10
+    width: 120
+    height: 20
+  text: Animate
+  method: animate
+  tooltip: Export an animation (GIF/MP4) of the selected variable over time

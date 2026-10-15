@@ -7,5 +7,3 @@ For full documentation (work in progress), go to: https://delftdashboard.readthe
 
 This will in time replace the Matlab version, which is now still functioning as GUI from Matlab, or as standalone executable:
 https://publicwiki.deltares.nl/display/DDB/Delft+Dashboard 
-
-
