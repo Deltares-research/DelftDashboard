@@ -24,7 +24,7 @@
 ; (C:\DelftDashboard), not Program Files. Uninstall removes only bin\ -
 ; data and user files under {app} are left untouched.
 
-#define MyAppName "DelftDashboard"
+#define MyAppName "DelftDashboard Training"
 ; The version is passed on the ISCC command line by package_ddb.bat, which
 ; reads it from src\delftdashboard\__init__.py (the single source of truth):
 ;   iscc /DMyAppVersion=x.y.z delftdashboard_nuitka.iss
@@ -39,7 +39,7 @@
 #define DistDir "dist_nuitka\start_ddb.dist"
 
 [Setup]
-AppId={{FAED70FA-2639-4D3E-943C-DEB34AD469F6}}
+AppId={{27EA091A-E298-4278-AAA2-AD3A9951749A}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}

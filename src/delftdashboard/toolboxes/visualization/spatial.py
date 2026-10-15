@@ -283,10 +283,15 @@ def _configure_ffmpeg() -> None:
     if shutil.which(current):
         return
     exe = "ffmpeg.exe" if os.name == "nt" else "ffmpeg"
+    exe_dir = os.path.dirname(os.path.abspath(sys.executable))
     for folder in (
+        # Compiled (Nuitka) build: bundled with its DLLs in <exe dir>/ffmpeg/
+        # by installer/build_delftdashboard.py (_ffmpeg_files).
+        os.path.join(exe_dir, "ffmpeg"),
+        exe_dir,
+        # Source run from a conda env.
         os.path.join(sys.prefix, "Library", "bin"),
         os.path.join(sys.prefix, "bin"),
-        os.path.dirname(sys.executable),
     ):
         candidate = os.path.join(folder, exe)
         if os.path.isfile(candidate):

@@ -30,6 +30,7 @@ import importlib.metadata
 import importlib.util
 import os
 import re
+import struct
 import subprocess
 import sys
 from pathlib import Path
@@ -289,6 +290,77 @@ def _numeric_version(fallback: str = "0.0.1") -> str:
     return match.group(0) if match else fallback
 
 
+def _pe_imports(path: Path) -> list[str]:
+    """Return the DLL names a Windows PE file imports (lower-case).
+
+    Minimal reader of the PE import table, so the build does not depend on
+    pefile or MSVC's dumpbin. Delay-load imports are not followed.
+    """
+    data = path.read_bytes()
+    pe = struct.unpack_from("<I", data, 0x3C)[0]
+    n_sections = struct.unpack_from("<H", data, pe + 6)[0]
+    opt_size = struct.unpack_from("<H", data, pe + 20)[0]
+    opt = pe + 24
+    magic = struct.unpack_from("<H", data, opt)[0]
+    datadir = opt + (112 if magic == 0x20B else 96)  # PE32+ vs PE32
+    import_rva = struct.unpack_from("<I", data, datadir + 8)[0]
+    if not import_rva:
+        return []
+    sections = []
+    for i in range(n_sections):
+        s = opt + opt_size + 40 * i
+        vsize, vaddr, rawsize, rawptr = struct.unpack_from("<IIII", data, s + 8)
+        sections.append((vaddr, max(vsize, rawsize), rawptr))
+
+    def offset(rva: int) -> int:
+        for vaddr, size, rawptr in sections:
+            if vaddr <= rva < vaddr + size:
+                return rawptr + rva - vaddr
+        raise ValueError(f"RVA {rva:#x} not in any section of {path}")
+
+    names = []
+    desc = offset(import_rva)
+    while True:
+        name_rva = struct.unpack_from("<I", data, desc + 12)[0]
+        if not name_rva:
+            break
+        start = offset(name_rva)
+        names.append(data[start : data.index(b"\0", start)].decode().lower())
+        desc += 20  # sizeof(IMAGE_IMPORT_DESCRIPTOR)
+    return names
+
+
+def _ffmpeg_files() -> list[tuple[str, str]]:
+    """Return ffmpeg.exe plus the conda DLLs it needs, destined for ``ffmpeg/``.
+
+    Used for MP4 export of Output Visualization animations (matplotlib's
+    FFMpegWriter). Conda's ffmpeg is dynamically linked against ~80 DLLs in
+    <env>/Library/bin. They go into their own ``ffmpeg/`` subfolder rather than
+    the dist root: Windows loads an executable's DLLs from its own folder first,
+    so ffmpeg stays self-contained and cannot clash with the (possibly
+    different-version) copies of zlib, libpng, OpenSSL, ... that Nuitka places
+    in the root for Python extensions. At runtime spatial._configure_ffmpeg()
+    finds ``<exe dir>/ffmpeg/ffmpeg.exe``. Without it, MP4 export falls back to
+    GIF.
+    """
+    bindir = Path(sys.prefix) / "Library" / "bin"
+    exe = bindir / "ffmpeg.exe"
+    if not exe.exists():
+        print(f"WARNING: {exe} not found - MP4 animation export will fall back to GIF")
+        return []
+    local = {p.name.lower(): p for p in bindir.glob("*.dll")}
+    needed: set[str] = set()
+    todo = [exe]
+    while todo:
+        for dll in _pe_imports(todo.pop()):
+            if dll in local and dll not in needed:  # only conda DLLs, not system ones
+                needed.add(dll)
+                todo.append(local[dll])
+    files = [(str(exe), "ffmpeg/ffmpeg.exe")]
+    files += [(str(local[d]), f"ffmpeg/{local[d].name}") for d in sorted(needed)]
+    return files
+
+
 def _extra_data_files() -> list[tuple[str, str]]:
     """Return (source, dest) pairs for individual files Nuitka won't auto-include.
 
@@ -296,6 +368,7 @@ def _extra_data_files() -> list[tuple[str, str]]:
     as binaries), so a DLL loaded via ctypes from a package directory is missed.
     meshkernel loads its MeshKernelApi.dll that way, so it is added explicitly
     here with the source path resolved from the installed package location.
+    ffmpeg (an external program, not a Python package) is added the same way.
     """
     files: list[tuple[str, str]] = []
     spec = importlib.util.find_spec("meshkernel")
@@ -305,6 +378,7 @@ def _extra_data_files() -> list[tuple[str, str]]:
             files.append((str(dll), "meshkernel/MeshKernelApi.dll"))
         else:
             print(f"WARNING: MeshKernelApi.dll not found next to {spec.origin}")
+    files += _ffmpeg_files()
     return files
 
 
