@@ -114,7 +114,7 @@ def create_boundary_points(*args: Any) -> None:
             "boundary points."
         )
         return
-    if not mask.has_open_boundaries():
+    if not mask.has_open_boundaries:
         app.gui.window.dialog_warning(
             "The mask contains no open boundary cells. Please update the "
             "mask first."
