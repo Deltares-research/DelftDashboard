@@ -36,7 +36,7 @@ removed `cm.get_cmap`).
 
 1. Install pixi: `winget install prefix-dev.pixi`
 2. Clone the repos **next to** DelftDashboard (e.g. `C:\git\guitares`,
-   `C:\git\hydromt_sfincs`, `C:\git\hydromt-hurrywave`, the `cht_*` repos,
+   `C:\git\hydromt_sfincs`, `C:\git\hydromt_hurrywave`, the `cht_*` repos,
    `cosmos`), on the branches used for the build. They are editable path
    dependencies in `pixi.toml` (folder names must match).
 3. From the DelftDashboard folder:
