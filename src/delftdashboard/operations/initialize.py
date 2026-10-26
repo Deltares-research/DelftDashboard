@@ -391,10 +391,13 @@ def initialize() -> None:
         app.config["meteo_database_path"] = os.path.join(
             app.config["data_path"], "meteo_database"
         )
-    s3_bucket = app.config["s3_bucket"]
-    s3_key = "data/meteo"
     app.meteo_database = MeteoDatabase(path=app.config["meteo_database_path"])
-    app.meteo_database.read_datasets()
+    # Only the meteo toolbox uses the meteo database (a local
+    # meteo_database.toml; cht_meteo has no S3 download). Skip reading it when
+    # that toolbox is not enabled, which also avoids the "does not exist"
+    # message on every fresh data folder (e.g. the training build).
+    if any(tlb.get("name") == "meteo" for tlb in app.config.get("toolbox", [])):
+        app.meteo_database.read_datasets()
 
     # Tide model database
     if "tide_model_database_path" not in app.config:
@@ -487,7 +490,20 @@ def initialize_topography() -> None:
         )
     path = app.config["bathymetry_database_path"]
 
-    app.topography_data_catalog = TopographyDataCatalog(path)
+    # Optional dataset selection (delftdashboard.cfg / .ini):
+    #  - extra_bathymetry_catalogs: catalog files shipped with the app (relative
+    #    to the config folder), e.g. course datasets; always shown.
+    #  - remote_bathymetry_datasets: allowlist for datasets from the S3 catalog;
+    #    local datasets (incl. user imports) are never filtered.
+    extra_catalogs = [
+        p if os.path.isabs(p) else os.path.join(app.config_path, p)
+        for p in (app.config.get("extra_bathymetry_catalogs") or [])
+    ]
+    app.topography_data_catalog = TopographyDataCatalog(
+        path,
+        extra_catalogs=extra_catalogs,
+        remote_allowlist=app.config.get("remote_bathymetry_datasets"),
+    )
     # Backward-compatible alias for toolboxes that still use cht_bathymetry
     app.bathymetry_database = app.topography_data_catalog
 

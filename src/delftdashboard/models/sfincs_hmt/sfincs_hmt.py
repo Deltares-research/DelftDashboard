@@ -725,14 +725,26 @@ class Model(GenericModel):
         update_cross_section_snapper()
         update_wave_maker_snapper()
 
+    def _config_dict(self) -> dict:
+        """Return the complete (unfiltered) SFINCS configuration as a dict.
+
+        Since hydromt_sfincs' SfincsConfig rework (#414), ``model_dump()`` goes
+        through a write-only serializer that drops settings at their default,
+        ``None`` or excluded by a condition (it returns only what would be
+        written to sfincs.inp). ``to_dict()`` returns every setting. Fall back
+        to ``model_dump()`` for older hydromt_sfincs versions without it.
+        """
+        data = self.domain.config.data
+        if hasattr(data, "to_dict"):
+            return data.to_dict()
+        return data.model_dump(exclude_unset=False)
+
     def set_gui_variables(self) -> None:
         """Populate GUI variables from the current model configuration."""
         group = _GROUP
 
         # Copy sfincs input variables to gui variables
-        for key, value in self.domain.config.data.model_dump(
-            exclude_unset=False
-        ).items():
+        for key, value in self._config_dict().items():
             app.gui.setvar(group, key, value)
 
         # View
@@ -1033,12 +1045,21 @@ class Model(GenericModel):
             Value to set (unused, read from GUI).
         """
         group = _GROUP
-        for key, value in self.domain.config.data.model_dump(
-            exclude_unset=False
-        ).items():
-            self.domain.config.set(
-                key, app.gui.getvar(group, key), skip_validation=True
-            )
+        gui_vars = app.gui.variables.get(group, {})
+        for key, current in self._config_dict().items():
+            # Only settings that exist as GUI variable and were changed in the
+            # GUI: setting a key marks it as explicitly set, and the config
+            # writes every explicitly set key to sfincs.inp - writing back all
+            # ~200 settings would fill the input file with defaults.
+            if key not in gui_vars:
+                continue
+            new = gui_vars[key]["value"]
+            try:
+                changed = bool(new != current)
+            except Exception:  # e.g. array comparison
+                changed = True
+            if changed:
+                self.domain.config.set(key, new, skip_validation=True)
         if self.domain.config.get("snapwave"):
             app.gui.setvar("modelmaker_sfincs_hmt", "use_snapwave", True)
         else:

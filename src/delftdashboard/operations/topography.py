@@ -30,9 +30,32 @@ class TopographyDataCatalog:
         Root directory of the topography/bathymetry database.
     """
 
-    def __init__(self, path: str) -> None:
+    def __init__(
+        self,
+        path: str,
+        extra_catalogs: Optional[List[str]] = None,
+        remote_allowlist: Optional[List[str]] = None,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        path : str
+            Root directory of the topography/bathymetry database.
+        extra_catalogs : list of str, optional
+            Additional catalog YAML files shipped with the application (e.g.
+            course datasets). Relative ``uri`` entries resolve against *path*,
+            so their data downloads into the regular bathymetry folder.
+        remote_allowlist : list of str, optional
+            If given, only these datasets from the S3 (remote) catalog are
+            offered. Datasets from the local catalog (including user imports)
+            and from *extra_catalogs* are never filtered. ``None`` shows all.
+        """
         self.path = path
         self.catalog = DataCatalog()
+        self._extra_catalogs: List[str] = list(extra_catalogs or [])
+        self._remote_allowlist = (
+            set(remote_allowlist) if remote_allowlist is not None else None
+        )
         # Maps source name → YAML file that provided it (first-wins merge).
         # Populated by :py:meth:`_load` and consumed by
         # :py:meth:`data_libs_for` to emit an accurate ``global.data_libs``
@@ -62,6 +85,12 @@ class TopographyDataCatalog:
         """
         candidates: List[Tuple[str, str]] = [
             (os.path.join(path, "data_catalog_local.yml"), path),
+        ]
+        # Catalogs shipped with the application (after the local catalog so a
+        # user definition still wins, before the remote one so they are not
+        # shadowed by - or filtered as - S3 datasets).
+        candidates += [(yml, path) for yml in self._extra_catalogs]
+        candidates += [
             (os.path.join(path, "data_catalog.yml"), path),  # legacy master
         ]
         candidates += [
@@ -80,6 +109,24 @@ class TopographyDataCatalog:
                 self._merge_catalog_file(yml, root=root)
             except Exception as e:
                 logger.warning("Could not load %s: %s", yml, e)
+        self._apply_remote_allowlist()
+
+    _REMOTE_CATALOGS = ("data_catalog_remote.yml", "data_catalog_s3.yml")
+
+    def _apply_remote_allowlist(self) -> None:
+        """Drop S3-provided datasets that are not in the remote allowlist.
+
+        Only sources whose winning definition comes from the remote catalog
+        are filtered, so datasets in the local catalog (user imports) and in
+        bundled extra catalogs are always kept.
+        """
+        if self._remote_allowlist is None:
+            return
+        for name in list(self.catalog._sources):
+            yml = os.path.basename(self._source_yaml.get(name, ""))
+            if yml in self._REMOTE_CATALOGS and name not in self._remote_allowlist:
+                del self.catalog._sources[name]
+                self._source_yaml.pop(name, None)
 
     def update_from_s3(self, s3_bucket: str, s3_key: str = "data/bathymetry") -> None:
         """Refresh the S3-provided bathymetry catalog and merge it in.
@@ -129,8 +176,10 @@ class TopographyDataCatalog:
                 pass
 
         added = self._merge_catalog_file(catalog_file)
+        self._apply_remote_allowlist()
         for name in added:
-            print(f"Adding bathymetry dataset {name} to local database ...")
+            if name in self.catalog._sources:  # skip datasets hidden by the allowlist
+                print(f"Adding bathymetry dataset {name} to local database ...")
 
     def _merge_catalog_file(self, yml: str, root: Optional[str] = None) -> List[str]:
         """Merge sources from a catalog YAML, keeping existing sources.

@@ -1,0 +1,24 @@
+# Bathymetry/topography datasets shipped with the training build.
+# Loaded via "extra_bathymetry_catalogs" in delftdashboard.cfg. Relative uris
+# resolve against the user's data\bathymetry folder; the COG is downloaded from
+# the S3 bucket (anonymous access) on first use.
+meta:
+  category: bathymetry
+
+topography_charleston_10m:
+  data_type: RasterDataset
+  uri: topography_charleston_10m.tif
+  driver:
+    name: rasterio
+    options:
+      s3_bucket: delftdashboard
+      s3_key: data/bathymetry/charleston_test
+      s3_region: eu-west-1
+      s3_endpoint: https://s3.deltares.nl
+  metadata:
+    category: topography
+    unit_mult: 1
+    source: USGS
+    long_name: Charleston topography 10 m (USGS)
+    difference_with_msl: 0.0
+    crs: 26917
