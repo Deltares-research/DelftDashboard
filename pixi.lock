@@ -109,7 +109,7 @@ environments:
       - pypi: ../cht_utils
       - pypi: ../cht_xbeach
       - pypi: ../guitares
-      - pypi: ../hydromt-hurrywave
+      - pypi: ../hydromt_hurrywave
       - pypi: ../hydromt_sfincs
       - pypi: ./
       - pypi: https://files.pythonhosted.org/packages/00/4b/ccc026168948fec4f7555b9164c724cf4125eac006e176541483d2c959be/pydantic_settings-2.13.1-py3-none-any.whl
@@ -1915,7 +1915,7 @@ packages:
   - pytest ; extra == 'tests'
   - pytest-cov ; extra == 'tests'
   requires_python: '>=3.10'
-- pypi: ../hydromt-hurrywave
+- pypi: ../hydromt_hurrywave
   name: hydromt-hurrywave
   requires_dist:
   - affine
