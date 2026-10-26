@@ -26,6 +26,39 @@ the user where the (potentially large, downloaded) data folder should live.
   (`winget install JRSoftware.InnoSetup`; `ISCC.exe` ends up in
   `C:\Program Files (x86)\Inno Setup 6\`)
 
+## Environment with pixi (recommended)
+
+`pixi.toml` + `pixi.lock` (repo root) reproduce the tested environment exactly
+on any Windows machine - conda *and* PyPI packages, pinned to exact builds - so
+a build machine gets the same versions as the development PC (e.g. PySide6 6.9:
+6.10+ blocks the map's `qrc://` QWebChannel script; matplotlib 3.10: 3.11
+removed `cm.get_cmap`).
+
+1. Install pixi: `winget install prefix-dev.pixi`
+2. Clone the repos **next to** DelftDashboard (e.g. `C:\git\guitares`,
+   `C:\git\hydromt_sfincs`, `C:\git\hydromt-hurrywave`, the `cht_*` repos,
+   `cosmos`), on the branches used for the build. They are editable path
+   dependencies in `pixi.toml` (folder names must match).
+3. From the DelftDashboard folder:
+
+   ```bat
+   pixi install              :: creates .pixi\envs\default from pixi.lock
+   pixi run start            :: start DelftDashboard
+   pixi run build-exe        :: = python build_delftdashboard.py --debug (in installer\)
+   pixi run package          :: = package_ddb.bat (installer)
+   ```
+
+No conda activation is needed (`pixi run` works from any terminal). Notes on
+`pixi.toml`:
+- Packages pinned on the conda side (`packaging`) and the
+  `[pypi-options.dependency-overrides]` keep the tested versions where a
+  dependency declares a narrower range (pandas, botocore, zarr) and make the
+  local checkouts win over the `git+https` URLs in the repos' `pyproject.toml`.
+- After changing a version or adding a package: `pixi lock` (re-solve), test,
+  and commit `pixi.toml` + `pixi.lock` together.
+- The conda alternative (`installer\remote_build\environment.yml` +
+  `setup_env.bat`) is kept for machines without pixi.
+
 ## Building the executable
 
 ```bat

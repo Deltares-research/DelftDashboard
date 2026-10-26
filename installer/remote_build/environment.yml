@@ -1,8 +1,8 @@
-﻿# Conda environment for building DelftDashboard (exported from a working
+# Conda environment for building DelftDashboard (exported from a working
 # delftdashboard_dev env, versions pinned). The 17 DelftDashboard/cht/hydromt
 # repos are NOT listed here: they are installed editable from git checkouts
-# (pip install -e --no-deps) by setup_build_machine.bat, at the commits in
-# repos.txt. Includes nuitka (build) and ffmpeg (bundled for MP4 export).
+# (pip install -e --no-deps) by setup_env.bat, at the branches used for the
+# training build. Includes nuitka (build) and ffmpeg (bundled for MP4 export).
 #
 #   mamba env create -f environment.yml
 

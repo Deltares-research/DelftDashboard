@@ -30,3 +30,6 @@ sfincs.nc
 quadtree.geojson
 run.bat
 sfincs.inp
+
+# pixi environments
+.pixi/
