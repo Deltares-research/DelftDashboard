@@ -47,9 +47,9 @@ if errorlevel 1 ( echo ERROR: could not activate %ENVNAME% & exit /b 1 )
 rem -- Editable installs ---------------------------------------------------
 rem --no-deps keeps the exact versions pinned in environment.yml (otherwise pip
 rem would re-resolve dependencies, e.g. pull cht packages from git main).
-rem Folder names are the actual repo names (note hydromt-hurrywave).
+rem Folder names as cloned next to DelftDashboard (note hydromt_hurrywave).
 set "FAILED="
-for %%r in (DelftDashboard cosmos guitares cht_beware cht_cyclones cht_delft3dfm cht_meteo cht_nesting cht_observations cht_physics cht_tide cht_tiling cht_tsunami cht_utils cht_xbeach hydromt_sfincs hydromt-hurrywave) do (
+for %%r in (DelftDashboard cosmos guitares cht_beware cht_cyclones cht_delft3dfm cht_meteo cht_nesting cht_observations cht_physics cht_tide cht_tiling cht_tsunami cht_utils cht_xbeach hydromt_sfincs hydromt_hurrywave) do (
     if exist "%GITDIR%\%%r\" (
         echo Installing %%r ...
         python -m pip install -e "%GITDIR%\%%r" --no-deps -q
