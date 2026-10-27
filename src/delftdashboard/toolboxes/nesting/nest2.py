@@ -92,11 +92,18 @@ def load_overall_model(*args: Any) -> None:
             filter="sfincs.inp",
             allow_directory_change=True,
         )
-    elif overall_model_type == "hurrywave":
+    elif overall_model_type in ("hurrywave", "hurrywave_hmt"):
         rsp = app.gui.window.dialog_open_file(
             "Select file ...",
             file_name="hurrywave.inp",
             filter="hurrywave.inp",
+            allow_directory_change=True,
+        )
+    elif overall_model_type == "sfincs_hmt":
+        rsp = app.gui.window.dialog_open_file(
+            "Select file ...",
+            file_name="sfincs.inp",
+            filter="sfincs.inp",
             allow_directory_change=True,
         )
     else:
@@ -156,6 +163,10 @@ def perform_nesting_step_2(*args: Any) -> None:
     """
     overall_model_type = app.gui.getvar("nesting", "overall_model_type")
     overall_model_file = app.gui.getvar("nesting", "overall_model_file")
+
+    if app.active_model.name in ("sfincs_hmt", "hurrywave_hmt"):
+        _perform_nesting_step_2_hmt(overall_model_type, overall_model_file)
+        return
 
     if app.active_model.name == "sfincs_cht":
         if overall_model_type == "hurrywave":
@@ -234,3 +245,66 @@ def perform_nesting_step_2(*args: Any) -> None:
                 bspfile  # file name without path
             )
             app.active_model.domain.boundary_conditions.write_boundary_conditions_spectra()
+
+
+def _perform_nesting_step_2_hmt(
+    overall_model_type: str, overall_model_file: str
+) -> None:
+    """Nesting step 2 for the HydroMT-based models (sfincs_hmt, hurrywave_hmt).
+
+    Reads the overall model output at the nesting observation points and sets
+    (and writes) the boundary conditions of the active (detail) model:
+    water levels for SFINCS in SFINCS, SnapWave time series for SFINCS in
+    HurryWave, and spectra for HurryWave in HurryWave.
+    """
+    if not overall_model_file:
+        app.gui.window.dialog_warning("Please load the overall model first.")
+        return
+
+    path = os.path.dirname(overall_model_file)
+    detail = app.active_model.domain
+
+    wb = app.gui.window.dialog_wait("Performing nesting step 2 ...")
+    try:
+        # Only the overall model's output folder is needed, not its full input
+        if overall_model_type == "sfincs_hmt":
+            from hydromt_sfincs import SfincsModel
+
+            overall = SfincsModel(root=path, mode="r", write_gis=False)
+        else:
+            from hydromt_hurrywave import HurrywaveModel
+
+            overall = HurrywaveModel(root=path, mode="r")
+
+        obs_point_prefix = app.gui.getvar("nesting", "obs_point_prefix")
+        correction = app.gui.getvar("nesting", "water_level_correction") or 0.0
+        okay = nest2(
+            overall,
+            detail,
+            obs_point_prefix=obs_point_prefix,
+            output_path=path,
+            boundary_water_level_correction=correction,
+            # bc_path makes cht_nesting write the boundary conditions of the
+            # detail model (to the detail model's own folder)
+            bc_path=str(detail.root.path),
+        )
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+        wb.close()
+        app.gui.window.dialog_warning(f"Nesting step 2 failed:\n{e}")
+        return
+    wb.close()
+
+    if okay is False:
+        app.gui.window.dialog_warning(
+            "Nesting step 2 is not available for this combination of models."
+        )
+        return
+    print("Nesting step 2 completed successfully")
+    app.gui.window.dialog_info(
+        "Boundary conditions were generated and written. "
+        "Save the model to update the input file.",
+        "Nesting step 2",
+    )

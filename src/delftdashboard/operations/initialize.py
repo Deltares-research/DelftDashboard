@@ -281,6 +281,12 @@ def initialize() -> None:
     app.config.setdefault("s3_endpoint", "https://s3.deltares.nl")
     app.config.setdefault("s3_region", "eu-west-1")
 
+    # HydroMT's slippy_tile driver ignores the endpoint and talks to AWS;
+    # botocore/s3fs honour AWS_ENDPOINT_URL_S3.
+    # TODO: remove after hydromt#1560
+    if app.config.get("s3_endpoint"):
+        os.environ.setdefault("AWS_ENDPOINT_URL_S3", app.config["s3_endpoint"])
+
     # If it does not exist, create it
     if not os.path.exists(app.config["data_path"]):
         os.mkdir(app.config["data_path"])
