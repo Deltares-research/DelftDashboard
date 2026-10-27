@@ -1,14 +1,10 @@
 """Utility functions for generating topobathy COG files."""
 
-import logging
-
 import geopandas as gpd
 import numpy as np
 import rasterio
 from rasterio.transform import from_origin
 from shapely.geometry import box
-
-logger = logging.getLogger(__name__)
 
 
 def make_topobathy_cog(
@@ -31,7 +27,7 @@ def make_topobathy_cog(
     filename : str
         Output COG file path.
     bathymetry_sets : list of dict
-        Selected bathymetry datasets, highest priority first.
+        Selected bathymetry datasets.
     bounds : tuple
         (x0, y0, x1, y1) bounding box in the model CRS.
     crs : CRS
@@ -41,65 +37,44 @@ def make_topobathy_cog(
     bathymetry_database : object, optional
         Legacy cht_bathymetry database.
     dx : float
-        Output pixel size (in units of ``crs``).
+        Output pixel size.
     """
     x0, y0, x1, y1 = bounds
 
-    # Round outward to a multiple of dx
+    # Round to nearest dx
     x0 = x0 - (x0 % dx)
     x1 = x1 + (dx - x1 % dx)
     y0 = y0 - (y0 % dx)
     y1 = y1 + (dx - y1 % dx)
 
-    # Target grid: this defines the shape and transform of the output raster
-    nx = int(np.round((x1 - x0) / dx))
-    ny = int(np.round((y1 - y0) / dx))
-    transform = from_origin(x0, y1, dx, dx)
-
     if topography_data_catalog is not None:
-        # HydroMT path: fetch each dataset, resample it onto the target grid,
-        # and merge with first-selected-dataset-wins priority.
+        # HydroMT path: fetch merged raster from the catalog
         geom = gpd.GeoDataFrame(geometry=[box(x0, y0, x1, y1)], crs=crs)
-        zz = np.full((ny, nx), np.nan, dtype=np.float32)
-        for ds in bathymetry_sets:
+        zz = None
+        for ds in reversed(bathymetry_sets):
             name = ds.get("elevation", ds.get("name"))
             zmin = ds.get("zmin", -1.0e9)
             zmax = ds.get("zmax", 1.0e9)
             try:
-                # zoom only selects the closest overview level of the source;
-                # the actual resampling to dx happens in reproject() below.
                 da = topography_data_catalog.get_rasterdataset(
-                    name, geom=geom, zoom=(dx, "metre"), buffer=2
+                    name, geom=geom, zoom=(dx, "metre")
                 )
-                if da.ndim > 2:
-                    da = da.squeeze(drop=True)
-                da = da.astype(np.float32)
-                da.raster.set_nodata(np.nan)
-                da = da.raster.reproject(
-                    dst_crs=crs,
-                    dst_transform=transform,
-                    dst_width=nx,
-                    dst_height=ny,
-                    dst_nodata=np.nan,
-                    method="bilinear",
-                )
-                vals = np.asarray(da.values, dtype=np.float32)
-                if vals.shape != (ny, nx):
-                    raise ValueError(
-                        f"unexpected shape {vals.shape}, expected {(ny, nx)}"
-                    )
+                vals = da.values.astype(np.float32)
                 vals[(vals < zmin) | (vals > zmax)] = np.nan
-                # Fill gaps left by higher-priority datasets
-                mask = np.isnan(zz)
-                zz[mask] = vals[mask]
-            except Exception as e:
-                logger.warning(
-                    "Skipping dataset '%s' in topobathy geotiff: %s", name, e
-                )
+                if zz is None:
+                    zz = vals
+                else:
+                    # Fill NaN in zz with this dataset (priority merge)
+                    mask = np.isnan(zz)
+                    zz[mask] = vals[mask]
+            except Exception:
                 continue
-            if not np.isnan(zz).any():
-                # Grid is fully covered; lower-priority datasets not needed
-                break
+
+        if zz is None:
+            # No data found at all — create empty array
+            nx = int(np.round((x1 - x0) / dx))
+            ny = int(np.round((y1 - y0) / dx))
+            zz = np.full((ny, nx), np.nan, dtype=np.float32)
 
     elif bathymetry_database is not None:
         # Legacy cht_bathymetry path

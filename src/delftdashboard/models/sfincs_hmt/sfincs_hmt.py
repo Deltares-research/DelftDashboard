@@ -511,8 +511,9 @@ class Model(GenericModel):
         crs = app.crs
         try:
             old_crs = self.domain.crs
-        except (KeyError, AttributeError, ValueError, FileNotFoundError):
-            # Model not yet initialized — no CRS to update
+        except (KeyError, AttributeError, ValueError, TypeError, FileNotFoundError):
+            # Model not yet initialized (or quadtree grid cleared, for which
+            # SfincsModel.crs raises TypeError) — no CRS to update
             return
         if old_crs != crs:
             # Set the new EPSG first: clearing re-derives the grid properties
@@ -523,7 +524,19 @@ class Model(GenericModel):
 
     def clear_spatial_attributes(self) -> None:
         """Clear all spatial model data and its map layers, keeping the config."""
-        self.domain.clear_spatial_attributes()
+        # check the class: SfincsModel.__getattr__ raises KeyError (not
+        # AttributeError) for unknown names, so hasattr on the instance fails
+        if hasattr(type(self.domain), "clear_spatial_attributes"):
+            self.domain.clear_spatial_attributes()
+        else:
+            # hydromt_sfincs main has no working clear method yet: re-create every
+            # component except config, then re-derive the grid type and (for
+            # regular grids) the grid properties from the config
+            for name, cls in self.domain._ALL_COMPONENTS.items():
+                if name == "config":
+                    continue
+                self.domain.components[name] = cls(self.domain)
+            self.domain.config.update_grid_from_config()
         self.clear_layers()
         self.observation_points_changed = False
         self.cross_sections_changed = False
