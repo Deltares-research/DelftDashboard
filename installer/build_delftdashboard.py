@@ -461,6 +461,9 @@ def build(debug: bool = False, print_only: bool = False) -> None:
         "--lto=no",
         f"--jobs={os.cpu_count() or 1}",
         f"--output-dir={OUTPUT_DIR}",
+        # XML report of the build (included modules/DLLs, plugin decisions,
+        # versions) - the first thing to check when the exe misbehaves.
+        f"--report={OUTPUT_DIR / 'compilation-report.xml'}",
         "--output-filename=DelftDashboard.exe",
         f"--windows-console-mode={console}",
         "--product-name=DelftDashboard",
