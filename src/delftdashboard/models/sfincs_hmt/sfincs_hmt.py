@@ -738,14 +738,25 @@ class Model(GenericModel):
         update_cross_section_snapper()
         update_wave_maker_snapper()
 
+    def _config_dict(self) -> dict:
+        """Return all SFINCS config variables as a dict of native values.
+
+        In newer hydromt_sfincs, ``model_dump()`` returns the filtered sfincs.inp
+        write format (no defaults, no inactive conditional keys such as
+        ``snapwave``); ``to_dict()`` returns every field. Older versions only
+        have ``model_dump()``, which then returns every field.
+        """
+        data = self.domain.config.data
+        if hasattr(type(data), "to_dict"):
+            return data.to_dict()
+        return data.model_dump(exclude_unset=False)
+
     def set_gui_variables(self) -> None:
         """Populate GUI variables from the current model configuration."""
         group = _GROUP
 
         # Copy sfincs input variables to gui variables
-        for key, value in self.domain.config.data.model_dump(
-            exclude_unset=False
-        ).items():
+        for key, value in self._config_dict().items():
             app.gui.setvar(group, key, value)
 
         # View
@@ -1046,12 +1057,12 @@ class Model(GenericModel):
             Value to set (unused, read from GUI).
         """
         group = _GROUP
-        for key, value in self.domain.config.data.model_dump(
-            exclude_unset=False
-        ).items():
-            self.domain.config.set(
-                key, app.gui.getvar(group, key), skip_validation=True
-            )
+        for key, value in self._config_dict().items():
+            gui_value = app.gui.getvar(group, key)
+            # Only set changed values: newer hydromt_sfincs marks every set key
+            # as explicit and then always writes it to sfincs.inp
+            if gui_value != value:
+                self.domain.config.set(key, gui_value, skip_validation=True)
         if self.domain.config.get("snapwave"):
             app.gui.setvar("modelmaker_sfincs_hmt", "use_snapwave", True)
         else:
