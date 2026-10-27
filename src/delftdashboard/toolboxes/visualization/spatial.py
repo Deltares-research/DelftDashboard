@@ -620,7 +620,7 @@ def animate(*args: Any) -> None:
         z = _face_values(ds, variable, tdim, itime)
         return np.ma.masked_invalid(np.concatenate([z, z]))
 
-    cmap_obj = matplotlib.cm.get_cmap(cmap).copy()
+    cmap_obj = matplotlib.colormaps.get_cmap(cmap).copy()
     cmap_obj.set_bad(alpha=0.0)
 
     basemap = app.gui.getvar(_G, "spatial_basemap")
