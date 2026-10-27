@@ -247,7 +247,9 @@ def perform_nesting_step_2(*args: Any) -> None:
             app.active_model.domain.boundary_conditions.write_boundary_conditions_spectra()
 
 
-def _perform_nesting_step_2_hmt(overall_model_type: str, overall_model_file: str) -> None:
+def _perform_nesting_step_2_hmt(
+    overall_model_type: str, overall_model_file: str
+) -> None:
     """Nesting step 2 for the HydroMT-based models (sfincs_hmt, hurrywave_hmt).
 
     Reads the overall model output at the nesting observation points and sets
