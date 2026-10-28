@@ -307,7 +307,7 @@ def initialize() -> None:
         app,
         framework=app.config["gui_framework"],
         config_path=app.config_path,
-        server_path=app.I am ,
+        server_path=app.server_path,
         server_nodejs=app.config["server_nodejs"],
         server_port=app.config["server_port"],
         stylesheet=app.config["stylesheet"],
