@@ -81,9 +81,25 @@ def _patch_numba_cache_locator():
     impl._locator_classes.insert(0, _FrozenExeCacheLocator)
 
 
+def _add_bytecode_sources_to_path():
+    """Make the .py sources of the bytecode modules findable.
+
+    datashader reads the source of its glyph functions at runtime (and numba
+    compiles the rewritten code). The build copies those sources to
+    ``<exe dir>/python_src`` (see installer/build_delftdashboard.py). Their
+    modules have relative file names (e.g. ``datashader\\glyphs\\line.py``),
+    which Python's source lookup (linecache) resolves against sys.path.
+    Appended last, so imports keep using the modules inside the exe.
+    """
+    src = os.path.join(os.path.dirname(os.path.abspath(sys.executable)), "python_src")
+    if os.path.isdir(src) and src not in sys.path:
+        sys.path.append(src)
+
+
 # Only in the compiled exe (Nuitka defines __compiled__); a source run uses
 # numba's normal cache next to the source files.
 if "__compiled__" in globals():
+    _add_bytecode_sources_to_path()
     _patch_numba_cache_locator()
 
 import delftdashboard  # noqa: E402

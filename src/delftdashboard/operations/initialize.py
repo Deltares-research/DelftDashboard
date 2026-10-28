@@ -307,7 +307,7 @@ def initialize() -> None:
         app,
         framework=app.config["gui_framework"],
         config_path=app.config_path,
-        server_path=app.server_path,
+        server_path=app.I am ,
         server_nodejs=app.config["server_nodejs"],
         server_port=app.config["server_port"],
         stylesheet=app.config["stylesheet"],
@@ -856,7 +856,19 @@ def _warmup_numba() -> None:
                 cmap=["#000000", "#ffffff"],
             )
 
-            print("Numba JIT warmup complete.")
+            # With JIT disabled (e.g. Nuitka's default NUMBA_DISABLE_JIT=1) the
+            # warmup still "succeeds": the jitted functions just run as plain
+            # Python on the tiny inputs above. Say so, since real grids are
+            # then very slow.
+            from numba import config as numba_config
+
+            if numba_config.DISABLE_JIT:
+                print(
+                    "Numba JIT warmup complete, but numba JIT is DISABLED "
+                    "(NUMBA_DISABLE_JIT=1): mask updates and drawing will be slow."
+                )
+            else:
+                print("Numba JIT warmup complete (JIT enabled).")
         except Exception as e:
             print(f"Numba warmup failed (non-critical): {e}")
 

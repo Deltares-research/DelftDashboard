@@ -1967,6 +1967,7 @@ packages:
   - sphinx-autosummary-accessors ; extra == 'doc'
   - sphinx>=8.0.0,<9.0.0 ; extra == 'doc'
   - sphinx-design ; extra == 'doc'
+  - sphinxcontrib-mermaid ; extra == 'doc'
   - autodoc-pydantic ; extra == 'doc'
   - cartopy ; extra == 'examples'
   - descartes ; extra == 'examples'

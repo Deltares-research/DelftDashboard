@@ -30,6 +30,7 @@ import importlib.metadata
 import importlib.util
 import os
 import re
+import shutil
 import struct
 import subprocess
 import sys
@@ -382,6 +383,66 @@ def _extra_data_files() -> list[tuple[str, str]]:
     return files
 
 
+def _copy_bytecode_sources(dist: Path) -> None:
+    """Copy the .py sources of the bytecode modules to ``<dist>/python_src``.
+
+    The modules kept as bytecode for numba (see nuitka_numba_bytecode.py) have
+    no source files in the exe. Some code reads its own source at runtime:
+    datashader rewrites its glyph functions from source before numba compiles
+    them (datashader.macros.expand_varargs), so without the sources every grid,
+    mask and elevation overlay fails with "could not get source code".
+
+    In standalone builds Nuitka gives these modules a relative file name, e.g.
+    ``datashader\\glyphs\\line.py``. Python looks up relative names in every
+    sys.path folder, and start_ddb.py adds ``python_src`` to sys.path, so the
+    files are copied there with the same relative paths. They are only read
+    for their source; imports still use the bytecode inside the exe.
+    """
+    spec = importlib.util.spec_from_file_location(
+        "nuitka_numba_bytecode", HERE / "nuitka_numba_bytecode.py"
+    )
+    plugin = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(plugin)
+
+    target = dist / "python_src"
+    if target.exists():
+        shutil.rmtree(target)
+
+    def package_root(name: str) -> Path | None:
+        # Folder that contains the top-level package (find_spec on a top-level
+        # name does not import the package).
+        top = importlib.util.find_spec(name.split(".")[0])
+        if top is None or not top.submodule_search_locations:
+            print(f"WARNING: cannot find package for {name}, sources not copied")
+            return None
+        return Path(list(top.submodule_search_locations)[0]).parent
+
+    count = 0
+    for pkg in plugin.BYTECODE_PACKAGES:
+        root = package_root(pkg)
+        if root is None:
+            continue
+        for py in (root / pkg).rglob("*.py"):
+            rel = py.relative_to(root)
+            if "tests" in rel.parts:
+                continue
+            (target / rel).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(py, target / rel)
+            count += 1
+    for name in plugin.BYTECODE_MODULES:
+        root = package_root(name)
+        if root is None:
+            continue
+        rel = Path(*name.split(".")).with_suffix(".py")
+        if not (root / rel).exists():
+            print(f"WARNING: source not found for {name}: {root / rel}")
+            continue
+        (target / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(root / rel, target / rel)
+        count += 1
+    print(f"Copied {count} source files of bytecode modules to {target}")
+
+
 def _module_installed(name: str) -> bool:
     """Return True if the top-level module of ``name`` can be located."""
     top = name.split(".")[0]
@@ -512,6 +573,7 @@ def build(debug: bool = False, print_only: bool = False) -> None:
     subprocess.run(cmd, check=True)
 
     dist = OUTPUT_DIR / "start_ddb.dist"
+    _copy_bytecode_sources(dist)
     print("\nBuild complete!")
     print(f"Executable: {dist / 'DelftDashboard.exe'}")
     print("\nPost-build checklist (PySide6 + MapLibre):")
