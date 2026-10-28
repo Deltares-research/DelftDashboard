@@ -20,6 +20,14 @@ os.environ.setdefault(
     ),
 )
 
+# The map (MapLibre) needs WebGL. Chromium (QtWebEngine) blocklists some GPUs,
+# notably virtual ones (VMware, Hyper-V, remote desktops), and then disables
+# WebGL, leaving the map white. Ignore the blocklist so WebGL stays available.
+# Must be set before QtWebEngine starts; flags set by the user are kept.
+_flags = os.environ.get("QTWEBENGINE_CHROMIUM_FLAGS", "")
+if "--ignore-gpu-blocklist" not in _flags:
+    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (_flags + " --ignore-gpu-blocklist").strip()
+
 import delftdashboard  # noqa: E402
 
 # rasterio 1.5 installs a broken sys.excepthook that recurses infinitely, and
