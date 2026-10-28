@@ -110,7 +110,6 @@ environments:
       - pypi: ../cht_xbeach
       - pypi: ../guitares
       - pypi: ../hydromt_hurrywave
-      - pypi: ../hydromt_sfincs
       - pypi: ./
       - pypi: https://files.pythonhosted.org/packages/00/4b/ccc026168948fec4f7555b9164c724cf4125eac006e176541483d2c959be/pydantic_settings-2.13.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/01/c8/fadd0b92ffa7b5eb5949bf340a63a4a496a6930a6c37a7ba0f12acb076d6/contourpy-1.3.2-cp312-cp312-win_amd64.whl
@@ -287,6 +286,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/d9/a6/91536b7e9e16c0935e2f7b4145d500e16384b05c4be25cc60f222819aef9/cht_bathymetry-1.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d9/fa/7558852b959b33b484b79e4e30b8aa56579be56106143ed748dca40c9f34/elementpath-5.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/db/bc/83e112abc66cd466c6b83f99118035867cecd41802f8d044638aa78a106e/locket-1.0.0-py2.py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/db/e3/e2d702653b99ab6c14fbe6a8d616776b9f7f70f74b0ebbb73d26e1a4049c/hydromt_sfincs-2.0.0rc4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/df/c0/87c2073e0c72515bb8733d4eef7b21548e8d189f094b5dad20b0ecaf64f6/google_crc32c-1.8.0-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/e0/69/7b1d9bc299445cf72d5abeada78a3f615f0c0e36ff0fbcceb3914dac3d73/xugrid-0.15.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e0/db/0f29bd882aee8b5754f3e1ab104d2d09cdd9138a889558b43badcd81ce11/PyQtWebEngine_Qt5-5.15.2-py3-none-win_amd64.whl
@@ -1941,47 +1941,6 @@ packages:
   - ruff ; extra == 'lint'
   - pytest ; extra == 'test'
   - pytest-cov ; extra == 'test'
-  requires_python: '>=3.11'
-- pypi: ../hydromt_sfincs
-  name: hydromt-sfincs
-  requires_dist:
-  - affine
-  - cht-tide
-  - geopandas>=1.1.3
-  - hydromt>=1.3.0,<2.0
-  - mapbox-earcut
-  - numba
-  - numpy
-  - pandas<4
-  - pillow
-  - pyflwdir>=0.5.10
-  - pyproj
-  - rasterio
-  - scipy
-  - shapely
-  - xarray
-  - xugrid>=0.15.1,<1.0
-  - hydromt-sfincs[examples] ; extra == 'doc'
-  - nbsphinx ; extra == 'doc'
-  - pydata-sphinx-theme>=0.17.0 ; extra == 'doc'
-  - sphinx-autosummary-accessors ; extra == 'doc'
-  - sphinx>=8.0.0,<9.0.0 ; extra == 'doc'
-  - sphinx-design ; extra == 'doc'
-  - sphinxcontrib-mermaid ; extra == 'doc'
-  - autodoc-pydantic ; extra == 'doc'
-  - cartopy ; extra == 'examples'
-  - descartes ; extra == 'examples'
-  - ffmpeg ; extra == 'examples'
-  - jupyterlab ; extra == 'examples'
-  - matplotlib ; extra == 'examples'
-  - pillow ; extra == 'examples'
-  - hydromt-sfincs[test,doc,examples,quadtree] ; extra == 'full'
-  - datashader ; extra == 'quadtree'
-  - numba-celltree>=0.4.2 ; extra == 'quadtree'
-  - black[jupyter] ; extra == 'test'
-  - pytest>=2.7.3 ; extra == 'test'
-  - pytest-cov ; extra == 'test'
-  - pre-commit ; extra == 'test'
   requires_python: '>=3.11'
 - pypi: ./
   name: delftdashboard
@@ -4667,6 +4626,49 @@ packages:
   version: 1.0.0
   sha256: b6c819a722f7b6bd955b80781788e4a66a55628b858d347536b7e81325a3a5e3
   requires_python: '>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*'
+- pypi: https://files.pythonhosted.org/packages/db/e3/e2d702653b99ab6c14fbe6a8d616776b9f7f70f74b0ebbb73d26e1a4049c/hydromt_sfincs-2.0.0rc4-py3-none-any.whl
+  name: hydromt-sfincs
+  version: 2.0.0rc4
+  sha256: 49e120137175e758646478d51b02b1de01a43503294df68a8d948549a51f62ef
+  requires_dist:
+  - affine
+  - cht-tide
+  - geopandas>=1.1.3
+  - hydromt>=1.3.0,<2.0
+  - mapbox-earcut
+  - numba
+  - numpy
+  - pandas<4
+  - pillow
+  - pyflwdir>=0.5.10
+  - pyproj
+  - rasterio
+  - scipy
+  - shapely
+  - xarray
+  - xugrid>=0.15.1,<1.0
+  - hydromt-sfincs[examples] ; extra == 'doc'
+  - nbsphinx ; extra == 'doc'
+  - pydata-sphinx-theme>=0.17.0 ; extra == 'doc'
+  - sphinx-autosummary-accessors ; extra == 'doc'
+  - sphinx>=8.0.0,<9.0.0 ; extra == 'doc'
+  - sphinx-design ; extra == 'doc'
+  - sphinxcontrib-mermaid ; extra == 'doc'
+  - autodoc-pydantic ; extra == 'doc'
+  - cartopy ; extra == 'examples'
+  - descartes ; extra == 'examples'
+  - ffmpeg ; extra == 'examples'
+  - jupyterlab ; extra == 'examples'
+  - matplotlib ; extra == 'examples'
+  - pillow ; extra == 'examples'
+  - hydromt-sfincs[test,doc,examples,quadtree] ; extra == 'full'
+  - datashader ; extra == 'quadtree'
+  - numba-celltree>=0.4.2 ; extra == 'quadtree'
+  - black[jupyter] ; extra == 'test'
+  - pytest>=2.7.3 ; extra == 'test'
+  - pytest-cov ; extra == 'test'
+  - pre-commit ; extra == 'test'
+  requires_python: '>=3.11'
 - pypi: https://files.pythonhosted.org/packages/df/c0/87c2073e0c72515bb8733d4eef7b21548e8d189f094b5dad20b0ecaf64f6/google_crc32c-1.8.0-cp312-cp312-win_amd64.whl
   name: google-crc32c
   version: 1.8.0

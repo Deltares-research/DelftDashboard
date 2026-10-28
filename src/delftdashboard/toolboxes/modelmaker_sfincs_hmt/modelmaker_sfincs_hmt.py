@@ -714,9 +714,9 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
         manning_level = app.gui.getvar(group, "manning_level")
         nr_levels = app.gui.getvar(group, "subgrid_nr_levels")
         nr_pixels = app.gui.getvar(group, "subgrid_nr_pixels")
-        max_dzdv = app.gui.getvar(group, "subgrid_max_dzdv")
-        manning_max = app.gui.getvar(group, "subgrid_manning_max")
-        manning_z_cutoff = app.gui.getvar(group, "subgrid_manning_z_cutoff")
+        # max_dzdv = app.gui.getvar(group, "subgrid_max_dzdv")
+        # manning_max = app.gui.getvar(group, "subgrid_manning_max")
+        # manning_z_cutoff = app.gui.getvar(group, "subgrid_manning_z_cutoff")
         zmin = app.gui.getvar(group, "zmin")
         zmax = app.gui.getvar(group, "zmax")
         p = app.gui.window.dialog_progress(
@@ -734,7 +734,7 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
                 manning_level=manning_level,
                 nr_levels=nr_levels,
                 nr_subgrid_pixels=nr_pixels,
-                max_gradient=max_dzdv,
+                # max_gradient=max_dzdv,
                 zmin=zmin,
                 zmax=zmax,
                 write_dep_tif=False,

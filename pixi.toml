@@ -37,8 +37,12 @@ cht-tiling = { path = "../cht_tiling", editable = true }
 cht-tsunami = { path = "../cht_tsunami", editable = true }
 cht-utils = { path = "../cht_utils", editable = true }
 cht-xbeach = { path = "../cht_xbeach", editable = true }
-hydromt-sfincs = { path = "../hydromt_sfincs", editable = true }
 hydromt-hurrywave = { path = "../hydromt_hurrywave", editable = true }
+
+# hydromt-sfincs from PyPI: release candidate 2.0.0rc4 (same code as the main
+# branch on 2026-10-28). For a local checkout use instead:
+#   hydromt-sfincs = { path = "../hydromt_sfincs", editable = true }
+hydromt-sfincs = "==2.0.0rc4"
 
 # Pinned third-party packages
 affine = "==2.4.0"
