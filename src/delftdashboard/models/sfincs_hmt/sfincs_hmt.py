@@ -511,8 +511,9 @@ class Model(GenericModel):
         crs = app.crs
         try:
             old_crs = self.domain.crs
-        except (KeyError, AttributeError, ValueError, FileNotFoundError):
-            # Model not yet initialized — no CRS to update
+        except (KeyError, AttributeError, ValueError, TypeError, FileNotFoundError):
+            # Model not yet initialized (or quadtree grid cleared, for which
+            # SfincsModel.crs raises TypeError) — no CRS to update
             return
         if old_crs != crs:
             # Set the new EPSG first: clearing re-derives the grid properties
@@ -523,7 +524,19 @@ class Model(GenericModel):
 
     def clear_spatial_attributes(self) -> None:
         """Clear all spatial model data and its map layers, keeping the config."""
-        self.domain.clear_spatial_attributes()
+        # check the class: SfincsModel.__getattr__ raises KeyError (not
+        # AttributeError) for unknown names, so hasattr on the instance fails
+        if hasattr(type(self.domain), "clear_spatial_attributes"):
+            self.domain.clear_spatial_attributes()
+        else:
+            # hydromt_sfincs main has no working clear method yet: re-create every
+            # component except config, then re-derive the grid type and (for
+            # regular grids) the grid properties from the config
+            for name, cls in self.domain._ALL_COMPONENTS.items():
+                if name == "config":
+                    continue
+                self.domain.components[name] = cls(self.domain)
+            self.domain.config.update_grid_from_config()
         self.clear_layers()
         self.observation_points_changed = False
         self.cross_sections_changed = False
@@ -726,16 +739,15 @@ class Model(GenericModel):
         update_wave_maker_snapper()
 
     def _config_dict(self) -> dict:
-        """Return the complete (unfiltered) SFINCS configuration as a dict.
+        """Return all SFINCS config variables as a dict of native values.
 
-        Since hydromt_sfincs' SfincsConfig rework (#414), ``model_dump()`` goes
-        through a write-only serializer that drops settings at their default,
-        ``None`` or excluded by a condition (it returns only what would be
-        written to sfincs.inp). ``to_dict()`` returns every setting. Fall back
-        to ``model_dump()`` for older hydromt_sfincs versions without it.
+        In newer hydromt_sfincs, ``model_dump()`` returns the filtered sfincs.inp
+        write format (no defaults, no inactive conditional keys such as
+        ``snapwave``); ``to_dict()`` returns every field. Older versions only
+        have ``model_dump()``, which then returns every field.
         """
         data = self.domain.config.data
-        if hasattr(data, "to_dict"):
+        if hasattr(type(data), "to_dict"):
             return data.to_dict()
         return data.model_dump(exclude_unset=False)
 
@@ -1045,21 +1057,12 @@ class Model(GenericModel):
             Value to set (unused, read from GUI).
         """
         group = _GROUP
-        gui_vars = app.gui.variables.get(group, {})
-        for key, current in self._config_dict().items():
-            # Only settings that exist as GUI variable and were changed in the
-            # GUI: setting a key marks it as explicitly set, and the config
-            # writes every explicitly set key to sfincs.inp - writing back all
-            # ~200 settings would fill the input file with defaults.
-            if key not in gui_vars:
-                continue
-            new = gui_vars[key]["value"]
-            try:
-                changed = bool(new != current)
-            except Exception:  # e.g. array comparison
-                changed = True
-            if changed:
-                self.domain.config.set(key, new, skip_validation=True)
+        for key, value in self._config_dict().items():
+            gui_value = app.gui.getvar(group, key)
+            # Only set changed values: newer hydromt_sfincs marks every set key
+            # as explicit and then always writes it to sfincs.inp
+            if gui_value != value:
+                self.domain.config.set(key, gui_value, skip_validation=True)
         if self.domain.config.get("snapwave"):
             app.gui.setvar("modelmaker_sfincs_hmt", "use_snapwave", True)
         else:

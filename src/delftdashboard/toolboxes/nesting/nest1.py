@@ -315,7 +315,10 @@ def _perform_nesting_step_1_hmt(detail_model_type: str, detail_model_file: str) 
     if overall_name == "hurrywave_hmt" and detail_model_type == "hurrywave_hmt":
         # Spectra for the detail HurryWave model
         component, file_key, default_file = (
-            "observation_points_spectra", "ospfile", "hurrywave.osp")
+            "observation_points_spectra",
+            "ospfile",
+            "hurrywave.osp",
+        )
         layer, active_var, nr_var = (
             "observation_points_spectra",
             "active_observation_point_spectra",
@@ -328,12 +331,16 @@ def _perform_nesting_step_1_hmt(detail_model_type: str, detail_model_file: str) 
         default_file = "sfincs.obs" if overall_name == "sfincs_hmt" else "hurrywave.obs"
         if overall_name == "sfincs_hmt":
             layer, active_var, nr_var = (
-                "observation_points", "active_observation_point",
-                "nr_observation_points")
+                "observation_points",
+                "active_observation_point",
+                "nr_observation_points",
+            )
         else:
             layer, active_var, nr_var = (
-                "observation_points_regular", "active_observation_point_regular",
-                "nr_observation_points_regular")
+                "observation_points_regular",
+                "active_observation_point_regular",
+                "nr_observation_points_regular",
+            )
         filt = "*.obs"
 
     file_name = overall.config.get(file_key) or default_file
