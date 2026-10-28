@@ -90,6 +90,7 @@ add a dependency and the frozen exe fails, this table is the debugging guide.
 | External toolboxes (tiling, tsunami, watersheds, model_database) | `No module named delftdashboard_*_toolbox` | included as package + data + metadata |
 | Cython-internal imports | `No module named netCDF4.utils` / `cftime._strptime` | force-include `netCDF4`, `cftime` |
 | numba stack (pyflwdir hard-requires numba) | ImportError numba excluded | include `numba`, `llvmlite`, `pyflwdir`, `numba_celltree` |
+| numba JIT disabled in standalone (Nuitka default `NUMBA_DISABLE_JIT=1`) | mask update, datashader drawing, subgrid building very slow | `--module-parameter=numba-disable-jit=no` + user plugin `nuitka_numba_bytecode.py` (keeps numba-jitted modules as bytecode, which numba needs); `start_ddb.py` adds a numba cache locator that works without the source files |
 | Lazy `__getattr__` imports | `No module named plotly.graph_objs._scatter` | force-include `plotly`, `_plotly_utils` |
 | Conditional imports (`HAS_S3FS` in hydromt) | bathymetry tiles never download | force-include `s3fs`, `fsspec`, `aiobotocore`, `botocore` (+ their data) |
 | Package data files | `FileNotFoundError ...\hydrolib\...\*.yaml`, `ddlpy\endpoints.json` | `--include-package-data=` hydrolib, dfm_tools, ddlpy, ... |

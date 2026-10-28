@@ -28,6 +28,64 @@ _flags = os.environ.get("QTWEBENGINE_CHROMIUM_FLAGS", "")
 if "--ignore-gpu-blocklist" not in _flags:
     os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (_flags + " --ignore-gpu-blocklist").strip()
 
+
+def _patch_numba_cache_locator():
+    """Let numba cache jitted functions in the exe without their source files.
+
+    The build keeps numba-jitted modules as bytecode (see
+    installer/nuitka_numba_bytecode.py) so numba's JIT works. Their functions
+    still point at the .py files on the build machine, which do not exist on
+    other PCs. numba then finds no cache location and raises "cannot cache
+    function ... no locator available" while importing any module with
+    cache=True functions. This locator caches in NUMBA_CACHE_DIR regardless of
+    the source file and invalidates the cache when the exe changes. It is put
+    first, so the build machine behaves like any other PC.
+    """
+    if os.environ.get("NUMBA_DISABLE_JIT") == "1":
+        return
+    try:
+        from numba.core import caching, config
+    except Exception:
+        return
+
+    class _FrozenExeCacheLocator(caching._CacheLocator):
+        def __init__(self, py_func, py_file):
+            self._lineno = py_func.__code__.co_firstlineno
+            self._cache_path = os.path.join(
+                config.CACHE_DIR, self.get_suitable_cache_subpath(py_file)
+            )
+
+        def get_cache_path(self):
+            return self._cache_path
+
+        def get_source_stamp(self):
+            st = os.stat(sys.executable)
+            return st.st_mtime, st.st_size
+
+        def get_disambiguator(self):
+            return str(self._lineno)
+
+        @classmethod
+        def from_function(cls, py_func, py_file):
+            if not config.CACHE_DIR:
+                return None
+            self = cls(py_func, py_file)
+            try:
+                self.ensure_cache_path()
+            except OSError:
+                return None
+            return self
+
+    # The class is called CacheImpl in recent numba, _CacheImpl in older ones.
+    impl = getattr(caching, "CacheImpl", None) or getattr(caching, "_CacheImpl")
+    impl._locator_classes.insert(0, _FrozenExeCacheLocator)
+
+
+# Only in the compiled exe (Nuitka defines __compiled__); a source run uses
+# numba's normal cache next to the source files.
+if "__compiled__" in globals():
+    _patch_numba_cache_locator()
+
 import delftdashboard  # noqa: E402
 
 # rasterio 1.5 installs a broken sys.excepthook that recurses infinitely, and

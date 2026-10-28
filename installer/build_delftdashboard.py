@@ -470,6 +470,12 @@ def build(debug: bool = False, print_only: bool = False) -> None:
         "--company-name=Deltares",
         f"--product-version={_numeric_version()}",
         f"--file-version={_numeric_version()}",
+        # Keep numba's JIT working (Nuitka disables it in standalone builds by
+        # default, which makes mask updates, datashader drawing and subgrid
+        # building very slow). The user plugin includes the numba-jitted
+        # modules as bytecode, which numba needs to compile them.
+        "--module-parameter=numba-disable-jit=no",
+        f"--user-plugin={HERE / 'nuitka_numba_bytecode.py'}",
     ]
 
     if ICON.exists():
