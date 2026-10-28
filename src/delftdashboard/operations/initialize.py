@@ -870,7 +870,12 @@ def _warmup_numba() -> None:
             else:
                 print("Numba JIT warmup complete (JIT enabled).")
         except Exception as e:
+            import traceback
+
             print(f"Numba warmup failed (non-critical): {e}")
+            # Full traceback: shows which step/function failed (the map
+            # overlays use the same code and fail silently).
+            traceback.print_exc()
 
     t = threading.Thread(target=_warmup, daemon=True)
     t.start()

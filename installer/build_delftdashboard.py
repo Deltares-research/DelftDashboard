@@ -384,7 +384,7 @@ def _extra_data_files() -> list[tuple[str, str]]:
 
 
 def _copy_bytecode_sources(dist: Path) -> None:
-    """Copy the .py sources of the bytecode modules to ``<dist>/python_src``.
+    """Copy the .py sources of the bytecode modules into the dist folder.
 
     The modules kept as bytecode for numba (see nuitka_numba_bytecode.py) have
     no source files in the exe. Some code reads its own source at runtime:
@@ -392,11 +392,11 @@ def _copy_bytecode_sources(dist: Path) -> None:
     them (datashader.macros.expand_varargs), so without the sources every grid,
     mask and elevation overlay fails with "could not get source code".
 
-    In standalone builds Nuitka gives these modules a relative file name, e.g.
-    ``datashader\\glyphs\\line.py``. Python looks up relative names in every
-    sys.path folder, and start_ddb.py adds ``python_src`` to sys.path, so the
-    files are copied there with the same relative paths. They are only read
-    for their source; imports still use the bytecode inside the exe.
+    When the exe loads such a module, Nuitka sets the file name of its code to
+    ``<exe dir>\\<package path>.py`` (or ``...\\__init__.py`` for packages),
+    i.e. the normal site-packages layout under the exe folder. So the sources
+    are copied to exactly those paths. They are only read for their source;
+    imports still use the bytecode inside the exe.
     """
     spec = importlib.util.spec_from_file_location(
         "nuitka_numba_bytecode", HERE / "nuitka_numba_bytecode.py"
@@ -404,9 +404,10 @@ def _copy_bytecode_sources(dist: Path) -> None:
     plugin = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(plugin)
 
-    target = dist / "python_src"
-    if target.exists():
-        shutil.rmtree(target)
+    target = dist
+    # Left over from an earlier approach that did not work.
+    if (dist / "python_src").exists():
+        shutil.rmtree(dist / "python_src")
 
     def package_root(name: str) -> Path | None:
         # Folder that contains the top-level package (find_spec on a top-level
@@ -440,7 +441,7 @@ def _copy_bytecode_sources(dist: Path) -> None:
         (target / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(root / rel, target / rel)
         count += 1
-    print(f"Copied {count} source files of bytecode modules to {target}")
+    print(f"Copied {count} source files of bytecode modules into {target}")
 
 
 def _module_installed(name: str) -> bool:

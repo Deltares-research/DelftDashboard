@@ -29,17 +29,38 @@ if "--ignore-gpu-blocklist" not in _flags:
     os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (_flags + " --ignore-gpu-blocklist").strip()
 
 
+def _exe_stamp():
+    """(mtime, size) of the running exe, used to invalidate numba's cache.
+
+    Not sys.executable: in a Nuitka build that points at a non-existent
+    ``python.exe`` next to the exe (until something imports multiprocessing).
+    Falls back to the exe folder, and never raises.
+    """
+    for path in (sys.argv[0] if sys.argv else "", sys.executable):
+        try:
+            if path and path.lower().endswith(".exe") and os.path.isfile(path):
+                st = os.stat(path)
+                return st.st_mtime, st.st_size
+        except OSError:
+            pass
+    try:
+        st = os.stat(os.path.dirname(os.path.abspath(sys.executable)))
+        return st.st_mtime, 0
+    except OSError:
+        return 0.0, 0
+
+
 def _patch_numba_cache_locator():
-    """Let numba cache jitted functions in the exe without their source files.
+    """Let numba cache jitted functions in the exe, with or without sources.
 
     The build keeps numba-jitted modules as bytecode (see
-    installer/nuitka_numba_bytecode.py) so numba's JIT works. Their functions
-    still point at the .py files on the build machine, which do not exist on
-    other PCs. numba then finds no cache location and raises "cannot cache
-    function ... no locator available" while importing any module with
-    cache=True functions. This locator caches in NUMBA_CACHE_DIR regardless of
-    the source file and invalidates the cache when the exe changes. It is put
-    first, so the build machine behaves like any other PC.
+    installer/nuitka_numba_bytecode.py) so numba's JIT works, and copies their
+    .py files next to the exe. numba's own cache locators need those source
+    files; if they were missing, numba would raise "cannot cache function ...
+    no locator available" while importing any module with cache=True
+    functions. This locator caches in NUMBA_CACHE_DIR regardless of the source
+    file and invalidates the cache when the exe changes. It is put first, so
+    every PC behaves the same.
     """
     if os.environ.get("NUMBA_DISABLE_JIT") == "1":
         return
@@ -47,6 +68,8 @@ def _patch_numba_cache_locator():
         from numba.core import caching, config
     except Exception:
         return
+
+    stamp = _exe_stamp()
 
     class _FrozenExeCacheLocator(caching._CacheLocator):
         def __init__(self, py_func, py_file):
@@ -59,8 +82,7 @@ def _patch_numba_cache_locator():
             return self._cache_path
 
         def get_source_stamp(self):
-            st = os.stat(sys.executable)
-            return st.st_mtime, st.st_size
+            return stamp
 
         def get_disambiguator(self):
             return str(self._lineno)
@@ -81,25 +103,9 @@ def _patch_numba_cache_locator():
     impl._locator_classes.insert(0, _FrozenExeCacheLocator)
 
 
-def _add_bytecode_sources_to_path():
-    """Make the .py sources of the bytecode modules findable.
-
-    datashader reads the source of its glyph functions at runtime (and numba
-    compiles the rewritten code). The build copies those sources to
-    ``<exe dir>/python_src`` (see installer/build_delftdashboard.py). Their
-    modules have relative file names (e.g. ``datashader\\glyphs\\line.py``),
-    which Python's source lookup (linecache) resolves against sys.path.
-    Appended last, so imports keep using the modules inside the exe.
-    """
-    src = os.path.join(os.path.dirname(os.path.abspath(sys.executable)), "python_src")
-    if os.path.isdir(src) and src not in sys.path:
-        sys.path.append(src)
-
-
 # Only in the compiled exe (Nuitka defines __compiled__); a source run uses
 # numba's normal cache next to the source files.
 if "__compiled__" in globals():
-    _add_bytecode_sources_to_path()
     _patch_numba_cache_locator()
 
 import delftdashboard  # noqa: E402
