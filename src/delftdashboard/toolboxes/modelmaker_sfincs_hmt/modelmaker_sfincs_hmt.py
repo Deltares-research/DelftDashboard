@@ -136,6 +136,8 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
         # Mask
         app.gui.setvar(group, "zmax", 100000.0)
         app.gui.setvar(group, "zmin", -100000.0)
+        # Bathymetry: do not fill cells without data (they become inactive)
+        app.gui.setvar(group, "interpolate_na", False)
         app.gui.setvar(group, "use_mask_global", False)
         app.gui.setvar(group, "global_zmax", 10.0)
         app.gui.setvar(group, "global_zmin", -10.0)
@@ -579,9 +581,9 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
                 to_hydromt_elevation_list(app.selected_bathymetry_datasets),
                 zmin=app.gui.getvar(_TB, "zmin"),
                 zmax=app.gui.getvar(_TB, "zmax"),
-                # Do not fill cells without DEM coverage: they stay NaN, so
-                # the mask step leaves them inactive.
-                interpolate_na=False,
+                # When off, cells without DEM coverage stay NaN, so the mask
+                # step leaves them inactive
+                interpolate_na=app.gui.getvar(_TB, "interpolate_na"),
             )
             app.model[_MODEL].domain.quadtree_grid.write()
         except Exception as e:

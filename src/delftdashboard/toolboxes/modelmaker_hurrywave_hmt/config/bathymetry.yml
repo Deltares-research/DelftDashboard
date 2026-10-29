@@ -165,6 +165,16 @@ element:
       variable_group: bathy_topo_selector
       operator: gt
       value: 0
+- style: checkbox
+  position:
+    x: 610
+    y: 35
+    width: 20
+    height: 20
+  text: Fill cells without data
+  variable: interpolate_na
+  method: edit
+  tooltip: Interpolate/extrapolate the bed level of cells that none of the selected datasets cover. When off, these cells stay empty and become inactive in the mask.
 - style: pushbutton
   position:
     x: 610

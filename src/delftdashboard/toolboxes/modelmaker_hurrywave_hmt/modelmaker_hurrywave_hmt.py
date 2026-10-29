@@ -91,6 +91,8 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
         )
         app.gui.setvar(_TB, "bathymetry_dataset_names", dataset_names)
         app.gui.setvar(_TB, "bathymetry_dataset_index", 0)
+        # Do not fill cells without data (they become inactive)
+        app.gui.setvar(_TB, "interpolate_na", False)
         app.gui.setvar(_TB, "selected_bathymetry_dataset_names", [])
         app.gui.setvar(_TB, "selected_bathymetry_dataset_index", 0)
         app.gui.setvar(_TB, "selected_bathymetry_dataset_zmin", -99999.0)
@@ -309,6 +311,9 @@ class Toolbox(PolygonsMixin, SetupYamlMixin, GenericToolbox):
                 nr_subgrid_pixels=20,
                 threshold_level=0.0,
                 mean_wet=True,
+                # When off, cells without data stay NaN, so the mask step
+                # leaves them inactive
+                interpolate_na=app.gui.getvar(_TB, "interpolate_na"),
             )
             domain.quadtree_grid.write()
         except Exception as e:

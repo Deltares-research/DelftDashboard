@@ -68,7 +68,9 @@ class SetupYamlMixin:
                     "quadtree_elevation.create": {
                         "elevation_list": to_hydromt_elevation_list(
                             app.selected_bathymetry_datasets
-                        )
+                        ),
+                        # Same as the GUI checkbox "Fill cells without data"
+                        "interpolate_na": bool(app.gui.getvar(_TB, "interpolate_na")),
                     }
                 }
             )
@@ -208,6 +210,15 @@ class SetupYamlMixin:
         # ------------------------------------------------------------------
         from delftdashboard.operations import bathy_topo_selector
 
+        app.gui.setvar(
+            _TB,
+            "interpolate_na",
+            bool(
+                (step_args.get("quadtree_elevation.create", {}) or {}).get(
+                    "interpolate_na", False
+                )
+            ),
+        )
         elevation_entries = []
         for step_key in ("quadtree_elevation.create", "wave_blocking.create"):
             step = step_args.get(step_key, {}) or {}
