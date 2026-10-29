@@ -299,7 +299,9 @@ class SetupYamlMixin:
                     "quadtree_elevation.create": {
                         "elevation_list": to_hydromt_elevation_list(
                             app.selected_bathymetry_datasets
-                        )
+                        ),
+                        # Same as the GUI: cells without DEM coverage stay NaN
+                        "interpolate_na": False,
                     }
                 }
             )
